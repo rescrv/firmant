@@ -5,7 +5,7 @@ class Settings(dict):
         try:
             settings = __import__(settings_module, {}, {}, [''])
         except ImportError:
-            raise ImportError, 'Settings import failed'
+            raise ImportError('Settings import failed')
 
         for setting in dir(settings):
             if setting.upper() == setting:

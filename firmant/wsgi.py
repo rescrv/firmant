@@ -1,5 +1,6 @@
 from firmant import settings
 
+
 class Request(object):
 
     def __init__(self, environ=None):
