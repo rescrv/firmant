@@ -1,10 +1,13 @@
 class Request(object):
+
     def __init__(self, environ=None):
         self.method = environ["REQUEST_METHOD"]
         self.url_prefix = environ["SCRIPT_NAME"]
         self.url = environ["PATH_INFO"]
 
+
 class Response(object):
+
     def __init__(self,
             status='200 OK',
             headers=[('content-type', 'text/plain')],
@@ -13,7 +16,9 @@ class Response(object):
         self.headers = headers
         self.content = content
 
+
 class Application(object):
+
     def __init__(self, environ, start_response):
         self.environ = environ
         self.start = start_response
