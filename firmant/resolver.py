@@ -7,7 +7,7 @@ class RegexURLLink(object):
     regular expression and its callable function
     '''
 
-    def __init__(self, urlregex, callable):
+    def __init__(self, urlregex, callable, kwargs=None):
         '''
         Create a new link between a regular expression for a URL and its
         callable function.  Both arguments should be strings.
