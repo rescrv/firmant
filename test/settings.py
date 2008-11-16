@@ -21,3 +21,6 @@ class TestSettings(unittest.TestCase):
     def testfailure(self):
         self.assertRaises(ImportError, firmant.settings.Settings,
                 'test.data.settings.nonexistent')
+
+
+suite = unittest.TestLoader().loadTestsFromTestCase(TestSettings)
