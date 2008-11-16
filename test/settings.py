@@ -4,10 +4,10 @@ import firmant.settings
 
 class TestSettings(unittest.TestCase):
 
-    def testemptyconstruct(self):
+    def testemptyinit(self):
         s = firmant.settings.Settings('test.data.settings.empty')
 
-    def testconstruct(self):
+    def testinit(self):
         s = firmant.settings.Settings('test.data.settings.full')
         self.assertEqual(s['INT'], 42)
         self.assertEqual(s['STRING'], 'hello world')
