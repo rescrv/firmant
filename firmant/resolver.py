@@ -45,7 +45,11 @@ class RegexURLLink(object):
         Add the value to the beginning of the regular expression.  It should be
         a string literal.
         '''
-        pass
+        url = self.url.pattern
+        if url.startswith('^'):
+            prefix = '^' + prefix
+            url = url[1:]
+        self.url = re.compile(prefix + url)
 
     def parameters(self):
         '''
@@ -58,7 +62,7 @@ class RegexURLLink(object):
         '''
         Returns the regex string that is used for pattern matching.
         '''
-        pass
+        return self.url.pattern
 
 
 class URLHandler(object):
