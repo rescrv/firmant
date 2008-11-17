@@ -2,8 +2,10 @@
 import unittest
 
 from test.settings import suite as settings
+from test.resolver import suite as regexurllink
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTests(settings)
+    suite.addTests(regexurllink)
     unittest.TextTestRunner(verbosity=2).run(suite)

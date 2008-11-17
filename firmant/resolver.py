@@ -17,14 +17,16 @@ class RegexURLLink(object):
     def rlookup(self, kwargs=None):
         '''
         Perform a reverse lookup.  That is, accept the kwargs and construct a
-        URL using the kwargs to return to the user.
+        URL using the kwargs to return to the user.  It should raise a TypeError
+        if the kwargs do not match.
         '''
         pass
 
     def lookup(self, url):
         '''
         Perform a lookup.  That is, accept a URL and return a tuple with the
-        callable and its kwargs.
+        callable and its kwargs.  It should raise a TypeError if the URL does
+        not match.
         '''
         pass
 
@@ -40,6 +42,13 @@ class RegexURLLink(object):
         Returns a set of the kwargs for the callable.  A set was chosen over
         other containers because it has no implicit order.
         '''
+        pass
+
+    def matches(self):
+        '''
+        Returns the regex string that is used for pattern matching.
+        '''
+        pass
 
 
 class URLHandler(object):
