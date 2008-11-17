@@ -27,8 +27,8 @@ class RegexURLLink(object):
     def rlookup(self, kwargs=None):
         '''
         Perform a reverse lookup.  That is, accept the kwargs and construct a
-        URL using the kwargs to return to the user.  It should raise a TypeError
-        if the kwargs do not match.
+        URL using the kwargs to return to the user.  It should raise a
+        TypeError if the kwargs do not match.
         '''
         pass
 
