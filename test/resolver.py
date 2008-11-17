@@ -11,7 +11,7 @@ class TestRegexURLLink(unittest.TestCase):
         Tests the case where the URL's matches, the callable's kwargs are all
         blank.
         '''
-        RegexURLLink('homepage/', 'test.data.views.emptyargs', None)
+        RegexURLLink('homepage/', 'test.data.views.emptyargs', {})
         '''
         Tests the case where the URL's matches, and the callable's kwargs are
         blank.  The kwargs dictionary contains arguments.  This should

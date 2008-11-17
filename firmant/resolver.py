@@ -7,12 +7,22 @@ class RegexURLLink(object):
     regular expression and its callable function
     '''
 
-    def __init__(self, urlregex, callable, kwargs=None):
+    def __init__(self, urlregex, callable, kwargs={}):
         '''
         Create a new link between a regular expression for a URL and its
         callable function.  Both arguments should be strings.
         '''
-        pass
+        self.url = re.compile(urlregex)
+        module = '.'.join(callable.split('.')[:-1])
+        attr = callable[len(module) + 1:]
+        self.callable = getattr(__import__(module, {}, {}, ['']), attr)
+        self.kwargs = kwargs
+
+        # Check that url parameters + kwargs = callable's kwargs
+        lhs = set(self.kwargs) | set(self.url.groupindex)
+        rhs = self.parameters()
+        if lhs != rhs:
+            raise TypeError("Argument mismatch")
 
     def rlookup(self, kwargs=None):
         '''
@@ -42,7 +52,7 @@ class RegexURLLink(object):
         Returns a set of the kwargs for the callable.  A set was chosen over
         other containers because it has no implicit order.
         '''
-        pass
+        return set(self.callable.func_code.co_varnames) - set(['request'])
 
     def matches(self):
         '''
