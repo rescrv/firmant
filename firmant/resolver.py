@@ -38,7 +38,12 @@ class RegexURLLink(object):
         callable and its kwargs.  It should raise a TypeError if the URL does
         not match.
         '''
-        pass
+        results = self.url.match(url)
+        if results is None:
+            raise TypeError('URL Does Not Match')
+        kwargs = self.kwargs
+        kwargs.update(results.groupdict())
+        return (self.callable, kwargs)
 
     def add_prefix(self, prefix):
         '''
