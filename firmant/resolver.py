@@ -61,6 +61,9 @@ class RegexURLLink(object):
         Returns a set of the kwargs for the callable.  A set was chosen over
         other containers because it has no implicit order.
         '''
+        # This gets the variable names of the function the instance is
+        # associated with.  It then removes the request function, as every
+        # view function must have a request parameter.
         return set(self.callable.func_code.co_varnames) - set(['request'])
 
     def matches(self):
