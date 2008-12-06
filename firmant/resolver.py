@@ -12,12 +12,23 @@ class RegexURLLink(object):
         Create a new link between a regular expression for a URL and its
         callable function.  Both arguments should be strings.
         '''
-        self.url = re.compile(urlregex)
-        module = '.'.join(callable.split('.')[:-1])
-        attr = callable[len(module) + 1:]
-        self.callable = getattr(__import__(module, {}, {}, ['']), attr)
+        self.__set_url(urlregex)
+        self.__set_callable(callable)
         self.kwargs = kwargs
+        self.__check_for_mismatch()
 
+    def __set_callable(self, callable):
+        # Split off the last element of the callable's path.
+        module = '.'.join(callable.split('.')[:-1])
+        # Take the remaining part of the path.
+        attr = callable[len(module) + 1:]
+        # Import the module, and get the callable specified by attr.
+        self.callable = getattr(__import__(module, {}, {}, ['']), attr)
+
+    def __set_url(self, urlregex):
+        self.url = re.compile(urlregex)
+
+    def __check_for_mismatch(self):
         # Check that url parameters + kwargs = callable's kwargs
         lhs = set(self.kwargs) | set(self.url.groupindex)
         rhs = self.parameters()
@@ -50,11 +61,17 @@ class RegexURLLink(object):
         Add the value to the beginning of the regular expression.  It should be
         a string literal.
         '''
+        # Get our current pattern.
         url = self.url.pattern
+        # If we have a left-anchored expression.
         if url.startswith('^'):
+            # Move the carrot to the prefix.
             prefix = '^' + prefix
+            # Remove it from the url.
             url = url[1:]
-        self.url = re.compile(prefix + url)
+        # Compile the new URL.
+        self.__set_url(prefix + url)
+        self.__check_for_mismatch()
 
     def parameters(self):
         '''
