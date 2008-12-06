@@ -46,7 +46,7 @@ class TestRegexURLLink(unittest.TestCase):
                 'test.data.views.bymonth')
 
     def testrlookup(self):
-        lookup1, lookup2, lookup3 = self.cases()
+        lookup1, lookup2, lookup3 = self.__cases()
         self.assertRaises(TypeError, lookup1.rlookup, {'foo': 1, 'bar': 1})
         self.assertRaises(TypeError, lookup1.rlookup, {'foo': '1', 'bar': '1'})
         self.assertRaises(TypeError, lookup1.rlookup, {})
@@ -63,7 +63,7 @@ class TestRegexURLLink(unittest.TestCase):
                 lookup3.rlookup('test.data.views.emptyargs', {}))
 
     def testlookup(self):
-        lookup1, lookup2, lookup3 = self.cases()
+        lookup1, lookup2, lookup3 = self.__cases()
         self.assertRaises(TypeError, lookup1.lookup, '200a/10/')
         self.assertRaises(TypeError, lookup1.lookup, '2008/1a/')
         self.assertRaises(TypeError, lookup1.lookup, 'foobar/')
@@ -100,12 +100,12 @@ class TestRegexURLLink(unittest.TestCase):
                 lookup4.matches())
 
     def testparameters(self):
-        lookup1, lookup2, lookup3 = self.cases()
+        lookup1, lookup2, lookup3 = self.__cases()
         self.assertEqual(set(['year', 'month']), lookup1.parameters())
         self.assertEqual(set(['year', 'month']), lookup2.parameters())
         self.assertEqual(set([]), lookup3.parameters())
 
-    def cases(self):
+    def __cases(self):
         lookup1 = RegexURLLink('^(?P<year>\d{4})/(?P<month>\d{2})/$',
                 'test.data.views.bymonth')
         lookup2 = RegexURLLink('^foo/bar/$', 'test.data.views.bymonth',
