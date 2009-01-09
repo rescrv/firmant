@@ -15,8 +15,6 @@ SET escape_string_warning = off;
 CREATE SCHEMA atom;
 
 
-ALTER SCHEMA atom OWNER TO axelrod;
-
 --
 -- Name: SCHEMA atom; Type: COMMENT; Schema: -; Owner: axelrod
 --
@@ -40,8 +38,6 @@ CREATE TABLE _entries_authors_join (
 );
 
 
-ALTER TABLE atom._entries_authors_join OWNER TO axelrod;
-
 --
 -- Name: _feeds_entries_join; Type: TABLE; Schema: atom; Owner: axelrod; Tablespace: 
 --
@@ -52,8 +48,6 @@ CREATE TABLE _feeds_entries_join (
 );
 
 
-ALTER TABLE atom._feeds_entries_join OWNER TO axelrod;
-
 --
 -- Name: _link_rel_values; Type: TABLE; Schema: atom; Owner: axelrod; Tablespace: 
 --
@@ -62,8 +56,6 @@ CREATE TABLE _link_rel_values (
     id character varying NOT NULL
 );
 
-
-ALTER TABLE atom._link_rel_values OWNER TO axelrod;
 
 --
 -- Name: TABLE _link_rel_values; Type: COMMENT; Schema: atom; Owner: axelrod
@@ -81,8 +73,6 @@ CREATE TABLE categories (
     label character varying
 );
 
-
-ALTER TABLE atom.categories OWNER TO axelrod;
 
 --
 -- Name: TABLE categories; Type: COMMENT; Schema: atom; Owner: axelrod
@@ -104,8 +94,6 @@ CREATE TABLE content (
 );
 
 
-ALTER TABLE atom.content OWNER TO axelrod;
-
 --
 -- Name: entries; Type: TABLE; Schema: atom; Owner: axelrod; Tablespace: 
 --
@@ -122,8 +110,6 @@ CREATE TABLE entries (
     rights text
 );
 
-
-ALTER TABLE atom.entries OWNER TO axelrod;
 
 --
 -- Name: TABLE entries; Type: COMMENT; Schema: atom; Owner: axelrod
@@ -146,8 +132,6 @@ CREATE TABLE feeds (
     link integer
 );
 
-
-ALTER TABLE atom.feeds OWNER TO axelrod;
 
 --
 -- Name: TABLE feeds; Type: COMMENT; Schema: atom; Owner: axelrod
@@ -178,8 +162,6 @@ CREATE TABLE links (
 );
 
 
-ALTER TABLE atom.links OWNER TO axelrod;
-
 --
 -- Name: TABLE links; Type: COMMENT; Schema: atom; Owner: axelrod
 --
@@ -198,8 +180,6 @@ CREATE TABLE people (
 );
 
 
-ALTER TABLE atom.people OWNER TO axelrod;
-
 --
 -- Name: content_id_seq; Type: SEQUENCE; Schema: atom; Owner: axelrod
 --
@@ -211,8 +191,6 @@ CREATE SEQUENCE content_id_seq
     NO MINVALUE
     CACHE 1;
 
-
-ALTER TABLE atom.content_id_seq OWNER TO axelrod;
 
 --
 -- Name: content_id_seq; Type: SEQUENCE OWNED BY; Schema: atom; Owner: axelrod
@@ -239,8 +217,6 @@ CREATE SEQUENCE links_id_seq
     NO MINVALUE
     CACHE 1;
 
-
-ALTER TABLE atom.links_id_seq OWNER TO axelrod;
 
 --
 -- Name: links_id_seq; Type: SEQUENCE OWNED BY; Schema: atom; Owner: axelrod
