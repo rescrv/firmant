@@ -65,18 +65,15 @@ COMMENT ON TABLE _link_rel_values IS 'The possible values a link''s rel attribut
 
 
 --
--- Name: categories; Type: TABLE; Schema: atom; Owner: axelrod; Tablespace: 
+-- The categories relation
 --
 
 CREATE TABLE categories (
-    term character varying NOT NULL,
-    label character varying
+    term VARCHAR(32),
+    label VARCHAR(255),
+    CONSTRAINT categories_pkey PRIMARY KEY (term),
+    CONSTRAINT categories_valid_term CHECK (term ~ E'^[-\\_a-zA-Z0-9]{1,32}$')
 );
-
-
---
--- Name: TABLE categories; Type: COMMENT; Schema: atom; Owner: axelrod
---
 
 COMMENT ON TABLE categories IS 'Scheme can be generated.';
 
@@ -249,14 +246,6 @@ via
 
 ALTER TABLE ONLY _link_rel_values
     ADD CONSTRAINT _link_rel_values_pkey PRIMARY KEY (id);
-
-
---
--- Name: categories_pkey; Type: CONSTRAINT; Schema: atom; Owner: axelrod; Tablespace: 
---
-
-ALTER TABLE ONLY categories
-    ADD CONSTRAINT categories_pkey PRIMARY KEY (term);
 
 
 --
