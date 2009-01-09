@@ -170,14 +170,26 @@ COMMENT ON TABLE links IS 'length is not supported for now.';
 
 
 --
--- Name: people; Type: TABLE; Schema: atom; Owner: axelrod; Tablespace: 
+-- The people relation
 --
 
 CREATE TABLE people (
-    name character varying NOT NULL,
-    uri character varying,
-    email character varying
+    name VARCHAR(32),
+    uri VARCHAR(2048),
+    email VARCHAR(320),
+    CONSTRAINT people_pkey PRIMARY KEY (name)
 );
+
+COMMENT ON TABLE people IS
+'The name is limited to 32 characters as that seems long enough for most any
+name.
+
+The URI is limited to 2048 characters as some browsers with majority market
+share do not accept a longer URI (besides, such a link would most likely be
+spam.)
+
+The email is limited to 320 (64+1+255) characters as that is the maximum length
+of an email address.';
 
 
 --
@@ -305,14 +317,6 @@ ALTER TABLE ONLY feeds
 
 ALTER TABLE ONLY links
     ADD CONSTRAINT links_pkey PRIMARY KEY (id);
-
-
---
--- Name: people_pkey; Type: CONSTRAINT; Schema: atom; Owner: axelrod; Tablespace: 
---
-
-ALTER TABLE ONLY people
-    ADD CONSTRAINT people_pkey PRIMARY KEY (name);
 
 
 --
