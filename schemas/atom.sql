@@ -111,27 +111,67 @@ implemented.';
 
 
 --
--- Name: entries; Type: TABLE; Schema: atom; Owner: axelrod; Tablespace: 
+-- The entries relation
 --
 
 CREATE TABLE entries (
-    id character varying NOT NULL,
-    title character varying NOT NULL,
-    updated timestamp with time zone DEFAULT now() NOT NULL,
-    author character varying,
-    content integer,
-    link integer,
-    category character varying,
-    published timestamp with time zone DEFAULT now(),
-    rights text
+    slug VARCHAR(96) NOT NULL,
+    published_date DATE,
+    published_time TIME(0) WITH TIME ZONE,
+    author VARCHAR(32),
+    category VARCHAR(32),
+    rights TEXT,
+    CONSTRAINT entries_pkey PRIMARY KEY (slug, published_date),
+    CONSTRAINT entries_valid_slug CHECK (slug ~ E'^[-\\_a-zA-Z0-9]{1,96}$'),
+    CONSTRAINT entries_author_fkey
+        FOREIGN KEY (author) REFERENCES people (name)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT entries_category_fkey
+        FOREIGN KEY (category) REFERENCES categories (term)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
 );
 
+COMMENT ON TABLE entries IS
+'This table contains the information that should be the same for all
+revisions of a post.  As only the most current revision should be public, this
+table ensures that the author, categories and rights stay consistent across
+edits.';
+
 
 --
--- Name: TABLE entries; Type: COMMENT; Schema: atom; Owner: axelrod
+-- The entry_revisions relation
 --
 
-COMMENT ON TABLE entries IS 'Source currently not supported.';
+CREATE TABLE entry_revisions (
+    slug VARCHAR(96) NOT NULL,
+    published_date DATE,
+    published_time TIME(0) WITH TIME ZONE,
+    updated TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+    title VARCHAR(96) NOT NULL,
+    content INTEGER,
+    summary INTEGER,
+    CONSTRAINT entry_revisions_pkey PRIMARY KEY (slug, published_date, updated),
+    CONSTRAINT entry_revisions_entries_fkey
+        FOREIGN KEY (slug, published_date)
+        REFERENCES entries (slug, published_date)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT entry_revisions_content_fkey
+        FOREIGN KEY (content) REFERENCES content (id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT entry_revisions_summary_fkey
+        FOREIGN KEY (summary) REFERENCES content (id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+);
+
+COMMENT ON TABLE entry_revisions IS
+'This table has information that is able to be unique to a particular edit.  The
+slug and published relate to the ''entries'' table.  The title can change in a
+particular revision, as can the references to the content and summary.';
 
 
 --
@@ -240,14 +280,6 @@ via
 
 
 --
--- Name: entries_pkey; Type: CONSTRAINT; Schema: atom; Owner: axelrod; Tablespace: 
---
-
---ALTER TABLE ONLY entries
---    ADD CONSTRAINT entries_pkey PRIMARY KEY (id);
-
-
---
 -- Name: feeds_pkey; Type: CONSTRAINT; Schema: atom; Owner: axelrod; Tablespace: 
 --
 
@@ -293,38 +325,6 @@ via
 
 --ALTER TABLE ONLY _feeds_entries_join
 --    ADD CONSTRAINT _feeds_entries_join_feed_id_fkey FOREIGN KEY (feed_id) REFERENCES feeds(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: entries_author_fkey; Type: FK CONSTRAINT; Schema: atom; Owner: axelrod
---
-
---ALTER TABLE ONLY entries
---    ADD CONSTRAINT entries_author_fkey FOREIGN KEY (author) REFERENCES people(name) ON UPDATE CASCADE ON DELETE SET NULL;
-
-
---
--- Name: entries_category_fkey; Type: FK CONSTRAINT; Schema: atom; Owner: axelrod
---
-
---ALTER TABLE ONLY entries
---    ADD CONSTRAINT entries_category_fkey FOREIGN KEY (category) REFERENCES categories(term) ON UPDATE CASCADE;
-
-
---
--- Name: entries_content_fkey; Type: FK CONSTRAINT; Schema: atom; Owner: axelrod
---
-
---ALTER TABLE ONLY entries
---    ADD CONSTRAINT entries_content_fkey FOREIGN KEY (content) REFERENCES content(id) ON UPDATE CASCADE ON DELETE SET NULL;
-
-
---
--- Name: entries_link_fkey; Type: FK CONSTRAINT; Schema: atom; Owner: axelrod
---
-
---ALTER TABLE ONLY entries
---    ADD CONSTRAINT entries_link_fkey FOREIGN KEY (link) REFERENCES links(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
