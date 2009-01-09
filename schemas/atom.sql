@@ -235,112 +235,112 @@ via
 -- Name: _link_rel_values_pkey; Type: CONSTRAINT; Schema: atom; Owner: axelrod; Tablespace: 
 --
 
-ALTER TABLE ONLY _link_rel_values
-    ADD CONSTRAINT _link_rel_values_pkey PRIMARY KEY (id);
+--ALTER TABLE ONLY _link_rel_values
+--    ADD CONSTRAINT _link_rel_values_pkey PRIMARY KEY (id);
 
 
 --
 -- Name: entries_pkey; Type: CONSTRAINT; Schema: atom; Owner: axelrod; Tablespace: 
 --
 
-ALTER TABLE ONLY entries
-    ADD CONSTRAINT entries_pkey PRIMARY KEY (id);
+--ALTER TABLE ONLY entries
+--    ADD CONSTRAINT entries_pkey PRIMARY KEY (id);
 
 
 --
 -- Name: feeds_pkey; Type: CONSTRAINT; Schema: atom; Owner: axelrod; Tablespace: 
 --
 
-ALTER TABLE ONLY feeds
-    ADD CONSTRAINT feeds_pkey PRIMARY KEY (id);
+--ALTER TABLE ONLY feeds
+--    ADD CONSTRAINT feeds_pkey PRIMARY KEY (id);
 
 
 --
 -- Name: links_pkey; Type: CONSTRAINT; Schema: atom; Owner: axelrod; Tablespace: 
 --
 
-ALTER TABLE ONLY links
-    ADD CONSTRAINT links_pkey PRIMARY KEY (id);
+--ALTER TABLE ONLY links
+--    ADD CONSTRAINT links_pkey PRIMARY KEY (id);
 
 
 --
 -- Name: _entry_author_set_author_id_fkey; Type: FK CONSTRAINT; Schema: atom; Owner: axelrod
 --
 
-ALTER TABLE ONLY _entries_authors_join
-    ADD CONSTRAINT _entry_author_set_author_id_fkey FOREIGN KEY (author_id) REFERENCES people(name) ON UPDATE CASCADE ON DELETE CASCADE;
+--ALTER TABLE ONLY _entries_authors_join
+--    ADD CONSTRAINT _entry_author_set_author_id_fkey FOREIGN KEY (author_id) REFERENCES people(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
 -- Name: _entry_author_set_entry_id_fkey; Type: FK CONSTRAINT; Schema: atom; Owner: axelrod
 --
 
-ALTER TABLE ONLY _entries_authors_join
-    ADD CONSTRAINT _entry_author_set_entry_id_fkey FOREIGN KEY (entry_id) REFERENCES entries(id) ON UPDATE CASCADE ON DELETE CASCADE;
+--ALTER TABLE ONLY _entries_authors_join
+--    ADD CONSTRAINT _entry_author_set_entry_id_fkey FOREIGN KEY (entry_id) REFERENCES entries(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
 -- Name: _feeds_entries_join_entry_id_fkey; Type: FK CONSTRAINT; Schema: atom; Owner: axelrod
 --
 
-ALTER TABLE ONLY _feeds_entries_join
-    ADD CONSTRAINT _feeds_entries_join_entry_id_fkey FOREIGN KEY (entry_id) REFERENCES entries(id) ON UPDATE CASCADE ON DELETE CASCADE;
+--ALTER TABLE ONLY _feeds_entries_join
+--    ADD CONSTRAINT _feeds_entries_join_entry_id_fkey FOREIGN KEY (entry_id) REFERENCES entries(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
 -- Name: _feeds_entries_join_feed_id_fkey; Type: FK CONSTRAINT; Schema: atom; Owner: axelrod
 --
 
-ALTER TABLE ONLY _feeds_entries_join
-    ADD CONSTRAINT _feeds_entries_join_feed_id_fkey FOREIGN KEY (feed_id) REFERENCES feeds(id) ON UPDATE CASCADE ON DELETE CASCADE;
+--ALTER TABLE ONLY _feeds_entries_join
+--    ADD CONSTRAINT _feeds_entries_join_feed_id_fkey FOREIGN KEY (feed_id) REFERENCES feeds(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
 -- Name: entries_author_fkey; Type: FK CONSTRAINT; Schema: atom; Owner: axelrod
 --
 
-ALTER TABLE ONLY entries
-    ADD CONSTRAINT entries_author_fkey FOREIGN KEY (author) REFERENCES people(name) ON UPDATE CASCADE ON DELETE SET NULL;
+--ALTER TABLE ONLY entries
+--    ADD CONSTRAINT entries_author_fkey FOREIGN KEY (author) REFERENCES people(name) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
 -- Name: entries_category_fkey; Type: FK CONSTRAINT; Schema: atom; Owner: axelrod
 --
 
-ALTER TABLE ONLY entries
-    ADD CONSTRAINT entries_category_fkey FOREIGN KEY (category) REFERENCES categories(term) ON UPDATE CASCADE;
+--ALTER TABLE ONLY entries
+--    ADD CONSTRAINT entries_category_fkey FOREIGN KEY (category) REFERENCES categories(term) ON UPDATE CASCADE;
 
 
 --
 -- Name: entries_content_fkey; Type: FK CONSTRAINT; Schema: atom; Owner: axelrod
 --
 
-ALTER TABLE ONLY entries
-    ADD CONSTRAINT entries_content_fkey FOREIGN KEY (content) REFERENCES content(id) ON UPDATE CASCADE ON DELETE SET NULL;
+--ALTER TABLE ONLY entries
+--    ADD CONSTRAINT entries_content_fkey FOREIGN KEY (content) REFERENCES content(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
 -- Name: entries_link_fkey; Type: FK CONSTRAINT; Schema: atom; Owner: axelrod
 --
 
-ALTER TABLE ONLY entries
-    ADD CONSTRAINT entries_link_fkey FOREIGN KEY (link) REFERENCES links(id) ON UPDATE CASCADE ON DELETE SET NULL;
+--ALTER TABLE ONLY entries
+--    ADD CONSTRAINT entries_link_fkey FOREIGN KEY (link) REFERENCES links(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
 -- Name: feeds_link_fkey; Type: FK CONSTRAINT; Schema: atom; Owner: axelrod
 --
 
-ALTER TABLE ONLY feeds
-    ADD CONSTRAINT feeds_link_fkey FOREIGN KEY (link) REFERENCES links(id) ON UPDATE CASCADE;
+--ALTER TABLE ONLY feeds
+--    ADD CONSTRAINT feeds_link_fkey FOREIGN KEY (link) REFERENCES links(id) ON UPDATE CASCADE;
 
 
 --
 -- Name: links_rel_fkey; Type: FK CONSTRAINT; Schema: atom; Owner: axelrod
 --
 
-ALTER TABLE ONLY links
-    ADD CONSTRAINT links_rel_fkey FOREIGN KEY (rel) REFERENCES _link_rel_values(id) ON UPDATE CASCADE;
+--ALTER TABLE ONLY links
+--    ADD CONSTRAINT links_rel_fkey FOREIGN KEY (rel) REFERENCES _link_rel_values(id) ON UPDATE CASCADE;
 
 
 --
