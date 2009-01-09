@@ -56,6 +56,29 @@ COMMENT ON TABLE _link_rel_values IS 'The possible values a link''s rel attribut
 
 
 --
+-- The people relation
+--
+
+CREATE TABLE people (
+    name VARCHAR(32),
+    uri VARCHAR(2048),
+    email VARCHAR(320),
+    CONSTRAINT people_pkey PRIMARY KEY (name)
+);
+
+COMMENT ON TABLE people IS
+'The name is limited to 32 characters as that seems long enough for most any
+name.
+
+The URI is limited to 2048 characters as some browsers with majority market
+share do not accept a longer URI (besides, such a link would most likely be
+spam.)
+
+The email is limited to 320 (64+1+255) characters as that is the maximum length
+of an email address.';
+
+
+--
 -- The categories relation
 --
 
@@ -160,29 +183,6 @@ CREATE TABLE links (
 --
 
 COMMENT ON TABLE links IS 'length is not supported for now.';
-
-
---
--- The people relation
---
-
-CREATE TABLE people (
-    name VARCHAR(32),
-    uri VARCHAR(2048),
-    email VARCHAR(320),
-    CONSTRAINT people_pkey PRIMARY KEY (name)
-);
-
-COMMENT ON TABLE people IS
-'The name is limited to 32 characters as that seems long enough for most any
-name.
-
-The URI is limited to 2048 characters as some browsers with majority market
-share do not accept a longer URI (besides, such a link would most likely be
-spam.)
-
-The email is limited to 320 (64+1+255) characters as that is the maximum length
-of an email address.';
 
 
 --
