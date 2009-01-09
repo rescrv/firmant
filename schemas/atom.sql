@@ -353,16 +353,6 @@ ALTER TABLE ONLY links
 
 
 --
--- Name: public; Type: ACL; Schema: -; Owner: pgsql
---
-
-REVOKE ALL ON SCHEMA public FROM PUBLIC;
-REVOKE ALL ON SCHEMA public FROM pgsql;
-GRANT ALL ON SCHEMA public TO pgsql;
-GRANT ALL ON SCHEMA public TO PUBLIC;
-
-
---
 -- PostgreSQL database dump complete
 --
 
