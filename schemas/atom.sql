@@ -82,16 +82,21 @@ COMMENT ON TABLE categories IS 'Scheme can be generated.';
 
 
 --
--- Name: content; Type: TABLE; Schema: atom; Owner: axelrod; Tablespace: 
+-- The content relation
 --
 
 CREATE TABLE content (
-    id integer NOT NULL,
-    type character varying,
-    src character varying,
-    content text,
-    summary text
+    id SERIAL,
+    content TEXT,
+    summary TEXT,
+    CONSTRAINT content_pkey PRIMARY KEY (id)
 );
+
+COMMENT ON TABLE content is
+'This provides a minimal set of the functionality required by the atom spec.
+Source attributes are not supported at this point in time.  The type attribute
+is not stored in the database.  It will be generated when markdown support is
+implemented.';
 
 
 --
@@ -193,32 +198,6 @@ of an email address.';
 
 
 --
--- Name: content_id_seq; Type: SEQUENCE; Schema: atom; Owner: axelrod
---
-
-CREATE SEQUENCE content_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: content_id_seq; Type: SEQUENCE OWNED BY; Schema: atom; Owner: axelrod
---
-
-ALTER SEQUENCE content_id_seq OWNED BY content.id;
-
-
---
--- Name: content_id_seq; Type: SEQUENCE SET; Schema: atom; Owner: axelrod
---
-
-SELECT pg_catalog.setval('content_id_seq', 1, false);
-
-
---
 -- Name: links_id_seq; Type: SEQUENCE; Schema: atom; Owner: axelrod
 --
 
@@ -242,13 +221,6 @@ ALTER SEQUENCE links_id_seq OWNED BY links.id;
 --
 
 SELECT pg_catalog.setval('links_id_seq', 1, false);
-
-
---
--- Name: id; Type: DEFAULT; Schema: atom; Owner: axelrod
---
-
-ALTER TABLE content ALTER COLUMN id SET DEFAULT nextval('content_id_seq'::regclass);
 
 
 --
@@ -285,14 +257,6 @@ ALTER TABLE ONLY _link_rel_values
 
 ALTER TABLE ONLY categories
     ADD CONSTRAINT categories_pkey PRIMARY KEY (term);
-
-
---
--- Name: content_pkey; Type: CONSTRAINT; Schema: atom; Owner: axelrod; Tablespace: 
---
-
-ALTER TABLE ONLY content
-    ADD CONSTRAINT content_pkey PRIMARY KEY (id);
 
 
 --
