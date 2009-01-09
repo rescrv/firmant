@@ -247,22 +247,6 @@ ALTER TABLE links ALTER COLUMN id SET DEFAULT nextval('links_id_seq'::regclass);
 
 
 --
--- Data for Name: _entries_authors_join; Type: TABLE DATA; Schema: atom; Owner: axelrod
---
-
-COPY _entries_authors_join (entry_id, author_id) FROM stdin;
-\.
-
-
---
--- Data for Name: _feeds_entries_join; Type: TABLE DATA; Schema: atom; Owner: axelrod
---
-
-COPY _feeds_entries_join (feed_id, entry_id) FROM stdin;
-\.
-
-
---
 -- Data for Name: _link_rel_values; Type: TABLE DATA; Schema: atom; Owner: axelrod
 --
 
@@ -272,54 +256,6 @@ enclosure
 related
 self
 via
-\.
-
-
---
--- Data for Name: categories; Type: TABLE DATA; Schema: atom; Owner: axelrod
---
-
-COPY categories (term, label) FROM stdin;
-\.
-
-
---
--- Data for Name: content; Type: TABLE DATA; Schema: atom; Owner: axelrod
---
-
-COPY content (id, type, src, content, summary) FROM stdin;
-\.
-
-
---
--- Data for Name: entries; Type: TABLE DATA; Schema: atom; Owner: axelrod
---
-
-COPY entries (id, title, updated, author, content, link, category, published, rights) FROM stdin;
-\.
-
-
---
--- Data for Name: feeds; Type: TABLE DATA; Schema: atom; Owner: axelrod
---
-
-COPY feeds (id, title, icon, logo, rights, subtitle, link) FROM stdin;
-\.
-
-
---
--- Data for Name: links; Type: TABLE DATA; Schema: atom; Owner: axelrod
---
-
-COPY links (id, href, type, hreflang, title, rel) FROM stdin;
-\.
-
-
---
--- Data for Name: people; Type: TABLE DATA; Schema: atom; Owner: axelrod
---
-
-COPY people (name, uri, email) FROM stdin;
 \.
 
 
