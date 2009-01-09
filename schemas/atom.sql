@@ -1,6 +1,6 @@
---
--- PostgreSQL database dump
---
+-- This file contains the sql necessary to create a database used for storing
+-- the data associated with atom feeds.  It provides the storage backend for
+-- Firmant.
 
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = off;
@@ -8,25 +8,16 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET escape_string_warning = off;
 
---
--- Name: atom; Type: SCHEMA; Schema: -; Owner: axelrod
---
-
 CREATE SCHEMA atom;
 
-
---
--- Name: SCHEMA atom; Type: COMMENT; Schema: -; Owner: axelrod
---
-
-COMMENT ON SCHEMA atom IS 'Need to add support for has many relationsihps, rather than just has one.';
+COMMENT ON SCHEMA atom IS
+'This schema provides the set of functionality defined in the atom specification
+that Firmant requires.  Some attributes will be automatically generated, and are
+not stored in these relations.';
 
 
-SET search_path = atom, pg_catalog;
+SET search_path = atom;
 
-SET default_tablespace = '';
-
-SET default_with_oids = false;
 
 --
 -- Name: _entries_authors_join; Type: TABLE; Schema: atom; Owner: axelrod; Tablespace: 
