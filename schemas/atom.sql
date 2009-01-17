@@ -79,9 +79,9 @@ implemented.';
 
 CREATE TABLE entries (
     slug VARCHAR(96) NOT NULL,
-    published_date DATE,
-    published_time TIME(0) WITH TIME ZONE,
-    author VARCHAR(32),
+    published_date DATE NOT NULL,
+    published_time TIME(0) WITH TIME ZONE NOT NULL,
+    author VARCHAR(32) NOT NULL,
     category VARCHAR(32),
     rights TEXT,
     CONSTRAINT entries_pkey PRIMARY KEY (slug, published_date),
@@ -109,11 +109,11 @@ edits.';
 
 CREATE TABLE entry_revisions (
     slug VARCHAR(96) NOT NULL,
-    published_date DATE,
-    published_time TIME(0) WITH TIME ZONE,
+    published_date DATE NOT NULL,
+    published_time TIME(0) WITH TIME ZONE NOT NULL,
     updated TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
     title VARCHAR(96) NOT NULL,
-    content INTEGER,
+    content INTEGER NOT NULL,
     summary INTEGER,
     CONSTRAINT entry_revisions_pkey PRIMARY KEY (slug, published_date, updated),
     CONSTRAINT entry_revisions_entries_fkey
