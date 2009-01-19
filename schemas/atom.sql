@@ -110,7 +110,6 @@ edits.';
 CREATE TABLE entry_revisions (
     slug VARCHAR(96) NOT NULL,
     published_date DATE NOT NULL,
-    published_time TIME(0) WITH TIME ZONE NOT NULL,
     updated TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
     title VARCHAR(96) NOT NULL,
     content INTEGER NOT NULL,
