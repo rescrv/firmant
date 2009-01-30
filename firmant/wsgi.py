@@ -1,4 +1,4 @@
-from firmant import settings
+from firmant.configuration import settings
 
 
 class Request(object):
@@ -34,9 +34,10 @@ class Application(object):
         3. The response is returned to the WSGI Server
         '''
         request = Request(self.environ)
-        s = settings.Settings(self.environ['firmant.settings'])
+        settings.reconfigure(self.environ['firmant.settings'])
+        print settings
         response = Response('200 OK', [('content-type', 'text/plain')],
                 request.url)
         self.start(response.status, response.headers)
-        for key, val in s.iteritems():
+        for key, val in settings.iteritems():
             yield '%s %s\n' % (key, val)
