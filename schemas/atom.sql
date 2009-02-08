@@ -113,7 +113,6 @@ CREATE TABLE entry_revisions (
     updated TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
     title VARCHAR(96) NOT NULL,
     content INTEGER NOT NULL,
-    summary INTEGER,
     CONSTRAINT entry_revisions_pkey PRIMARY KEY (slug, published_date, updated),
     CONSTRAINT entry_revisions_entries_fkey
         FOREIGN KEY (slug, published_date)
@@ -122,10 +121,6 @@ CREATE TABLE entry_revisions (
         ON DELETE CASCADE,
     CONSTRAINT entry_revisions_content_fkey
         FOREIGN KEY (content) REFERENCES content (id)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT,
-    CONSTRAINT entry_revisions_summary_fkey
-        FOREIGN KEY (summary) REFERENCES content (id)
         ON UPDATE CASCADE
         ON DELETE RESTRICT
 );
