@@ -1,4 +1,7 @@
+import psycopg2
 import os.path
+
+from firmant.configuration import settings
 
 class Relation(object):
     '''
@@ -66,6 +69,14 @@ class Relation(object):
             results.append(r)
             row = cursor.fetchone()
         return results
+
+
+class DB(object):
+
+    @staticmethod
+    def connection(readonly=True):
+        return psycopg2.connect(settings['OMNIPOTENT_DB_CONNECT'])
+
 
 def schema(schema_name):
     '''
