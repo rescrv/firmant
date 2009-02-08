@@ -61,10 +61,10 @@ class Relation(object):
         # Create the appropriate instances
         results = []
         row = cursor.fetchone()
-        if len(row) != len(fields):
-            cursor.close()
-            raise ValueError("Query tables not equivalent to fields")
         while row != None:
+            if len(row) != len(fields):
+                cursor.close()
+                raise ValueError("Query tables not equivalent to fields")
             r = self.__class__()
             for key, value in zip(fields, row):
                 setattr(r, key, value)
