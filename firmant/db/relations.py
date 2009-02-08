@@ -10,20 +10,14 @@ class Relation(object):
     # The attributes of the relation.  Corresponds to columns in a table.
     attributes = None
 
-    # The function to call to return a new connection instance.
-    connection = None
-
     def __init__(self):
         '''
         Ensure that the Relation class is not instantiated without attributes of
-        a relation or the ability to create a connection.
+        a relation.
         '''
         if self.__class__.attributes == None:
             raise NotImplementedError(
                     'You must declare attributes of the relation.')
-        if self.__class__.connection == None:
-            raise NotImplementedError(
-                    'You must declare a connection factory.')
 
     def _select(self, cursor, fields):
         '''
@@ -45,7 +39,6 @@ class Relation(object):
 
         fields = ['message', 'dest']
         attributes = ['message', 'dest']
-        connection = MessageConnectionFactory
 
         If a function invoked _select with the above scenario it would generate
         two Message objects with the attributes 'message' and 'dest' set on the
