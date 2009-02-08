@@ -12,10 +12,10 @@ class TestSettings(unittest.TestCase):
         # We do not want settings in here to affect any other tests.
         settings.reset()
 
-    def testemptyinit(self):
+    def testEmptyInit(self):
         settings.configure('test.data.settings.empty')
 
-    def testinit(self):
+    def testInit(self):
         settings.configure('test.data.settings.full')
         self.assertEqual(settings['INT'], 42)
         self.assertEqual(settings['STRING'], 'hello world')
@@ -27,19 +27,19 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(settings['SET_TEST'], set([1, 2, 3, 4, 5]))
         self.assertRaises(KeyError, settings.__getitem__, 'nonexistent')
 
-    def test_already_configured(self):
+    def testAlreadyConfigured(self):
         settings.configure('test.data.settings.full')
         # This fails because we've already configured the module.  We should be
         # using reconfigure, not configure.
         self.assertRaises(ImportError, settings.configure,
                           'test.data.settings.empty')
 
-    def test_configure_invalid(self):
+    def testConfigureInvalid(self):
         # We wish to test for unimportable modules
         self.assertRaises(ImportError, settings.configure,
             'test.data.settings.nonexistent')
 
-    def test_reconfigure(self):
+    def testReconfigure(self):
         # We wish to make 'firmant.settings' change to be updated globally.
         # Reconfigure should only change the properties of the settings, but
         # the object should be the same.  This is vital for allowing statements
