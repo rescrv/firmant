@@ -5,12 +5,16 @@ from firmant.configuration import settings
 class TestSettings(unittest.TestCase):
 
     def setUp(self):
-        # We do not want other tests to affect settings in here.
+        # We do not want other tests to affect settings in here, but we want
+        # configuration to persist.
+        self.old = settings._settings
         settings.reset()
 
     def tearDown(self):
-        # We do not want settings in here to affect any other tests.
+        # We do not want settings in here to affect any other tests.  Restore
+        # the test settings.
         settings.reset()
+        settings._settings = self.old
 
     def testEmptyInit(self):
         settings.configure('test.data.settings.empty')

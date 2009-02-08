@@ -1,0 +1,4 @@
+# This is the connection string used for manipulating the atom schema in unit
+# tests.  The database should be empty, and the user from whom you connect
+# should have privileges to create schemas and tables.
+TEST_ATOM_DB_CONNECT = "dbname='firmant'"
