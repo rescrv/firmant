@@ -1,3 +1,5 @@
+import os.path
+
 class Relation(object):
     '''
     This is a loose wrapper around the database layer that allows easy
@@ -71,3 +73,18 @@ class Relation(object):
             results.append(r)
             row = cursor.fetchone()
         return results
+
+def schema(schema_name):
+    '''
+    This function takes a string argument such as 'atom' and loads the
+    corresponding file firmant/db/schemas/<name>.sql and returns the file as
+    text.
+    '''
+    mod = __import__('firmant.db.schemas', {}, {}, ['schemas'])
+    schema = os.path.join(os.path.dirname(mod.__file__), schema_name + '.sql')
+    del mod
+    f = open(schema)
+    schema = f.read()
+    f.close()
+    del f
+    return schema
