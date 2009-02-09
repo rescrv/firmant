@@ -94,4 +94,9 @@ class Entry(Relation):
         results = self._select(cur, self.attributes)
         cur.close()
         conn.close()
-        return results
+        if len(results) == 0:
+            return None
+        elif len(results) == 1:
+            return results[0]
+        else:
+            raise ValueError("A single select returned multiple")
