@@ -2,15 +2,15 @@
 import unittest
 
 from firmant.configuration import settings
-from test.settings import suite as settings_tests
-from test.atom import suite as atom_tests
-from test.relations import suite as relations_tests
+from test.configuration import suite as configuration_tests
+from test.db.atom import suite as db_atom_tests
+from test.db.relations import suite as db_relations_tests
 
 
 if __name__ == '__main__':
     settings.reconfigure('test_settings')
     suite = unittest.TestSuite()
-    suite.addTests(settings_tests)
-    suite.addTests(atom_tests)
-    suite.addTests(relations_tests)
+    suite.addTests(configuration_tests)
+    suite.addTests(db_atom_tests)
+    suite.addTests(db_relations_tests)
     unittest.TextTestRunner(verbosity=2).run(suite)
