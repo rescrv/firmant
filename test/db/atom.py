@@ -11,7 +11,6 @@ class TestAtomSchema(unittest.TestCase):
 
     def setUp(self):
         # We do not want other tests to affect settings in here.
-        # We do not use the DB api as we are testing the actual 
         AtomDB.reset()
 
     def tearDown(self):
