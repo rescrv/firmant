@@ -56,5 +56,23 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(settings['UNIQUE_TO_TEST_RECONFIGURE'],
                          'this is the unique key, value pair')
 
+    def testIteritems(self):
+        settings.configure('test.data.settings.full')
+        for key, val in settings.iteritems():
+            if key == 'INT':
+                self.assertEqual(val, 42)
+            elif key == 'STRING':
+                self.assertEqual(val, 'hello world')
+            elif key == 'LIST_TEST':
+                self.assertEqual(val, [1, 2, 3, 4, 5])
+            elif key == 'SINGLE_TUPLE_TEST':
+                self.assertEqual(val, (1, ))
+            elif key == 'TUPLE_TEST':
+                self.assertEqual(val, (1, 2, 3, 4, 5))
+            elif key == 'DICT_TEST':
+                self.assertEqual(val, {'hello': 'world', "g'bye": 'world'})
+            elif key == 'SET_TEST':
+                self.assertEqual(val, set([1, 2, 3, 4, 5]))
+
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestSettings)
