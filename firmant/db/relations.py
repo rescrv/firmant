@@ -22,7 +22,8 @@ class Relation(object):
             raise NotImplementedError(
                     'You must declare attributes of the relation.')
 
-    def _select(self, cursor, fields):
+    @classmethod
+    def _select(cls, cursor, fields):
         '''
         This function accepts a cursor, and a list of names of the various
         tables returned.  it will then populate the Relation object by setting
@@ -52,7 +53,7 @@ class Relation(object):
         # Verify the arguments.
         # fields intersect attributes should equal fields.
         f = set(fields)
-        a = set(self.__class__.attributes)
+        a = set(cls.attributes)
         if f & a != f:
             raise AttributeError("fields must be a subset of attributes")
 
@@ -63,7 +64,7 @@ class Relation(object):
             if len(row) != len(fields):
                 cursor.close()
                 raise ValueError("Query tables not equivalent to fields")
-            r = self.__class__()
+            r = cls()
             for key, value in zip(fields, row):
                 setattr(r, key, value)
             results.append(r)

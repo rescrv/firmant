@@ -53,7 +53,8 @@ class Entry(Relation):
                   'category_label', 'rights', 'updated', 'title', 'content',
                   'summary',]
 
-    def single(self, slug, date):
+    @classmethod
+    def single(cls, slug, date):
         sql = """
         SELECT e.slug, e.published_date, e.published_time, p.name, p.uri,
                p.email, ca.term, ca.label, e.rights, er.updated, er.title,
@@ -91,7 +92,7 @@ class Entry(Relation):
             conn.close()
             raise ValueError('Invalid date')
 
-        results = self._select(cur, self.attributes)
+        results = cls._select(cur, cls.attributes)
         cur.close()
         conn.close()
         if len(results) == 0:
