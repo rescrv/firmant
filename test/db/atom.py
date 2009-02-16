@@ -17,10 +17,17 @@ class TestAtomSchema(unittest.TestCase):
         # We do not want settings in here to affect any other tests.
         AtomDB.reset()
 
-    def testBlank(self):
-        # This test will never fail.  It just exists to ensure the
-        # setup/teardown functions work.
-        pass
+    def testReset(self):
+        # This tests the reset functionality of the schema.
+        AtomDB.reset()
+
+    def testGetReadConnection(self):
+        conn = AtomDB.connection(readonly=True)
+        conn.close()
+
+    def testGetWriteConnection(self):
+        conn = AtomDB.connection(readonly=False)
+        conn.close()
 
     def testLoadData(self):
         # Load some sample fixtures for use by other tests.
