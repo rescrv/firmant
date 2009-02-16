@@ -6,7 +6,6 @@ from firmant.db.relations import schema
 class TestSchemaLoad(unittest.TestCase):
 
     def testLoad(self):
-        if schema('loader-works') != 'SCHEMA LOAD WORKING PROPERLY':
-            self.fail()
+        self.assertEqual(schema('loader-works'), 'SCHEMA LOAD WORKING PROPERLY')
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestSchemaLoad)
