@@ -13,6 +13,20 @@ class TestAtomSchema(unittest.TestCase):
     def setUp(self):
         # We do not want other tests to affect settings in here.
         AtomDB.reset()
+        self.e1 = Entry()
+        self.e1.slug           = 'sample'
+        self.e1.published_date = datetime.date(2009, 2, 13)
+        self.e1.published_time = datetime.time(23, 31, 30)
+        self.e1.author_name    = 'Robert Escriva'
+        self.e1.author_uri     = 'http://robescriva.com'
+        self.e1.author_email   = 'rob@/dev/null'
+        self.e1.category_term  = 'General'
+        self.e1.category_label = 'All topics'
+        self.e1.rights         = 'Same as source.'
+        self.e1.updated        = datetime.datetime(2009, 2, 13, 23, 31, 30)
+        self.e1.title          = 'Unix 1234567890'
+        self.e1.content        = 'This is the main content of revision two.'
+        self.e1.summary        = 'This is the summary of revision two.'
 
     def tearDown(self):
         # We do not want settings in here to affect any other tests.
@@ -50,20 +64,7 @@ class TestAtomSchema(unittest.TestCase):
         conn.commit()
         conn.close()
         e = Entry.single('sample', datetime.date(2009, 2, 13))
-        self.assertEqual(e.slug, 'sample')
-        self.assertEqual(e.published_date, datetime.date(2009, 2, 13))
-        self.assertEqual(e.published_time, datetime.time(23, 31, 30))
-        self.assertEqual(e.author_name, 'Robert Escriva')
-        self.assertEqual(e.author_uri, 'http://robescriva.com')
-        self.assertEqual(e.author_email, 'rob@/dev/null')
-        self.assertEqual(e.category_term, 'General')
-        self.assertEqual(e.category_label, 'All topics')
-        self.assertEqual(e.rights, 'Same as source.')
-        #elf.assertEqual(e.updated, datetime.datetime(2009, 2, 13, 23, 31, 30))
-        self.assertEqual(e.title, 'Unix 1234567890')
-        self.assertEqual(e.content,
-                         'This is the main content of revision two.')
-        self.assertEqual(e.summary, 'This is the summary of revision two.')
+        self.assertEqual(e, self.e1)
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestAtomSchema)
