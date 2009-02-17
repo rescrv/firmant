@@ -23,6 +23,17 @@ class Relation(object):
             raise NotImplementedError(
                     'You must declare attributes of the relation.')
 
+    def __eq__(self, other):
+        for attr in self.attributes:
+            v1 = getattr(self, attr, None)
+            v2 = getattr(other, attr, None)
+            if v1 != v2:
+                return False
+        return True
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     @classmethod
     def _select(cls, cursor, fields):
         '''

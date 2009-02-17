@@ -42,6 +42,24 @@ class TestRelation(unittest.TestCase):
         self.assertRaises(ValueError, self.ExampleRelation._select,
                                       self.FakeCursor(), ['foo'])
 
+    def testEqualComparison(self):
+        e1 = self.ExampleRelation()
+        e2 = self.ExampleRelation()
+        self.assertEqual(e1, e2)
+
+        e1.foo = 'foobar'
+        e2.foo = 'foobar'
+        self.assertEqual(e1, e2)
+
+    def testNotEqualComparison(self):
+        e1 = self.ExampleRelation()
+        e2 = self.ExampleRelation()
+        e1.foo = 'foobar'
+        e2.foo = 'barfoo'
+        # We use this convoluted means instead of assertNotEqual as this means
+        # calls __ne__ while assertNotEqual really calls __eq__.
+        self.assertEqual(e1 != e2, True)
+
 
 suite = unittest.TestSuite()
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestSchemaLoad))
