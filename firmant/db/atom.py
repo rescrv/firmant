@@ -62,6 +62,8 @@ class Entry(Relation):
         FROM entries e, people p, categories ca, entry_revisions er, content co
         WHERE e.author = p.name AND
               e.category = ca.term AND
+              e.published_date = %(pub_date)s AND
+              e.slug = %(slug)s AND
               er.slug = e.slug AND
               er.published_date = e.published_date AND
               er.content = co.id
@@ -86,7 +88,7 @@ class Entry(Relation):
 
         try:
             cur.execute('SET search_path = atom;')
-            cur.execute(sql)
+            cur.execute(sql, {'pub_date': date, 'slug': slug})
         except psycopg2.DataError, e:
             cur.close()
             conn.close()
