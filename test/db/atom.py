@@ -54,7 +54,19 @@ class TestAtomSchema(unittest.TestCase):
         conn.commit()
         conn.close()
 
-    def testEntrySingle(self):
+    def testEntrySingleEmpty(self):
+        # Load some sample fixtures for use by other tests.
+        atom = schema('atom-sample-data')
+        conn = AtomDB.connection(readonly=False)
+        cur = conn.cursor()
+        cur.execute(atom)
+        cur.close()
+        conn.commit()
+        conn.close()
+        e = Entry.single('IDONOTEXIST', datetime.date(2009, 2, 13))
+        self.assertEqual(e, None)
+
+    def testEntrySinglePresent(self):
         # Load some sample fixtures for use by other tests.
         atom = schema('atom-sample-data')
         conn = AtomDB.connection(readonly=False)
