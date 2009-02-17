@@ -58,24 +58,13 @@ class Entry(Relation):
         if slug_re.match(slug) == None:
             raise ValueError('Invalid slug')
         try:
-            if date_re.match(date) != None:
-                datestr = date
-            else:
-                raise ValueError('Invalid date')
-        except TypeError, e:
-            try:
-                datestr = date.strftime('%Y-%m-%d')
-            except AttributeError, e:
-                raise ValueError('Invalid date')
+            datestr = date.strftime('%Y-%m-%d')
+        except AttributeError, e:
+            raise ValueError('date should provide strftime')
 
         conn = AtomDB.connection(readonly=True)
         cur = conn.cursor()
-        try:
-            cur = cls._posts_in_range(cur, slug, datestr, datestr)
-        except psycopg2.DataError, e:
-            cur.close()
-            conn.close()
-            raise ValueError('Invalid date')
+        cur = cls._posts_in_range(cur, slug, datestr, datestr)
         results = cls._select(cur, cls.attributes)
         cur.close()
         conn.close()
