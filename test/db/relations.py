@@ -6,7 +6,8 @@ from firmant.db import relations
 class TestSchemaLoad(unittest.TestCase):
 
     def testLoad(self):
-        self.assertEqual(relations.schema('loader-works'), 'SCHEMA LOAD WORKING PROPERLY')
+        self.assertEqual(relations.schema('loader-works'),
+                         'SCHEMA LOAD WORKING PROPERLY')
 
 
 class TestDB(unittest.TestCase):
@@ -25,7 +26,7 @@ class TestRelation(unittest.TestCase):
     class FakeCursor(object):
 
         def fetchone(self):
-            return ('foo', 'bar',)
+            return ('foo', 'bar')
 
         def close(self):
             pass

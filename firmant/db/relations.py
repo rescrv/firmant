@@ -3,6 +3,7 @@ import os.path
 
 from firmant.configuration import settings
 
+
 class Relation(object):
     '''
     This is a loose wrapper around the database layer that allows easy
@@ -15,8 +16,8 @@ class Relation(object):
 
     def __init__(self):
         '''
-        Ensure that the Relation class is not instantiated without attributes of
-        a relation.
+        Ensure that the Relation class is not instantiated without attributes
+        of a relation.
         '''
         if self.__class__.attributes == None:
             raise NotImplementedError(
@@ -35,7 +36,7 @@ class Relation(object):
         message are 'message' and 'dest'.  The user defines a function that
         runs the query "SELECT * from messages;".  The following would be
         returned by psql:
-         message | dest 
+         message | dest
         ---------+------
          hello   | John
          goodbye | Jack

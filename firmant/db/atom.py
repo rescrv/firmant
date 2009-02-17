@@ -51,7 +51,7 @@ class Entry(Relation):
     attributes = ['slug', 'published_date', 'published_time', 'author_name',
                   'author_uri', 'author_email', 'category_term',
                   'category_label', 'rights', 'updated', 'title', 'content',
-                  'summary',]
+                  'summary']
 
     @classmethod
     def single(cls, slug, date):

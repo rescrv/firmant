@@ -59,9 +59,10 @@ class TestAtomSchema(unittest.TestCase):
         self.assertEqual(e.category_term, 'General')
         self.assertEqual(e.category_label, 'All topics')
         self.assertEqual(e.rights, 'Same as source.')
-        #self.assertEqual(e.updated, datetime.datetime(2009, 2, 13, 23, 31, 30))
+        #elf.assertEqual(e.updated, datetime.datetime(2009, 2, 13, 23, 31, 30))
         self.assertEqual(e.title, 'Unix 1234567890')
-        self.assertEqual(e.content, 'This is the main content of revision two.')
+        self.assertEqual(e.content,
+                         'This is the main content of revision two.')
         self.assertEqual(e.summary, 'This is the summary of revision two.')
 
 
