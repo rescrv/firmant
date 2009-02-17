@@ -21,8 +21,8 @@ INSERT INTO content (id, content, summary) VALUES
 -- Insert a sample person (me).  Not my actual email
 INSERT INTO people (name, uri, email) VALUES
     ('Robert Escriva',
-     'rob@/dev/null',
-     'http://robescriva.com');
+     'http://robescriva.com',
+     'rob@/dev/null');
 
 -- Insert a general category.
 INSERT INTO categories (term, label) VALUES ('General', 'All topics');
