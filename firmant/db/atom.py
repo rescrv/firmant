@@ -53,6 +53,27 @@ class Entry(Relation):
                   'category_label', 'rights', 'updated', 'title', 'content',
                   'summary']
 
+    sql = """
+        SELECT e.slug, (e.published_date + e.published_time)::TIMESTAMP WITH
+            TIME ZONE AT TIME ZONE 'GMT', p.name, p.uri, p.email, ca.term,
+            ca.label, e.rights, er.updated AT TIME ZONE 'GMT', er.title,
+            co.content, co.summary
+        FROM entries e, people p, categories ca, entry_revisions er, content co
+        WHERE e.author = p.name AND
+            e.category = ca.term AND
+            er.slug = e.slug AND
+            er.published_date = e.published_date AND
+            er.content = co.id AND
+            %(additional)s AND
+            (er.slug, er.published_date, er.updated) IN
+                (SELECT er2.slug,
+                    er2.published_date,
+                    MAX(er2.updated)
+                FROM entry_revisions er2
+                GROUP BY er2.slug, er2.published_date)
+        ORDER BY e.published_date DESC, e.published_time DESC, e.slug ASC;
+        """
+
     @classmethod
     def single(cls, slug, date):
         if slug_re.match(slug) == None:
@@ -64,7 +85,12 @@ class Entry(Relation):
 
         conn = AtomDB.connection(readonly=True)
         cur = conn.cursor()
-        cur = cls._posts_in_range(cur, slug, datestr, datestr)
+        params = {'additional': """e.slug=%(slug)s
+                                   AND e.published_date=%(date)s"""}
+        singlesql = Entry.sql % params
+        params = {'slug': slug, 'date': datestr}
+        cur.execute('SET search_path = atom;')
+        cur.execute(singlesql, params)
         results = cls._select(cur, cls.attributes)
         cur.close()
         conn.close()
@@ -72,34 +98,3 @@ class Entry(Relation):
             return None
         elif len(results) == 1:
             return results[0]
-
-    @classmethod
-    def _posts_in_range(cls, cur, slug, min, max):
-        additional_compare = {'min_pub_date': '%(min_pub_date)s',
-                              'max_pub_date': '%(max_pub_date)s',
-                              'slugselect': ''}
-        params = {'min_pub_date': min, 'max_pub_date': max}
-        if slug != None:
-            additional_compare['slugselect'] = 'e.slug = %(slug)s'
-            params['slug'] = slug
-        sql = """
-        SELECT e.slug, (e.published_date + e.published_time)::TIMESTAMP WITH
-               TIME ZONE AT TIME ZONE 'GMT', p.name, p.uri, p.email,
-               ca.term, ca.label, e.rights, er.updated AT TIME ZONE 'GMT',
-               er.title, co.content, co.summary
-        FROM entries e, people p, categories ca, entry_revisions er, content co
-        WHERE e.author = p.name AND
-              e.category = ca.term AND
-              e.published_date <= %(max_pub_date)s AND
-              e.published_date >= %(min_pub_date)s AND
-              er.slug = e.slug AND
-              er.published_date = e.published_date AND
-              er.content = co.id AND
-              %(slugselect)s
-        ORDER BY er.updated DESC
-        LIMIT 1;
-        """ % additional_compare
-        cur.execute('SET search_path = atom;')
-        cur.execute(sql, params)
-
-        return cur
