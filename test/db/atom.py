@@ -102,5 +102,15 @@ class TestAtomSchema(unittest.TestCase):
         e = Entry.single('loren-ipsum', datetime.date(2009, 2, 17))
         self.assertEqual(e, self.e2)
 
+    def testEntrySingleSlugInvalid(self):
+        self.testLoadData()
+        self.assertRaises(ValueError,
+            Entry.single, 's@mpl3', datetime.date(2009, 2, 13))
+
+    def testEntrySingleNoStrftime(self):
+        self.testLoadData()
+        # List does not have strftime method
+        self.assertRaises(ValueError, Entry.single, 'sample', list())
+
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestAtomSchema)
