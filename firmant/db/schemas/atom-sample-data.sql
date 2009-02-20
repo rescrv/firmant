@@ -60,7 +60,7 @@ INSERT INTO people (name, uri, email) VALUES
 INSERT INTO categories (term, label) VALUES ('General', 'All topics');
 INSERT INTO categories (term, label) VALUES
     ('Generated',
-     'You can\'t tell a computer wrote it.');
+     E'You can\'t tell a computer wrote it.');
 
 -- Insert the test entry and its two revisions.
 INSERT INTO entries
