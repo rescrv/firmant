@@ -1,6 +1,7 @@
 import re
 import psycopg2
 import os.path
+import datetime
 
 from firmant.configuration import settings
 from firmant.db.relations import Relation
@@ -98,3 +99,22 @@ class Entry(Relation):
             return None
         elif len(results) == 1:
             return results[0]
+
+    @classmethod
+    def day(cls, year, month, day):
+        # If this raises an error, let it rise up.
+        try:
+            dt = datetime.datetime(int(year), int(month), int(day))
+        except ValueError:
+            raise
+        conn = AtomDB.connection(readonly=True)
+        cur = conn.cursor()
+        params = {'additional': """e.published_date=%(date)s"""}
+        daysql = Entry.sql % params
+        params = {'date': dt.strftime('%Y-%m-%d')}
+        cur.execute('SET search_path = atom;')
+        cur.execute(daysql, params)
+        results = cls._select(cur, cls.attributes)
+        cur.close()
+        conn.close()
+        return results

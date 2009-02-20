@@ -144,5 +144,9 @@ class TestAtomSchema(unittest.TestCase):
         self.assertEqual(e[0], self.e3)
         self.assertEqual(e[1], self.e2)
 
+    def testEntryDayInvalidDate(self):
+        self.testLoadData()
+        self.assertRaises(ValueError, Entry.day, 2009, 0, 0)
+
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestAtomSchema)
