@@ -148,5 +148,8 @@ class TestAtomSchema(unittest.TestCase):
         self.testLoadData()
         self.assertRaises(ValueError, Entry.day, 2009, 0, 0)
 
+    def testEntryDateTrunc(self):
+        self.assertRaises(ValueError, Entry._date_trunc, 'foo', 2009, 2, 13)
+
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestAtomSchema)

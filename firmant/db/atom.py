@@ -102,16 +102,23 @@ class Entry(Relation):
 
     @classmethod
     def day(cls, year, month, day):
+        return cls._date_trunc('day', year, month, day)
+
+    @classmethod
+    def _date_trunc(cls, trunc='day', year=1, month=1, day=1):
         # If this raises an error, let it rise up.
         try:
             dt = datetime.datetime(int(year), int(month), int(day))
         except ValueError:
             raise
+        if trunc not in set(['day', 'month', 'year']):
+            raise ValueError('Must truncate to the day, month, or year')
         conn = AtomDB.connection(readonly=True)
         cur = conn.cursor()
-        params = {'additional': """e.published_date=%(date)s"""}
+        params = {'additional':
+                """date_trunc(%(trunc)s, e.published_date)=%(date)s"""}
         daysql = Entry.sql % params
-        params = {'date': dt.strftime('%Y-%m-%d')}
+        params = {'date': dt.strftime('%Y-%m-%d'), 'trunc': trunc}
         cur.execute('SET search_path = atom;')
         cur.execute(daysql, params)
         results = cls._select(cur, cls.attributes)
