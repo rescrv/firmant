@@ -64,6 +64,20 @@ class TestAtomSchema(unittest.TestCase):
      nunc.""")
         self.e2.summary        = 'A generated loren ipsum paragraph.'
 
+        self.e3 = Entry()
+        self.e3.slug           = 'sample'
+        self.e3.published      = datetime.datetime(2009, 2, 17, 21, 31, 30)
+        self.e3.author_name    = 'Loren Ipsum Generator'
+        self.e3.author_uri     = 'http://www.lipsum.com'
+        self.e3.author_email   = 'lipsum@/dev/null'
+        self.e3.category_term  = 'Generated'
+        self.e3.category_label = "You can't tell a computer wrote it."
+        self.e3.rights         = 'Same as source.'
+        self.e3.updated        = datetime.datetime(2009, 2, 17, 16, 31, 30)
+        self.e3.title          = 'Loren Ipsum ...'
+        self.e3.content        = 'This is the main content of revision one.'
+        self.e3.summary        = 'This is the summary of revision one.'
+
     def tearDown(self):
         # We do not want settings in here to affect any other tests.
         AtomDB.reset()
@@ -111,6 +125,24 @@ class TestAtomSchema(unittest.TestCase):
         self.testLoadData()
         # List does not have strftime method
         self.assertRaises(ValueError, Entry.single, 'sample', list())
+
+    def testEntryDayEmpty(self):
+        self.testLoadData()
+        e = Entry.day('2009', '01', '09')
+        self.assertEqual(len(e), 0)
+
+    def testEntryDayPresent(self):
+        self.testLoadData()
+        e = Entry.day('2009', '02', '13')
+        self.assertEqual(1, len(e))
+        self.assertEqual(e[0], self.e1)
+
+    def testEntryDayOrder(self):
+        self.testLoadData()
+        e = Entry.day('2009', '02', '17')
+        self.assertEqual(2, len(e))
+        self.assertEqual(e[0], self.e3)
+        self.assertEqual(e[1], self.e2)
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestAtomSchema)

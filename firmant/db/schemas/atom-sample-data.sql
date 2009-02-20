@@ -81,6 +81,15 @@ INSERT INTO entries
      'Generated',
      'Same as source.');
 
+INSERT INTO entries
+    (slug, published_date, published_time, author, category, rights) VALUES
+    ('sample',
+     '2009-2-17',
+     '163130 EST',
+     'Loren Ipsum Generator',
+     'Generated',
+     'Same as source.');
+
 INSERT INTO entry_revisions
     (slug, published_date, updated, title, content) VALUES
     ('sample',
@@ -104,3 +113,11 @@ INSERT INTO entry_revisions
      '2009-2-17 113130 EST',
      'Loren Ipsum ...',
      3);
+
+INSERT INTO entry_revisions
+    (slug, published_date, updated, title, content) VALUES
+    ('sample',
+     '2009-2-17',
+     '2009-2-17 113130 EST',
+     'Loren Ipsum ...',
+     1);
