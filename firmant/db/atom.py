@@ -72,8 +72,6 @@ class Entry(Relation):
             return None
         elif len(results) == 1:
             return results[0]
-        else:
-            raise ValueError("A single select returned multiple")
 
     @classmethod
     def _posts_in_range(cls, cur, slug, min, max):
