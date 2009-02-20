@@ -48,7 +48,7 @@ class AtomDB(object):
 
 class Entry(Relation):
 
-    attributes = ['slug', 'published_date', 'published_time', 'author_name',
+    attributes = ['slug', 'published', 'author_name',
                   'author_uri', 'author_email', 'category_term',
                   'category_label', 'rights', 'updated', 'title', 'content',
                   'summary']
@@ -85,9 +85,10 @@ class Entry(Relation):
             additional_compare['slugselect'] = 'e.slug = %(slug)s'
             params['slug'] = slug
         sql = """
-        SELECT e.slug, e.published_date, e.published_time, p.name, p.uri,
-               p.email, ca.term, ca.label, e.rights, er.updated, er.title,
-               co.content, co.summary
+        SELECT e.slug, (e.published_date + e.published_time)::TIMESTAMP WITH
+               TIME ZONE AT TIME ZONE 'GMT', p.name, p.uri, p.email,
+               ca.term, ca.label, e.rights, er.updated AT TIME ZONE 'GMT',
+               er.title, co.content, co.summary
         FROM entries e, people p, categories ca, entry_revisions er, content co
         WHERE e.author = p.name AND
               e.category = ca.term AND

@@ -15,30 +15,28 @@ class TestAtomSchema(unittest.TestCase):
         AtomDB.reset()
         self.e1 = Entry()
         self.e1.slug           = 'sample'
-        self.e1.published_date = datetime.date(2009, 2, 13)
-        self.e1.published_time = datetime.time(23, 31, 30)
+        self.e1.published      = datetime.datetime(2009, 2, 14, 04, 31, 30)
         self.e1.author_name    = 'Robert Escriva'
         self.e1.author_uri     = 'http://robescriva.com'
         self.e1.author_email   = 'rob@/dev/null'
         self.e1.category_term  = 'General'
         self.e1.category_label = 'All topics'
         self.e1.rights         = 'Same as source.'
-        self.e1.updated        = datetime.datetime(2009, 2, 13, 23, 31, 30)
+        self.e1.updated        = datetime.datetime(2009, 2, 14, 04, 31, 31)
         self.e1.title          = 'Unix 1234567890'
         self.e1.content        = 'This is the main content of revision two.'
         self.e1.summary        = 'This is the summary of revision two.'
 
         self.e2 = Entry()
         self.e2.slug           = 'loren-ipsum'
-        self.e2.published_date = datetime.date(2009, 2, 17)
-        self.e2.published_time = datetime.time(11, 31, 30)
+        self.e2.published      = datetime.datetime(2009, 2, 17, 16, 31, 30)
         self.e2.author_name    = 'Loren Ipsum Generator'
         self.e2.author_uri     = 'http://www.lipsum.com'
         self.e2.author_email   = 'lipsum@/dev/null'
         self.e2.category_term  = 'Generated'
         self.e2.category_label = "You can't tell a computer wrote it."
         self.e2.rights         = 'Same as source.'
-        self.e2.updated        = datetime.datetime(2009, 2, 17, 11, 31, 30)
+        self.e2.updated        = datetime.datetime(2009, 2, 17, 16, 31, 30)
         self.e2.title          = 'Loren Ipsum ...'
         self.e2.content        = (
      """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus eget
