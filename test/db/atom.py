@@ -151,5 +151,31 @@ class TestAtomSchema(unittest.TestCase):
     def testEntryDateTrunc(self):
         self.assertRaises(ValueError, Entry._date_trunc, 'foo', 2009, 2, 13)
 
+    def testEntryMonthEmpty(self):
+        self.testLoadData()
+        e = Entry.month('2009', '01')
+        self.assertEqual(len(e), 0)
+
+    def testEntryMonthPresent(self):
+        self.testLoadData()
+        e = Entry.month('2009', '02')
+        self.assertEqual(3, len(e))
+        self.assertEqual(e[0], self.e3)
+        self.assertEqual(e[1], self.e2)
+        self.assertEqual(e[2], self.e1)
+
+    def testEntryYearEmpty(self):
+        self.testLoadData()
+        e = Entry.year('2008')
+        self.assertEqual(len(e), 0)
+
+    def testEntryYearPresent(self):
+        self.testLoadData()
+        e = Entry.year('2009')
+        self.assertEqual(3, len(e))
+        self.assertEqual(e[0], self.e3)
+        self.assertEqual(e[1], self.e2)
+        self.assertEqual(e[2], self.e1)
+
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestAtomSchema)

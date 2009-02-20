@@ -105,6 +105,14 @@ class Entry(Relation):
         return cls._date_trunc('day', year, month, day)
 
     @classmethod
+    def month(cls, year, month):
+        return cls._date_trunc('month', year, month)
+
+    @classmethod
+    def year(cls, year):
+        return cls._date_trunc('year', year)
+
+    @classmethod
     def _date_trunc(cls, trunc='day', year=1, month=1, day=1):
         # If this raises an error, let it rise up.
         try:
