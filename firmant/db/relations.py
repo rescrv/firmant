@@ -34,6 +34,12 @@ class Relation(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def __repr__(self):
+        ret = {}
+        for attr in self.attributes:
+            ret[attr] = getattr(self, attr, None)
+        return ret.__repr__()
+
     @classmethod
     def _select(cls, cursor, fields):
         '''
