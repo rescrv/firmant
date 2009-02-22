@@ -8,37 +8,32 @@ from firmant.db.atom import AtomDB
 from firmant.db.atom import Entry
 
 
-class TestAtomSchema(unittest.TestCase):
+e1 = Entry()
+e1.slug           = 'sample'
+e1.published      = datetime.datetime(2009, 2, 14, 04, 31, 30)
+e1.author_name    = 'Robert Escriva'
+e1.author_uri     = 'http://robescriva.com'
+e1.author_email   = 'rob@/dev/null'
+e1.category_term  = 'General'
+e1.category_label = 'All topics'
+e1.rights         = 'Same as source.'
+e1.updated        = datetime.datetime(2009, 2, 14, 04, 31, 31)
+e1.title          = 'Unix 1234567890'
+e1.content        = 'This is the main content of revision two.'
+e1.summary        = 'This is the summary of revision two.'
 
-    def setUp(self):
-        # We do not want other tests to affect settings in here.
-        AtomDB.reset()
-        self.e1 = Entry()
-        self.e1.slug           = 'sample'
-        self.e1.published      = datetime.datetime(2009, 2, 14, 04, 31, 30)
-        self.e1.author_name    = 'Robert Escriva'
-        self.e1.author_uri     = 'http://robescriva.com'
-        self.e1.author_email   = 'rob@/dev/null'
-        self.e1.category_term  = 'General'
-        self.e1.category_label = 'All topics'
-        self.e1.rights         = 'Same as source.'
-        self.e1.updated        = datetime.datetime(2009, 2, 14, 04, 31, 31)
-        self.e1.title          = 'Unix 1234567890'
-        self.e1.content        = 'This is the main content of revision two.'
-        self.e1.summary        = 'This is the summary of revision two.'
-
-        self.e2 = Entry()
-        self.e2.slug           = 'loren-ipsum'
-        self.e2.published      = datetime.datetime(2009, 2, 17, 16, 31, 30)
-        self.e2.author_name    = 'Loren Ipsum Generator'
-        self.e2.author_uri     = 'http://www.lipsum.com'
-        self.e2.author_email   = 'lipsum@/dev/null'
-        self.e2.category_term  = 'Generated'
-        self.e2.category_label = "You can't tell a computer wrote it."
-        self.e2.rights         = 'Same as source.'
-        self.e2.updated        = datetime.datetime(2009, 2, 17, 16, 31, 30)
-        self.e2.title          = 'Loren Ipsum ...'
-        self.e2.content        = (
+e2 = Entry()
+e2.slug           = 'loren-ipsum'
+e2.published      = datetime.datetime(2009, 2, 17, 16, 31, 30)
+e2.author_name    = 'Loren Ipsum Generator'
+e2.author_uri     = 'http://www.lipsum.com'
+e2.author_email   = 'lipsum@/dev/null'
+e2.category_term  = 'Generated'
+e2.category_label = "You can't tell a computer wrote it."
+e2.rights         = 'Same as source.'
+e2.updated        = datetime.datetime(2009, 2, 17, 16, 31, 30)
+e2.title          = 'Loren Ipsum ...'
+e2.content        = (
      """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus eget
      ante sit amet elit condimentum varius. Nullam blandit pede quis neque.
      Suspendisse elit erat, malesuada quis, ultrices cursus, pretium eget,
@@ -62,21 +57,27 @@ class TestAtomSchema(unittest.TestCase):
      In molestie est a neque. Aliquam erat volutpat. Nam commodo tincidunt
      magna.  Morbi justo leo, faucibus nec, consectetur id, sodales vitae,
      nunc.""")
-        self.e2.summary        = 'A generated loren ipsum paragraph.'
+e2.summary        = 'A generated loren ipsum paragraph.'
 
-        self.e3 = Entry()
-        self.e3.slug           = 'sample'
-        self.e3.published      = datetime.datetime(2009, 2, 17, 21, 31, 30)
-        self.e3.author_name    = 'Loren Ipsum Generator'
-        self.e3.author_uri     = 'http://www.lipsum.com'
-        self.e3.author_email   = 'lipsum@/dev/null'
-        self.e3.category_term  = 'Generated'
-        self.e3.category_label = "You can't tell a computer wrote it."
-        self.e3.rights         = 'Same as source.'
-        self.e3.updated        = datetime.datetime(2009, 2, 17, 16, 31, 30)
-        self.e3.title          = 'Loren Ipsum ...'
-        self.e3.content        = 'This is the main content of revision one.'
-        self.e3.summary        = 'This is the summary of revision one.'
+e3 = Entry()
+e3.slug           = 'sample'
+e3.published      = datetime.datetime(2009, 2, 17, 21, 31, 30)
+e3.author_name    = 'Loren Ipsum Generator'
+e3.author_uri     = 'http://www.lipsum.com'
+e3.author_email   = 'lipsum@/dev/null'
+e3.category_term  = 'Generated'
+e3.category_label = "You can't tell a computer wrote it."
+e3.rights         = 'Same as source.'
+e3.updated        = datetime.datetime(2009, 2, 17, 16, 31, 30)
+e3.title          = 'Loren Ipsum ...'
+e3.content        = 'This is the main content of revision one.'
+e3.summary        = 'This is the summary of revision one.'
+
+class TestAtomSchema(unittest.TestCase):
+
+    def setUp(self):
+        # We do not want other tests to affect settings in here.
+        AtomDB.reset()
 
     def tearDown(self):
         # We do not want settings in here to affect any other tests.
@@ -112,9 +113,9 @@ class TestAtomSchema(unittest.TestCase):
     def testEntrySinglePresent(self):
         self.testLoadData()
         e = Entry.single('sample', datetime.date(2009, 2, 13))
-        self.assertEqual(e, self.e1)
+        self.assertEqual(e, e1)
         e = Entry.single('loren-ipsum', datetime.date(2009, 2, 17))
-        self.assertEqual(e, self.e2)
+        self.assertEqual(e, e2)
 
     def testEntrySingleSlugInvalid(self):
         self.testLoadData()
@@ -135,14 +136,14 @@ class TestAtomSchema(unittest.TestCase):
         self.testLoadData()
         e = Entry.day('2009', '02', '13')
         self.assertEqual(1, len(e))
-        self.assertEqual(e[0], self.e1)
+        self.assertEqual(e[0], e1)
 
     def testEntryDayOrder(self):
         self.testLoadData()
         e = Entry.day('2009', '02', '17')
         self.assertEqual(2, len(e))
-        self.assertEqual(e[0], self.e3)
-        self.assertEqual(e[1], self.e2)
+        self.assertEqual(e[0], e3)
+        self.assertEqual(e[1], e2)
 
     def testEntryDayInvalidDate(self):
         self.testLoadData()
@@ -160,9 +161,9 @@ class TestAtomSchema(unittest.TestCase):
         self.testLoadData()
         e = Entry.month('2009', '02')
         self.assertEqual(3, len(e))
-        self.assertEqual(e[0], self.e3)
-        self.assertEqual(e[1], self.e2)
-        self.assertEqual(e[2], self.e1)
+        self.assertEqual(e[0], e3)
+        self.assertEqual(e[1], e2)
+        self.assertEqual(e[2], e1)
 
     def testEntryYearEmpty(self):
         self.testLoadData()
@@ -173,9 +174,9 @@ class TestAtomSchema(unittest.TestCase):
         self.testLoadData()
         e = Entry.year('2009')
         self.assertEqual(3, len(e))
-        self.assertEqual(e[0], self.e3)
-        self.assertEqual(e[1], self.e2)
-        self.assertEqual(e[2], self.e1)
+        self.assertEqual(e[0], e3)
+        self.assertEqual(e[1], e2)
+        self.assertEqual(e[2], e1)
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestAtomSchema)
