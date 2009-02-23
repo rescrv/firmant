@@ -28,6 +28,12 @@ class TestTxtDateResolver(unittest.TestCase):
         conn.commit()
         conn.close()
 
+    def testRecent(self):
+        self.loadData()
+        tdr = DateResolver()
+        self.assertEqual(Response(content='RECENT'),
+                tdr.resolve(FakeRequest('/')))
+
     def testYear(self):
         self.loadData()
         tdr = DateResolver()
@@ -57,6 +63,19 @@ class TestTxtDateResolver(unittest.TestCase):
                 tdr.resolve(FakeRequest('/2009/02/17/loren-ipsum/')))
         self.assertEqual(Response(content=e1.__repr__()),
                 tdr.resolve(FakeRequest('/2009/02/13/sample/')))
+
+    def testInvalid(self):
+        tdr = DateResolver()
+        self.assertEqual(None, tdr._year(None, '200a'))
+        self.assertEqual(None, tdr._month(None, '200a', '02'))
+        self.assertEqual(None, tdr._month(None, '2009', '0a'))
+        self.assertEqual(None, tdr._day(None, '200a', '02', '13'))
+        self.assertEqual(None, tdr._day(None, '2009', '0a', '13'))
+        self.assertEqual(None, tdr._day(None, '2009', '02', 'b3'))
+        self.assertEqual(None, tdr._single(None, 'foo', '200a', '02', '13'))
+        self.assertEqual(None, tdr._single(None, 'foo', '2009', '0a', '13'))
+        self.assertEqual(None, tdr._single(None, 'foo', '2009', '02', 'b3'))
+        self.assertEqual(None, tdr._single(None, 'fo#o', '2009', '02', '13'))
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestTxtDateResolver)
