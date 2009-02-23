@@ -40,9 +40,11 @@ class Application(object):
         '''
         request = Request(self.environ)
         settings.reconfigure(self.environ['firmant.settings'])
-        print settings
-        response = Response('200 OK', [('content-type', 'text/plain')],
-                request.url)
-        self.start(response.status, response.headers)
-        for key, val in settings.iteritems():
-            yield '%s %s\n' % (key, val)
+        for resolver in settings['URL_RESOLVERS']:
+            response = resolver.resolve(request)
+            if response != None:
+                self.start(response.status, response.headers)
+                yield response.content
+                return
+        self.start('404 Not Found', [('content-type', 'text/plain')])
+        yield '404'

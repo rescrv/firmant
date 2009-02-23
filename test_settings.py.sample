@@ -7,3 +7,7 @@ ATOM_DB_CONNECT_WRITE = "dbname='firmant'"
 # This user should have the ability to drop schemas and tables.  It should not
 # be enabled in production.
 OMNIPOTENT_DB_CONNECT = "dbname='firmant'"
+
+# Load our resolvers.
+from firmant.frontend.txt.resolvers import TxtDateResolver
+URL_RESOLVERS = [TxtDateResolver(), ]
