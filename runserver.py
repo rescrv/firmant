@@ -8,7 +8,7 @@ from firmant.wsgi import Application
 
 parser = OptionParser()
 parser.add_option('-s', '--settings',
-        dest='settings', type='string', default='settings',
+        dest='settings', type='string', default='test_settings',
         help='the settings module to use for the test server.')
 parser.add_option('-p', '--port',
         dest='port', type='int', default='8080',
