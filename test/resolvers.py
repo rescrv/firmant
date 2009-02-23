@@ -1,5 +1,7 @@
 import unittest
+
 from firmant.resolvers import *
+from firmant.wsgi import Response
 
 
 class FakeRequest(object):
@@ -19,15 +21,15 @@ class TestDateResolver(unittest.TestCase):
     def testNoPrefixSuccess(self):
         dr = DateResolver()
         fr = FakeRequest('/')
-        self.assertEqual('RECENT', dr.resolve(fr))
+        self.assertEqual(Response(content='RECENT'), dr.resolve(fr))
         fr = FakeRequest('/2009/02/13/foo/')
-        self.assertEqual('2009-02-13 foo', dr.resolve(fr))
+        self.assertEqual(Response(content='2009-02-13 foo'), dr.resolve(fr))
         fr = FakeRequest('/2009/02/13/')
-        self.assertEqual('2009-02-13', dr.resolve(fr))
+        self.assertEqual(Response(content='2009-02-13'), dr.resolve(fr))
         fr = FakeRequest('/2009/02/')
-        self.assertEqual('2009-02', dr.resolve(fr))
+        self.assertEqual(Response(content='2009-02'), dr.resolve(fr))
         fr = FakeRequest('/2009/')
-        self.assertEqual('2009', dr.resolve(fr))
+        self.assertEqual(Response(content='2009'), dr.resolve(fr))
 
     def testNoPrefixFail(self):
         dr = DateResolver()
@@ -45,15 +47,15 @@ class TestDateResolver(unittest.TestCase):
     def testPrefixSuccess(self):
         dr = DateResolver('prefix')
         fr = FakeRequest('/prefix/')
-        self.assertEqual('RECENT', dr.resolve(fr))
+        self.assertEqual(Response(content='RECENT'), dr.resolve(fr))
         fr = FakeRequest('/prefix/2009/02/13/foo/')
-        self.assertEqual('2009-02-13 foo', dr.resolve(fr))
+        self.assertEqual(Response(content='2009-02-13 foo'), dr.resolve(fr))
         fr = FakeRequest('/prefix/2009/02/13/')
-        self.assertEqual('2009-02-13', dr.resolve(fr))
+        self.assertEqual(Response(content='2009-02-13'), dr.resolve(fr))
         fr = FakeRequest('/prefix/2009/02/')
-        self.assertEqual('2009-02', dr.resolve(fr))
+        self.assertEqual(Response(content='2009-02'), dr.resolve(fr))
         fr = FakeRequest('/prefix/2009/')
-        self.assertEqual('2009', dr.resolve(fr))
+        self.assertEqual(Response(content='2009'), dr.resolve(fr))
 
     def testPrefixFail(self):
         dr = DateResolver()

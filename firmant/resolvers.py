@@ -1,5 +1,7 @@
 import re
 
+from firmant.wsgi import Response
+
 
 class Resolver(object):
 
@@ -30,31 +32,41 @@ class DateResolver(object):
     def resolve(self, request):
         match = self.recent_re.match(request.url)
         if match != None:
-            return self._recent(request, **match.groupdict())
+            d = match.groupdict()
+            d['request'] = request
+            return self._recent(**d)
         match = self.year_re.match(request.url)
         if match != None:
-            return self._year(request, **match.groupdict())
+            d = match.groupdict()
+            d['request'] = request
+            return self._year(**d)
         match = self.month_re.match(request.url)
         if match != None:
-            return self._month(request, **match.groupdict())
+            d = match.groupdict()
+            d['request'] = request
+            return self._month(**d)
         match = self.day_re.match(request.url)
         if match != None:
-            return self._day(request, **match.groupdict())
+            d = match.groupdict()
+            d['request'] = request
+            return self._day(**d)
         match = self.single_re.match(request.url)
         if match != None:
-            return self._single(request, **match.groupdict())
+            d = match.groupdict()
+            d['request'] = request
+            return self._single(**d)
 
     def _recent(self, request):
-        return 'RECENT'
+        return Response(content='RECENT')
 
     def _year(self, request, year):
-        return '%s' % year
+        return Response(content='%s' % year)
 
     def _month(self, request, year, month):
-        return '%s-%s' % (year, month)
+        return Response(content='%s-%s' % (year, month))
 
     def _day(self, request, year, month, day):
-        return '%s-%s-%s' % (year, month, day)
+        return Response(content='%s-%s-%s' % (year, month, day))
 
     def _single(self, request, slug, year, month, day):
-        return '%s-%s-%s %s' % (year, month, day, slug)
+        return Response(content='%s-%s-%s %s' % (year, month, day, slug))

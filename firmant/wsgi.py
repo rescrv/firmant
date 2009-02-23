@@ -19,6 +19,11 @@ class Response(object):
         self.headers = headers
         self.content = content
 
+    def __eq__(self, other):
+        return (self.status == other.status and
+                self.headers == other.headers and
+                self.content == other.content)
+
 
 class Application(object):
 

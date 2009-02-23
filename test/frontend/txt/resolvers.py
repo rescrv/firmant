@@ -1,5 +1,6 @@
 import unittest
 
+from firmant.wsgi import Response
 from firmant.frontend.txt.resolvers import TxtDateResolver as DateResolver
 from firmant.db.relations import schema
 from firmant.db.atom import AtomDB
@@ -30,31 +31,31 @@ class TestTxtDateResolver(unittest.TestCase):
     def testYear(self):
         self.loadData()
         tdr = DateResolver()
-        self.assertEqual([e3, e2, e1].__repr__(),
+        self.assertEqual(Response(content=[e3, e2, e1].__repr__()),
                 tdr.resolve(FakeRequest('/2009/')))
 
     def testMonth(self):
         self.loadData()
         tdr = DateResolver()
-        self.assertEqual([e3, e2, e1].__repr__(),
+        self.assertEqual(Response(content=[e3, e2, e1].__repr__()),
                 tdr.resolve(FakeRequest('/2009/02/')))
 
     def testDay(self):
         self.loadData()
         tdr = DateResolver()
-        self.assertEqual([e3, e2].__repr__(),
+        self.assertEqual(Response(content=[e3, e2].__repr__()),
                 tdr.resolve(FakeRequest('/2009/02/17/')))
-        self.assertEqual([e1].__repr__(),
+        self.assertEqual(Response(content=[e1].__repr__()),
                 tdr.resolve(FakeRequest('/2009/02/13/')))
 
     def testSingle(self):
         self.loadData()
         tdr = DateResolver()
-        self.assertEqual(e3.__repr__(),
+        self.assertEqual(Response(content=e3.__repr__()),
                 tdr.resolve(FakeRequest('/2009/02/17/sample/')))
-        self.assertEqual(e2.__repr__(),
+        self.assertEqual(Response(content=e2.__repr__()),
                 tdr.resolve(FakeRequest('/2009/02/17/loren-ipsum/')))
-        self.assertEqual(e1.__repr__(),
+        self.assertEqual(Response(content=e1.__repr__()),
                 tdr.resolve(FakeRequest('/2009/02/13/sample/')))
 
 
