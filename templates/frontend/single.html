@@ -1,0 +1,23 @@
+{% extends 'frontend/base.html' %}
+
+{% block title %}Firmant Post{% endblock %}
+
+{% block content %}
+{% if entry %}
+    <h1>{{ entry.title | escape }}</h1>
+    <div class="published">Published on: {{ entry.published.strftime("%Y-%M-%d") }}</div>
+    <div class="updated">Last updated: {{ entry.updated }}</div>
+    <div class="author_name">Authored by: {{ entry.author_name | escape }}</div>
+    <div class="author_email">Author email: {{ entry.author_email | escape }}</div>
+    <div class="author_uri">Author uri: {{ entry.author_uri | escape }}</div>
+    <div class="category">Filed in: {{ entry.category_term | escape }}</div>
+    <div class="category">Category description: {{ entry.category_label | escape }}</div>
+    <div class="rights">Rights: {{ entry.rights | escape }}</div>
+    <div class="slug">Slug: {{ entry.slug | escape }}</div>
+    <p>{{ entry.summary | escape }}</p>
+    <hr />
+    <p>{{ entry.content | escape }}</p>
+{% else %}
+<p>There are no entries in the system.</p>
+{% endif %}
+{% endblock %}

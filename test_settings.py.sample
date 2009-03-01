@@ -9,6 +9,12 @@ ATOM_DB_CONNECT_WRITE = "dbname='firmant'"
 OMNIPOTENT_DB_CONNECT = "dbname='firmant'"
 
 # Our enabled components
-PLUGINS = ['firmant.frontend.txt']
+PLUGINS = ['firmant.frontend.txt', 'firmant.frontend.jinja2']
 
 FRONTEND_TXT_PREFIX = ''
+FRONTEND_JINJA2_PREFIX = 'jinja2'
+FRONTEND_JINJA2_ENCODING = 'utf-8'
+FRONTEND_JINJA2_MIME = 'text/html'
+
+import os
+TEMPLATES = [os.path.join(os.getcwd(), 'templates')]

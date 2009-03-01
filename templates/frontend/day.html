@@ -1,0 +1,10 @@
+{% extends 'frontend/base.html' %}
+
+{% block title %}Firmant Archive {{ year }}-{{ month }}-{{ day }}{% endblock %}
+
+{% block content %}
+<h1>Firmant Archive for the Day {{ year }}-{{ month }}-{{ day }}</h1>
+
+{% include 'frontend/_entry_list.html' %}
+
+{% endblock %}
