@@ -1,4 +1,6 @@
 from firmant.configuration import settings
+from firmant.plugins import resolver_list
+from firmant.plugins import load_plugins
 
 
 class Request(object):
@@ -39,8 +41,7 @@ class Application(object):
         3. The response is returned to the WSGI Server
         '''
         request = Request(self.environ)
-        settings.reconfigure(self.environ['firmant.settings'])
-        for resolver in settings['URL_RESOLVERS']:
+        for resolver in resolver_list:
             response = resolver.resolve(request)
             if response != None:
                 self.start(response.status, response.headers)
@@ -48,3 +49,13 @@ class Application(object):
                 return
         self.start('404 Not Found', [('content-type', 'text/plain')])
         yield '404'
+
+
+configured = False
+def application(environ, start_response):
+    global configured
+    if not configured:
+        settings.configure(environ['firmant.settings'])
+        load_plugins()
+        configured = True
+    return Application(environ, start_response)

@@ -4,7 +4,7 @@ from optparse import OptionParser
 from sys import stderr
 import socket
 
-from firmant.wsgi import Application
+from firmant.wsgi import application
 
 parser = OptionParser()
 parser.add_option('-s', '--settings',
@@ -25,7 +25,7 @@ except ImportError:
     exit(1)
 
 try:
-    server = make_server(options.host, options.port, Application)
+    server = make_server(options.host, options.port, application)
 except socket.error:
     stderr.write('Please specify a host/port to which you may bind (the '
                  'defaults usually work well)\n')

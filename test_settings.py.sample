@@ -8,6 +8,7 @@ ATOM_DB_CONNECT_WRITE = "dbname='firmant'"
 # be enabled in production.
 OMNIPOTENT_DB_CONNECT = "dbname='firmant'"
 
-# Load our resolvers.
-from firmant.frontend.txt.resolvers import TxtDateResolver
-URL_RESOLVERS = [TxtDateResolver(), ]
+# Our enabled components
+PLUGINS = ['firmant.frontend.txt']
+
+FRONTEND_TXT_PREFIX = ''
