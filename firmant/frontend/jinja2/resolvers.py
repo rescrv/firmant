@@ -59,7 +59,7 @@ class Jinja2DateResolver(DateResolver):
         entry = Entry.single(slug, dt)
         template = self.env.get_template('frontend/single.html')
         return Jinja2DateResolver.generate_response(template,
-                {'entries': entries, 'year': dt.year, 'month': dt.month,
+                {'entry': entry, 'year': dt.year, 'month': dt.month,
                     'day': dt.day, 'slug': slug})
 
     @staticmethod
