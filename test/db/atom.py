@@ -178,5 +178,17 @@ class TestAtomSchema(unittest.TestCase):
         self.assertEqual(e[1], e2)
         self.assertEqual(e[2], e1)
 
+    def testEntryRecentPresent(self):
+        self.testLoadData()
+        e = Entry.recent()
+        self.assertEqual(3, len(e))
+        self.assertEqual(e[0], e3)
+        self.assertEqual(e[1], e2)
+        self.assertEqual(e[2], e1)
+
+    def testEntryRecentEmpty(self):
+        e = Entry.recent()
+        self.assertEqual(e, [])
+
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestAtomSchema)

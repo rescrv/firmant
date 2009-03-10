@@ -133,3 +133,15 @@ class Entry(Relation):
         cur.close()
         conn.close()
         return results
+
+    @classmethod
+    def recent(cls):
+        # If this raises an error, let it rise up.
+        cur = AtomDB.readonly_cursor()
+        params = {'additional': '1=1'}
+        sql = Entry.sql % params
+        cur.execute('SET search_path = atom;')
+        cur.execute(sql)
+        results = cls._select(cur, cls.attributes)
+        cur.close()
+        return results
