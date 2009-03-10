@@ -15,12 +15,21 @@ date_re = re.compile('^\d{4}-\d{1,2}-\d{1,2}$')
 
 class AtomDB(object):
 
+    ro_connection = None
+
     @staticmethod
     def connection(readonly=True):
         if readonly:
             return psycopg2.connect(settings['ATOM_DB_CONNECT'])
         else:
             return psycopg2.connect(settings['ATOM_DB_CONNECT_WRITE'])
+
+    @staticmethod
+    def readonly_cursor():
+        if AtomDB.ro_connection == None:
+            AtomDB.ro_connection = AtomDB.connection(readonly=True)
+            AtomDB.ro_connection.set_isolation_level(0)
+        return AtomDB.ro_connection.cursor()
 
     @staticmethod
     def reset():
@@ -84,8 +93,7 @@ class Entry(Relation):
         except AttributeError, e:
             raise ValueError('date should provide strftime')
 
-        conn = AtomDB.connection(readonly=True)
-        cur = conn.cursor()
+        cur = AtomDB.readonly_cursor()
         params = {'additional': """e.slug=%(slug)s
                                    AND e.published_date=%(date)s"""}
         singlesql = Entry.sql % params
@@ -94,7 +102,6 @@ class Entry(Relation):
         cur.execute(singlesql, params)
         results = cls._select(cur, cls.attributes)
         cur.close()
-        conn.close()
         if len(results) == 0:
             return None
         elif len(results) == 1:
@@ -121,8 +128,7 @@ class Entry(Relation):
             raise
         if trunc not in set(['day', 'month', 'year']):
             raise ValueError('Must truncate to the day, month, or year')
-        conn = AtomDB.connection(readonly=True)
-        cur = conn.cursor()
+        cur = AtomDB.readonly_cursor()
         params = {'additional':
                 """date_trunc(%(trunc)s, e.published_date)=%(date)s"""}
         daysql = Entry.sql % params
@@ -131,7 +137,6 @@ class Entry(Relation):
         cur.execute(daysql, params)
         results = cls._select(cur, cls.attributes)
         cur.close()
-        conn.close()
         return results
 
     @classmethod
