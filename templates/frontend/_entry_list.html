@@ -1,7 +1,7 @@
 {% if entries %}
     {% for entry in entries %}
         <h2>{{ entry.title | escape }}</h2>
-        <div class="published">Published on: {{ entry.published.strftime("%Y-%M-%d") }}</div>
+        <div class="published">Published on: {{ entry.published.strftime("%Y-%m-%d") }}</div>
         <div class="updated">Last updated: {{ entry.updated }}</div>
         <div class="author_name">Authored by: {{ entry.author_name | escape }}</div>
         <div class="author_email">Author email: {{ entry.author_email | escape }}</div>
