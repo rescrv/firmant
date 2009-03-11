@@ -16,7 +16,10 @@ class Jinja2DateResolver(DateResolver):
         self.env = Environment(loader=FileSystemLoader(settings['TEMPLATES']))
 
     def _recent(self, request):
-        return Response(content='RECENT')
+        entries = Entry.recent()
+        template = self.env.get_template('frontend/recent.html')
+        return Jinja2DateResolver.generate_response(template,
+                {'entries': entries})
 
     def _year(self, request, year):
         try:

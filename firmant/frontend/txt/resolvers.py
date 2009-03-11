@@ -10,7 +10,8 @@ from firmant.db.atom import slug_re
 class TxtDateResolver(DateResolver):
 
     def _recent(self, request):
-        return Response(content='RECENT')
+        entries = Entry.recent()
+        return Response(content=entries.__repr__())
 
     def _year(self, request, year):
         try:

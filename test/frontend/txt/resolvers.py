@@ -31,7 +31,7 @@ class TestTxtDateResolver(unittest.TestCase):
     def testRecent(self):
         self.loadData()
         tdr = DateResolver()
-        self.assertEqual(Response(content='RECENT'),
+        self.assertEqual(Response(content=[e3, e2, e1].__repr__()),
                 tdr.resolve(FakeRequest('/')))
 
     def testYear(self):
