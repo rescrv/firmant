@@ -5,6 +5,8 @@ DELETE FROM entries CASCADE;
 DELETE FROM people CASCADE;
 DELETE FROM categories CASCADE;
 DELETE FROM content CASCADE;
+DELETE FROM feeds CASCADE;
+DELETE FROM _feeds_entries_join;
 
 -- Insert some sample post content.  These represent two revisions of the same
 -- post.
@@ -121,3 +123,22 @@ INSERT INTO entry_revisions
      '2009-2-17 113130 EST',
      'Loren Ipsum ...',
      1);
+
+INSERT INTO feeds
+    (slug, title, rights, subtitle) VALUES
+    ('general',
+     'General Content',
+     'Same as source.',
+     'This is a feed that holds general content');
+
+INSERT INTO _feeds_entries_join
+    (feeds_slug, entries_slug, entries_published_date) VALUES
+    ('general',
+     'sample',
+     '2009-2-13');
+
+INSERT INTO _feeds_entries_join
+    (feeds_slug, entries_slug, entries_published_date) VALUES
+    ('general',
+     'loren-ipsum',
+     '2009-2-17');

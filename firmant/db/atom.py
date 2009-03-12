@@ -85,6 +85,29 @@ class Entry(Relation):
         """
 
     @classmethod
+    def for_feed(cls, feedname):
+        # Monkey Patch SQL to find for feeds.  Perhaps I will rewrite to be
+        # cleaner.
+        i = Entry.sql.find('WHERE')
+        newsql = Entry.sql[:i]
+        newsql += ''', feeds f, _feeds_entries_join fej '''
+        newsql += Entry.sql[i:]
+        cur = AtomDB.readonly_cursor()
+        params = {'additional':
+                """f.slug = fej.feeds_slug AND
+                fej.entries_slug = e.slug AND
+                fej.entries_published_date = e.published_date AND
+                f.slug = %(slug)s
+                """}
+        newsql = newsql % params
+        params = {'slug': feedname}
+        cur.execute('SET search_path = atom;')
+        cur.execute(newsql, params)
+        results = cls._select(cur, cls.attributes)
+        cur.close()
+        return results
+
+    @classmethod
     def single(cls, slug, date):
         if slug_re.match(slug) == None:
             raise ValueError('Invalid slug')

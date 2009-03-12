@@ -190,5 +190,14 @@ class TestAtomSchema(unittest.TestCase):
         e = Entry.recent()
         self.assertEqual(e, [])
 
+    def testEntryForFeedEmpty(self):
+        self.testLoadData()
+        self.assertEqual([], Entry.for_feed('Idon_tExist'))
+
+    def testEntryForFeedPresent(self):
+        self.testLoadData()
+        results = Entry.for_feed('general')
+        self.assertEqual([e2, e1], results)
+
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestAtomSchema)
