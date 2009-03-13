@@ -1,9 +1,23 @@
+import datetime
 import re
+import urlparse
+import lxml.etree as etree
 
 from firmant.wsgi import Response
 from firmant.resolvers import Resolver
 from firmant.db.atom import Entry
+from firmant.db.atom import Feed
 from firmant.configuration import settings
+
+
+atom_date_str = '%Y-%m-%dT%H:%M:%S-00:00'
+
+
+def feed_permalink(slug=''):
+    url = urlparse.urljoin(settings['HOST'], '/atom/')
+    if slug != '':
+        url += slug + '/'
+    return url
 
 
 class AtomResolver(Resolver):
@@ -19,8 +33,91 @@ class AtomResolver(Resolver):
     def resolve(self, request):
         default = self.default_re.match(request.url)
         named = self.named_re.match(request.url)
+        feed = None
         if default != None:
-            return Response(content='default atom')
+            feed = Feed()
+            feed.title = settings['ATOM_DEFAULT_TITLE']
+            feed.rights = settings['ATOM_DEFAULT_RIGHTS']
+            feed.subtitle = settings['ATOM_DEFAULT_SUBTITLE']
+            feed.entries = Entry.recent()
+            feed.updated = datetime.datetime(1900, 1, 1, 1, 1, 1)
+            for entry in feed.entries:
+                if feed.updated < entry.updated:
+                    feed.updated = entry.updated
         elif named != None:
-            return Response(content='named atom')
-        return None
+            feed = Feed.by_name(named.groupdict()['slug'])
+        if feed == None:
+            return None
+        else:
+            return Response(content=create_xml_from_feed(feed))
+
+
+def create_xml_from_feed(feed):
+    root = etree.Element('feed')
+    root.set('xmlns', 'http://www.w3.org/2005/Atom')
+
+    generator = etree.SubElement(root, 'generator')
+    generator.text = settings['GENERATOR']
+
+    title = etree.SubElement(root, 'title')
+    title.text = feed.title
+
+    rights = etree.SubElement(root, 'rights')
+    rights.text = feed.rights
+
+    updated = etree.SubElement(root, 'updated')
+    updated.text = feed.updated.strftime(atom_date_str)
+
+    l_self = etree.SubElement(root, 'link')
+    l_self.set('href', feed_permalink())
+    l_self.set('rel', 'self')
+
+    id = etree.SubElement(root, 'id')
+    id.text = feed_permalink()
+
+    for entry in feed.entries:
+        root.append(create_xml_from_entry(entry))
+    return ('<?xml version="1.0" encoding="utf-8"?>\n' +
+            etree.tostring(root, pretty_print=True))
+
+
+def create_xml_from_entry(entry):
+    root = etree.Element('entry')
+
+    title = etree.SubElement(root, 'title')
+    title.text = entry.title
+
+    updated = etree.SubElement(root, 'updated')
+    updated.text = entry.updated.strftime(atom_date_str)
+
+    published = etree.SubElement(root, 'published')
+    published.text = entry.published.strftime(atom_date_str)
+
+    author = etree.SubElement(root, 'author')
+    author_name = etree.SubElement(author, 'name')
+    author_name.text = entry.author_name
+    author_uri = etree.SubElement(author, 'uri')
+    author_uri.text = entry.author_uri
+    author_email = etree.SubElement(author, 'email')
+    author_email.text = entry.author_email
+
+    content = etree.SubElement(root, 'content')
+    content.text = entry.content
+
+    l_alt = etree.SubElement(root, 'link')
+    l_alt.set('href', entry.permalink())
+    l_alt.set('rel', 'alternate')
+
+    id = etree.SubElement(root, 'id')
+    id.text = entry.permalink()
+
+    rights = etree.SubElement(root, 'rights')
+    rights.text = entry.rights
+
+    summary = etree.SubElement(root, 'summary')
+    summary.text = entry.summary
+
+    category = etree.SubElement(root, 'category')
+    category.set('term', entry.category_term)
+    category.set('label', entry.category_label)
+    return root

@@ -8,6 +8,14 @@ ATOM_DB_CONNECT_WRITE = "dbname='firmant'"
 # be enabled in production.
 OMNIPOTENT_DB_CONNECT = "dbname='firmant'"
 
+# The component of the hostname.  Must be suitable for the first parameter of
+# urlparse.urljoin
+HOST = 'http://localhost:8080/'
+
+# The generator string.  Please leave as 'firmant' just to spread the word (or
+# change it if you absolutely must).
+GENERATOR = 'Firmant 0.10'
+
 # Our enabled components
 PLUGINS = ['firmant.frontend.txt', 'firmant.frontend.jinja2', 'firmant.frontend.atom']
 ENTRY_PERMALINK = 'firmant.frontend.jinja2'
@@ -20,3 +28,8 @@ FRONTEND_ATOM_PREFIX = 'atom'
 
 import os
 TEMPLATES = [os.path.join(os.getcwd(), 'templates')]
+
+# Atom Default Feed ('/atom/')
+ATOM_DEFAULT_TITLE = 'Firmant Atom Feed'
+ATOM_DEFAULT_RIGHTS = 'Same as source.'
+ATOM_DEFAULT_SUBTITLE = 'The default atom feed'

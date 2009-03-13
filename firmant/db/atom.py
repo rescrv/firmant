@@ -173,3 +173,34 @@ class Entry(Relation):
         results = cls._select(cur, cls.attributes)
         cur.close()
         return results
+
+
+class Feed(Relation):
+
+    attributes = ['slug', 'title', 'rights', 'subtitle', 'updated']
+
+    sql = """
+        SELECT f.slug, f.title, f.rights, f.subtitle, MAX(er.updated)
+        FROM feeds f, _feeds_entries_join f_e, entries e, entry_revisions er
+        WHERE f.slug = f_e.feeds_slug AND
+            f_e.entries_slug = e.slug AND
+            f_e.entries_published_date = e.published_date AND
+            e.slug = er.slug AND
+            e.published_date = er.published_date AND
+            f.slug = %(slug)s
+        GROUP BY f.slug, f.title, f.rights, f.subtitle;
+        """
+
+    @classmethod
+    def by_name(cls, name):
+        # If this raises an error, let it rise up.
+        cur = AtomDB.readonly_cursor()
+        cur.execute('SET search_path = atom;')
+        cur.execute(Feed.sql, {'slug': name})
+        results = cls._select(cur, cls.attributes)
+        cur.close()
+        if len(results) == 0:
+            return None
+        feed = results[0]
+        feed.entries = Entry.for_feed(name)
+        return feed
