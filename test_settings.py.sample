@@ -10,6 +10,7 @@ OMNIPOTENT_DB_CONNECT = "dbname='firmant'"
 
 # Our enabled components
 PLUGINS = ['firmant.frontend.txt', 'firmant.frontend.jinja2', 'firmant.frontend.atom']
+ENTRY_PERMALINK = 'firmant.frontend.jinja2'
 
 FRONTEND_TXT_PREFIX = ''
 FRONTEND_JINJA2_PREFIX = 'jinja2'

@@ -1,5 +1,6 @@
 import datetime
 import re
+import urlparse
 from jinja2 import Environment, FileSystemLoader
 
 from firmant.wsgi import Response
@@ -7,6 +8,15 @@ from firmant.resolvers import DateResolver
 from firmant.db.atom import Entry
 from firmant.db.atom import slug_re
 from firmant.configuration import settings
+
+
+def entry_permalink(entry):
+    prefix = '/' + settings['FRONTEND_JINJA2_PREFIX']
+    if prefix == '/':
+        prefix = ''
+    path = '%s/%s/%s/' % (prefix, entry.published.strftime('%Y/%m/%d'),
+                          entry.slug)
+    return urlparse.urljoin(settings['HOST'], path)
 
 
 class Jinja2DateResolver(DateResolver):
