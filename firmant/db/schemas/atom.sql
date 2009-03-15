@@ -190,3 +190,31 @@ CREATE TABLE _entries_contributors_join (
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+
+
+--------------------------------------------------------------------------------
+-- Views -----------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+CREATE VIEW entries_published (slug, published, name, uri, email, term, label,
+    rights, updated, title, content, summary, published_date)
+    AS
+        SELECT e.slug, (e.published_date + e.published_time)::TIMESTAMP WITH
+            TIME ZONE AT TIME ZONE 'GMT', p.name, p.uri, p.email, ca.term,
+            ca.label, e.rights, er.updated AT TIME ZONE 'GMT', er.title,
+            co.content, co.summary, e.published_date
+        FROM entries e, people p, categories ca, entry_revisions er, content co
+        WHERE e.author = p.name AND
+            e.category = ca.term AND
+            er.slug = e.slug AND
+            er.published_date = e.published_date AND
+            er.content = co.id AND
+            (e.published_date + e.published_time)::TIMESTAMP WITH TIME ZONE
+                AT TIME ZONE 'GMT' < NOW() AT TIME ZONE 'GMT' AND
+            (er.slug, er.published_date, er.updated) IN
+                (SELECT er2.slug,
+                    er2.published_date,
+                    MAX(er2.updated)
+                FROM entry_revisions er2
+                GROUP BY er2.slug, er2.published_date)
+        ORDER BY e.published_date DESC, e.published_time DESC, e.slug ASC;

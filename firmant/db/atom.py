@@ -63,46 +63,20 @@ class Entry(Relation):
                   'category_label', 'rights', 'updated', 'title', 'content',
                   'summary']
 
-    sql = """
-        SELECT e.slug, (e.published_date + e.published_time)::TIMESTAMP WITH
-            TIME ZONE AT TIME ZONE 'GMT', p.name, p.uri, p.email, ca.term,
-            ca.label, e.rights, er.updated AT TIME ZONE 'GMT', er.title,
-            co.content, co.summary
-        FROM entries e, people p, categories ca, entry_revisions er, content co
-        WHERE e.author = p.name AND
-            e.category = ca.term AND
-            er.slug = e.slug AND
-            er.published_date = e.published_date AND
-            er.content = co.id AND
-            %(additional)s AND
-            (er.slug, er.published_date, er.updated) IN
-                (SELECT er2.slug,
-                    er2.published_date,
-                    MAX(er2.updated)
-                FROM entry_revisions er2
-                GROUP BY er2.slug, er2.published_date)
-        ORDER BY e.published_date DESC, e.published_time DESC, e.slug ASC;
-        """
-
     @classmethod
     def for_feed(cls, feedname):
-        # Monkey Patch SQL to find for feeds.  Perhaps I will rewrite to be
-        # cleaner.
-        i = Entry.sql.find('WHERE')
-        newsql = Entry.sql[:i]
-        newsql += ''', feeds f, _feeds_entries_join fej '''
-        newsql += Entry.sql[i:]
+        sql = """SELECT ep.slug, ep.published, ep.name, ep.uri, ep.email,
+                        ep.term, ep.label, ep.rights, ep.updated, ep.title,
+                        ep.content, ep.summary
+                 FROM entries_published ep, feeds f, _feeds_entries_join fej
+                 WHERE f.slug = fej.feeds_slug AND
+                       fej.entries_slug = ep.slug AND
+                       fej.entries_published_date = ep.published_date AND
+                       f.slug = %(slug)s;"""
         cur = AtomDB.readonly_cursor()
-        params = {'additional':
-                """f.slug = fej.feeds_slug AND
-                fej.entries_slug = e.slug AND
-                fej.entries_published_date = e.published_date AND
-                f.slug = %(slug)s
-                """}
-        newsql = newsql % params
         params = {'slug': feedname}
         cur.execute('SET search_path = atom;')
-        cur.execute(newsql, params)
+        cur.execute(sql, params)
         results = cls._select(cur, cls.attributes)
         cur.close()
         return results
@@ -117,12 +91,14 @@ class Entry(Relation):
             raise ValueError('date should provide strftime')
 
         cur = AtomDB.readonly_cursor()
-        params = {'additional': """e.slug=%(slug)s
-                                   AND e.published_date=%(date)s"""}
-        singlesql = Entry.sql % params
+        sql = """SELECT slug, published, name, uri, email, term, label, rights,
+                        updated, title, content, summary
+                 FROM entries_published
+                 WHERE slug=%(slug)s AND
+                       published_date=%(date)s;"""
         params = {'slug': slug, 'date': datestr}
         cur.execute('SET search_path = atom;')
-        cur.execute(singlesql, params)
+        cur.execute(sql, params)
         results = cls._select(cur, cls.attributes)
         cur.close()
         if len(results) == 0:
@@ -152,12 +128,13 @@ class Entry(Relation):
         if trunc not in set(['day', 'month', 'year']):
             raise ValueError('Must truncate to the day, month, or year')
         cur = AtomDB.readonly_cursor()
-        params = {'additional':
-                """date_trunc(%(trunc)s, e.published_date)=%(date)s"""}
-        daysql = Entry.sql % params
+        sql = """SELECT slug, published, name, uri, email, term, label, rights,
+                        updated, title, content, summary
+                 FROM entries_published
+                 WHERE date_trunc(%(trunc)s, published_date)=%(date)s;"""
         params = {'date': dt.strftime('%Y-%m-%d'), 'trunc': trunc}
         cur.execute('SET search_path = atom;')
-        cur.execute(daysql, params)
+        cur.execute(sql, params)
         results = cls._select(cur, cls.attributes)
         cur.close()
         return results
@@ -166,8 +143,9 @@ class Entry(Relation):
     def recent(cls):
         # If this raises an error, let it rise up.
         cur = AtomDB.readonly_cursor()
-        params = {'additional': '1=1'}
-        sql = Entry.sql % params
+        sql = """SELECT slug, published, name, uri, email, term, label, rights,
+                        updated, title, content, summary
+                 FROM entries_published;"""
         cur.execute('SET search_path = atom;')
         cur.execute(sql)
         results = cls._select(cur, cls.attributes)
