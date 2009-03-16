@@ -21,6 +21,7 @@ e1.updated        = datetime.datetime(2009, 2, 14, 04, 31, 31)
 e1.title          = 'Unix 1234567890'
 e1.content        = 'This is the main content of revision two.'
 e1.summary        = 'This is the summary of revision two.'
+e1.tz             = 'EST'
 
 e2 = Entry()
 e2.slug           = 'loren-ipsum'
@@ -58,6 +59,7 @@ e2.content        = (
      magna.  Morbi justo leo, faucibus nec, consectetur id, sodales vitae,
      nunc.""")
 e2.summary        = 'A generated loren ipsum paragraph.'
+e2.tz             = 'EST'
 
 e3 = Entry()
 e3.slug           = 'sample'
@@ -72,6 +74,7 @@ e3.updated        = datetime.datetime(2009, 2, 17, 16, 31, 30)
 e3.title          = 'Loren Ipsum ...'
 e3.content        = 'This is the main content of revision one.'
 e3.summary        = 'This is the summary of revision one.'
+e3.tz             = 'EST'
 
 class TestAtomSchema(unittest.TestCase):
 

@@ -197,12 +197,14 @@ CREATE TABLE _entries_contributors_join (
 --------------------------------------------------------------------------------
 
 CREATE VIEW entries_published (slug, published, name, uri, email, term, label,
-    rights, updated, title, content, summary, published_date)
+    rights, updated, title, content, summary, published_date, tz)
     AS
         SELECT e.slug, (e.published_date + e.published_time)::TIMESTAMP WITH
             TIME ZONE AT TIME ZONE 'GMT', p.name, p.uri, p.email, ca.term,
             ca.label, e.rights, er.updated AT TIME ZONE 'GMT', er.title,
-            co.content, co.summary, e.published_date
+            co.content, co.summary, e.published_date,
+            to_char((e.published_date + e.published_time)::TIMESTAMP WITH TIME
+                ZONE, 'TZ')
         FROM entries e, people p, categories ca, entry_revisions er, content co
         WHERE e.author = p.name AND
             e.category = ca.term AND

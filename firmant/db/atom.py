@@ -61,13 +61,13 @@ class Entry(Relation):
     attributes = ['slug', 'published', 'author_name',
                   'author_uri', 'author_email', 'category_term',
                   'category_label', 'rights', 'updated', 'title', 'content',
-                  'summary']
+                  'summary', 'tz']
 
     @classmethod
     def for_feed(cls, feedname):
         sql = """SELECT ep.slug, ep.published, ep.name, ep.uri, ep.email,
                         ep.term, ep.label, ep.rights, ep.updated, ep.title,
-                        ep.content, ep.summary
+                        ep.content, ep.summary, ep.tz
                  FROM entries_published ep, feeds f, _feeds_entries_join fej
                  WHERE f.slug = fej.feeds_slug AND
                        fej.entries_slug = ep.slug AND
@@ -92,7 +92,7 @@ class Entry(Relation):
 
         cur = AtomDB.readonly_cursor()
         sql = """SELECT slug, published, name, uri, email, term, label, rights,
-                        updated, title, content, summary
+                        updated, title, content, summary, tz
                  FROM entries_published
                  WHERE slug=%(slug)s AND
                        published_date=%(date)s;"""
@@ -129,7 +129,7 @@ class Entry(Relation):
             raise ValueError('Must truncate to the day, month, or year')
         cur = AtomDB.readonly_cursor()
         sql = """SELECT slug, published, name, uri, email, term, label, rights,
-                        updated, title, content, summary
+                        updated, title, content, summary, tz
                  FROM entries_published
                  WHERE date_trunc(%(trunc)s, published_date)=%(date)s;"""
         params = {'date': dt.strftime('%Y-%m-%d'), 'trunc': trunc}
@@ -144,7 +144,7 @@ class Entry(Relation):
         # If this raises an error, let it rise up.
         cur = AtomDB.readonly_cursor()
         sql = """SELECT slug, published, name, uri, email, term, label, rights,
-                        updated, title, content, summary
+                        updated, title, content, summary, tz
                  FROM entries_published;"""
         cur.execute('SET search_path = atom;')
         cur.execute(sql)
