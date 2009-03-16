@@ -1,5 +1,7 @@
 #!/usr/bin/python
 import unittest
+# Import this now to avoid it throwing errors.
+import pytz
 
 from firmant.configuration import settings
 from test.configuration import suite as configuration_tests

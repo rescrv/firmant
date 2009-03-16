@@ -2,6 +2,7 @@ import re
 import psycopg2
 import os.path
 import datetime
+import pytz
 
 from firmant.configuration import settings
 from firmant.db.relations import Relation
@@ -62,6 +63,17 @@ class Entry(Relation):
                   'author_uri', 'author_email', 'category_term',
                   'category_label', 'rights', 'updated', 'title', 'content',
                   'summary', 'tz']
+
+    @classmethod
+    def _select(cls, cursor, fields):
+        entries = super(Entry, cls)._select(cursor, fields)
+        for entry in entries:
+            tz = pytz.timezone(entry.tz)
+            entry.published = pytz.utc.localize(entry.published)
+            entry.published = entry.published.astimezone(tz)
+            entry.updated = pytz.utc.localize(entry.updated)
+            entry.updated = entry.updated.astimezone(tz)
+        return entries
 
     @classmethod
     def for_feed(cls, feedname):

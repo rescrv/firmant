@@ -1,6 +1,7 @@
 import unittest
 import psycopg2
 import datetime
+import pytz
 
 from firmant.configuration import settings
 from firmant.db.relations import schema
@@ -8,16 +9,19 @@ from firmant.db.atom import AtomDB
 from firmant.db.atom import Entry
 
 
+EST = pytz.timezone('EST')
 e1 = Entry()
 e1.slug           = 'sample'
-e1.published      = datetime.datetime(2009, 2, 14, 04, 31, 30)
+e1.published      = datetime.datetime(2009, 2, 14, 04, 31, 30, tzinfo=pytz.utc)
+e1.published      = e1.published.astimezone(EST)
 e1.author_name    = 'Robert Escriva'
 e1.author_uri     = 'http://robescriva.com'
 e1.author_email   = 'rob@/dev/null'
 e1.category_term  = 'General'
 e1.category_label = 'All topics'
 e1.rights         = 'Same as source.'
-e1.updated        = datetime.datetime(2009, 2, 14, 04, 31, 31)
+e1.updated        = datetime.datetime(2009, 2, 14, 04, 31, 31, tzinfo=pytz.utc)
+e1.updated        = e1.updated.astimezone(EST)
 e1.title          = 'Unix 1234567890'
 e1.content        = 'This is the main content of revision two.'
 e1.summary        = 'This is the summary of revision two.'
@@ -25,14 +29,16 @@ e1.tz             = 'EST'
 
 e2 = Entry()
 e2.slug           = 'loren-ipsum'
-e2.published      = datetime.datetime(2009, 2, 17, 16, 31, 30)
+e2.published      = datetime.datetime(2009, 2, 17, 16, 31, 30, tzinfo=pytz.utc)
+e2.published      = e2.published.astimezone(EST)
 e2.author_name    = 'Loren Ipsum Generator'
 e2.author_uri     = 'http://www.lipsum.com'
 e2.author_email   = 'lipsum@/dev/null'
 e2.category_term  = 'Generated'
 e2.category_label = "You can't tell a computer wrote it."
 e2.rights         = 'Same as source.'
-e2.updated        = datetime.datetime(2009, 2, 17, 16, 31, 30)
+e2.updated        = datetime.datetime(2009, 2, 17, 16, 31, 30, tzinfo=pytz.utc)
+e2.updated        = e2.updated.astimezone(EST)
 e2.title          = 'Loren Ipsum ...'
 e2.content        = (
      """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus eget
@@ -63,14 +69,16 @@ e2.tz             = 'EST'
 
 e3 = Entry()
 e3.slug           = 'sample'
-e3.published      = datetime.datetime(2009, 2, 17, 21, 31, 30)
+e3.published      = datetime.datetime(2009, 2, 17, 21, 31, 30, tzinfo=pytz.utc)
+e3.published      = e3.published.astimezone(EST)
 e3.author_name    = 'Loren Ipsum Generator'
 e3.author_uri     = 'http://www.lipsum.com'
 e3.author_email   = 'lipsum@/dev/null'
 e3.category_term  = 'Generated'
 e3.category_label = "You can't tell a computer wrote it."
 e3.rights         = 'Same as source.'
-e3.updated        = datetime.datetime(2009, 2, 17, 16, 31, 30)
+e3.updated        = datetime.datetime(2009, 2, 17, 16, 31, 30, tzinfo=pytz.utc)
+e3.updated        = e3.updated.astimezone(EST)
 e3.title          = 'Loren Ipsum ...'
 e3.content        = 'This is the main content of revision one.'
 e3.summary        = 'This is the summary of revision one.'

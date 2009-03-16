@@ -2,6 +2,7 @@ import datetime
 import re
 import urlparse
 import lxml.etree as etree
+import pytz
 
 from firmant.wsgi import Response
 from firmant.resolvers import Resolver
@@ -10,7 +11,12 @@ from firmant.db.atom import Feed
 from firmant.configuration import settings
 
 
-atom_date_str = '%Y-%m-%dT%H:%M:%S-00:00'
+atom_date_str = '%Y-%m-%dT%H:%M:%S%z'
+
+
+def RFC3339(dt):
+    ret = dt.strftime(atom_date_str)
+    return ret[:-2] + ':' + ret[-2:]
 
 
 def feed_permalink(slug=''):
@@ -40,7 +46,8 @@ class AtomResolver(Resolver):
             feed.rights = settings['ATOM_DEFAULT_RIGHTS']
             feed.subtitle = settings['ATOM_DEFAULT_SUBTITLE']
             feed.entries = Entry.recent()
-            feed.updated = datetime.datetime(1900, 1, 1, 1, 1, 1)
+            feed.updated = pytz.utc.localize(
+                    datetime.datetime(1900, 1, 1, 1, 1, 1))
             for entry in feed.entries:
                 if feed.updated < entry.updated:
                     feed.updated = entry.updated
@@ -66,7 +73,7 @@ def create_xml_from_feed(feed):
     rights.text = feed.rights
 
     updated = etree.SubElement(root, 'updated')
-    updated.text = feed.updated.strftime(atom_date_str)
+    updated.text = RFC3339(feed.updated)
 
     l_self = etree.SubElement(root, 'link')
     l_self.set('href', feed_permalink())
@@ -88,10 +95,10 @@ def create_xml_from_entry(entry):
     title.text = entry.title
 
     updated = etree.SubElement(root, 'updated')
-    updated.text = entry.updated.strftime(atom_date_str)
+    updated.text = RFC3339(entry.updated)
 
     published = etree.SubElement(root, 'published')
-    published.text = entry.published.strftime(atom_date_str)
+    published.text = RFC3339(entry.published)
 
     author = etree.SubElement(root, 'author')
     author_name = etree.SubElement(author, 'name')
