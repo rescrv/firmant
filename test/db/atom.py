@@ -16,7 +16,7 @@ e1.published      = datetime.datetime(2009, 2, 14, 04, 31, 30, tzinfo=pytz.utc)
 e1.published      = e1.published.astimezone(EST)
 e1.author_name    = 'Robert Escriva'
 e1.author_uri     = 'http://robescriva.com'
-e1.author_email   = 'rob@/dev/null'
+e1.author_email   = 'rob@example.org'
 e1.category_term  = 'General'
 e1.category_label = 'All topics'
 e1.rights         = 'Same as source.'
@@ -33,7 +33,7 @@ e2.published      = datetime.datetime(2009, 2, 17, 16, 31, 30, tzinfo=pytz.utc)
 e2.published      = e2.published.astimezone(EST)
 e2.author_name    = 'Loren Ipsum Generator'
 e2.author_uri     = 'http://www.lipsum.com'
-e2.author_email   = 'lipsum@/dev/null'
+e2.author_email   = 'lipsum@example.org'
 e2.category_term  = 'Generated'
 e2.category_label = "You can't tell a computer wrote it."
 e2.rights         = 'Same as source.'
@@ -73,7 +73,7 @@ e3.published      = datetime.datetime(2009, 2, 17, 21, 31, 30, tzinfo=pytz.utc)
 e3.published      = e3.published.astimezone(EST)
 e3.author_name    = 'Loren Ipsum Generator'
 e3.author_uri     = 'http://www.lipsum.com'
-e3.author_email   = 'lipsum@/dev/null'
+e3.author_email   = 'lipsum@example.org'
 e3.category_term  = 'Generated'
 e3.category_label = "You can't tell a computer wrote it."
 e3.rights         = 'Same as source.'

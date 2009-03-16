@@ -51,12 +51,12 @@ INSERT INTO content (id, content, summary) VALUES
 INSERT INTO people (name, uri, email) VALUES
     ('Robert Escriva',
      'http://robescriva.com',
-     'rob@/dev/null');
+     'rob@example.org');
 
 INSERT INTO people (name, uri, email) VALUES
     ('Loren Ipsum Generator',
      'http://www.lipsum.com',
-     'lipsum@/dev/null');
+     'lipsum@example.org');
 
 -- Insert a general category.
 INSERT INTO categories (term, label) VALUES ('General', 'All topics');
