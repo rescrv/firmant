@@ -17,7 +17,10 @@ HOST = 'http://localhost:8080/'
 GENERATOR = 'Firmant 0.10'
 
 # Our enabled components
-PLUGINS = ['firmant.frontend.txt', 'firmant.frontend.jinja2', 'firmant.frontend.atom']
+PLUGINS = ['firmant.frontend.txt',
+           'firmant.frontend.jinja2',
+           'firmant.frontend.atom',
+           'firmant.filters.markdown']
 ENTRY_PERMALINK = 'firmant.frontend.jinja2'
 
 FRONTEND_TXT_PREFIX = ''
@@ -33,3 +36,8 @@ TEMPLATES = [os.path.join(os.getcwd(), 'templates')]
 ATOM_DEFAULT_TITLE = 'Firmant Atom Feed'
 ATOM_DEFAULT_RIGHTS = 'Same as source.'
 ATOM_DEFAULT_SUBTITLE = 'The default atom feed'
+
+# Markdown options
+MARKDOWN_XHTML_ENABLED = True
+# Valid options: 'replace', 'remove', 'escape'
+MARKDOWN_XHTML_SAFE_MODE = 'escape'
