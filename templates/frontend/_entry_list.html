@@ -10,9 +10,9 @@
         <div class="category">Category description: {{ entry.category_label | escape }}</div>
         <div class="rights">Rights: {{ entry.rights | escape }}</div>
         <div class="slug">Slug: {{ entry.slug | escape }}</div>
-        <p>{{ entry.summary | escape }}</p>
+        {{ entry.summary }}
         <hr />
-        <p>{{ entry.content | escape }}</p>
+        {{ entry.content }}
     {% endfor %}
 {% else %}
 <p>There are no entries in the system.</p>

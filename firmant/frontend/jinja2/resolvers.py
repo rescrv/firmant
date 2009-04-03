@@ -7,6 +7,7 @@ from firmant.wsgi import Response
 from firmant.resolvers import DateResolver
 from firmant.db.atom import Entry
 from firmant.db.atom import slug_re
+from firmant.filters import text_filter
 from firmant.configuration import settings
 
 
@@ -27,6 +28,7 @@ class Jinja2DateResolver(DateResolver):
 
     def _recent(self, request):
         entries = Entry.recent()
+        entries = map(Jinja2DateResolver.XHTML_filter, entries)
         template = self.env.get_template('frontend/recent.html')
         return Jinja2DateResolver.generate_response(template,
                 {'entries': entries})
@@ -37,6 +39,7 @@ class Jinja2DateResolver(DateResolver):
         except ValueError:
             return None
         entries = Entry.year(dt.year)
+        entries = map(Jinja2DateResolver.XHTML_filter, entries)
         template = self.env.get_template('frontend/year.html')
         return Jinja2DateResolver.generate_response(template,
                 {'entries': entries, 'year': dt.year})
@@ -47,6 +50,7 @@ class Jinja2DateResolver(DateResolver):
         except ValueError:
             return None
         entries = Entry.month(dt.year, dt.month)
+        entries = map(Jinja2DateResolver.XHTML_filter, entries)
         template = self.env.get_template('frontend/month.html')
         return Jinja2DateResolver.generate_response(template,
                 {'entries': entries, 'year': dt.year, 'month': dt.month})
@@ -57,6 +61,7 @@ class Jinja2DateResolver(DateResolver):
         except ValueError:
             return None
         entries = Entry.day(dt.year, dt.month, dt.day)
+        entries = map(Jinja2DateResolver.XHTML_filter, entries)
         template = self.env.get_template('frontend/day.html')
         return Jinja2DateResolver.generate_response(template,
                 {'entries': entries, 'year': dt.year, 'month': dt.month,
@@ -70,6 +75,7 @@ class Jinja2DateResolver(DateResolver):
         if slug_re.match(slug) == None:
             return None
         entry = Entry.single(slug, dt)
+        entry = Jinja2DateResolver.XHTML_filter(entry)
         template = self.env.get_template('frontend/single.html')
         return Jinja2DateResolver.generate_response(template,
                 {'entry': entry, 'year': dt.year, 'month': dt.month,
@@ -82,3 +88,9 @@ class Jinja2DateResolver(DateResolver):
         return Response('200 Ok',
                         [('content-type', settings['FRONTEND_JINJA2_MIME'])],
                         content)
+
+    @staticmethod
+    def XHTML_filter(entry):
+        entry.summary = text_filter('XHTML', entry.summary)
+        entry.content = text_filter('XHTML', entry.content)
+        return entry
