@@ -66,37 +66,40 @@ INSERT INTO categories (term, label) VALUES
 
 -- Insert the test entry and its two revisions.
 INSERT INTO entries
-    (slug, published_date, published_time, author, category, rights) VALUES
+    (slug, published_date, published_time, author, category, rights, timezone) VALUES
     ('sample',
      '2009-2-13',
-     '233130 EST',
+     '233130',
      'Robert Escriva',
      'General',
-     'Same as source.');
+     'Same as source.',
+     'America/New_York');
 
 INSERT INTO entries
-    (slug, published_date, published_time, author, category, rights) VALUES
+    (slug, published_date, published_time, author, category, rights, timezone) VALUES
     ('loren-ipsum',
      '2009-2-17',
-     '113130 EST',
+     '113130',
      'Loren Ipsum Generator',
      'Generated',
-     'Same as source.');
+     'Same as source.',
+     'America/New_York');
 
 INSERT INTO entries
-    (slug, published_date, published_time, author, category, rights) VALUES
+    (slug, published_date, published_time, author, category, rights, timezone) VALUES
     ('sample',
-     '2009-2-17',
-     '163130 EST',
+     '2009-3-17',
+     '163130',
      'Loren Ipsum Generator',
      'Generated',
-     'Same as source.');
+     'Same as source.',
+     'America/New_York');
 
 INSERT INTO entry_revisions
     (slug, published_date, updated, title, content) VALUES
     ('sample',
      '2009-2-13',
-     '2009-2-13 233130 EST',
+     '2009-2-13 233130',
      'Unix 1234567890',
      1);
 
@@ -104,7 +107,7 @@ INSERT INTO entry_revisions
     (slug, published_date, updated, title, content) VALUES
     ('sample',
      '2009-2-13',
-     '2009-2-13 233131 EST',
+     '2009-2-13 233131',
      'Unix 1234567890',
      2);
 
@@ -112,15 +115,15 @@ INSERT INTO entry_revisions
     (slug, published_date, updated, title, content) VALUES
     ('loren-ipsum',
      '2009-2-17',
-     '2009-2-17 113130 EST',
+     '2009-2-17 113130',
      'Loren Ipsum ...',
      3);
 
 INSERT INTO entry_revisions
     (slug, published_date, updated, title, content) VALUES
     ('sample',
-     '2009-2-17',
-     '2009-2-17 113130 EST',
+     '2009-3-17',
+     '2009-3-17 113130',
      'Loren Ipsum ...',
      1);
 

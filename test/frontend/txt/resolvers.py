@@ -43,13 +43,15 @@ class TestTxtDateResolver(unittest.TestCase):
     def testMonth(self):
         self.loadData()
         tdr = DateResolver()
-        self.assertEqual(Response(content=[e3, e2, e1].__repr__()),
+        self.assertEqual(Response(content=[e2, e1].__repr__()),
                 tdr.resolve(FakeRequest('/2009/02/')))
 
     def testDay(self):
         self.loadData()
         tdr = DateResolver()
-        self.assertEqual(Response(content=[e3, e2].__repr__()),
+        self.assertEqual(Response(content=[e3].__repr__()),
+                tdr.resolve(FakeRequest('/2009/03/17/')))
+        self.assertEqual(Response(content=[e2].__repr__()),
                 tdr.resolve(FakeRequest('/2009/02/17/')))
         self.assertEqual(Response(content=[e1].__repr__()),
                 tdr.resolve(FakeRequest('/2009/02/13/')))
@@ -58,7 +60,7 @@ class TestTxtDateResolver(unittest.TestCase):
         self.loadData()
         tdr = DateResolver()
         self.assertEqual(Response(content=e3.__repr__()),
-                tdr.resolve(FakeRequest('/2009/02/17/sample/')))
+                tdr.resolve(FakeRequest('/2009/03/17/sample/')))
         self.assertEqual(Response(content=e2.__repr__()),
                 tdr.resolve(FakeRequest('/2009/02/17/loren-ipsum/')))
         self.assertEqual(Response(content=e1.__repr__()),

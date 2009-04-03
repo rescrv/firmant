@@ -9,36 +9,32 @@ from firmant.db.atom import AtomDB
 from firmant.db.atom import Entry
 
 
-EST = pytz.timezone('EST')
+A_NY = pytz.timezone('America/New_York')
 e1 = Entry()
 e1.slug           = 'sample'
-e1.published      = datetime.datetime(2009, 2, 14, 04, 31, 30, tzinfo=pytz.utc)
-e1.published      = e1.published.astimezone(EST)
+e1.published      = datetime.datetime(2009, 2, 13, 23, 31, 30, tzinfo=A_NY)
 e1.author_name    = 'Robert Escriva'
 e1.author_uri     = 'http://robescriva.com'
 e1.author_email   = 'rob@example.org'
 e1.category_term  = 'General'
 e1.category_label = 'All topics'
 e1.rights         = 'Same as source.'
-e1.updated        = datetime.datetime(2009, 2, 14, 04, 31, 31, tzinfo=pytz.utc)
-e1.updated        = e1.updated.astimezone(EST)
+e1.updated        = datetime.datetime(2009, 2, 13, 23, 31, 31, tzinfo=A_NY)
 e1.title          = 'Unix 1234567890'
 e1.content        = 'This is the main content of revision two.'
 e1.summary        = 'This is the summary of revision two.'
-e1.tz             = 'EST'
+e1.tz             = 'America/New_York'
 
 e2 = Entry()
 e2.slug           = 'loren-ipsum'
-e2.published      = datetime.datetime(2009, 2, 17, 16, 31, 30, tzinfo=pytz.utc)
-e2.published      = e2.published.astimezone(EST)
+e2.published      = datetime.datetime(2009, 2, 17, 11, 31, 30, tzinfo=A_NY)
 e2.author_name    = 'Loren Ipsum Generator'
 e2.author_uri     = 'http://www.lipsum.com'
 e2.author_email   = 'lipsum@example.org'
 e2.category_term  = 'Generated'
 e2.category_label = "You can't tell a computer wrote it."
 e2.rights         = 'Same as source.'
-e2.updated        = datetime.datetime(2009, 2, 17, 16, 31, 30, tzinfo=pytz.utc)
-e2.updated        = e2.updated.astimezone(EST)
+e2.updated        = datetime.datetime(2009, 2, 17, 11, 31, 30, tzinfo=A_NY)
 e2.title          = 'Loren Ipsum ...'
 e2.content        = (
      """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus eget
@@ -65,24 +61,24 @@ e2.content        = (
      magna.  Morbi justo leo, faucibus nec, consectetur id, sodales vitae,
      nunc.""")
 e2.summary        = 'A generated loren ipsum paragraph.'
-e2.tz             = 'EST'
+e2.tz             = 'America/New_York'
 
 e3 = Entry()
 e3.slug           = 'sample'
-e3.published      = datetime.datetime(2009, 2, 17, 21, 31, 30, tzinfo=pytz.utc)
-e3.published      = e3.published.astimezone(EST)
+e3.published      = A_NY.localize(
+        datetime.datetime(2009, 3, 17, 16, 31, 30), is_dst=True)
 e3.author_name    = 'Loren Ipsum Generator'
 e3.author_uri     = 'http://www.lipsum.com'
 e3.author_email   = 'lipsum@example.org'
 e3.category_term  = 'Generated'
 e3.category_label = "You can't tell a computer wrote it."
 e3.rights         = 'Same as source.'
-e3.updated        = datetime.datetime(2009, 2, 17, 16, 31, 30, tzinfo=pytz.utc)
-e3.updated        = e3.updated.astimezone(EST)
+e3.updated        = A_NY.localize(
+        datetime.datetime(2009, 3, 17, 11, 31, 30), is_dst=True)
 e3.title          = 'Loren Ipsum ...'
 e3.content        = 'This is the main content of revision one.'
 e3.summary        = 'This is the summary of revision one.'
-e3.tz             = 'EST'
+e3.tz             = 'America/New_York'
 
 class TestAtomSchema(unittest.TestCase):
 
@@ -148,13 +144,6 @@ class TestAtomSchema(unittest.TestCase):
         e = Entry.day('2009', '02', '13')
         self.assertEqual(1, len(e))
         self.assertEqual(e[0], e1)
-
-    def testEntryDayOrder(self):
-        self.testLoadData()
-        e = Entry.day('2009', '02', '17')
-        self.assertEqual(2, len(e))
-        self.assertEqual(e[0], e3)
-        self.assertEqual(e[1], e2)
 
     def testEntryDayInvalidDate(self):
         self.testLoadData()

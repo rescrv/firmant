@@ -80,10 +80,11 @@ implemented.';
 CREATE TABLE entries (
     slug VARCHAR(96) NOT NULL,
     published_date DATE NOT NULL,
-    published_time TIME(0) WITH TIME ZONE NOT NULL,
+    published_time TIME(0) WITHOUT TIME ZONE NOT NULL,
     author VARCHAR(32) NOT NULL,
     category VARCHAR(32),
     rights TEXT,
+    timezone VARCHAR(48),
     CONSTRAINT entries_pkey PRIMARY KEY (slug, published_date),
     CONSTRAINT entries_valid_slug CHECK (slug ~ E'^[-\\_a-zA-Z0-9]{1,96}$'),
     CONSTRAINT entries_author_fkey
@@ -110,7 +111,7 @@ edits.';
 CREATE TABLE entry_revisions (
     slug VARCHAR(96) NOT NULL,
     published_date DATE NOT NULL,
-    updated TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+    updated TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
     title VARCHAR(96) NOT NULL,
     content INTEGER NOT NULL,
     CONSTRAINT entry_revisions_pkey PRIMARY KEY (slug, published_date, updated),
@@ -199,20 +200,18 @@ CREATE TABLE _entries_contributors_join (
 CREATE VIEW entries_published (slug, published, name, uri, email, term, label,
     rights, updated, title, content, summary, published_date, tz)
     AS
-        SELECT e.slug, (e.published_date + e.published_time)::TIMESTAMP WITH
-            TIME ZONE AT TIME ZONE 'GMT', p.name, p.uri, p.email, ca.term,
-            ca.label, e.rights, er.updated AT TIME ZONE 'GMT', er.title,
-            co.content, co.summary, e.published_date,
-            to_char((e.published_date + e.published_time)::TIMESTAMP WITH TIME
-                ZONE, 'TZ')
+        SELECT e.slug, (e.published_date + e.published_time)::TIMESTAMP WITHOUT
+            TIME ZONE AS published, p.name, p.uri, p.email, ca.term, ca.label,
+            e.rights, er.updated, er.title, co.content, co.summary,
+            e.published_date, e.timezone
         FROM entries e, people p, categories ca, entry_revisions er, content co
         WHERE e.author = p.name AND
             e.category = ca.term AND
             er.slug = e.slug AND
             er.published_date = e.published_date AND
             er.content = co.id AND
-            (e.published_date + e.published_time)::TIMESTAMP WITH TIME ZONE
-                AT TIME ZONE 'GMT' < NOW() AT TIME ZONE 'GMT' AND
+            (e.published_date + e.published_time)::TIMESTAMP WITHOUT TIME ZONE
+            AT TIME ZONE e.timezone < NOW() AND
             (er.slug, er.published_date, er.updated) IN
                 (SELECT er2.slug,
                     er2.published_date,

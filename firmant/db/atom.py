@@ -69,10 +69,8 @@ class Entry(Relation):
         entries = super(Entry, cls)._select(cursor, fields)
         for entry in entries:
             tz = pytz.timezone(entry.tz)
-            entry.published = pytz.utc.localize(entry.published)
-            entry.published = entry.published.astimezone(tz)
-            entry.updated = pytz.utc.localize(entry.updated)
-            entry.updated = entry.updated.astimezone(tz)
+            entry.published = tz.localize(entry.published)
+            entry.updated = tz.localize(entry.updated)
         return entries
 
     @classmethod
