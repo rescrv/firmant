@@ -8,6 +8,7 @@ from firmant.wsgi import Response
 from firmant.resolvers import Resolver
 from firmant.db.atom import Entry
 from firmant.db.atom import Feed
+from firmant.filters import text_filter
 from firmant.configuration import settings
 
 
@@ -87,6 +88,7 @@ def create_xml_from_feed(feed):
     return ('<?xml version="1.0" encoding="utf-8"?>\n' +
             etree.tostring(root, pretty_print=True))
 
+open_div = '<div xmlns="http://www.w3.org/1999/xhtml">'
 
 def create_xml_from_entry(entry):
     root = etree.Element('entry')
@@ -109,7 +111,9 @@ def create_xml_from_entry(entry):
     author_email.text = entry.author_email
 
     content = etree.SubElement(root, 'content')
-    content.text = entry.content
+    content.set('type', 'xhtml')
+    e = etree.fromstring(open_div + text_filter('XHTML', entry.content) +'</div>')
+    content.append(e)
 
     l_alt = etree.SubElement(root, 'link')
     l_alt.set('href', entry.permalink())
@@ -122,7 +126,9 @@ def create_xml_from_entry(entry):
     rights.text = entry.rights
 
     summary = etree.SubElement(root, 'summary')
-    summary.text = entry.summary
+    summary.set('type', 'xhtml')
+    e = etree.fromstring(open_div + text_filter('XHTML', entry.summary) +'</div>')
+    summary.append(e)
 
     category = etree.SubElement(root, 'category')
     category.set('term', entry.category_term)
