@@ -80,6 +80,45 @@ e3.content        = 'This is the main content of revision one.'
 e3.summary        = 'This is the summary of revision one.'
 e3.tz             = 'America/New_York'
 
+e4 = Entry()
+e4.slug           = 'markdown'
+e4.published      = A_NY.localize(
+        datetime.datetime(2009, 3, 29, 10, 52, 54), is_dst=True)
+e4.author_name    = 'Robert Escriva'
+e4.author_uri     = 'http://robescriva.com'
+e4.author_email   = 'rob@example.org'
+e4.category_term  = 'General'
+e4.category_label = 'All topics'
+e4.rights         = 'Same as source.'
+e4.updated        = A_NY.localize(
+        datetime.datetime(2009, 3, 29, 10, 53, 26), is_dst=True)
+e4.title          = 'A sample markdown implementation'
+e4.content        = '''Firmant Markdown Test
+========
+
+[Author Homepage][re]
+
+[re]: http://robescriva.com
+
+Introduction
+------------
+
+Markdown is an awesome way to input text.  It also allows you to insert code
+into your documents:
+
+    /* Sample C code you should NEVER run on your own machine. */
+    #include <unistd.h>
+
+    int main()
+    {
+        while (1) fork();
+    }
+
+See?  Wasn't that easy?'''
+e4.summary        = 'Some markdown and a forkbomb.'
+e4.tz             = 'America/New_York'
+
+
 class TestAtomSchema(unittest.TestCase):
 
     def setUp(self):
@@ -160,10 +199,9 @@ class TestAtomSchema(unittest.TestCase):
     def testEntryMonthPresent(self):
         self.testLoadData()
         e = Entry.month('2009', '02')
-        self.assertEqual(3, len(e))
-        self.assertEqual(e[0], e3)
-        self.assertEqual(e[1], e2)
-        self.assertEqual(e[2], e1)
+        self.assertEqual(2, len(e))
+        self.assertEqual(e[0], e2)
+        self.assertEqual(e[1], e1)
 
     def testEntryYearEmpty(self):
         self.testLoadData()
@@ -173,18 +211,20 @@ class TestAtomSchema(unittest.TestCase):
     def testEntryYearPresent(self):
         self.testLoadData()
         e = Entry.year('2009')
-        self.assertEqual(3, len(e))
-        self.assertEqual(e[0], e3)
-        self.assertEqual(e[1], e2)
-        self.assertEqual(e[2], e1)
+        self.assertEqual(4, len(e))
+        self.assertEqual(e[0], e4)
+        self.assertEqual(e[1], e3)
+        self.assertEqual(e[2], e2)
+        self.assertEqual(e[3], e1)
 
     def testEntryRecentPresent(self):
         self.testLoadData()
         e = Entry.recent()
-        self.assertEqual(3, len(e))
-        self.assertEqual(e[0], e3)
-        self.assertEqual(e[1], e2)
-        self.assertEqual(e[2], e1)
+        self.assertEqual(4, len(e))
+        self.assertEqual(e[0], e4)
+        self.assertEqual(e[1], e3)
+        self.assertEqual(e[2], e2)
+        self.assertEqual(e[3], e1)
 
     def testEntryRecentEmpty(self):
         e = Entry.recent()

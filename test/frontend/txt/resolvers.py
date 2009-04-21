@@ -4,7 +4,7 @@ from firmant.wsgi import Response
 from firmant.frontend.txt.resolvers import TxtDateResolver as DateResolver
 from firmant.db.relations import schema
 from firmant.db.atom import AtomDB
-from test.db.atom import e1, e2, e3
+from test.db.atom import e1, e2, e3, e4
 from test.resolvers import FakeRequest
 
 
@@ -31,13 +31,13 @@ class TestTxtDateResolver(unittest.TestCase):
     def testRecent(self):
         self.loadData()
         tdr = DateResolver()
-        self.assertEqual(Response(content=[e3, e2, e1].__repr__()),
+        self.assertEqual(Response(content=[e4, e3, e2, e1].__repr__()),
                 tdr.resolve(FakeRequest('/')))
 
     def testYear(self):
         self.loadData()
         tdr = DateResolver()
-        self.assertEqual(Response(content=[e3, e2, e1].__repr__()),
+        self.assertEqual(Response(content=[e4, e3, e2, e1].__repr__()),
                 tdr.resolve(FakeRequest('/2009/')))
 
     def testMonth(self):
