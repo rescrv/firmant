@@ -41,3 +41,6 @@ ATOM_DEFAULT_SUBTITLE = 'The default atom feed'
 MARKDOWN_XHTML_ENABLED = True
 # Valid options: 'replace', 'remove', 'escape'
 MARKDOWN_XHTML_SAFE_MODE = 'escape'
+
+# Backend options
+ATOM_MODULE = 'firmant.db.atom'
