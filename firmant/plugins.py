@@ -1,19 +1,9 @@
 from firmant.configuration import settings
 from firmant.db.atom import Entry
+from firmant.utils import get_module
 
 
 resolver_list = []
-
-
-def get_module(plugin):
-    try:
-        modules = plugin.split('.')
-        mod = __import__(plugin, {}, {}, [])
-        for module in modules[1:]:
-            mod = getattr(mod, module)
-        return mod
-    except ImportError:
-        raise
 
 
 def load_plugins():
