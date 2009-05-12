@@ -141,6 +141,17 @@ class TestAtomSchema(unittest.TestCase):
         conn = AtomDB.connection(readonly=False)
         conn.close()
 
+
+class TestEntry(unittest.TestCase):
+
+    def setUp(self):
+        # We do not want other tests to affect settings in here.
+        AtomDB.reset()
+
+    def tearDown(self):
+        # We do not want settings in here to affect any other tests.
+        AtomDB.reset()
+
     def testLoadData(self):
         # Load some sample fixtures for use by other tests.
         atom = schema('atom-sample-data')
@@ -151,64 +162,65 @@ class TestAtomSchema(unittest.TestCase):
         conn.commit()
         conn.close()
 
-    def testEntrySingleEmpty(self):
+    def testSingleEmpty(self):
         self.testLoadData()
         e = Entry.single('IDONOTEXIST', datetime.date(2009, 2, 13))
         self.assertEqual(e, None)
 
-    def testEntrySinglePresent(self):
+    def testSinglePresent(self):
         self.testLoadData()
         e = Entry.single('sample', datetime.date(2009, 2, 13))
         self.assertEqual(e, e1)
         e = Entry.single('loren-ipsum', datetime.date(2009, 2, 17))
         self.assertEqual(e, e2)
 
-    def testEntrySingleSlugInvalid(self):
+    def testSingleSlugInvalid(self):
         self.testLoadData()
         self.assertRaises(ValueError,
             Entry.single, 's@mpl3', datetime.date(2009, 2, 13))
 
-    def testEntrySingleNoStrftime(self):
+    def testSingleNoStrftime(self):
         self.testLoadData()
         # List does not have strftime method
         self.assertRaises(ValueError, Entry.single, 'sample', list())
 
-    def testEntryDayEmpty(self):
+    def testDayEmpty(self):
         self.testLoadData()
         e = Entry.day('2009', '01', '09')
         self.assertEqual(len(e), 0)
 
-    def testEntryDayPresent(self):
+    def testDayPresent(self):
         self.testLoadData()
         e = Entry.day('2009', '02', '13')
         self.assertEqual(1, len(e))
         self.assertEqual(e[0], e1)
 
-    def testEntryDayInvalidDate(self):
+    def testDayInvalidDate(self):
         self.testLoadData()
         self.assertRaises(ValueError, Entry.day, 2009, 0, 0)
 
-    def testEntryDateTrunc(self):
+    def testDateTrunc(self):
+        self.testLoadData()
         self.assertRaises(ValueError, Entry._date_trunc, 'foo', 2009, 2, 13)
 
-    def testEntryMonthEmpty(self):
+    def testMonthEmpty(self):
         self.testLoadData()
         e = Entry.month('2009', '01')
         self.assertEqual(len(e), 0)
 
-    def testEntryMonthPresent(self):
+    def testMonthPresent(self):
         self.testLoadData()
         e = Entry.month('2009', '02')
         self.assertEqual(2, len(e))
         self.assertEqual(e[0], e2)
         self.assertEqual(e[1], e1)
 
-    def testEntryYearEmpty(self):
+    def testYearEmpty(self):
         self.testLoadData()
         e = Entry.year('2008')
         self.assertEqual(len(e), 0)
 
-    def testEntryYearPresent(self):
+    def testYearPresent(self):
         self.testLoadData()
         e = Entry.year('2009')
         self.assertEqual(4, len(e))
@@ -217,7 +229,7 @@ class TestAtomSchema(unittest.TestCase):
         self.assertEqual(e[2], e2)
         self.assertEqual(e[3], e1)
 
-    def testEntryRecentPresent(self):
+    def testRecentPresent(self):
         self.testLoadData()
         e = Entry.recent()
         self.assertEqual(4, len(e))
@@ -226,18 +238,20 @@ class TestAtomSchema(unittest.TestCase):
         self.assertEqual(e[2], e2)
         self.assertEqual(e[3], e1)
 
-    def testEntryRecentEmpty(self):
+    def testRecentEmpty(self):
         e = Entry.recent()
         self.assertEqual(e, [])
 
-    def testEntryForFeedEmpty(self):
+    def testForFeedEmpty(self):
         self.testLoadData()
         self.assertEqual([], Entry.for_feed('Idon_tExist'))
 
-    def testEntryForFeedPresent(self):
+    def testForFeedPresent(self):
         self.testLoadData()
         results = Entry.for_feed('general')
         self.assertEqual([e2, e1], results)
 
 
-suite = unittest.TestLoader().loadTestsFromTestCase(TestAtomSchema)
+suite = unittest.TestSuite()
+suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestAtomSchema))
+suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestEntry))
