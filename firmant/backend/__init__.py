@@ -8,6 +8,10 @@ def get_entry_class():
     atom = get_atom_module()
     return atom.Entry
 
+def get_slug_re():
+    atom = get_atom_module()
+    return atom.slug_re
+
 def get_feed_class():
     atom = get_atom_module()
     return atom.Feed

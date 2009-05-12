@@ -6,8 +6,8 @@ import pytz
 
 from firmant.wsgi import Response
 from firmant.resolvers import Resolver
-from firmant.db.atom import Entry
-from firmant.db.atom import Feed
+from firmant.backend.atom import Entry
+from firmant.backend.atom import Feed
 from firmant.filters import text_filter
 from firmant.configuration import settings
 

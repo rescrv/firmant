@@ -3,8 +3,8 @@ import re
 
 from firmant.wsgi import Response
 from firmant.resolvers import DateResolver
-from firmant.db.atom import Entry
-from firmant.db.atom import slug_re
+from firmant.backend.atom import Entry
+from firmant.backend.atom import slug_re
 
 
 class TxtDateResolver(DateResolver):

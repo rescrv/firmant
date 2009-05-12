@@ -4,7 +4,7 @@ from firmant.wsgi import Response
 from firmant.frontend.txt.resolvers import TxtDateResolver as DateResolver
 from firmant.db.relations import schema
 from firmant.db.atom import AtomDB
-from test.db.atom import e1, e2, e3, e4
+from test.backend.atom import e1, e2, e3, e4
 from test.resolvers import FakeRequest
 
 

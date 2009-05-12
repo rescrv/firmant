@@ -1,5 +1,5 @@
 from firmant.configuration import settings
-from firmant.db.atom import Entry
+from firmant.backend.atom import Entry
 from firmant.utils import get_module
 
 
