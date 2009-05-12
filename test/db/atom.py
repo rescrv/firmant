@@ -147,12 +147,13 @@ class TestEntry(unittest.TestCase):
     def setUp(self):
         # We do not want other tests to affect settings in here.
         AtomDB.reset()
+        self.loadData()
 
     def tearDown(self):
         # We do not want settings in here to affect any other tests.
         AtomDB.reset()
 
-    def testLoadData(self):
+    def loadData(self):
         # Load some sample fixtures for use by other tests.
         atom = schema('atom-sample-data')
         conn = AtomDB.connection(readonly=False)
@@ -163,65 +164,53 @@ class TestEntry(unittest.TestCase):
         conn.close()
 
     def testSingleEmpty(self):
-        self.testLoadData()
         e = Entry.single('IDONOTEXIST', datetime.date(2009, 2, 13))
         self.assertEqual(e, None)
 
     def testSinglePresent(self):
-        self.testLoadData()
         e = Entry.single('sample', datetime.date(2009, 2, 13))
         self.assertEqual(e, e1)
         e = Entry.single('loren-ipsum', datetime.date(2009, 2, 17))
         self.assertEqual(e, e2)
 
     def testSingleSlugInvalid(self):
-        self.testLoadData()
         self.assertRaises(ValueError,
             Entry.single, 's@mpl3', datetime.date(2009, 2, 13))
 
     def testSingleNoStrftime(self):
-        self.testLoadData()
         # List does not have strftime method
         self.assertRaises(ValueError, Entry.single, 'sample', list())
 
     def testDayEmpty(self):
-        self.testLoadData()
         e = Entry.day('2009', '01', '09')
         self.assertEqual(len(e), 0)
 
     def testDayPresent(self):
-        self.testLoadData()
         e = Entry.day('2009', '02', '13')
         self.assertEqual(1, len(e))
         self.assertEqual(e[0], e1)
 
     def testDayInvalidDate(self):
-        self.testLoadData()
         self.assertRaises(ValueError, Entry.day, 2009, 0, 0)
 
     def testDateTrunc(self):
-        self.testLoadData()
         self.assertRaises(ValueError, Entry._date_trunc, 'foo', 2009, 2, 13)
 
     def testMonthEmpty(self):
-        self.testLoadData()
         e = Entry.month('2009', '01')
         self.assertEqual(len(e), 0)
 
     def testMonthPresent(self):
-        self.testLoadData()
         e = Entry.month('2009', '02')
         self.assertEqual(2, len(e))
         self.assertEqual(e[0], e2)
         self.assertEqual(e[1], e1)
 
     def testYearEmpty(self):
-        self.testLoadData()
         e = Entry.year('2008')
         self.assertEqual(len(e), 0)
 
     def testYearPresent(self):
-        self.testLoadData()
         e = Entry.year('2009')
         self.assertEqual(4, len(e))
         self.assertEqual(e[0], e4)
@@ -230,7 +219,6 @@ class TestEntry(unittest.TestCase):
         self.assertEqual(e[3], e1)
 
     def testRecentPresent(self):
-        self.testLoadData()
         e = Entry.recent()
         self.assertEqual(4, len(e))
         self.assertEqual(e[0], e4)
@@ -239,15 +227,13 @@ class TestEntry(unittest.TestCase):
         self.assertEqual(e[3], e1)
 
     def testRecentEmpty(self):
-        e = Entry.recent()
+        e = Entry.recent(datetime.datetime.min)
         self.assertEqual(e, [])
 
     def testForFeedEmpty(self):
-        self.testLoadData()
         self.assertEqual([], Entry.for_feed('Idon_tExist'))
 
     def testForFeedPresent(self):
-        self.testLoadData()
         results = Entry.for_feed('general')
         self.assertEqual([e2, e1], results)
 

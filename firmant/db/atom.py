@@ -150,14 +150,15 @@ class Entry(Relation):
         return results
 
     @classmethod
-    def recent(cls):
+    def recent(cls, upper_bound=datetime.datetime.max):
         # If this raises an error, let it rise up.
         cur = AtomDB.readonly_cursor()
         sql = """SELECT slug, published, name, uri, email, term, label, rights,
                         updated, title, content, summary, tz
-                 FROM entries_published;"""
+                 FROM entries_published
+                 WHERE published < %(upper_bound)s;"""
         cur.execute('SET search_path = atom;')
-        cur.execute(sql)
+        cur.execute(sql, {'upper_bound': upper_bound})
         results = cls._select(cur, cls.attributes)
         cur.close()
         return results
