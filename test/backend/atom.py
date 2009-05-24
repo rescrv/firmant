@@ -3,7 +3,7 @@ import datetime
 import pytz
 
 from firmant.configuration import settings
-from firmant.backend.atom import Entry
+from firmant.backend.atom import AtomProvider
 from firmant.utils import ProxyObject
 
 
@@ -130,10 +130,10 @@ See?  Wasn't that easy?'''
     return e4
 
 
-e1 = ProxyObject(lambda: generate_e1(Entry))
-e2 = ProxyObject(lambda: generate_e2(Entry))
-e3 = ProxyObject(lambda: generate_e3(Entry))
-e4 = ProxyObject(lambda: generate_e4(Entry))
+e1 = ProxyObject(lambda: generate_e1(AtomProvider.entry))
+e2 = ProxyObject(lambda: generate_e2(AtomProvider.entry))
+e3 = ProxyObject(lambda: generate_e3(AtomProvider.entry))
+e4 = ProxyObject(lambda: generate_e4(AtomProvider.entry))
 
 
 class TestEntry(unittest.TestCase):

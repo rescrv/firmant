@@ -20,8 +20,9 @@ GENERATOR = 'Firmant 0.10'
 PLUGINS = ['firmant.frontend.txt',
            'firmant.frontend.jinja2',
            'firmant.frontend.atom',
-           'firmant.filters.markdown']
-ENTRY_PERMALINK = 'firmant.frontend.jinja2'
+           'firmant.filters.markdown',
+           'firmant.db.atom']
+ENTRY_PERMALINK = 'firmant.frontend.jinja2.resolvers'
 
 FRONTEND_TXT_PREFIX = ''
 FRONTEND_JINJA2_PREFIX = 'jinja2'
@@ -43,4 +44,4 @@ MARKDOWN_XHTML_ENABLED = True
 MARKDOWN_XHTML_SAFE_MODE = 'escape'
 
 # Backend options
-ATOM_MODULE = 'firmant.db.atom'
+ATOM_PROVIDER = 'firmant.db.atom'

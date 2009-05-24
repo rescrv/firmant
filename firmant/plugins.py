@@ -1,5 +1,4 @@
 from firmant.configuration import settings
-from firmant.backend.atom import Entry
 from firmant.utils import get_module
 
 
@@ -31,7 +30,8 @@ def load_plugins():
         try:
             mod = get_module(plugin)
             mod.load()
+            print 'Oldstyle plugin'
         except ImportError:
             raise
-    entry_permalink = get_module(settings['ENTRY_PERMALINK'])
-    Entry.set_permalink(entry_permalink.resolvers.entry_permalink)
+        except AttributeError:
+            print 'Newstyle plugin'

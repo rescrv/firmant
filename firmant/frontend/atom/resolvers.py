@@ -6,8 +6,7 @@ import pytz
 
 from firmant.wsgi import Response
 from firmant.resolvers import Resolver
-from firmant.backend.atom import Entry
-from firmant.backend.atom import Feed
+from firmant.backend.atom import AtomProvider
 from firmant.filters import text_filter
 from firmant.configuration import settings
 
@@ -42,18 +41,18 @@ class AtomResolver(Resolver):
         named = self.named_re.match(request.url)
         feed = None
         if default != None:
-            feed = Feed()
+            feed = AtomProvider.feed()
             feed.title = settings['ATOM_DEFAULT_TITLE']
             feed.rights = settings['ATOM_DEFAULT_RIGHTS']
             feed.subtitle = settings['ATOM_DEFAULT_SUBTITLE']
-            feed.entries = Entry.recent()
+            feed.entries = AtomProvider.entry.recent()
             feed.updated = pytz.utc.localize(
                     datetime.datetime(1900, 1, 1, 1, 1, 1))
             for entry in feed.entries:
                 if feed.updated < entry.updated:
                     feed.updated = entry.updated
         elif named != None:
-            feed = Feed.by_name(named.groupdict()['slug'])
+            feed = AtomProvider.feed.by_name(named.groupdict()['slug'])
         if feed == None:
             return None
         else:

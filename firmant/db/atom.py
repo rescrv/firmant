@@ -8,6 +8,7 @@ from firmant.configuration import settings
 from firmant.db.relations import Relation
 from firmant.db.relations import schema
 from firmant.db.relations import DB
+from firmant.backend.atom import AtomProvider
 
 
 slug_re = re.compile('^[-\\_a-zA-Z0-9]{1,96}$')
@@ -193,3 +194,9 @@ class Feed(Relation):
         feed = results[0]
         feed.entries = Entry.for_feed(name)
         return feed
+
+
+class PostgresAtomProvider(AtomProvider):
+    entry = Entry
+    feed = Feed
+    slug_re = re.compile('^[-\\_a-zA-Z0-9]{1,96}$')

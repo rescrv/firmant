@@ -3,14 +3,13 @@ import re
 
 from firmant.wsgi import Response
 from firmant.resolvers import DateResolver
-from firmant.backend.atom import Entry
-from firmant.backend.atom import slug_re
+from firmant.backend.atom import AtomProvider
 
 
 class TxtDateResolver(DateResolver):
 
     def _recent(self, request):
-        entries = Entry.recent()
+        entries = AtomProvider.entry.recent()
         return Response(content=entries.__repr__())
 
     def _year(self, request, year):
@@ -18,7 +17,7 @@ class TxtDateResolver(DateResolver):
             dt = datetime.datetime(int(year), 1, 1)
         except ValueError:
             return None
-        entries = Entry.year(dt.year)
+        entries = AtomProvider.entry.year(dt.year)
         return Response(content=entries.__repr__())
 
     def _month(self, request, year, month):
@@ -26,7 +25,7 @@ class TxtDateResolver(DateResolver):
             dt = datetime.datetime(int(year), int(month), 1)
         except ValueError:
             return None
-        entries = Entry.month(dt.year, dt.month)
+        entries = AtomProvider.entry.month(dt.year, dt.month)
         return Response(content=entries.__repr__())
 
     def _day(self, request, year, month, day):
@@ -34,7 +33,7 @@ class TxtDateResolver(DateResolver):
             dt = datetime.datetime(int(year), int(month), int(day))
         except ValueError:
             return None
-        entries = Entry.day(dt.year, dt.month, dt.day)
+        entries = AtomProvider.entry.day(dt.year, dt.month, dt.day)
         return Response(content=entries.__repr__())
 
     def _single(self, request, slug, year, month, day):
@@ -42,7 +41,7 @@ class TxtDateResolver(DateResolver):
             dt = datetime.datetime(int(year), int(month), int(day))
         except ValueError:
             return None
-        if slug_re.match(slug) == None:
+        if AtomProvider.slug_re.match(slug) == None:
             return None
-        entries = Entry.single(slug, dt)
+        entries = AtomProvider.entry.single(slug, dt)
         return Response(content=entries.__repr__())

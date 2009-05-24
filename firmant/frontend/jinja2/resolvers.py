@@ -5,19 +5,22 @@ from jinja2 import Environment, FileSystemLoader
 
 from firmant.wsgi import Response
 from firmant.resolvers import DateResolver
-from firmant.backend.atom import Entry
-from firmant.backend.atom import slug_re
+from firmant.backend.atom import AtomProvider
 from firmant.filters import text_filter
 from firmant.configuration import settings
+from firmant.backend.atom import EntryPermalinkProvider
 
 
-def entry_permalink(entry):
-    prefix = '/' + settings['FRONTEND_JINJA2_PREFIX']
-    if prefix == '/':
-        prefix = ''
-    path = '%s/%s/%s/' % (prefix, entry.published.strftime('%Y/%m/%d'),
-                          entry.slug)
-    return urlparse.urljoin(settings['HOST'], path)
+class Jinja2EntryPermalink(EntryPermalinkProvider):
+
+    @staticmethod
+    def authoritative(entry):
+        prefix = '/' + settings['FRONTEND_JINJA2_PREFIX']
+        if prefix == '/':
+            prefix = ''
+        path = '%s/%s/%s/' % (prefix, entry.published.strftime('%Y/%m/%d'),
+                              entry.slug)
+        return urlparse.urljoin(settings['HOST'], path)
 
 
 class Jinja2DateResolver(DateResolver):
@@ -27,7 +30,7 @@ class Jinja2DateResolver(DateResolver):
         self.env = Environment(loader=FileSystemLoader(settings['TEMPLATES']))
 
     def _recent(self, request):
-        entries = Entry.recent()
+        entries = AtomProvider.entry.recent()
         entries = map(Jinja2DateResolver.XHTML_filter, entries)
         template = self.env.get_template('frontend/recent.html')
         return Jinja2DateResolver.generate_response(template,
@@ -38,7 +41,7 @@ class Jinja2DateResolver(DateResolver):
             dt = datetime.datetime(int(year), 1, 1)
         except ValueError:
             return None
-        entries = Entry.year(dt.year)
+        entries = AtomProvider.entry.year(dt.year)
         entries = map(Jinja2DateResolver.XHTML_filter, entries)
         template = self.env.get_template('frontend/year.html')
         return Jinja2DateResolver.generate_response(template,
@@ -49,7 +52,7 @@ class Jinja2DateResolver(DateResolver):
             dt = datetime.datetime(int(year), int(month), 1)
         except ValueError:
             return None
-        entries = Entry.month(dt.year, dt.month)
+        entries = AtomProvider.entry.month(dt.year, dt.month)
         entries = map(Jinja2DateResolver.XHTML_filter, entries)
         template = self.env.get_template('frontend/month.html')
         return Jinja2DateResolver.generate_response(template,
@@ -60,7 +63,7 @@ class Jinja2DateResolver(DateResolver):
             dt = datetime.datetime(int(year), int(month), int(day))
         except ValueError:
             return None
-        entries = Entry.day(dt.year, dt.month, dt.day)
+        entries = AtomProvider.entry.day(dt.year, dt.month, dt.day)
         entries = map(Jinja2DateResolver.XHTML_filter, entries)
         template = self.env.get_template('frontend/day.html')
         return Jinja2DateResolver.generate_response(template,
@@ -72,9 +75,9 @@ class Jinja2DateResolver(DateResolver):
             dt = datetime.datetime(int(year), int(month), int(day))
         except ValueError:
             return None
-        if slug_re.match(slug) == None:
+        if AtomProvider.slug_re.match(slug) == None:
             return None
-        entry = Entry.single(slug, dt)
+        entry = AtomProvider.entry.single(slug, dt)
         entry = Jinja2DateResolver.XHTML_filter(entry)
         template = self.env.get_template('frontend/single.html')
         return Jinja2DateResolver.generate_response(template,
