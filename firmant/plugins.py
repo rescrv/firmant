@@ -29,9 +29,8 @@ def load_plugins():
     for plugin in settings['PLUGINS']:
         try:
             mod = get_module(plugin)
-            mod.load()
-            print 'Oldstyle plugin'
+            if hasattr(mod, 'load'):
+                mod.load()
+                print 'Oldstyle plugin', plugin
         except ImportError:
             raise
-        except AttributeError:
-            print 'Newstyle plugin'
