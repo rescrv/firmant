@@ -1,18 +1,18 @@
-_filter_dict = {}
+from firmant.plugins import PluginMount
+from firmant.configuration import settings
 
-def register(slot, filter, force=False):
-    try:
-        _filter_dict[slot]
-    except KeyError:
-        pass
-    else:
-        if not force:
-            raise RuntimeError("Slot '%s' already registered" % slot)
-    _filter_dict[slot] = filter
 
-def text_filter(slot, content):
-    try:
-        _filter_dict[slot]
-    except KeyError:
-        raise RuntimeError("Slot '%s' not registered" % slot)
-    return _filter_dict[slot].filter(content)
+class FilterProvider(object):
+    __metaclass__ = PluginMount
+
+    @classmethod
+    def filter(cls, slot, content):
+        providers = filter(lambda x: slot in x.provides(), cls.plugins)
+        if len(providers):
+            return providers[0].filter(slot, content)
+        raise RuntimeError("No filter defines slot '%s'" % slot)
+
+    @classmethod
+    def provides(cls):
+        provides = reduce(lambda x, y: x + y, cls.plugins)
+        return provides

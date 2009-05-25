@@ -7,7 +7,7 @@ import pytz
 from firmant.wsgi import Response
 from firmant.resolvers import Resolver
 from firmant.backend.atom import AtomProvider
-from firmant.filters import text_filter
+from firmant.filters import FilterProvider
 from firmant.configuration import settings
 
 
@@ -111,7 +111,7 @@ def create_xml_from_entry(entry):
 
     content = etree.SubElement(root, 'content')
     content.set('type', 'xhtml')
-    e = etree.fromstring(open_div + text_filter('XHTML', entry.content) +'</div>')
+    e = etree.fromstring(open_div + FilterProvider.filter('XHTML', entry.content) +'</div>')
     content.append(e)
 
     l_alt = etree.SubElement(root, 'link')
@@ -126,7 +126,7 @@ def create_xml_from_entry(entry):
 
     summary = etree.SubElement(root, 'summary')
     summary.set('type', 'xhtml')
-    e = etree.fromstring(open_div + text_filter('XHTML', entry.summary) +'</div>')
+    e = etree.fromstring(open_div + FilterProvider.filter('XHTML', entry.summary) +'</div>')
     summary.append(e)
 
     category = etree.SubElement(root, 'category')

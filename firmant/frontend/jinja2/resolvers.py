@@ -6,7 +6,7 @@ from jinja2 import Environment, FileSystemLoader
 from firmant.wsgi import Response
 from firmant.resolvers import DateResolver
 from firmant.backend.atom import AtomProvider
-from firmant.filters import text_filter
+from firmant.filters import FilterProvider
 from firmant.configuration import settings
 from firmant.backend.atom import EntryPermalinkProvider
 
@@ -94,6 +94,6 @@ class Jinja2DateResolver(DateResolver):
 
     @staticmethod
     def XHTML_filter(entry):
-        entry.summary = text_filter('XHTML', entry.summary)
-        entry.content = text_filter('XHTML', entry.content)
+        entry.summary = FilterProvider.filter('XHTML', entry.summary)
+        entry.content = FilterProvider.filter('XHTML', entry.content)
         return entry

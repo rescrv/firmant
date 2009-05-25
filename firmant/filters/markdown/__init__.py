@@ -1,21 +1,20 @@
 import markdown
 
 from firmant.configuration import settings
-from firmant.filters import register
+from firmant.filters import FilterProvider
 
 
-class MarkdownFilter:
+class MarkdownFilter(FilterProvider):
 
-    def __init__(self, safe_mode=None):
-        self._safe_mode = safe_mode
-
-    def filter(self, content):
-        if self._safe_mode != None:
-            return markdown.markdown(text=content, safe_mode=self._safe_mode)
+    @classmethod
+    def filter(cls, slot, content):
+        if settings['MARKDOWN_XHTML_SAFE_MODE'] != None:
+            return markdown.markdown(text=content,
+            safe_mode=settings['MARKDOWN_XHTML_SAFE_MODE'])
         return markdown.markdown(text=content)
 
-
-def load():
-    if settings['MARKDOWN_XHTML_ENABLED']:
-        mf = MarkdownFilter(settings['MARKDOWN_XHTML_SAFE_MODE'])
-        register('XHTML', mf)
+    @classmethod
+    def provides(cls):
+        if settings['MARKDOWN_XHTML_ENABLED']:
+            return ['XHTML']
+        return []
