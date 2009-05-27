@@ -1,5 +1,4 @@
 from firmant.plugins import PluginMount
-from firmant.configuration import settings
 
 
 class FilterProvider(object):
