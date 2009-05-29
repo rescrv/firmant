@@ -14,7 +14,7 @@ class MarkdownFilter(FilterProvider):
         return markdown.markdown(text=content)
 
     @classmethod
-    def provides(cls):
-        if settings['MARKDOWN_XHTML_ENABLED']:
-            return ['XHTML']
-        return []
+    def provides(cls, slot):
+        if slot == 'XHTML' and settings['MARKDOWN_XHTML_ENABLED']:
+            return True
+        return False
