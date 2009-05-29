@@ -109,9 +109,11 @@ def create_xml_from_entry(entry):
     author_email = etree.SubElement(author, 'email')
     author_email.text = entry.author_email
 
+    fp = FilterProvider(settings)
+
     content = etree.SubElement(root, 'content')
     content.set('type', 'xhtml')
-    e = etree.fromstring(open_div + FilterProvider.filter('XHTML', entry.content) +'</div>')
+    e = etree.fromstring(open_div + fp.filter('XHTML', entry.content) +'</div>')
     content.append(e)
 
     l_alt = etree.SubElement(root, 'link')
@@ -126,7 +128,7 @@ def create_xml_from_entry(entry):
 
     summary = etree.SubElement(root, 'summary')
     summary.set('type', 'xhtml')
-    e = etree.fromstring(open_div + FilterProvider.filter('XHTML', entry.summary) +'</div>')
+    e = etree.fromstring(open_div + fp.filter('XHTML', entry.summary) +'</div>')
     summary.append(e)
 
     category = etree.SubElement(root, 'category')

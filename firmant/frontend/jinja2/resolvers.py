@@ -94,6 +94,7 @@ class Jinja2DateResolver(DateResolver):
 
     @staticmethod
     def XHTML_filter(entry):
-        entry.summary = FilterProvider.filter('XHTML', entry.summary)
-        entry.content = FilterProvider.filter('XHTML', entry.content)
+        fp = FilterProvider(settings)
+        entry.summary = fp.filter('XHTML', entry.summary)
+        entry.content = fp.filter('XHTML', entry.content)
         return entry
