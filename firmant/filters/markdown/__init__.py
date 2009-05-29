@@ -6,8 +6,7 @@ from firmant.filters import FilterProvider
 
 class MarkdownFilter(FilterProvider):
 
-    @classmethod
-    def filter(cls, slot, content):
+    def filter(self, slot, content):
         if settings['MARKDOWN_XHTML_SAFE_MODE'] != None:
             return markdown.markdown(text=content,
             safe_mode=settings['MARKDOWN_XHTML_SAFE_MODE'])
