@@ -18,8 +18,8 @@ class AtomProvider(object):
 
         def __get__(self, instance, owner):
             e = AtomProvider._get_provider().entry
-            e.permalink = lambda self: \
-                EntryPermalinkProvider.authoritative(self)
+            e.permalink = lambda cls: \
+                EntryPermalinkProvider.authoritative(cls)
             return e
 
     entry = EntryDescriptor()
@@ -28,8 +28,8 @@ class AtomProvider(object):
 
         def __get__(self, instance, owner):
             f = AtomProvider._get_provider().feed
-            f.permalink = lambda self: \
-                    FeedPermalinkProvider.authoritative(self)
+            f.permalink = lambda cls: \
+                    FeedPermalinkProvider.authoritative(cls)
             return f
 
     feed = FeedDescriptor()
