@@ -31,7 +31,9 @@ class AtomDB(object):
         if AtomDB.ro_connection == None:
             AtomDB.ro_connection = AtomDB.connection(readonly=True)
             AtomDB.ro_connection.set_isolation_level(0)
-        return AtomDB.ro_connection.cursor()
+        cur = AtomDB.ro_connection.cursor()
+        cur.execute('SET search_path = atom;')
+        return cur
 
     @staticmethod
     def reset():
@@ -86,7 +88,6 @@ class Entry(Relation):
                        f.slug = %(slug)s;"""
         cur = AtomDB.readonly_cursor()
         params = {'slug': feedname}
-        cur.execute('SET search_path = atom;')
         cur.execute(sql, params)
         results = cls._select(cur, cls.attributes)
         cur.close()
@@ -108,7 +109,6 @@ class Entry(Relation):
                  WHERE slug=%(slug)s AND
                        published_date=%(date)s;"""
         params = {'slug': slug, 'date': datestr}
-        cur.execute('SET search_path = atom;')
         cur.execute(sql, params)
         results = cls._select(cur, cls.attributes)
         cur.close()
@@ -144,7 +144,6 @@ class Entry(Relation):
                  FROM entries_published
                  WHERE date_trunc(%(trunc)s, published_date)=%(date)s;"""
         params = {'date': dt.strftime('%Y-%m-%d'), 'trunc': trunc}
-        cur.execute('SET search_path = atom;')
         cur.execute(sql, params)
         results = cls._select(cur, cls.attributes)
         cur.close()
@@ -158,7 +157,6 @@ class Entry(Relation):
                         updated, title, content, summary, tz
                  FROM entries_published
                  WHERE published < %(upper_bound)s;"""
-        cur.execute('SET search_path = atom;')
         cur.execute(sql, {'upper_bound': upper_bound})
         results = cls._select(cur, cls.attributes)
         cur.close()
@@ -185,7 +183,6 @@ class Feed(Relation):
     def by_name(cls, name):
         # If this raises an error, let it rise up.
         cur = AtomDB.readonly_cursor()
-        cur.execute('SET search_path = atom;')
         cur.execute(Feed.sql, {'slug': name})
         results = cls._select(cur, cls.attributes)
         cur.close()
