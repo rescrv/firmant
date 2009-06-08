@@ -13,14 +13,16 @@ from firmant.backend.atom import EntryPermalinkProvider
 
 class Jinja2EntryPermalink(EntryPermalinkProvider):
 
-    @staticmethod
-    def authoritative(entry):
-        prefix = '/' + settings['FRONTEND_JINJA2_PREFIX']
+    def __init__(self, settings):
+        self.settings = settings
+
+    def authoritative(self, entry):
+        prefix = '/' + self.settings['FRONTEND_JINJA2_PREFIX']
         if prefix == '/':
             prefix = ''
         path = '%s/%s/%s/' % (prefix, entry.published.strftime('%Y/%m/%d'),
                               entry.slug)
-        return urlparse.urljoin(settings['HOST'], path)
+        return urlparse.urljoin(self.settings['HOST'], path)
 
 
 class Jinja2DateResolver(DateResolver):

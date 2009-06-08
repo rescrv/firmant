@@ -15,10 +15,11 @@ class AtomProvider(object):
             raise RuntimeError('Multiple Atom Providers available')
 
         self._provider = provider[0]
+        self._eperma = EntryPermalinkProvider(settings)
 
     def get_entry(self):
         e = self._provider.entry
-        e.permalink = lambda self: EntryPermalinkProvider.authoritative(self)
+        e.permalink = lambda e_self: self._eperma.authoritative(e_self)
         return e
 
     entry = property(get_entry, None, None, "The Atom Entry class")
@@ -37,18 +38,22 @@ class AtomProvider(object):
 
 
 class EntryPermalinkProvider(object):
+
     __metaclass__ = PluginMount
 
-    @classmethod
-    def authoritative(cls, entry):
-        import firmant.frontend.jinja2.resolvers
-        provider = filter(lambda m: m.__module__ == settings['ENTRY_PERMALINK'],
-                          cls.plugins)
-        if len(provider) == 0:
+    def __init__(self, settings):
+        provider = filter(lambda m: m.__module__ == \
+                          settings['ENTRY_PERMALINK'],
+                          self.plugins)
+        if len(provider) < 1:
             raise RuntimeError('No Entry Permalink Provider specified')
-        if len(provider) >= 2:
+        if len(provider) > 1:
             raise RuntimeError('Multiple Entry Permalink Providers available')
-        return provider[0].authoritative(entry)
+
+        self._provider = provider[0](settings)
+
+    def authoritative(self, entry):
+        return self._provider.authoritative(entry)
 
 
 class FeedPermalinkProvider(object):
