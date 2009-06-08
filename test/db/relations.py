@@ -60,24 +60,6 @@ class TestRelation(unittest.TestCase):
         # calls __ne__ while assertNotEqual really calls __eq__.
         self.assertEqual(e1 != e2, True)
 
-    class Dummy(relations.Relation):
-
-        attributes = []
-
-        def __init__(self):
-            pass
-
-    def testPermalink(self):
-        self.assertRaises(RuntimeError, self.Dummy().permalink)
-
-    def testInnerPermalink(self):
-        self.assertRaises(RuntimeError, self.Dummy()._permalink)
-
-    def testSet_permalink(self):
-        f = lambda x: 'new'
-        self.Dummy.set_permalink(f)
-        self.assertEqual('new', self.Dummy().permalink())
-
 
 suite = unittest.TestSuite()
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestSchemaLoad))

@@ -89,16 +89,6 @@ class Relation(object):
             row = cursor.fetchone()
         return results
 
-    def permalink(self):
-        return self._permalink()
-
-    def _permalink(self):
-        raise RuntimeError('Please enable a permalink handler in settings')
-
-    @classmethod
-    def set_permalink(cls, perm):
-        setattr(cls, '_permalink', perm)
-
 
 class DB(object):
 
