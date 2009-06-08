@@ -1,46 +1,39 @@
-from firmant.configuration import settings
 from firmant.plugins import PluginMount
+from firmant.configuration import settings
 
 class AtomProvider(object):
+
     __metaclass__ = PluginMount
 
-    @classmethod
-    def _get_provider(cls):
-        provider = filter(lambda m: m.__module__ == settings['ATOM_PROVIDER'],
-                          cls.plugins)
-        if len(provider) == 0:
+    def __init__(self, settings):
+        provider = filter(lambda m: m.__module__ == \
+                          settings['ATOM_PROVIDER'],
+                          self.plugins)
+        if len(provider) < 1:
             raise RuntimeError('No Atom Provider specified')
-        if len(provider) >= 2:
+        if len(provider) > 1:
             raise RuntimeError('Multiple Atom Providers available')
-        return provider[0]
 
-    class EntryDescriptor(object):
+        self._provider = provider[0]
 
-        def __get__(self, instance, owner):
-            e = AtomProvider._get_provider().entry
-            e.permalink = lambda cls: \
-                EntryPermalinkProvider.authoritative(cls)
-            return e
+    def get_entry(self):
+        e = self._provider.entry
+        e.permalink = lambda self: EntryPermalinkProvider.authoritative(self)
+        return e
 
-    entry = EntryDescriptor()
+    entry = property(get_entry, None, None, "The Atom Entry class")
 
-    class FeedDescriptor(object):
+    def get_feed(self):
+        f = self._provider.feed
+        f.permalink = lambda self: FeedPermalinkProvider.authoritative(self)
+        return f
 
-        def __get__(self, instance, owner):
-            f = AtomProvider._get_provider().feed
-            f.permalink = lambda cls: \
-                    FeedPermalinkProvider.authoritative(cls)
-            return f
+    feed = property(get_feed, None, None, "The Atom Feed class")
 
-    feed = FeedDescriptor()
+    def get_slug_re(self):
+        return self._provider.slug_re
 
-    class SlugREDescriptor(object):
-
-        def __get__(self, instance, owner):
-            s = AtomProvider._get_provider().slug_re
-            return s
-
-    slug_re = SlugREDescriptor()
+    slug_re = property(get_slug_re, None, None, "The Atom slug re")
 
 
 class EntryPermalinkProvider(object):

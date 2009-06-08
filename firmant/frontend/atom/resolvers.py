@@ -41,18 +41,18 @@ class AtomResolver(Resolver):
         named = self.named_re.match(request.url)
         feed = None
         if default != None:
-            feed = AtomProvider.feed()
+            feed = AtomProvider(settings).feed()
             feed.title = settings['ATOM_DEFAULT_TITLE']
             feed.rights = settings['ATOM_DEFAULT_RIGHTS']
             feed.subtitle = settings['ATOM_DEFAULT_SUBTITLE']
-            feed.entries = AtomProvider.entry.recent()
+            feed.entries = AtomProvider(settings).entry.recent()
             feed.updated = pytz.utc.localize(
                     datetime.datetime(1900, 1, 1, 1, 1, 1))
             for entry in feed.entries:
                 if feed.updated < entry.updated:
                     feed.updated = entry.updated
         elif named != None:
-            feed = AtomProvider.feed.by_name(named.groupdict()['slug'])
+            feed = AtomProvider(settings).feed.by_name(named.groupdict()['slug'])
         if feed == None:
             return None
         else:

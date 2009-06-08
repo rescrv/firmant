@@ -30,7 +30,7 @@ class Jinja2DateResolver(DateResolver):
         self.env = Environment(loader=FileSystemLoader(settings['TEMPLATES']))
 
     def _recent(self, request):
-        entries = AtomProvider.entry.recent()
+        entries = AtomProvider(settings).entry.recent()
         entries = map(Jinja2DateResolver.XHTML_filter, entries)
         template = self.env.get_template('frontend/recent.html')
         return Jinja2DateResolver.generate_response(template,
@@ -41,7 +41,7 @@ class Jinja2DateResolver(DateResolver):
             dt = datetime.datetime(int(year), 1, 1)
         except ValueError:
             return None
-        entries = AtomProvider.entry.year(dt.year)
+        entries = AtomProvider(settings).entry.year(dt.year)
         entries = map(Jinja2DateResolver.XHTML_filter, entries)
         template = self.env.get_template('frontend/year.html')
         return Jinja2DateResolver.generate_response(template,
@@ -52,7 +52,7 @@ class Jinja2DateResolver(DateResolver):
             dt = datetime.datetime(int(year), int(month), 1)
         except ValueError:
             return None
-        entries = AtomProvider.entry.month(dt.year, dt.month)
+        entries = AtomProvider(settings).entry.month(dt.year, dt.month)
         entries = map(Jinja2DateResolver.XHTML_filter, entries)
         template = self.env.get_template('frontend/month.html')
         return Jinja2DateResolver.generate_response(template,
@@ -63,7 +63,7 @@ class Jinja2DateResolver(DateResolver):
             dt = datetime.datetime(int(year), int(month), int(day))
         except ValueError:
             return None
-        entries = AtomProvider.entry.day(dt.year, dt.month, dt.day)
+        entries = AtomProvider(settings).entry.day(dt.year, dt.month, dt.day)
         entries = map(Jinja2DateResolver.XHTML_filter, entries)
         template = self.env.get_template('frontend/day.html')
         return Jinja2DateResolver.generate_response(template,
@@ -75,9 +75,9 @@ class Jinja2DateResolver(DateResolver):
             dt = datetime.datetime(int(year), int(month), int(day))
         except ValueError:
             return None
-        if AtomProvider.slug_re.match(slug) == None:
+        if AtomProvider(settings).slug_re.match(slug) == None:
             return None
-        entry = AtomProvider.entry.single(slug, dt)
+        entry = AtomProvider(settings).entry.single(slug, dt)
         entry = Jinja2DateResolver.XHTML_filter(entry)
         template = self.env.get_template('frontend/single.html')
         return Jinja2DateResolver.generate_response(template,
