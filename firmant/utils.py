@@ -9,12 +9,13 @@ def get_module(plugin):
         raise
 
 
-class ProxyObject:
+class ProxyObject(object):
 
-    def __init__(self, get_object):
+    def __init__(self, obj):
+        super(ProxyObject, self).__init__()
         # first set the list of 'local' attrs for __setattr__
-        self.__dict__['_local'] = ('_local', '_get_object' )
-        self._get_object = get_object
+        self.__dict__['_local'] = ('_local', '_object' )
+        self._object = obj
 
     def __setattr__(self, attr, value):
         # Case 1: attr is in _local.
@@ -22,16 +23,16 @@ class ProxyObject:
             self.__dict__[attr] = value
         # Case 2: attr is in _proxied.
         else:
-            setattr(self.__dict__['_get_object'](), attr, value)
+            setattr(self.__dict__['_object'], attr, value)
 
     def __getattr__(self, attr):
-        attribute = getattr(self.__dict__['_get_object'](), attr)
+        attribute = getattr(self.__dict__['_object'], attr)
         # Case 1: attr is a method.
         if callable(attribute):
             import types
             def method(*args, **kwargs):
                 if attribute is types.MethodType:
-                    args = (self.__dict__['_get_object'](),) + args
+                    args = (self.__dict__['_object'],) + args
                 return attribute(*args, **kwargs)
             return method
         # Case 2: attr is an attribute.
@@ -46,4 +47,4 @@ class ProxyObject:
             raise AttributeError()
         # Case 2: attr is in _proxied.
         else:
-            del self.__dict__['_get_object']().__dict__[attr]
+            del self.__dict__['_object'].__dict__[attr]
