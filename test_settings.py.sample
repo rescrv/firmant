@@ -23,6 +23,7 @@ PLUGINS = ['firmant.frontend.txt',
            'firmant.filters.markdown',
            'firmant.db.atom']
 ENTRY_PERMALINK = 'firmant.frontend.jinja2.resolvers'
+FEED_PERMALINK  = 'firmant.frontend.atom.resolvers'
 
 FRONTEND_TXT_PREFIX = ''
 FRONTEND_JINJA2_PREFIX = 'jinja2'

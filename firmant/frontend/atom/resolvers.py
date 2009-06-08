@@ -7,6 +7,7 @@ import pytz
 from firmant.wsgi import Response
 from firmant.resolvers import Resolver
 from firmant.backend.atom import AtomProvider
+from firmant.backend.atom import FeedPermalinkProvider
 from firmant.filters import FilterProvider
 from firmant.configuration import settings
 
@@ -19,11 +20,16 @@ def RFC3339(dt):
     return ret[:-2] + ':' + ret[-2:]
 
 
-def feed_permalink(slug=''):
-    url = urlparse.urljoin(settings['HOST'], '/atom/')
-    if slug != '':
-        url += slug + '/'
-    return url
+class AtomFeedPermalink(FeedPermalinkProvider):
+
+    def __init__(self, settings):
+        self.settings = settings
+
+    def authoritative(self, feed):
+        url = urlparse.urljoin(self.settings['HOST'], '/atom/')
+        if feed.slug != '':
+            url += feed.slug + '/'
+        return url
 
 
 class AtomResolver(Resolver):
@@ -48,6 +54,7 @@ class AtomResolver(Resolver):
             feed.entries = AtomProvider(settings).entry.recent()
             feed.updated = pytz.utc.localize(
                     datetime.datetime(1900, 1, 1, 1, 1, 1))
+            feed.slug=''
             for entry in feed.entries:
                 if feed.updated < entry.updated:
                     feed.updated = entry.updated
@@ -76,11 +83,11 @@ def create_xml_from_feed(feed):
     updated.text = RFC3339(feed.updated)
 
     l_self = etree.SubElement(root, 'link')
-    l_self.set('href', feed_permalink())
+    l_self.set('href', FeedPermalinkProvider(settings).authoritative(feed))
     l_self.set('rel', 'self')
 
     id = etree.SubElement(root, 'id')
-    id.text = feed_permalink()
+    id.text = FeedPermalinkProvider(settings).authoritative(feed)
 
     for entry in feed.entries:
         root.append(create_xml_from_entry(entry))

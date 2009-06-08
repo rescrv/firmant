@@ -16,6 +16,7 @@ class AtomProvider(object):
 
         self._provider = provider[0]
         self._eperma = EntryPermalinkProvider(settings)
+        self._fperma = FeedPermalinkProvider(settings)
 
     def get_entry(self):
         e = self._provider.entry
@@ -26,7 +27,7 @@ class AtomProvider(object):
 
     def get_feed(self):
         f = self._provider.feed
-        f.permalink = lambda self: FeedPermalinkProvider.authoritative(self)
+        f.permalink = lambda f_self: self._fperma.authoritative(f_self)
         return f
 
     feed = property(get_feed, None, None, "The Atom Feed class")
@@ -57,14 +58,19 @@ class EntryPermalinkProvider(object):
 
 
 class FeedPermalinkProvider(object):
+
     __metaclass__ = PluginMount
 
-    @classmethod
-    def authoritative(cls, feed):
-        provider = filter(lambda m: m.__module__ == settings['FEED_PERMALINK'],
-                          cls.plugins)
-        if len(provider) == 0:
+    def __init__(self, settings):
+        provider = filter(lambda m: m.__module__ == \
+                          settings['FEED_PERMALINK'],
+                          self.plugins)
+        if len(provider) < 1:
             raise RuntimeError('No Feed Permalink Provider specified')
-        if len(provider) >= 2:
+        if len(provider) > 1:
             raise RuntimeError('Multiple Feed Permalink Providers available')
-        return provider[0].authoritative(feed)
+
+        self._provider = provider[0](settings)
+
+    def authoritative(self, feed):
+        return self._provider.authoritative(feed)
