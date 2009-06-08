@@ -1,5 +1,4 @@
 from firmant.plugins import PluginMount
-from firmant.configuration import settings
 
 
 def select_canonical_plugin(plugins, settings, config_var):
