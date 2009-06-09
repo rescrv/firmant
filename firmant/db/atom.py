@@ -4,7 +4,6 @@ import os.path
 import datetime
 import pytz
 
-from firmant.configuration import settings
 from firmant.db.relations import Relation
 from firmant.backend.atom import AtomProvider
 
@@ -50,7 +49,7 @@ class Entry(Relation):
         return entries
 
     @classmethod
-    def for_feed(cls, feedname):
+    def for_feed(cls, settings, feedname):
         sql = """SELECT ep.slug, ep.published, ep.name, ep.uri, ep.email,
                         ep.term, ep.label, ep.rights, ep.updated, ep.title,
                         ep.content, ep.summary, ep.tz
@@ -67,7 +66,7 @@ class Entry(Relation):
         return results
 
     @classmethod
-    def single(cls, slug, date):
+    def single(cls, settings, slug, date):
         if slug_re.match(slug) == None:
             raise ValueError('Invalid slug')
         try:
@@ -91,19 +90,19 @@ class Entry(Relation):
             return results[0]
 
     @classmethod
-    def day(cls, year, month, day):
-        return cls._date_trunc('day', year, month, day)
+    def day(cls, settings, year, month, day):
+        return cls._date_trunc(settings, 'day', year, month, day)
 
     @classmethod
-    def month(cls, year, month):
-        return cls._date_trunc('month', year, month)
+    def month(cls, settings, year, month):
+        return cls._date_trunc(settings, 'month', year, month)
 
     @classmethod
-    def year(cls, year):
-        return cls._date_trunc('year', year)
+    def year(cls, settings, year):
+        return cls._date_trunc(settings, 'year', year)
 
     @classmethod
-    def _date_trunc(cls, trunc='day', year=1, month=1, day=1):
+    def _date_trunc(cls, settings, trunc='day', year=1, month=1, day=1):
         # If this raises an error, let it rise up.
         try:
             dt = datetime.datetime(int(year), int(month), int(day))
@@ -123,7 +122,7 @@ class Entry(Relation):
         return results
 
     @classmethod
-    def recent(cls, upper_bound=datetime.datetime.max):
+    def recent(cls, settings, upper_bound=datetime.datetime.max):
         # If this raises an error, let it rise up.
         cur = AtomDB(settings).readonly_cursor()
         sql = """SELECT slug, published, name, uri, email, term, label, rights,
@@ -153,7 +152,7 @@ class Feed(Relation):
         """
 
     @classmethod
-    def by_name(cls, name):
+    def by_name(cls, settings, name):
         # If this raises an error, let it rise up.
         cur = AtomDB(settings).readonly_cursor()
         cur.execute(Feed.sql, {'slug': name})

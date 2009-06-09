@@ -148,54 +148,54 @@ class TestEntry(unittest.TestCase):
         raise NotImplemented("Implement implement loadData")
 
     def testSingleEmpty(self):
-        e = self.Entry.single('IDONOTEXIST', datetime.date(2009, 2, 13))
+        e = self.Entry.single(settings, 'IDONOTEXIST', datetime.date(2009, 2, 13))
         self.assertEqual(e, None)
 
     def testSinglePresent(self):
-        e = self.Entry.single('sample', datetime.date(2009, 2, 13))
+        e = self.Entry.single(settings, 'sample', datetime.date(2009, 2, 13))
         self.assertEqual(e, self.e1)
-        e = self.Entry.single('loren-ipsum', datetime.date(2009, 2, 17))
+        e = self.Entry.single(settings, 'loren-ipsum', datetime.date(2009, 2, 17))
         self.assertEqual(e, self.e2)
 
     def testSingleSlugInvalid(self):
         self.assertRaises(ValueError,
-            self.Entry.single, 's@mpl3', datetime.date(2009, 2, 13))
+            self.Entry.single, settings, 's@mpl3', datetime.date(2009, 2, 13))
 
     def testSingleNoStrftime(self):
         # List does not have strftime method
-        self.assertRaises(ValueError, self.Entry.single, 'sample', list())
+        self.assertRaises(ValueError, self.Entry.single, settings, 'sample', list())
 
     def testDayEmpty(self):
-        e = self.Entry.day('2009', '01', '09')
+        e = self.Entry.day(settings, '2009', '01', '09')
         self.assertEqual(len(e), 0)
 
     def testDayPresent(self):
-        e = self.Entry.day('2009', '02', '13')
+        e = self.Entry.day(settings, '2009', '02', '13')
         self.assertEqual(1, len(e))
         self.assertEqual(e[0], self.e1)
 
     def testDayInvalidDate(self):
-        self.assertRaises(ValueError, self.Entry.day, 2009, 0, 0)
+        self.assertRaises(ValueError, self.Entry.day, settings, 2009, 0, 0)
 
     def testDateTrunc(self):
         self.assertRaises(ValueError, self.Entry._date_trunc, 'foo', 2009, 2, 13)
 
     def testMonthEmpty(self):
-        e = self.Entry.month('2009', '01')
+        e = self.Entry.month(settings, '2009', '01')
         self.assertEqual(len(e), 0)
 
     def testMonthPresent(self):
-        e = self.Entry.month('2009', '02')
+        e = self.Entry.month(settings, '2009', '02')
         self.assertEqual(2, len(e))
         self.assertEqual(e[0], self.e2)
         self.assertEqual(e[1], self.e1)
 
     def testYearEmpty(self):
-        e = self.Entry.year('2008')
+        e = self.Entry.year(settings, '2008')
         self.assertEqual(len(e), 0)
 
     def testYearPresent(self):
-        e = self.Entry.year('2009')
+        e = self.Entry.year(settings, '2009')
         self.assertEqual(4, len(e))
         self.assertEqual(e[0], self.e4)
         self.assertEqual(e[1], self.e3)
@@ -203,7 +203,7 @@ class TestEntry(unittest.TestCase):
         self.assertEqual(e[3], self.e1)
 
     def testRecentPresent(self):
-        e = self.Entry.recent()
+        e = self.Entry.recent(settings)
         self.assertEqual(4, len(e))
         self.assertEqual(e[0], self.e4)
         self.assertEqual(e[1], self.e3)
@@ -211,12 +211,12 @@ class TestEntry(unittest.TestCase):
         self.assertEqual(e[3], self.e1)
 
     def testRecentEmpty(self):
-        e = self.Entry.recent(datetime.datetime.min)
+        e = self.Entry.recent(settings, datetime.datetime.min)
         self.assertEqual(e, [])
 
     def testForFeedEmpty(self):
-        self.assertEqual([], self.Entry.for_feed('Idon_tExist'))
+        self.assertEqual([], self.Entry.for_feed(settings, 'Idon_tExist'))
 
     def testForFeedPresent(self):
-        results = self.Entry.for_feed('general')
+        results = self.Entry.for_feed(settings, 'general')
         self.assertEqual([self.e2, self.e1], results)
