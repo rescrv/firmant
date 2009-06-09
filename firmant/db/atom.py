@@ -6,6 +6,7 @@ import pytz
 
 from firmant.db.relations import Relation
 from firmant.backend.atom import AtomProvider
+from firmant.utils import curry
 
 
 slug_re = re.compile('^[-\\_a-zA-Z0-9]{1,96}$')
@@ -161,11 +162,54 @@ class Feed(Relation):
         if len(results) == 0:
             return None
         feed = results[0]
-        feed.entries = Entry.for_feed(name)
+        feed.entries = Entry.for_feed(settings, name)
         return feed
 
 
+def curry_entry(settings):
+    class CurriedEntry(Entry):
+
+        @classmethod
+        def for_feed(cls, feedname):
+            return super(CurriedEntry, cls).for_feed(settings, feedname)
+
+        @classmethod
+        def single(cls, slug, date):
+            return super(CurriedEntry, cls).single(settings, slug, date)
+
+        @classmethod
+        def day(cls, year, month, day):
+            return super(CurriedEntry, cls).day(settings, year, month, day)
+
+        @classmethod
+        def month(cls, year, month):
+            return super(CurriedEntry, cls).month(settings, year, month)
+
+        @classmethod
+        def year(cls, year):
+            return super(CurriedEntry, cls).year(settings, year)
+
+        @classmethod
+        def recent(cls, upper_bound=datetime.datetime.max):
+            return super(CurriedEntry, cls).recent(settings, upper_bound)
+    return CurriedEntry
+
+
+def curry_feed(settings):
+    class CurriedFeed(Feed):
+
+        @classmethod
+        def by_name(cls, name):
+            return super(CurriedFeed, cls).by_name(settings, name)
+    return CurriedFeed
+
+
 class PostgresAtomProvider(AtomProvider):
-    entry = Entry
-    feed = Feed
+
+    def __init__(self, settings):
+        self._entry   = curry_entry(settings)
+        self._feed    = curry_feed(settings)
+
+    entry   = property(lambda self: self._entry)
+    feed    = property(lambda self: self._feed)
     slug_re = re.compile('^[-\\_a-zA-Z0-9]{1,96}$')

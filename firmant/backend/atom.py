@@ -17,7 +17,7 @@ class AtomProvider(object):
     def __init__(self, settings):
         self._provider = select_canonical_plugin(self.plugins,
                                                  settings,
-                                                 'ATOM_PROVIDER')
+                                                 'ATOM_PROVIDER')(settings)
         self._eperma = EntryPermalinkProvider(settings)
         self._fperma = FeedPermalinkProvider(settings)
 
