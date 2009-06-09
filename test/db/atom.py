@@ -1,8 +1,8 @@
 import unittest
 
 from firmant.configuration import settings
-from firmant.db.relations import schema
-from firmant.db.relations import DB
+from test.db.relations import schema
+from test.db.relations import DB
 from firmant.db.atom import Entry
 from firmant.db.atom import AtomDB
 from test.backend.atom import generate_e1, \

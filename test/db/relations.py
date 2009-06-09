@@ -1,19 +1,45 @@
 import unittest
+import psycopg2
+from firmant.configuration import settings
+import os
 
 from firmant.db import relations
+
+
+class DB(object):
+
+    @staticmethod
+    def connection(readonly=True):
+        return psycopg2.connect(settings['OMNIPOTENT_DB_CONNECT'])
+
+
+def schema(schema_name):
+    '''
+    This function takes a string argument such as 'atom' and loads the
+    corresponding file firmant/db/schemas/<name>.sql and returns the file as
+    text.
+    '''
+    mod = __import__('firmant.db.schemas', {}, {}, ['schemas'])
+    schema = os.path.join(os.path.dirname(mod.__file__), schema_name + '.sql')
+    del mod
+    f = open(schema)
+    schema = f.read()
+    f.close()
+    del f
+    return schema
 
 
 class TestSchemaLoad(unittest.TestCase):
 
     def testLoad(self):
-        self.assertEqual(relations.schema('loader-works'),
+        self.assertEqual(schema('loader-works'),
                          'SCHEMA LOAD WORKING PROPERLY')
 
 
 class TestDB(unittest.TestCase):
 
     def testDBOmnipotent(self):
-        conn = relations.DB.connection()
+        conn = DB.connection()
         conn.close()
 
 
