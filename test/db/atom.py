@@ -51,11 +51,11 @@ class TestAtomSchema(unittest.TestCase):
         reset()
 
     def testGetReadConnection(self):
-        conn = AtomDB.connection(readonly=True)
+        conn = AtomDB(settings).connection(readonly=True)
         conn.close()
 
     def testGetWriteConnection(self):
-        conn = AtomDB.connection(readonly=False)
+        conn = AtomDB(settings).connection(readonly=False)
         conn.close()
 
 
@@ -78,7 +78,7 @@ class TestEntry(BaseTestEntry):
     def loadData(self):
         # Load some sample fixtures for use by other tests.
         atom = schema('atom-sample-data')
-        conn = AtomDB.connection(readonly=False)
+        conn = AtomDB(settings).connection(readonly=False)
         cur = conn.cursor()
         cur.execute(atom)
         cur.close()

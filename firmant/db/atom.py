@@ -15,21 +15,20 @@ date_re = re.compile('^\d{4}-\d{1,2}-\d{1,2}$')
 
 class AtomDB(object):
 
-    ro_connection = None
+    def __init__(self, settings):
+        # We must initialize settings before ro_connection.
+        self.settings = settings
+        self.ro_connection = self.connection(readonly=True)
+        self.ro_connection.set_isolation_level(0)
 
-    @staticmethod
-    def connection(readonly=True):
+    def connection(self, readonly=True):
         if readonly:
-            return psycopg2.connect(settings['ATOM_DB_CONNECT'])
+            return psycopg2.connect(self.settings['ATOM_DB_CONNECT'])
         else:
-            return psycopg2.connect(settings['ATOM_DB_CONNECT_WRITE'])
+            return psycopg2.connect(self.settings['ATOM_DB_CONNECT_WRITE'])
 
-    @staticmethod
-    def readonly_cursor():
-        if AtomDB.ro_connection == None:
-            AtomDB.ro_connection = AtomDB.connection(readonly=True)
-            AtomDB.ro_connection.set_isolation_level(0)
-        cur = AtomDB.ro_connection.cursor()
+    def readonly_cursor(self):
+        cur = self.ro_connection.cursor()
         cur.execute('SET search_path = atom;')
         return cur
 
@@ -60,7 +59,7 @@ class Entry(Relation):
                        fej.entries_slug = ep.slug AND
                        fej.entries_published_date = ep.published_date AND
                        f.slug = %(slug)s;"""
-        cur = AtomDB.readonly_cursor()
+        cur = AtomDB(settings).readonly_cursor()
         params = {'slug': feedname}
         cur.execute(sql, params)
         results = cls._select(cur, cls.attributes)
@@ -76,7 +75,7 @@ class Entry(Relation):
         except AttributeError, e:
             raise ValueError('date should provide strftime')
 
-        cur = AtomDB.readonly_cursor()
+        cur = AtomDB(settings).readonly_cursor()
         sql = """SELECT slug, published, name, uri, email, term, label, rights,
                         updated, title, content, summary, tz
                  FROM entries_published
@@ -112,7 +111,7 @@ class Entry(Relation):
             raise
         if trunc not in set(['day', 'month', 'year']):
             raise ValueError('Must truncate to the day, month, or year')
-        cur = AtomDB.readonly_cursor()
+        cur = AtomDB(settings).readonly_cursor()
         sql = """SELECT slug, published, name, uri, email, term, label, rights,
                         updated, title, content, summary, tz
                  FROM entries_published
@@ -126,7 +125,7 @@ class Entry(Relation):
     @classmethod
     def recent(cls, upper_bound=datetime.datetime.max):
         # If this raises an error, let it rise up.
-        cur = AtomDB.readonly_cursor()
+        cur = AtomDB(settings).readonly_cursor()
         sql = """SELECT slug, published, name, uri, email, term, label, rights,
                         updated, title, content, summary, tz
                  FROM entries_published
@@ -156,7 +155,7 @@ class Feed(Relation):
     @classmethod
     def by_name(cls, name):
         # If this raises an error, let it rise up.
-        cur = AtomDB.readonly_cursor()
+        cur = AtomDB(settings).readonly_cursor()
         cur.execute(Feed.sql, {'slug': name})
         results = cls._select(cur, cls.attributes)
         cur.close()
