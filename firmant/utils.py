@@ -48,3 +48,10 @@ class ProxyObject(object):
         # Case 2: attr is in _proxied.
         else:
             del self.__dict__['_object'].__dict__[attr]
+
+
+def curry(to_curry, *c_args, **c_kwargs):
+    def new_function(*args, **kwargs):
+        return to_curry(*(c_args + args),
+                        **dict(c_kwargs.items() + kwargs.items()))
+    return new_function
