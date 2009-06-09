@@ -6,8 +6,6 @@ import pytz
 
 from firmant.configuration import settings
 from firmant.db.relations import Relation
-from firmant.db.relations import schema
-from firmant.db.relations import DB
 from firmant.backend.atom import AtomProvider
 
 
@@ -34,30 +32,6 @@ class AtomDB(object):
         cur = AtomDB.ro_connection.cursor()
         cur.execute('SET search_path = atom;')
         return cur
-
-    @staticmethod
-    def reset():
-        AtomDB._drop()
-        AtomDB._setup()
-
-    @staticmethod
-    def _drop():
-        conn = DB.connection()
-        cur = conn.cursor()
-        cur.execute('DROP SCHEMA IF EXISTS atom CASCADE;')
-        cur.close()
-        conn.commit()
-        conn.close()
-
-    @staticmethod
-    def _setup():
-        atom = schema('atom')
-        conn = DB.connection()
-        cur = conn.cursor()
-        cur.execute(atom)
-        cur.close()
-        conn.commit()
-        conn.close()
 
 
 class Entry(Relation):

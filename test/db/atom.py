@@ -2,6 +2,7 @@ import unittest
 
 from firmant.configuration import settings
 from firmant.db.relations import schema
+from firmant.db.relations import DB
 from firmant.db.atom import Entry
 from firmant.db.atom import AtomDB
 from test.backend.atom import generate_e1, \
@@ -11,19 +12,43 @@ from test.backend.atom import generate_e1, \
 from test.backend.atom import TestEntry as BaseTestEntry
 
 
+def reset():
+    _drop()
+    _setup()
+
+
+def _drop():
+    conn = DB.connection()
+    cur = conn.cursor()
+    cur.execute('DROP SCHEMA IF EXISTS atom CASCADE;')
+    cur.close()
+    conn.commit()
+    conn.close()
+
+
+def _setup():
+    atom = schema('atom')
+    conn = DB.connection()
+    cur = conn.cursor()
+    cur.execute(atom)
+    cur.close()
+    conn.commit()
+    conn.close()
+
+
 class TestAtomSchema(unittest.TestCase):
 
     def setUp(self):
         # We do not want other tests to affect settings in here.
-        AtomDB.reset()
+        reset()
 
     def tearDown(self):
         # We do not want settings in here to affect any other tests.
-        AtomDB.reset()
+        reset()
 
     def testReset(self):
         # This tests the reset functionality of the schema.
-        AtomDB.reset()
+        reset()
 
     def testGetReadConnection(self):
         conn = AtomDB.connection(readonly=True)
@@ -43,12 +68,12 @@ class TestEntry(BaseTestEntry):
         self.e3 = generate_e3(Entry)
         self.e4 = generate_e4(Entry)
         # We do not want other tests to affect settings in here.
-        AtomDB.reset()
+        reset()
         self.loadData()
 
     def tearDown(self):
         # We do not want settings in here to affect any other tests.
-        AtomDB.reset()
+        reset()
 
     def loadData(self):
         # Load some sample fixtures for use by other tests.
