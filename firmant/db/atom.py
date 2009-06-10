@@ -1,3 +1,8 @@
+# TODO:  This file is broken, primarily because permalinks are not added to
+# Entry or Feed objects.  This may be fixed when this module gets more love.
+# For now this module is going to be set aside now that the plugin interface
+# behaves correctly.
+
 import re
 import psycopg2
 import os.path

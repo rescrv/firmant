@@ -18,27 +18,17 @@ class AtomProvider(object):
         self._provider = select_canonical_plugin(self.plugins,
                                                  settings,
                                                  'ATOM_PROVIDER')(settings)
-        self._eperma = EntryPermalinkProvider(settings)
-        self._fperma = FeedPermalinkProvider(settings)
+        self.entry_permalink = EntryPermalinkProvider(settings).authoritative
+        self.feed_permalink  = FeedPermalinkProvider(settings).authoritative
 
-    def get_entry(self):
-        e = self._provider.entry
-        e.permalink = lambda e_self: self._eperma.authoritative(e_self)
-        return e
+    entry   = property(lambda self: self._provider.entry,
+                       doc="The Atom Entry class")
 
-    entry = property(get_entry, None, None, "The Atom Entry class")
+    feed    = property(lambda self: self._provider.feed,
+                       doc="The Atom Feed class")
 
-    def get_feed(self):
-        f = self._provider.feed
-        f.permalink = lambda f_self: self._fperma.authoritative(f_self)
-        return f
-
-    feed = property(get_feed, None, None, "The Atom Feed class")
-
-    def get_slug_re(self):
-        return self._provider.slug_re
-
-    slug_re = property(get_slug_re, None, None, "The Atom slug re")
+    slug_re = property(lambda self: self._provider.slug_re,
+                       doc="The Atom slug re")
 
 
 class EntryPermalinkProvider(object):
