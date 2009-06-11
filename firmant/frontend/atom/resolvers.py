@@ -6,8 +6,8 @@ import pytz
 
 from firmant.wsgi import Response
 from firmant.resolvers import Resolver
-from firmant.backend.atom import AtomProvider
-from firmant.backend.atom import FeedPermalinkProvider
+from firmant.datasource.atom import AtomProvider
+from firmant.datasource.atom import FeedPermalinkProvider
 from firmant.filters import FilterProvider
 from firmant.configuration import settings
 

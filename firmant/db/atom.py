@@ -10,7 +10,7 @@ import datetime
 import pytz
 
 from firmant.db.relations import Relation
-from firmant.backend.atom import AtomProvider
+from firmant.datasource.atom import AtomProvider
 from firmant.utils import curry
 
 

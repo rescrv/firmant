@@ -3,7 +3,7 @@ import datetime
 import pytz
 
 from firmant.configuration import settings
-from firmant.backend.atom import AtomProvider
+from firmant.datasource.atom import AtomProvider
 from firmant.utils import ProxyObject
 
 

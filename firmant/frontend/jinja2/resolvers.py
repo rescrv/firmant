@@ -5,10 +5,10 @@ from jinja2 import Environment, FileSystemLoader
 
 from firmant.wsgi import Response
 from firmant.resolvers import DateResolver
-from firmant.backend.atom import AtomProvider
+from firmant.datasource.atom import AtomProvider
 from firmant.filters import FilterProvider
 from firmant.configuration import settings
-from firmant.backend.atom import EntryPermalinkProvider
+from firmant.datasource.atom import EntryPermalinkProvider
 
 
 class Jinja2EntryPermalink(EntryPermalinkProvider):

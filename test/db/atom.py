@@ -5,11 +5,11 @@ from test.db.relations import schema
 from test.db.relations import DB
 from firmant.db.atom import Entry
 from firmant.db.atom import AtomDB
-from test.backend.atom import generate_e1, \
+from test.datasource.atom import generate_e1, \
                               generate_e2, \
                               generate_e3, \
                               generate_e4
-from test.backend.atom import TestEntry as BaseTestEntry
+from test.datasource.atom import TestEntry as BaseTestEntry
 
 
 def reset():

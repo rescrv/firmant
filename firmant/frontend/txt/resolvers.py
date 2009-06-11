@@ -3,7 +3,7 @@ import re
 
 from firmant.wsgi import Response
 from firmant.resolvers import DateResolver
-from firmant.backend.atom import AtomProvider
+from firmant.datasource.atom import AtomProvider
 from firmant.configuration import settings
 
 
