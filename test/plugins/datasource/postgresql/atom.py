@@ -1,10 +1,10 @@
 import unittest
 
 from firmant.configuration import settings
-from test.db.relations import schema
-from test.db.relations import DB
-from firmant.db.atom import Entry
-from firmant.db.atom import AtomDB
+from test.plugins.datasource.postgresql.relations import schema
+from test.plugins.datasource.postgresql.relations import DB
+from firmant.plugins.datasource.postgresql.atom import Entry
+from firmant.plugins.datasource.postgresql.atom import AtomDB
 from test.datasource.atom import generate_e1, \
                               generate_e2, \
                               generate_e3, \

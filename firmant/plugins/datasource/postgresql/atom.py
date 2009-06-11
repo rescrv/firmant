@@ -9,7 +9,7 @@ import os.path
 import datetime
 import pytz
 
-from firmant.db.relations import Relation
+from firmant.plugins.datasource.postgresql.relations import Relation
 from firmant.datasource.atom import AtomProvider
 from firmant.utils import curry
 

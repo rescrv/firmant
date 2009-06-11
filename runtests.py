@@ -5,8 +5,8 @@ import pytz
 
 from firmant.configuration import settings
 from test.configuration import suite as configuration_tests
-from test.db.atom import suite as db_atom_tests
-from test.db.relations import suite as db_relations_tests
+from test.plugins.datasource.postgresql.atom import suite as db_atom_tests
+from test.plugins.datasource.postgresql.relations import suite as db_relations_tests
 from test.resolvers import suite as resolvers_tests
 
 

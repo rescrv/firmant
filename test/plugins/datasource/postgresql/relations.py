@@ -3,7 +3,7 @@ import psycopg2
 from firmant.configuration import settings
 import os
 
-from firmant.db import relations
+from firmant.plugins.datasource.postgresql import relations
 
 
 class DB(object):
@@ -19,7 +19,7 @@ def schema(schema_name):
     corresponding file firmant/db/schemas/<name>.sql and returns the file as
     text.
     '''
-    mod = __import__('firmant.db.schemas', {}, {}, ['schemas'])
+    mod = __import__('firmant.plugins.datasource.postgresql.schemas', {}, {}, ['schemas'])
     schema = os.path.join(os.path.dirname(mod.__file__), schema_name + '.sql')
     del mod
     f = open(schema)
