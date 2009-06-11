@@ -177,9 +177,6 @@ class TestEntry(unittest.TestCase):
     def testDayInvalidDate(self):
         self.assertRaises(ValueError, self.Entry.day, settings, 2009, 0, 0)
 
-    def testDateTrunc(self):
-        self.assertRaises(ValueError, self.Entry._date_trunc, 'foo', 2009, 2, 13)
-
     def testMonthEmpty(self):
         e = self.Entry.month(settings, '2009', '01')
         self.assertEqual(len(e), 0)

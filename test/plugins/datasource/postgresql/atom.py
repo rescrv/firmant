@@ -85,6 +85,9 @@ class TestEntry(BaseTestEntry):
         conn.commit()
         conn.close()
 
+    def testDateTrunc(self):
+        self.assertRaises(ValueError, self.Entry._date_trunc, 'foo', 2009, 2, 13)
+
 
 suite = unittest.TestSuite()
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestAtomSchema))
