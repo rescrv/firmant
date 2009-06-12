@@ -18,8 +18,6 @@ class AtomProvider(object):
         self._provider = select_canonical_plugin(self.plugins,
                                                  settings,
                                                  'ATOM_PROVIDER')(settings)
-        self.entry_permalink = EntryPermalinkProvider(settings).authoritative
-        self.feed_permalink  = FeedPermalinkProvider(settings).authoritative
 
     entry   = property(lambda self: self._provider.entry,
                        doc="The Atom Entry class")

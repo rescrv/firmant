@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import unittest
+from firmant.utils import get_module
 # Import this now to avoid it throwing errors.
 import pytz
 
@@ -10,9 +11,13 @@ from test.plugins.datasource.postgresql.relations import suite as db_relations_t
 from test.plugins.datasource.flatfile.atom import suite as flatfile_atom_tests
 from test.resolvers import suite as resolvers_tests
 
-
 if __name__ == '__main__':
     settings.reconfigure('test_settings')
+    for plugin in settings['PLUGINS']:
+        try:
+            mod = get_module(plugin)
+        except ImportError:
+            raise
     suite = unittest.TestSuite()
     suite.addTests(configuration_tests)
     suite.addTests(db_atom_tests)

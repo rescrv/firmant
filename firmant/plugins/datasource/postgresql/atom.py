@@ -1,8 +1,3 @@
-# TODO:  This file is broken, primarily because permalinks are not added to
-# Entry or Feed objects.  This may be fixed when this module gets more love.
-# For now this module is going to be set aside now that the plugin interface
-# behaves correctly.
-
 import re
 import psycopg2
 import os.path
@@ -11,6 +6,8 @@ import pytz
 
 from firmant.plugins.datasource.postgresql.relations import Relation
 from firmant.datasource.atom import AtomProvider
+from firmant.datasource.atom import FeedPermalinkProvider
+from firmant.datasource.atom import EntryPermalinkProvider
 from firmant.utils import curry
 
 
@@ -41,7 +38,7 @@ class AtomDB(object):
 class PostgresAtomProvider(AtomProvider):
 
     slug_re = slug_re
-    __slots__ = ['feed', 'entry']
+    __slots__ = ['feed', 'entry', 'feed_permalink', 'entry_permalink']
 
     def __init__(self, settings):
         adb = AtomDB(settings)
@@ -75,6 +72,9 @@ class PostgresAtomProvider(AtomProvider):
                 feed = results[0]
                 feed.entries = self.entry.for_feed(name)
                 return feed
+
+            def permalink(local_self):
+                return self.feed_permalink(local_self)
         self.feed = Feed
 
         class Entry(Relation):
@@ -181,4 +181,9 @@ class PostgresAtomProvider(AtomProvider):
                 results = cls._select(cur, cls.attributes)
                 cur.close()
                 return results
+
+            def permalink(local_self):
+                return self.entry_permalink(local_self)
         self.entry = Entry
+        self.entry_permalink = EntryPermalinkProvider(settings).authoritative
+        self.feed_permalink  = FeedPermalinkProvider(settings).authoritative
