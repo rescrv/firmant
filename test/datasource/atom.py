@@ -358,45 +358,34 @@ class TestEntry(unittest.TestCase):
 
     def testDayEmpty(self):
         e = self.Entry.day('2009', '01', '09')
-        self.assertEqual(len(e), 0)
+        self.assertEqual(e, [])
 
     def testDayPresent(self):
         e = self.Entry.day('2009', '02', '13')
-        self.assertEqual(1, len(e))
-        self.assertEqual(e[0], self.e1)
+        self.assertEqual(e, [self.e1])
 
     def testDayInvalidDate(self):
         self.assertRaises(ValueError, self.Entry.day, 2009, 0, 0)
 
     def testMonthEmpty(self):
         e = self.Entry.month('2009', '01')
-        self.assertEqual(len(e), 0)
+        self.assertEqual(e, [])
 
     def testMonthPresent(self):
         e = self.Entry.month('2009', '02')
-        self.assertEqual(2, len(e))
-        self.assertEqual(e[0], self.e2)
-        self.assertEqual(e[1], self.e1)
+        self.assertEqual(e, [self.e2, self.e1])
 
     def testYearEmpty(self):
         e = self.Entry.year('2008')
-        self.assertEqual(len(e), 0)
+        self.assertEqual(e, [])
 
     def testYearPresent(self):
         e = self.Entry.year('2009')
-        self.assertEqual(4, len(e))
-        self.assertEqual(e[0], self.e4)
-        self.assertEqual(e[1], self.e3)
-        self.assertEqual(e[2], self.e2)
-        self.assertEqual(e[3], self.e1)
+        self.assertEqual(e, [self.e4, self.e3, self.e2, self.e1])
 
     def testRecentPresent(self):
         e = self.Entry.recent()
-        self.assertEqual(4, len(e))
-        self.assertEqual(e[0], self.e4)
-        self.assertEqual(e[1], self.e3)
-        self.assertEqual(e[2], self.e2)
-        self.assertEqual(e[3], self.e1)
+        self.assertEqual(e, [self.e4, self.e3, self.e2, self.e1])
 
     def testRecentEmpty(self):
         e = self.Entry.recent(datetime.datetime.min)
