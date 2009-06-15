@@ -146,14 +146,20 @@ class AtomProvider(object):
                                                  settings,
                                                  'ATOM_PROVIDER')(settings)
 
-    entry   = property(lambda self: self._provider.entry,
-                       doc="The Atom Entry class")
+    entry    = property(lambda self: self._provider.entry,
+                        doc="The Atom Entry class")
 
-    feed    = property(lambda self: self._provider.feed,
-                       doc="The Atom Feed class")
+    feed     = property(lambda self: self._provider.feed,
+                        doc="The Atom Feed class")
 
-    slug_re = property(lambda self: self._provider.slug_re,
-                       doc="The Atom slug re")
+    author   = property(lambda self: self._provider.author,
+                        doc="The Atom Author class")
+
+    category = property(lambda self: self._provider.category,
+                        doc="The Atom Category class")
+
+    slug_re  = property(lambda self: self._provider.slug_re,
+                        doc="The Atom slug re")
 
 
 class EntryPermalinkProvider(object):
