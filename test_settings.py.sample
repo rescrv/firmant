@@ -1,13 +1,3 @@
-# This is the connection string used for manipulating the atom schema in unit
-# tests.  The database should be empty, and the user from whom you connect
-# should have privileges to create schemas and tables.
-ATOM_DB_CONNECT = "dbname='firmant'"
-ATOM_DB_CONNECT_WRITE = "dbname='firmant'"
-
-# This user should have the ability to drop schemas and tables.  It should not
-# be enabled in production.
-OMNIPOTENT_DB_CONNECT = "dbname='firmant'"
-
 # The component of the hostname.  Must be suitable for the first parameter of
 # urlparse.urljoin
 HOST = 'http://localhost:8080/'
@@ -22,8 +12,7 @@ PLUGINS = ['firmant.frontend.txt',
            'firmant.frontend.jinja2.resolvers',
            'firmant.frontend.atom',
            'firmant.frontend.atom.resolvers',
-           'firmant.plugins.filters.markdown',
-           'firmant.plugins.datasource.postgresql.atom']
+           'firmant.plugins.filters.markdown']
 ENTRY_PERMALINK = 'firmant.frontend.jinja2.resolvers'
 FEED_PERMALINK  = 'firmant.frontend.atom.resolvers'
 
@@ -47,4 +36,4 @@ MARKDOWN_XHTML_ENABLED = True
 MARKDOWN_XHTML_SAFE_MODE = 'escape'
 
 # Backend options
-ATOM_PROVIDER = 'firmant.plugins.datasource.postgresql.atom'
+ATOM_PROVIDER = 'firmant.plugins.datasource.flatfile.atom'
