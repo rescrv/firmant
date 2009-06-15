@@ -4,7 +4,8 @@ import pytz
 
 from firmant.datasource.atom import AtomProvider, \
                                     AtomBase, \
-                                    DatetimeFilter
+                                    DatetimeFilter, \
+                                    AtomObjectFilter
 from firmant.utils import ProxyObject
 
 
@@ -305,6 +306,23 @@ class TestAtomBase(unittest.TestCase):
         b = cls_with_filters.from_json(j)
 
         self.assertTrue(a == b)
+
+    def testJsonFilters4(self):
+        """TestAtomBase json filters: AtomObjectFilter"""
+
+        class cls_with_filters(self.cls):
+            filters = {}
+            filters['quux'] = AtomObjectFilter(self.cls())
+
+        a      = self.cls()
+        a.foo  = 'quux'
+        b      = cls_with_filters()
+        b.quux = a
+
+        j = b.to_json()
+        c = cls_with_filters.from_json(j)
+
+        self.assertTrue(b == c)
 
 
 class TestEntry(unittest.TestCase):

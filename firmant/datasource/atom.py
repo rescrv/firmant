@@ -41,6 +41,18 @@ class DatetimeFilter(Filter):
             return tz_obj.normalize(new_dt)
 
 
+class AtomObjectFilter(Filter):
+
+    def __init__(self, cls):
+        self.cls = cls
+
+    def to_json(self, obj):
+        return obj.to_json()
+
+    def from_json(self, obj):
+        return self.cls.from_json(obj)
+
+
 class AtomBase(object):
 
     filters = {}
