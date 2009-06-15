@@ -265,64 +265,78 @@ class TestAtomBase(unittest.TestCase):
 
         self.assertTrue(a == b)
 
-    def testJsonFilters1(self):
-        """TestAtomBase:  json filters:  datetime (timezone DST)"""
 
-        class cls_with_filters(self.cls):
+class TestDatetimeFilter(unittest.TestCase):
+
+    def setUp(self):
+        class TestData(AtomBase):
+            fields    = ['foo', 'bar', 'baz', 'quux']
+            __slots__ = fields
             filters = {}
             filters['quux'] = DatetimeFilter()
-        a      = cls_with_filters()
-        A_NY = pytz.timezone('America/New_York')
+
+        self.cls = TestData
+
+    def testDatetimeFilter1(self):
+        """TestAtomBase:  json filters:  datetime (timezone DST)"""
+
+        a      = self.cls()
+        A_NY   = pytz.timezone('America/New_York')
         a.quux = A_NY.localize(datetime.datetime(2009, 6, 15, 14, 40, 59))
 
         j = a.to_json()
-        b = cls_with_filters.from_json(j)
+        b = self.cls.from_json(j)
 
         self.assertTrue(a == b)
 
-    def testJsonFilters2(self):
+    def testDatetimeFilter2(self):
         """TestAtomBase:  json filters:  datetime (timezone no DST)"""
 
-        class cls_with_filters(self.cls):
-            filters = {}
-            filters['quux'] = DatetimeFilter()
-        a      = cls_with_filters()
-        A_NY = pytz.timezone('America/New_York')
+        a      = self.cls()
+        A_NY   = pytz.timezone('America/New_York')
         a.quux = A_NY.localize(datetime.datetime(2009, 1, 15, 14, 40, 59))
 
         j = a.to_json()
-        b = cls_with_filters.from_json(j)
+        b = self.cls.from_json(j)
 
         self.assertTrue(a == b)
 
-    def testJsonFilters3(self):
+    def testDatetimeFilter3(self):
         """TestAtomBase:  json filters:  datetime (no timezone)"""
 
-        class cls_with_filters(self.cls):
-            filters = {}
-            filters['quux'] = DatetimeFilter()
-        a      = cls_with_filters()
+        a      = self.cls()
         a.quux = datetime.datetime(2009, 6, 15, 14, 40, 59)
 
         j = a.to_json()
-        b = cls_with_filters.from_json(j)
+        b = self.cls.from_json(j)
 
         self.assertTrue(a == b)
 
-    def testJsonFilters4(self):
+
+class TestAtomObjectFilter(unittest.TestCase):
+
+    def setUp(self):
+        class TestData(AtomBase):
+            fields    = ['foo', 'bar', 'baz', 'quux']
+            __slots__ = fields
+
+        class MoreTestData(TestData):
+            filters = {}
+            filters['quux'] = AtomObjectFilter(TestData)
+
+        self.filtered   = MoreTestData
+        self.unfiltered = TestData
+
+    def testAtomObjectFilter1(self):
         """TestAtomBase json filters: AtomObjectFilter"""
 
-        class cls_with_filters(self.cls):
-            filters = {}
-            filters['quux'] = AtomObjectFilter(self.cls())
-
-        a      = self.cls()
+        a      = self.unfiltered()
         a.foo  = 'quux'
-        b      = cls_with_filters()
+        b      = self.filtered()
         b.quux = a
 
         j = b.to_json()
-        c = cls_with_filters.from_json(j)
+        c = self.filtered.from_json(j)
 
         self.assertTrue(b == c)
 
@@ -401,3 +415,5 @@ class TestEntry(unittest.TestCase):
 
 suite = unittest.TestSuite()
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestAtomBase))
+suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestAtomObjectFilter))
+suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestDatetimeFilter))
