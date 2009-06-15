@@ -87,6 +87,34 @@ class AtomBase(object):
         return entry
 
 
+class Author(AtomBase):
+
+    fields    = ['name', 'uri', 'email']
+    __slots__ = fields
+
+    @classmethod
+    def by_name(cls, name):
+        not_implemented()
+
+    # TODO:
+    #def permalink(self):
+    #    not_implemented()
+
+
+class Category(AtomBase):
+
+    fields    = ['term', 'label']
+    __slots__ = fields
+
+    @classmethod
+    def by_term(cls, term):
+        not_implemented()
+
+    # TODO:
+    #def permalink(self):
+    #    not_implemented()
+
+
 class Entry(AtomBase):
 
     # In case a subclass overloads __slots__ we can still compare two Entry
@@ -138,34 +166,6 @@ class Feed(AtomBase):
 
     def permalink(self):
         not_implemented()
-
-
-class Author(AtomBase):
-
-    fields    = ['name', 'uri', 'email']
-    __slots__ = fields
-
-    @classmethod
-    def by_name(cls, name):
-        not_implemented()
-
-    # TODO:
-    #def permalink(self):
-    #    not_implemented()
-
-
-class Category(AtomBase):
-
-    fields    = ['term', 'label']
-    __slots__ = fields
-
-    @classmethod
-    def by_term(cls, term):
-        not_implemented()
-
-    # TODO:
-    #def permalink(self):
-    #    not_implemented()
 
 
 # Plugin Code
