@@ -1,3 +1,7 @@
+def not_implemented(*args, **kwargs):
+    raise NotImplementedError("This function is not implemented")
+
+
 def get_module(plugin):
     try:
         modules = plugin.split('.')
