@@ -1,4 +1,5 @@
 import datetime
+import json
 
 from firmant.plugins import PluginMount
 from firmant.utils import not_implemented
@@ -25,6 +26,22 @@ class AtomBase(object):
 
     def __ne__(self, other):
         return not (self == other)
+
+    def to_json(self):
+        data = {}
+        for field in self.fields:
+            if hasattr(self, field):
+                data[field] = getattr(self, field)
+        return json.dumps(data)
+
+    @classmethod
+    def from_json(cls, string):
+        data = json.loads(string)
+        entry = cls()
+        for field in cls.fields:
+            if data.has_key(field):
+                setattr(entry, field, data[field])
+        return entry
 
 
 class Entry(AtomBase):

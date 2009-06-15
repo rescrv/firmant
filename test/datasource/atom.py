@@ -228,6 +228,41 @@ class TestAtomBase(unittest.TestCase):
 
         self.assertTrue(a != b)
 
+    def testJson1(self):
+        """TestAtomBase:  json:  all fields present"""
+
+        a      = self.cls()
+        a.foo  = 'quux'
+        a.bar  = 'baz'
+        a.baz  = 'bar'
+        a.quux = 'foo'
+
+        j = a.to_json()
+        b = self.cls.from_json(j)
+
+        self.assertTrue(a == b)
+
+    def testJson2(self):
+        """TestAtomBase:  json:  one field present"""
+
+        a      = self.cls()
+        a.foo  = 'quux'
+
+        j = a.to_json()
+        b = self.cls.from_json(j)
+
+        self.assertTrue(a == b)
+
+    def testJson3(self):
+        """TestAtomBase:  json:  no fields present"""
+
+        a      = self.cls()
+
+        j = a.to_json()
+        b = self.cls.from_json(j)
+
+        self.assertTrue(a == b)
+
 
 class TestEntry(unittest.TestCase):
 
