@@ -148,7 +148,9 @@ class TestAtomBase(unittest.TestCase):
         self.cls = TestAtomData
 
     def testEquality1(self):
-        """TestAtomBase:  equality:  all fields present; equal"""
+        """firmant.datasource.atom.AtomBase.__eq__
+        This tests the case that all defined fields are present and equivalent,
+        thus the two instances are equal"""
 
         a      = self.cls()
         a.foo  = 'quux'
@@ -165,7 +167,10 @@ class TestAtomBase(unittest.TestCase):
         self.assertTrue(a == b)
 
     def testEquality2(self):
-        """TestAtomBase:  equality:  missing fields; equal"""
+        """firmant.datasource.atom.AtomBase.__eq__
+        This tests the case that one or more defined fields are absent, but
+        those absent are absent in both instances and those present have
+        equivalent values, thus the two instances are equal"""
 
         a      = self.cls()
         a.foo  = 'quux'
@@ -180,13 +185,18 @@ class TestAtomBase(unittest.TestCase):
         self.assertTrue(a == b)
 
     def testEquality3(self):
-        """TestAtomBase:  equality:  no fields added; equal"""
+        """firmant.datasource.atom.AtomBase.__eq__
+        This tests the case that all defined fields are absent, thus the two
+        instances are equal"""
         a      = self.cls()
         b      = self.cls()
         self.assertTrue(a == b)
 
     def testEquality4(self):
-        """TestAtomBase:  equality:  matched fields; unmatched data; unequal"""
+        """firmant.datasource.atom.AtomBase.__eq__
+        This tests the case that that the same fields are present in both
+        instances, but have unequal values.  Thus it is the case that the two
+        instances are not equal."""
 
         a      = self.cls()
         a.foo  = 'quux'
@@ -197,7 +207,10 @@ class TestAtomBase(unittest.TestCase):
         self.assertTrue(not (a == b))
 
     def testEquality5(self):
-        """TestAtomBase:  equality:  unmatched fields; unequal"""
+        """firmant.datasource.atom.AtomBase.__eq__
+        This tests the case that that different fields are present in both
+        instances, but have equal values where they overlap.  Thus it is the
+        case that the two instances are not equal."""
 
         a      = self.cls()
         a.foo  = 'foo'
@@ -214,7 +227,9 @@ class TestAtomBase(unittest.TestCase):
         self.assertTrue(not (b == a))
 
     def testInequality1(self):
-        """TestAtomBase:  inequality:  all fields present; inequal"""
+        """firmant.datasource.atom.AtomBase.__ne__
+        This tests the __ne__ function with a simple case. where defined fields
+        are the same and values of said fields are different."""
 
         a      = self.cls()
         a.foo  = 'foo'
@@ -231,7 +246,8 @@ class TestAtomBase(unittest.TestCase):
         self.assertTrue(a != b)
 
     def testJson1(self):
-        """TestAtomBase:  json:  all fields present"""
+        """firmant.datasource.atom.AtomBase. to_json, from_json
+        Test JSON serialization with all fields present"""
 
         a      = self.cls()
         a.foo  = 'quux'
@@ -245,7 +261,8 @@ class TestAtomBase(unittest.TestCase):
         self.assertTrue(a == b)
 
     def testJson2(self):
-        """TestAtomBase:  json:  one field present"""
+        """firmant.datasource.atom.AtomBase. to_json, from_json
+        Test JSON serialization with just one field present"""
 
         a      = self.cls()
         a.foo  = 'quux'
@@ -256,7 +273,8 @@ class TestAtomBase(unittest.TestCase):
         self.assertTrue(a == b)
 
     def testJson3(self):
-        """TestAtomBase:  json:  no fields present"""
+        """firmant.datasource.atom.AtomBase. to_json, from_json
+        Test JSON serialization with no fields present"""
 
         a      = self.cls()
 
@@ -278,7 +296,10 @@ class TestDatetimeFilter(unittest.TestCase):
         self.cls = TestData
 
     def testDatetimeFilter1(self):
-        """TestAtomBase:  json filters:  datetime (timezone DST)"""
+        """firmant.datasource.atom.DatetimeFilter
+        Test serialization to JSON of an AtomBase object with a pytz localized
+        datetime object in one field.  The datetime object observes daylight
+        savings time."""
 
         a      = self.cls()
         A_NY   = pytz.timezone('America/New_York')
@@ -290,7 +311,10 @@ class TestDatetimeFilter(unittest.TestCase):
         self.assertTrue(a == b)
 
     def testDatetimeFilter2(self):
-        """TestAtomBase:  json filters:  datetime (timezone no DST)"""
+        """firmant.datasource.atom.DatetimeFilter
+        Test serialization to JSON of an AtomBase object with a pytz localized
+        datetime object in one field.  The datetime object is outside daylight
+        savings time"""
 
         a      = self.cls()
         A_NY   = pytz.timezone('America/New_York')
@@ -302,7 +326,9 @@ class TestDatetimeFilter(unittest.TestCase):
         self.assertTrue(a == b)
 
     def testDatetimeFilter3(self):
-        """TestAtomBase:  json filters:  datetime (no timezone)"""
+        """firmant.datasource.atom.DatetimeFilter
+        Test serialization to JSON of an AtomBase object with a naive datetime
+        object in one field."""
 
         a      = self.cls()
         a.quux = datetime.datetime(2009, 6, 15, 14, 40, 59)
@@ -328,7 +354,9 @@ class TestAtomObjectFilter(unittest.TestCase):
         self.unfiltered = TestData
 
     def testAtomObjectFilter1(self):
-        """TestAtomBase json filters: AtomObjectFilter"""
+        """firmant.datasource.atom.AtomObjectFilter
+        Test serialization to JSON of a
+        Test serialization to JSON of naive datetime object."""
 
         a      = self.unfiltered()
         a.foo  = 'quux'
