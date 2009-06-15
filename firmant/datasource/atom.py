@@ -134,6 +134,11 @@ class Entry(AtomBase):
     fields    = ['slug', 'published', 'author', 'category', 'rights', 'updated',
                  'title', 'content', 'summary', 'tz']
     __slots__ = fields
+    filters              = {}
+    filters['published'] = DatetimeFilter()
+    filters['updated']   = DatetimeFilter()
+    filters['author']    = AtomObjectFilter(Author)
+    filters['category']  = AtomObjectFilter(Category)
 
     @classmethod
     def for_feed(cls, feedslug, count=10, offset=0):
@@ -167,6 +172,8 @@ class Feed(AtomBase):
 
     fields    = ['slug', 'title', 'rights', 'subtitle', 'updated']
     __slots__ = fields
+    filters              = {}
+    filters['updated']   = DatetimeFilter()
 
     @classmethod
     def by_slug(cls, slug):
