@@ -8,7 +8,11 @@ import os.path
 import datetime
 import pytz
 
-from firmant.datasource.atom import AtomProvider
+from firmant.datasource.atom import AtomProvider, \
+                                    Entry, \
+                                    Feed, \
+                                    Author, \
+                                    Category
 
 
 slug_re = re.compile('^[-\\_a-zA-Z0-9]{1,96}$')
@@ -17,50 +21,27 @@ date_re = re.compile('^\d{4}-\d{1,2}-\d{1,2}$')
 
 class FlatfileAtomProvider(AtomProvider):
 
-    __slots__ = ['feed', 'entry']
+    __slots__ = ['feed', 'entry', 'author', 'category']
     slug_re = slug_re
 
     def __init__(provider_self, settings):
 
-        class Entry(object):
-
+        class FlatFileEntry(Entry):
             provider = provider_self
-            attributes = ['slug', 'published', 'author_name',
-                          'author_uri', 'author_email', 'category_term',
-                          'category_label', 'rights', 'updated', 'title',
-                          'content', 'summary', 'tz']
 
-            @classmethod
-            def for_feed(cls, feedname):
-                pass
+        provider_self.entry = FlatFileEntry
 
-            @classmethod
-            def single(cls, slug, date):
-                pass
-
-            @classmethod
-            def day(cls, year, month, day):
-                pass
-
-            @classmethod
-            def month(cls, year, month):
-                pass
-
-            @classmethod
-            def year(cls, year):
-                pass
-
-            @classmethod
-            def recent(cls, upper_bound=datetime.datetime.max):
-                pass
-        provider_self.entry = Entry
-
-        class Feed(object):
-
+        class FlatFileFeed(Feed):
             provider = provider_self
-            attributes = ['slug', 'title', 'rights', 'subtitle', 'updated']
 
-            @classmethod
-            def by_name(cls, name):
-                pass
-        provider_self.feed = Feed
+        provider_self.feed = FlatFileFeed
+
+        class FlatFileAuthor(Author):
+            provider = provider_self
+
+        provider_self.author = FlatFileAuthor
+
+        class FlatFileCategory(Category):
+            provider = provider_self
+
+        provider_self.category = FlatFileCategory
