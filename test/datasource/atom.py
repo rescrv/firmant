@@ -2,7 +2,8 @@ import unittest
 import datetime
 import pytz
 
-from firmant.datasource.atom import AtomProvider
+from firmant.datasource.atom import AtomProvider, \
+                                    AtomBase
 from firmant.utils import ProxyObject
 
 
@@ -135,6 +136,99 @@ e3 = ProxyObject(lambda: generate_e3(AtomProvider.entry))
 e4 = ProxyObject(lambda: generate_e4(AtomProvider.entry))
 
 
+class TestAtomBase(unittest.TestCase):
+
+    def setUp(self):
+        class TestAtomData(AtomBase):
+            fields    = ['foo', 'bar', 'baz', 'quux']
+            __slots__ = fields
+
+        self.cls = TestAtomData
+
+    def testEquality1(self):
+        """TestAtomBase:  equality:  all fields present; equal"""
+
+        a      = self.cls()
+        a.foo  = 'quux'
+        a.bar  = 'baz'
+        a.baz  = 'bar'
+        a.quux = 'foo'
+
+        b      = self.cls()
+        b.foo  = 'quux'
+        b.bar  = 'baz'
+        b.baz  = 'bar'
+        b.quux = 'foo'
+
+        self.assertTrue(a == b)
+
+    def testEquality2(self):
+        """TestAtomBase:  equality:  missing fields; equal"""
+
+        a      = self.cls()
+        a.foo  = 'quux'
+        a.bar  = 'baz'
+        a.quux = 'foo'
+
+        b      = self.cls()
+        b.foo  = 'quux'
+        b.bar  = 'baz'
+        b.quux = 'foo'
+
+        self.assertTrue(a == b)
+
+    def testEquality3(self):
+        """TestAtomBase:  equality:  no fields added; equal"""
+        a      = self.cls()
+        b      = self.cls()
+        self.assertTrue(a == b)
+
+    def testEquality4(self):
+        """TestAtomBase:  equality:  matched fields; unmatched data; unequal"""
+
+        a      = self.cls()
+        a.foo  = 'quux'
+
+        b      = self.cls()
+        b.foo  = 'foo'
+
+        self.assertTrue(not (a == b))
+
+    def testEquality5(self):
+        """TestAtomBase:  equality:  unmatched fields; unequal"""
+
+        a      = self.cls()
+        a.foo  = 'foo'
+        a.bar  = 'bar'
+        a.baz  = 'baz'
+        a.quux = 'quux'
+
+        b      = self.cls()
+        b.foo  = 'foo'
+        b.bar  = 'bar'
+        b.baz  = 'baz'
+
+        self.assertTrue(not (a == b))
+        self.assertTrue(not (b == a))
+
+    def testInequality1(self):
+        """TestAtomBase:  inequality:  all fields present; inequal"""
+
+        a      = self.cls()
+        a.foo  = 'foo'
+        a.bar  = 'baz'
+        a.baz  = 'bar'
+        a.quux = 'foo'
+
+        b      = self.cls()
+        b.foo  = 'quux'
+        b.bar  = 'baz'
+        b.baz  = 'bar'
+        b.quux = 'foo'
+
+        self.assertTrue(a != b)
+
+
 class TestEntry(unittest.TestCase):
 
     def setUp(self):
@@ -216,3 +310,7 @@ class TestEntry(unittest.TestCase):
     def testForFeedPresent(self):
         results = self.Entry.for_feed('general')
         self.assertEqual([self.e2, self.e1], results)
+
+
+suite = unittest.TestSuite()
+suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestAtomBase))
