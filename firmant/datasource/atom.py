@@ -24,7 +24,7 @@ class AtomBase(object):
         return True
 
     def __ne__(self, other):
-        return not __eq__(self, other)
+        return not (self == other)
 
 
 class Entry(AtomBase):
