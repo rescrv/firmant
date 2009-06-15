@@ -8,7 +8,18 @@ from firmant.utils import not_implemented
 # Base classes for Atom data.
 
 
+class Filter(object):
+
+    __slots__ = ['to_json', 'from_json']
+
+    def __init__(self, to_json=None, from_json=None):
+        self.to_json   = to_json   or (lambda self: self)
+        self.from_json = from_json or (lambda self: self)
+
+
 class AtomBase(object):
+
+    filters = {}
 
     def __eq__(self, other):
         for field in self.fields:
@@ -27,11 +38,17 @@ class AtomBase(object):
     def __ne__(self, other):
         return not (self == other)
 
+    @classmethod
+    def json_filter(cls, field):
+        return cls.filters.get(field, Filter())
+
     def to_json(self):
         data = {}
         for field in self.fields:
             if hasattr(self, field):
-                data[field] = getattr(self, field)
+                filter = self.json_filter(field)
+                value  = filter.to_json(getattr(self, field))
+                data[field] = value
         return json.dumps(data)
 
     @classmethod
@@ -40,7 +57,9 @@ class AtomBase(object):
         entry = cls()
         for field in cls.fields:
             if data.has_key(field):
-                setattr(entry, field, data[field])
+                filter = cls.json_filter(field)
+                value  = filter.from_json(data[field])
+                setattr(entry, field, value)
         return entry
 
 
