@@ -1,8 +1,10 @@
 import datetime
 import json
+import pytz
 
 from firmant.plugins import PluginMount
 from firmant.utils import not_implemented
+from firmant.constants import isoformat
 
 
 # Base classes for Atom data.
@@ -13,8 +15,30 @@ class Filter(object):
     __slots__ = ['to_json', 'from_json']
 
     def __init__(self, to_json=None, from_json=None):
-        self.to_json   = to_json   or (lambda self: self)
-        self.from_json = from_json or (lambda self: self)
+        if not hasattr(self, 'to_json'):
+            self.to_json   = to_json   or (lambda self: self)
+        if not hasattr(self, 'from_json'):
+            self.from_json = from_json or (lambda self: self)
+
+
+class DatetimeFilter(Filter):
+
+    def to_json(self, dt):
+        if dt.tzinfo is None:
+            return (dt.strftime(isoformat), None)
+        else:
+            utc_dt = dt.astimezone(pytz.UTC)
+            return (utc_dt.strftime(isoformat), dt.tzinfo.zone)
+
+    def from_json(self, dt):
+        if dt[1] is None:
+            return datetime.datetime.strptime(dt[0], isoformat)
+        else:
+            dt_obj = pytz.UTC.localize(datetime.datetime.strptime(dt[0],
+                isoformat))
+            tz_obj = pytz.timezone(dt[1])
+            new_dt = dt_obj.astimezone(tz_obj)
+            return tz_obj.normalize(new_dt)
 
 
 class AtomBase(object):

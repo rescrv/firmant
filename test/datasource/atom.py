@@ -3,7 +3,8 @@ import datetime
 import pytz
 
 from firmant.datasource.atom import AtomProvider, \
-                                    AtomBase
+                                    AtomBase, \
+                                    DatetimeFilter
 from firmant.utils import ProxyObject
 
 
@@ -260,6 +261,48 @@ class TestAtomBase(unittest.TestCase):
 
         j = a.to_json()
         b = self.cls.from_json(j)
+
+        self.assertTrue(a == b)
+
+    def testJsonFilters1(self):
+        """TestAtomBase:  json filters:  datetime (timezone DST)"""
+
+        class cls_with_filters(self.cls):
+            filters = {}
+            filters['quux'] = DatetimeFilter()
+        a      = cls_with_filters()
+        a.quux = A_NY.localize(datetime.datetime(2009, 6, 15, 14, 40, 59))
+
+        j = a.to_json()
+        b = cls_with_filters.from_json(j)
+
+        self.assertTrue(a == b)
+
+    def testJsonFilters2(self):
+        """TestAtomBase:  json filters:  datetime (timezone no DST)"""
+
+        class cls_with_filters(self.cls):
+            filters = {}
+            filters['quux'] = DatetimeFilter()
+        a      = cls_with_filters()
+        a.quux = A_NY.localize(datetime.datetime(2009, 1, 15, 14, 40, 59))
+
+        j = a.to_json()
+        b = cls_with_filters.from_json(j)
+
+        self.assertTrue(a == b)
+
+    def testJsonFilters3(self):
+        """TestAtomBase:  json filters:  datetime (no timezone)"""
+
+        class cls_with_filters(self.cls):
+            filters = {}
+            filters['quux'] = DatetimeFilter()
+        a      = cls_with_filters()
+        a.quux = datetime.datetime(2009, 6, 15, 14, 40, 59)
+
+        j = a.to_json()
+        b = cls_with_filters.from_json(j)
 
         self.assertTrue(a == b)
 
