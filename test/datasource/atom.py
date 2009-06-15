@@ -272,6 +272,7 @@ class TestAtomBase(unittest.TestCase):
             filters = {}
             filters['quux'] = DatetimeFilter()
         a      = cls_with_filters()
+        A_NY = pytz.timezone('America/New_York')
         a.quux = A_NY.localize(datetime.datetime(2009, 6, 15, 14, 40, 59))
 
         j = a.to_json()
@@ -286,6 +287,7 @@ class TestAtomBase(unittest.TestCase):
             filters = {}
             filters['quux'] = DatetimeFilter()
         a      = cls_with_filters()
+        A_NY = pytz.timezone('America/New_York')
         a.quux = A_NY.localize(datetime.datetime(2009, 1, 15, 14, 40, 59))
 
         j = a.to_json()
