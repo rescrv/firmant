@@ -785,7 +785,7 @@ class TestFeed(unittest.TestCase):
         self.assertRaises(raises, function)
 
     def testDefault(self):
-        """firmant.datasource.atom.Feed.by_slug
+        """firmant.datasource.atom.Feed.default
         The default feed object should be returned."""
         settings = self.configuration('Default')
         provider = self.provider(settings)
