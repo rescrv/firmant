@@ -175,12 +175,16 @@ class FlatfileAtomProvider(AtomProvider):
             def year(cls, year):
                 try:
                     year  = int(year)
-                    datetime.date(year, 1, 1)
+                    dt = datetime.date(year, 1, 1)
                 except ValueError:
                     raise
+                return cls._year(dt)
+
+            @classmethod
+            def _year(cls, dt):
                 entry_path = os.path.join(settings['FLATFILE_BASE'],
                                     'entries',
-                                    '%02i' % year)
+                                    '%02i' % dt.year)
                 if not os.access(entry_path, os.R_OK):
                     return []
                 months = reversed(sorted(os.listdir(entry_path)))
@@ -190,7 +194,7 @@ class FlatfileAtomProvider(AtomProvider):
                     otherwise."""
                     try:
                         month = int(month)
-                        return datetime.date(year, month, 1)
+                        return datetime.date(dt.year, month, 1)
                     except ValueError:
                         return False
                 clean_months = filter(lambda e: e, map(invalid_month, months))
