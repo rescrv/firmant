@@ -12,7 +12,8 @@ PLUGINS = ['firmant.frontend.txt',
            'firmant.frontend.jinja2.resolvers',
            'firmant.frontend.atom',
            'firmant.frontend.atom.resolvers',
-           'firmant.plugins.filters.markdown']
+           'firmant.plugins.filters.markdown',
+           'firmant.plugins.datasource.flatfile.atom']
 ENTRY_PERMALINK = 'firmant.frontend.jinja2.resolvers'
 FEED_PERMALINK  = 'firmant.frontend.atom.resolvers'
 
