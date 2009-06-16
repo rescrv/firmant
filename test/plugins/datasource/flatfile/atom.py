@@ -2,10 +2,10 @@ import unittest
 
 from firmant.configuration import settings
 from firmant.plugins.datasource.flatfile.atom import FlatfileAtomProvider
-from test.datasource.atom import generate_e1, \
-                              generate_e2, \
-                              generate_e3, \
-                              generate_e4
+from test.datasource.atom import e1, \
+                                 e2, \
+                                 e3, \
+                                 e4
 from test.datasource.atom import TestEntry as BaseTestEntry
 from test.datasource.atom import TestAuthor as BaseTestAuthor
 
@@ -24,10 +24,10 @@ class TestEntry(BaseTestEntry):
     def setUp(self):
         provider = FlatfileAtomProvider(settings)
         self.Entry = provider.entry
-        self.e1 = generate_e1(provider.entry)
-        self.e2 = generate_e2(provider.entry)
-        self.e3 = generate_e3(provider.entry)
-        self.e4 = generate_e4(provider.entry)
+        self.e1 = e1
+        self.e2 = e2
+        self.e3 = e3
+        self.e4 = e4
 
     def tearDown(self):
         pass

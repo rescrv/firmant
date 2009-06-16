@@ -6,12 +6,12 @@ from firmant.datasource.atom import AtomProvider, \
                                     AtomBase, \
                                     DatetimeFilter, \
                                     AtomObjectFilter, \
-                                    Author
+                                    Author, \
+                                    Category, \
+                                    Entry, \
+                                    Feed
 from firmant.utils import ProxyObject, \
                           not_implemented
-
-
-A_NY = pytz.timezone('America/New_York')
 
 
 # Defined Authors.
@@ -26,37 +26,37 @@ authors['Loren Ipsum Generator'].uri   = 'http://www.lipsum.com'
 authors['Loren Ipsum Generator'].email = 'lipsum@example.org'
 
 
-def generate_e1(entry):
-    e1 = entry()
-    e1.slug           = 'sample'
-    e1.published      = datetime.datetime(2009, 2, 13, 23, 31, 30, tzinfo=A_NY)
-    e1.author_name    = 'Robert Escriva'
-    e1.author_uri     = 'http://robescriva.com'
-    e1.author_email   = 'rob@example.org'
-    e1.category_term  = 'General'
-    e1.category_label = 'All topics'
-    e1.rights         = 'Same as source.'
-    e1.updated        = datetime.datetime(2009, 2, 13, 23, 31, 31, tzinfo=A_NY)
-    e1.title          = 'Unix 1234567890'
-    e1.content        = 'This is the main content of revision two.'
-    e1.summary        = 'This is the summary of revision two.'
-    e1.tz             = 'America/New_York'
-    return e1
+A_NY = pytz.timezone('America/New_York')
 
 
-def generate_e2(entry):
-    e2 = entry()
-    e2.slug           = 'loren-ipsum'
-    e2.published      = datetime.datetime(2009, 2, 17, 11, 31, 30, tzinfo=A_NY)
-    e2.author_name    = 'Loren Ipsum Generator'
-    e2.author_uri     = 'http://www.lipsum.com'
-    e2.author_email   = 'lipsum@example.org'
-    e2.category_term  = 'Generated'
-    e2.category_label = "You can't tell a computer wrote it."
-    e2.rights         = 'Same as source.'
-    e2.updated        = datetime.datetime(2009, 2, 17, 11, 31, 30, tzinfo=A_NY)
-    e2.title          = 'Loren Ipsum ...'
-    e2.content        = (
+# Defined Entries
+entries = {}
+entries['2009-02-13-sample'] = Entry()
+entries['2009-02-13-sample'].slug      = 'sample'
+entries['2009-02-13-sample'].published = \
+        A_NY.localize(datetime.datetime(2009, 2, 13, 23, 31, 30))
+entries['2009-02-13-sample'].author    = authors['Robert Escriva']
+entries['2009-02-13-sample'].category  = categories['General']
+entries['2009-02-13-sample'].rights    = 'Same as source.'
+entries['2009-02-13-sample'].updated   = \
+        A_NY.localize(datetime.datetime(2009, 2, 13, 23, 31, 31))
+entries['2009-02-13-sample'].title     = 'Unix 1234567890'
+entries['2009-02-13-sample'].content   = \
+        'This is the main content of revision two.'
+entries['2009-02-13-sample'].summary   = 'This is the summary of revision two.'
+entries['2009-02-13-sample'].tz        = 'America/New_York'
+
+entries['2009-02-17-loren-ipsum'] = Entry()
+entries['2009-02-17-loren-ipsum'].slug      = 'loren-ipsum'
+entries['2009-02-17-loren-ipsum'].published = \
+        A_NY.localize(datetime.datetime(2009, 2, 17, 11, 31, 30))
+entries['2009-02-17-loren-ipsum'].author    = authors['Loren Ipsum Generator']
+entries['2009-02-17-loren-ipsum'].category  = categories['Generated']
+entries['2009-02-17-loren-ipsum'].rights    = 'Same as source.'
+entries['2009-02-17-loren-ipsum'].updated   = \
+        A_NY.localize(datetime.datetime(2009, 2, 17, 11, 31, 30))
+entries['2009-02-17-loren-ipsum'].title     = 'Loren Ipsum ...'
+entries['2009-02-17-loren-ipsum'].content   = \
 """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus eget
 ante sit amet elit condimentum varius. Nullam blandit pede quis neque.
 Suspendisse elit erat, malesuada quis, ultrices cursus, pretium eget,
@@ -79,47 +79,38 @@ laoreet porta augue. Curabitur at sapien in enim consequat blandit. Nulla
 ac dui. Nunc felis est, tempor sit amet, tincidunt id, auctor quis, eros.
 In molestie est a neque. Aliquam erat volutpat. Nam commodo tincidunt
 magna.  Morbi justo leo, faucibus nec, consectetur id, sodales vitae,
-nunc.""")
-    e2.summary        = 'A generated loren ipsum paragraph.'
-    e2.tz             = 'America/New_York'
-    return e2
+nunc."""
+entries['2009-02-17-loren-ipsum'].summary   = \
+        'A generated loren ipsum paragraph.'
+entries['2009-02-17-loren-ipsum'].tz        = 'America/New_York'
 
+entries['2009-03-17-sample'] = Entry()
+entries['2009-03-17-sample'].slug      = 'sample'
+entries['2009-03-17-sample'].published = \
+        A_NY.localize(datetime.datetime(2009, 3, 17, 16, 31, 30))
+entries['2009-03-17-sample'].author    = authors['Loren Ipsum Generator']
+entries['2009-03-17-sample'].category  = categories['Generated']
+entries['2009-03-17-sample'].rights    = 'Same as source.'
+entries['2009-03-17-sample'].updated   = \
+        A_NY.localize(datetime.datetime(2009, 3, 17, 11, 31, 30))
+entries['2009-03-17-sample'].title     = 'Loren Ipsum ...'
+entries['2009-03-17-sample'].content   = \
+        'This is the main content of revision one.'
+entries['2009-03-17-sample'].summary   = 'This is the summary of revision one.'
+entries['2009-03-17-sample'].tz        = 'America/New_York'
 
-def generate_e3(entry):
-    e3 = entry()
-    e3.slug           = 'sample'
-    e3.published      = A_NY.localize(
-            datetime.datetime(2009, 3, 17, 16, 31, 30), is_dst=True)
-    e3.author_name    = 'Loren Ipsum Generator'
-    e3.author_uri     = 'http://www.lipsum.com'
-    e3.author_email   = 'lipsum@example.org'
-    e3.category_term  = 'Generated'
-    e3.category_label = "You can't tell a computer wrote it."
-    e3.rights         = 'Same as source.'
-    e3.updated        = A_NY.localize(
-            datetime.datetime(2009, 3, 17, 11, 31, 30), is_dst=True)
-    e3.title          = 'Loren Ipsum ...'
-    e3.content        = 'This is the main content of revision one.'
-    e3.summary        = 'This is the summary of revision one.'
-    e3.tz             = 'America/New_York'
-    return e3
-
-
-def generate_e4(entry):
-    e4 = entry()
-    e4.slug           = 'markdown'
-    e4.published      = A_NY.localize(
-            datetime.datetime(2009, 3, 29, 10, 52, 54), is_dst=True)
-    e4.author_name    = 'Robert Escriva'
-    e4.author_uri     = 'http://robescriva.com'
-    e4.author_email   = 'rob@example.org'
-    e4.category_term  = 'General'
-    e4.category_label = 'All topics'
-    e4.rights         = 'Same as source.'
-    e4.updated        = A_NY.localize(
-            datetime.datetime(2009, 3, 29, 10, 53, 26), is_dst=True)
-    e4.title          = 'A sample markdown implementation'
-    e4.content        = '''Firmant Markdown Test
+entries['2009-03-29-markdown'] = Entry()
+entries['2009-03-29-markdown'].slug      = 'markdown'
+entries['2009-03-29-markdown'].published = \
+        A_NY.localize(datetime.datetime(2009, 3, 29, 10, 52, 54))
+entries['2009-03-29-markdown'].author    = authors['Robert Escriva']
+entries['2009-03-29-markdown'].category  = categories['General']
+entries['2009-03-29-markdown'].rights    = 'Same as source.'
+entries['2009-03-29-markdown'].updated   = \
+        A_NY.localize(datetime.datetime(2009, 3, 29, 10, 53, 26))
+entries['2009-03-29-markdown'].title     = 'A sample markdown implementation'
+entries['2009-03-29-markdown'].content   = \
+'''Firmant Markdown Test
 ========
 
 [Author Homepage][re]
@@ -141,15 +132,14 @@ into your documents:
     }
 
 See?  Wasn't that easy?'''
-    e4.summary        = 'Some markdown and a forkbomb.'
-    e4.tz             = 'America/New_York'
-    return e4
+entries['2009-03-29-markdown'].summary   = 'Some markdown and a forkbomb.'
+entries['2009-03-29-markdown'].tz        = 'America/New_York'
 
 
-e1 = ProxyObject(lambda: generate_e1(AtomProvider.entry))
-e2 = ProxyObject(lambda: generate_e2(AtomProvider.entry))
-e3 = ProxyObject(lambda: generate_e3(AtomProvider.entry))
-e4 = ProxyObject(lambda: generate_e4(AtomProvider.entry))
+e1 = entries['2009-02-13-sample']
+e2 = entries['2009-02-17-loren-ipsum']
+e3 = entries['2009-03-17-sample']
+e4 = entries['2009-03-29-markdown']
 
 
 class TestAtomBase(unittest.TestCase):
