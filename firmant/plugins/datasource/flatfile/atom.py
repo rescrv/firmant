@@ -143,13 +143,17 @@ class FlatfileAtomProvider(AtomProvider):
                 try:
                     year  = int(year)
                     month = int(month)
-                    datetime.date(year, month, 1)
+                    dt = datetime.date(year, month, 1)
                 except ValueError:
                     raise
+                return cls._month(dt)
+
+            @classmethod
+            def _month(cls, dt):
                 entry_path = os.path.join(settings['FLATFILE_BASE'],
                                     'entries',
-                                    '%02i' % year,
-                                    '%02i' % month)
+                                    '%02i' % dt.year,
+                                    '%02i' % dt.month)
                 if not os.access(entry_path, os.R_OK):
                     return []
 
@@ -160,7 +164,7 @@ class FlatfileAtomProvider(AtomProvider):
                     otherwise."""
                     try:
                         day = int(day)
-                        return datetime.date(year, month, day)
+                        return datetime.date(dt.year, dt.month, day)
                     except ValueError:
                         return False
                 clean_days = filter(lambda e: e, map(invalid_day, days))
