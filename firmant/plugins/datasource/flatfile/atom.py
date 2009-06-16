@@ -37,7 +37,20 @@ class FlatfileAtomProvider(AtomProvider):
         provider_self.feed = FlatFileFeed
 
         class FlatFileAuthor(Author):
+
             provider = provider_self
+
+            @classmethod
+            def by_name(cls, name):
+                path = os.path.join(settings['FLATFILE_BASE'], 'people', name)
+                if not os.access(path, os.R_OK):
+                    return None
+                file = open(path)
+                data = file.read()
+                file.close()
+                author = cls.from_json(data)
+                author.name = name
+                return author
 
         provider_self.author = FlatFileAuthor
 
