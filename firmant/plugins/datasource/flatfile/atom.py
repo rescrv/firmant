@@ -8,7 +8,9 @@ from firmant.datasource.atom import AtomProvider, \
                                     Entry, \
                                     Feed, \
                                     Author, \
-                                    Category
+                                    Category, \
+                                    EntryPermalinkProvider, \
+                                    FeedPermalinkProvider
 
 
 slug_re = re.compile('^[-\\_a-zA-Z0-9]{1,96}$')
@@ -216,6 +218,9 @@ class FlatfileAtomProvider(AtomProvider):
                 return reduce(lambda x, y: x + y,
                               map(cls._year, clean_years))
 
+            def permalink(self):
+                return provider_self.entry_permalink(self)
+
         provider_self.entry = FlatFileEntry
 
         class FlatFileFeed(Feed):
@@ -259,3 +264,9 @@ class FlatfileAtomProvider(AtomProvider):
                 return category
 
         provider_self.category = FlatFileCategory
+
+        provider_self.entry_permalink = \
+                EntryPermalinkProvider(settings).authoritative
+
+        provider_self.feed_permalink = \
+                FeedPermalinkProvider(settings).authoritative
