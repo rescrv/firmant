@@ -55,6 +55,20 @@ class FlatfileAtomProvider(AtomProvider):
         provider_self.author = FlatFileAuthor
 
         class FlatFileCategory(Category):
+
             provider = provider_self
+
+            @classmethod
+            def by_term(cls, term):
+                path = os.path.join(settings['FLATFILE_BASE'], 'categories', term)
+                if not os.access(path, os.R_OK):
+                    return None
+                file = open(path)
+                data = file.read()
+                file.close()
+                category       = cls()
+                category.term  = term
+                category.label = data
+                return category
 
         provider_self.category = FlatFileCategory
