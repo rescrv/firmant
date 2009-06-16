@@ -328,7 +328,9 @@ class FlatfileAtomProvider(AtomProvider):
 
             @classmethod
             def by_term(cls, term):
-                path = os.path.join(settings['FLATFILE_BASE'], 'categories', term)
+                path = os.path.join(settings['FLATFILE_BASE'],
+                                    'categories',
+                                    term)
                 if not os.access(path, os.R_OK):
                     return None
                 file = open(path)
