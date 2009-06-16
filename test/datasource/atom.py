@@ -452,79 +452,229 @@ class TestCategory(unittest.TestCase):
 class TestEntry(unittest.TestCase):
 
     def setUp(self):
-        raise NotImplemented("Implement implement setUp")
+        """The setup function should alias the AtomProvider class to
+        self.provider so that the test functions can access it.  It also must
+        setup whatever data is necessary for the test cases to run."""
+        not_implemented()
 
-    def tearDown(self):
-        raise NotImplemented("Implement implement tearDown")
+    def configuration(self, name):
+        """This function should return the settings associated with test
+        'name'"""
+        not_implemented()
 
-    def loadData(self):
-        raise NotImplemented("Implement implement loadData")
+    def testForFeed1(self):
+        """firmant.datasource.atom.Entry.for_feed
+        The entries associated with a valid feed should be returned."""
+        settings = self.configuration('ForFeed1')
+        provider = self.provider(settings)
+        entry    = provider.entry
 
-    def testSingleEmpty(self):
-        e = self.Entry.single('IDONOTEXIST', datetime.date(2009, 2, 13))
-        self.assertEqual(e, None)
+        expected = [entries['2009-02-17-loren-ipsum'],
+                    entries['2009-02-13-sample']]
+        returned = entry.for_feed('general')
 
-    def testSinglePresent(self):
-        e = self.Entry.single('sample', datetime.date(2009, 2, 13))
-        self.assertEqual(e, entries['2009-02-13-sample'])
-        e = self.Entry.single('loren-ipsum', datetime.date(2009, 2, 17))
-        self.assertEqual(e, entries['2009-02-17-loren-ipsum'])
+        self.assertEqual(expected, returned)
 
-    def testSingleSlugInvalid(self):
-        self.assertRaises(ValueError,
-            self.Entry.single, 's@mpl3', datetime.date(2009, 2, 13))
+    def testForFeed2(self):
+        """firmant.datasource.atom.Entry.for_feed
+        None should be returned for an invalid feed."""
+        settings = self.configuration('ForFeed2')
+        provider = self.provider(settings)
+        entry    = provider.entry
 
-    def testSingleNoStrftime(self):
-        # List does not have strftime method
-        self.assertRaises(ValueError, self.Entry.single, 'sample', list())
+        expected = None
+        returned = entry.for_feed('noexist')
 
-    def testDayEmpty(self):
-        e = self.Entry.day('2009', '01', '09')
-        self.assertEqual(e, [])
+        self.assertEqual(expected, returned)
 
-    def testDayPresent(self):
-        e = self.Entry.day('2009', '02', '13')
-        self.assertEqual(e, [entries['2009-02-13-sample']])
+    def testSingle1(self):
+        """firmant.datasource.atom.Entry.single
+        A valid entry should be returned for the given date."""
+        settings = self.configuration('Single1')
+        provider = self.provider(settings)
+        entry    = provider.entry
 
-    def testDayInvalidDate(self):
-        self.assertRaises(ValueError, self.Entry.day, 2009, 0, 0)
+        expected = entries['2009-02-13-sample']
+        returned = entry.single('sample', datetime.date(2009, 2, 13))
 
-    def testMonthEmpty(self):
-        e = self.Entry.month('2009', '01')
-        self.assertEqual(e, [])
+        self.assertEqual(expected, returned)
 
-    def testMonthPresent(self):
-        e = self.Entry.month('2009', '02')
-        self.assertEqual(e, [entries['2009-02-17-loren-ipsum'],
-            entries['2009-02-13-sample']])
+    def testSingle2(self):
+        """firmant.datasource.atom.Entry.single
+        A valid entry should be returned for the given date."""
+        settings = self.configuration('Single2')
+        provider = self.provider(settings)
+        entry    = provider.entry
 
-    def testYearEmpty(self):
-        e = self.Entry.year('2008')
-        self.assertEqual(e, [])
+        expected = entries['2009-02-17-loren-ipsum']
+        returned = entry.single('loren-ipsum', datetime.date(2009, 2, 17))
 
-    def testYearPresent(self):
-        e = self.Entry.year('2009')
-        self.assertEqual(e, [entries['2009-03-29-markdown'],
-            entries['2009-03-17-sample'], entries['2009-02-17-loren-ipsum'],
-            entries['2009-02-13-sample']])
+        self.assertEqual(expected, returned)
 
-    def testRecentPresent(self):
-        e = self.Entry.recent()
-        self.assertEqual(e, [entries['2009-03-29-markdown'],
-            entries['2009-03-17-sample'], entries['2009-02-17-loren-ipsum'],
-            entries['2009-02-13-sample']])
+    def testSingle3(self):
+        """firmant.datasource.atom.Entry.single
+        None should be returned for a non-existent entry."""
+        settings = self.configuration('Single3')
+        provider = self.provider(settings)
+        entry    = provider.entry
 
-    def testRecentEmpty(self):
-        e = self.Entry.recent(datetime.datetime.min)
-        self.assertEqual(e, [])
+        expected = None
+        returned = entry.single('IDONOTEXIST', datetime.date(2009, 2, 13))
 
-    def testForFeedEmpty(self):
-        self.assertEqual([], self.Entry.for_feed('Idon_tExist'))
+        self.assertEqual(expected, returned)
 
-    def testForFeedPresent(self):
-        results = self.Entry.for_feed('general')
-        self.assertEqual([entries['2009-02-17-loren-ipsum'],
-            entries['2009-02-13-sample']], results)
+    def testSingle4(self):
+        """firmant.datasource.atom.Entry.single
+        A ValueError should be raised for invalid slug."""
+        settings = self.configuration('Single4')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        raises   = ValueError
+        function = lambda: entry.single('s@mpl3', datetime.date(2009, 2, 13))
+
+        self.assertRaises(raises, function)
+
+    def testSingle5(self):
+        """firmant.datasource.atom.Entry.single
+        A ValueError should be raised for invalid datetime."""
+        settings = self.configuration('Single5')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        raises   = ValueError
+        function = lambda: entry.single('sample', 'not a datetime')
+
+        self.assertRaises(raises, function)
+
+    def testDay1(self):
+        """firmant.datasource.atom.Entry.day
+        A valid list of entries for a given day should be returned."""
+        settings = self.configuration('Day1')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = [entries['2009-02-13-sample']]
+        returned = entry.day('2009', '02', '13')
+
+        self.assertEqual(expected, returned)
+
+    def testDay2(self):
+        """firmant.datasource.atom.Entry.day
+        An empty list for a day for which there are no entries."""
+        settings = self.configuration('Day2')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = []
+        returned = entry.day('2009', '01', '09')
+
+        self.assertEqual(expected, returned)
+
+    def testDay3(self):
+        """firmant.datasource.atom.Entry.day
+        A ValueError should be raised for an invalid date."""
+        settings = self.configuration('Day3')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        raises   = ValueError
+        function = lambda: entry.day(2009, 0, 0)
+
+        self.assertRaises(raises, function)
+
+    def testMonth1(self):
+        """firmant.datasource.atom.Entry.month
+        A list of entries for a month for which there are entries."""
+        settings = self.configuration('Month1')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = [entries['2009-02-17-loren-ipsum'],
+                    entries['2009-02-13-sample']]
+        returned = entry.month('2009', '02')
+
+        self.assertEqual(expected, returned)
+
+    def testMonth2(self):
+        """firmant.datasource.atom.Entry.month
+        An empty list for a month for which there are no entries."""
+        settings = self.configuration('Month2')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = []
+        returned = entry.month('2009', '01')
+
+        self.assertEqual(expected, returned)
+
+    def testMonth3(self):
+        """firmant.datasource.atom.Entry.month
+        A ValueError should be raised for an invalid date."""
+        settings = self.configuration('Month3')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        raises   = ValueError
+        function = lambda: entry.month(2009, 0, 0)
+
+        self.assertRaises(raises, function)
+
+    def testYear1(self):
+        """firmant.datasource.atom.Entry.year
+        A list of entries should be returned for a year for which there are
+        entries."""
+        settings = self.configuration('Year1')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = [entries['2009-03-29-markdown'],
+                    entries['2009-03-17-sample'],
+                    entries['2009-02-17-loren-ipsum'],
+                    entries['2009-02-13-sample']]
+        returned = entry.year('2009')
+
+        self.assertEqual(expected, returned)
+
+    def testYear2(self):
+        """firmant.datasource.atom.Entry.year
+        An empty list of entries should be returned for a year for which there
+        are no entries."""
+        settings = self.configuration('Year2')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = []
+        returned = entry.year('2008')
+
+        self.assertEqual(expected, returned)
+
+    def testYear3(self):
+        """firmant.datasource.atom.Entry.year
+        A ValueError should be raised for an invalid date."""
+        settings = self.configuration('Month3')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        raises   = ValueError
+        function = lambda: entry.year('abcd')
+
+        self.assertRaises(raises, function)
+
+    def testRecent(self):
+        """firmant.datasource.atom.Entry.recent
+        A list of entries should be returned."""
+        settings = self.configuration('Year2')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = [entries['2009-03-29-markdown'],
+                    entries['2009-03-17-sample'],
+                    entries['2009-02-17-loren-ipsum'],
+                    entries['2009-02-13-sample']]
+        returned = entry.recent()
+
+        self.assertEqual(expected, returned)
 
 
 suite = unittest.TestSuite()

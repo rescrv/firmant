@@ -28,14 +28,10 @@ class TestCategory(BaseTestCategory):
 class TestEntry(BaseTestEntry):
 
     def setUp(self):
-        provider = FlatfileAtomProvider(settings)
-        self.Entry = provider.entry
+        self.provider = FlatfileAtomProvider
 
-    def tearDown(self):
-        pass
-
-    def loadData(self):
-        pass
+    def configuration(self, name):
+        return settings
 
 
 suite = unittest.TestSuite()
