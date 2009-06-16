@@ -94,16 +94,19 @@ class FlatfileAtomProvider(AtomProvider):
                 return entry
 
             @classmethod
-            def single(cls, slug, date):
+            def single(cls, slug, year, month, day):
                 if provider_self.slug_re.match(slug) == None:
                     raise ValueError("Invalid slug")
 
-                if not hasattr(date, 'year') or \
-                   not hasattr(date, 'month') or \
-                   not hasattr(date, 'day'):
-                    raise ValueError("Invalid datetime")
+                try:
+                    year  = int(year)
+                    month = int(month)
+                    day   = int(day)
+                    dt = datetime.date(year, month, day)
+                except ValueError:
+                    raise
 
-                entry = cls._load_one(slug, date)
+                entry = cls._load_one(slug, dt)
                 return entry
 
         provider_self.entry = FlatFileEntry

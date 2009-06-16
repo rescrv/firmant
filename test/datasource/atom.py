@@ -553,7 +553,7 @@ class TestEntry(unittest.TestCase):
         entry    = provider.entry
 
         expected = entries['2009-02-13-sample']
-        returned = entry.single('sample', datetime.date(2009, 2, 13))
+        returned = entry.single('sample', 2009, 2, 13)
 
         self.assertEqual(expected, returned)
 
@@ -565,7 +565,7 @@ class TestEntry(unittest.TestCase):
         entry    = provider.entry
 
         expected = entries['2009-02-17-loren-ipsum']
-        returned = entry.single('loren-ipsum', datetime.date(2009, 2, 17))
+        returned = entry.single('loren-ipsum', '2009', '2', '17')
 
         self.assertEqual(expected, returned)
 
@@ -577,7 +577,7 @@ class TestEntry(unittest.TestCase):
         entry    = provider.entry
 
         expected = None
-        returned = entry.single('IDONOTEXIST', datetime.date(2009, 2, 13))
+        returned = entry.single('IDONOTEXIST', 2009, 2, 13)
 
         self.assertEqual(expected, returned)
 
@@ -589,7 +589,7 @@ class TestEntry(unittest.TestCase):
         entry    = provider.entry
 
         raises   = ValueError
-        function = lambda: entry.single('s@mpl3', datetime.date(2009, 2, 13))
+        function = lambda: entry.single('s@mpl3', 2009, 2, 13)
 
         self.assertRaises(raises, function)
 
@@ -601,7 +601,19 @@ class TestEntry(unittest.TestCase):
         entry    = provider.entry
 
         raises   = ValueError
-        function = lambda: entry.single('sample', 'not a datetime')
+        function = lambda: entry.single('sample', 2009, 'a', 15)
+
+        self.assertRaises(raises, function)
+
+    def testSingle6(self):
+        """firmant.datasource.atom.Entry.single
+        A ValueError should be raised for invalid datetime."""
+        settings = self.configuration('Single6')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        raises   = ValueError
+        function = lambda: entry.single('sample', 2009, 13, 15)
 
         self.assertRaises(raises, function)
 
