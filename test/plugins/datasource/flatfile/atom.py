@@ -8,9 +8,19 @@ from test.datasource.atom import e1, \
                                  e4
 from test.datasource.atom import TestEntry as BaseTestEntry
 from test.datasource.atom import TestAuthor as BaseTestAuthor
+from test.datasource.atom import TestCategory as BaseTestCategory
 
 
 class TestAuthor(BaseTestAuthor):
+
+    def setUp(self):
+        self.provider = FlatfileAtomProvider
+
+    def configuration(self, name):
+        return settings
+
+
+class TestCategory(BaseTestCategory):
 
     def setUp(self):
         self.provider = FlatfileAtomProvider
@@ -38,4 +48,5 @@ class TestEntry(BaseTestEntry):
 
 suite = unittest.TestSuite()
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestAuthor))
+suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestCategory))
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestEntry))

@@ -26,6 +26,16 @@ authors['Loren Ipsum Generator'].uri   = 'http://www.lipsum.com'
 authors['Loren Ipsum Generator'].email = 'lipsum@example.org'
 
 
+# Defined Categories
+categories = {}
+categories['General']       = Category()
+categories['General'].term  = 'General'
+categories['General'].label = 'All topics'
+categories['Generated']       = Category()
+categories['Generated'].term  = 'Generated'
+categories['Generated'].label = "You can't tell a computer wrote it."
+
+
 A_NY = pytz.timezone('America/New_York')
 
 
@@ -407,6 +417,42 @@ class TestAuthor(unittest.TestCase):
         author   = provider.author
 
         self.assertEqual(expected, author.by_name('Jane Doe'))
+
+
+class TestCategory(unittest.TestCase):
+
+    def setUp(self):
+        """The setup function should alias the AtomProvider class to
+        self.provider so that the test functions can access it.  It also must
+        setup whatever data is necessary for the test cases to run."""
+        not_implemented()
+
+    def configuration(self, name):
+        """This function should return the settings associated with test
+        'name'"""
+        not_implemented()
+
+    def testByTerm1(self):
+        """firmant.datasource.atom.Category.by_term
+        Load a valid atom Category object using the by_term function"""
+        settings = self.configuration('ByTerm1')
+        expected = categories['General']
+
+        provider = self.provider(settings)
+        category = provider.category
+
+        self.assertEqual(expected, category.by_term('General'))
+
+    def testByTerm2(self):
+        """firmant.datasource.atom.Category.by_term
+        No such Category object using the by_term function"""
+        settings = self.configuration('ByTerm2')
+        expected = None
+
+        provider = self.provider(settings)
+        category = provider.category
+
+        self.assertEqual(expected, category.by_term('NOEXIST'))
 
 
 class TestEntry(unittest.TestCase):
