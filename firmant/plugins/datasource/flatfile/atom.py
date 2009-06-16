@@ -171,6 +171,32 @@ class FlatfileAtomProvider(AtomProvider):
                 return reduce(lambda x, y: x + y,
                               map(cls._day, clean_days))
 
+            @classmethod
+            def year(cls, year):
+                try:
+                    year  = int(year)
+                    datetime.date(year, 1, 1)
+                except ValueError:
+                    raise
+                entry_path = os.path.join(settings['FLATFILE_BASE'],
+                                    'entries',
+                                    '%02i' % year)
+                if not os.access(entry_path, os.R_OK):
+                    return []
+                months = reversed(sorted(os.listdir(entry_path)))
+                def invalid_month(month):
+                    """Returns False if it cannot be converted to int or
+                    produces an invalid date.  Returns the date object
+                    otherwise."""
+                    try:
+                        month = int(month)
+                        return datetime.date(year, month, 1)
+                    except ValueError:
+                        return False
+                clean_months = filter(lambda e: e, map(invalid_month, months))
+                return reduce(lambda x, y: x + y,
+                              map(cls._month, clean_months))
+
         provider_self.entry = FlatFileEntry
 
         class FlatFileFeed(Feed):
