@@ -5,11 +5,25 @@ import pytz
 from firmant.datasource.atom import AtomProvider, \
                                     AtomBase, \
                                     DatetimeFilter, \
-                                    AtomObjectFilter
-from firmant.utils import ProxyObject
+                                    AtomObjectFilter, \
+                                    Author
+from firmant.utils import ProxyObject, \
+                          not_implemented
 
 
 A_NY = pytz.timezone('America/New_York')
+
+
+# Defined Authors.
+authors = {}
+authors['Robert Escriva']       = Author()
+authors['Robert Escriva'].name  = 'Robert Escriva'
+authors['Robert Escriva'].uri   = 'http://robescriva.com'
+authors['Robert Escriva'].email = 'rob@example.org'
+authors['Loren Ipsum Generator']       = Author()
+authors['Loren Ipsum Generator'].name  = 'Loren Ipsum Generator'
+authors['Loren Ipsum Generator'].uri   = 'http://www.lipsum.com'
+authors['Loren Ipsum Generator'].email = 'lipsum@example.org'
 
 
 def generate_e1(entry):
@@ -367,6 +381,42 @@ class TestAtomObjectFilter(unittest.TestCase):
         c = self.filtered.from_json(j)
 
         self.assertTrue(b == c)
+
+
+class TestAuthor(unittest.TestCase):
+
+    def setUp(self):
+        """The setup function should alias the AtomProvider class to
+        self.provider so that the test functions can access it.  It also must
+        setup whatever data is necessary for the test cases to run."""
+        not_implemented()
+
+    def configuration(self, name):
+        """This function should return the settings associated with test
+        'name'"""
+        not_implemented()
+
+    def testByName1(self):
+        """firmant.datasource.atom.Author.by_name
+        Load a valid atom Author object using the by_name function"""
+        settings = self.configuration('ByName1')
+        expected = authors['Robert Escriva']
+
+        provider = self.provider(settings)
+        author   = provider.author
+
+        self.assertEqual(expected, author.by_name('Robert Escriva'))
+
+    def testByName2(self):
+        """firmant.datasource.atom.Author.by_name
+        No such Author object using the by_name function"""
+        settings = self.configuration('ByName2')
+        expected = None
+
+        provider = self.provider(settings)
+        author   = provider.author
+
+        self.assertEqual(expected, author.by_name('Jane Doe'))
 
 
 class TestEntry(unittest.TestCase):
