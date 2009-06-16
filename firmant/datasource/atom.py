@@ -155,27 +155,27 @@ class Entry(AtomBase):
     filters['category']  = AtomObjectFilter(Category)
 
     @classmethod
-    def for_feed(cls, feedslug, count=10, offset=0):
+    def for_feed(cls, feedslug):
         not_implemented()
 
     @classmethod
-    def single(cls, slug, date):
+    def single(cls, slug, year, month, day):
         not_implemented()
 
     @classmethod
-    def day(cls, year, month, day, count=10, offset=0):
+    def day(cls, year, month, day):
         not_implemented()
 
     @classmethod
-    def month(cls, year, month, count=10, offset=0):
+    def month(cls, year, month):
         not_implemented()
 
     @classmethod
-    def year(cls, year, count=10, offset=0):
+    def year(cls, year):
         not_implemented()
 
     @classmethod
-    def recent(cls, count=10, offset=0):
+    def recent(cls):
         not_implemented()
 
     def permalink(self):
