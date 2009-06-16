@@ -686,7 +686,7 @@ class TestEntry(unittest.TestCase):
         entry    = provider.entry
 
         raises   = ValueError
-        function = lambda: entry.month(2009, 0, 0)
+        function = lambda: entry.month(2009, 0)
 
         self.assertRaises(raises, function)
 
