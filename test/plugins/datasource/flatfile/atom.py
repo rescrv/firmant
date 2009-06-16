@@ -5,6 +5,7 @@ from firmant.plugins.datasource.flatfile.atom import FlatfileAtomProvider
 from test.datasource.atom import TestEntry as BaseTestEntry
 from test.datasource.atom import TestAuthor as BaseTestAuthor
 from test.datasource.atom import TestCategory as BaseTestCategory
+from test.datasource.atom import TestFeed as BaseTestFeed
 
 
 class TestAuthor(BaseTestAuthor):
@@ -34,7 +35,18 @@ class TestEntry(BaseTestEntry):
         return settings
 
 
+class TestFeed(BaseTestFeed):
+
+    def setUp(self):
+        self.provider = FlatfileAtomProvider
+
+    def configuration(self, name):
+        return settings
+
+
+
 suite = unittest.TestSuite()
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestAuthor))
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestCategory))
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestEntry))
+suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestFeed))

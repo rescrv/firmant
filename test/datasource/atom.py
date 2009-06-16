@@ -147,6 +147,32 @@ entries['2009-03-29-markdown'].summary   = 'Some markdown and a forkbomb.'
 entries['2009-03-29-markdown'].tz        = 'America/New_York'
 
 
+# Defined Feeds
+
+feeds = {}
+feeds['general'] = Feed()
+feeds['general'].slug     = "general"
+feeds['general'].title    = "General Content"
+feeds['general'].rights   = "Same as source."
+feeds['general'].subtitle = "This is a feed that holds general content"
+feeds['general'].updated  = \
+        A_NY.localize(datetime.datetime(2009, 2, 17, 11, 31, 30))
+feeds['general'].entries  = [entries['2009-02-17-loren-ipsum'],
+                             entries['2009-02-13-sample']]
+
+feeds['default'] = Feed()
+feeds['default'].slug     = ""
+feeds['default'].title    = "Firmant Atom Feed"
+feeds['default'].rights   = "Same as source."
+feeds['default'].subtitle = "The default atom  feed"
+feeds['default'].updated  = \
+        A_NY.localize(datetime.datetime(2009, 3, 29, 10, 53, 26))
+feeds['default'].entries  = [entries['2009-03-29-markdown'],
+                             entries['2009-03-17-sample'],
+                             entries['2009-02-17-loren-ipsum'],
+                             entries['2009-02-13-sample']]
+
+
 class TestAtomBase(unittest.TestCase):
 
     def setUp(self):
@@ -705,6 +731,56 @@ class TestEntry(unittest.TestCase):
                     entries['2009-02-17-loren-ipsum'],
                     entries['2009-02-13-sample']]
         returned = entry.recent()
+
+        self.assertEqual(expected, returned)
+
+
+class TestFeed(unittest.TestCase):
+
+    def setUp(self):
+        """The setup function should alias the AtomProvider class to
+        self.provider so that the test functions can access it.  It also must
+        setup whatever data is necessary for the test cases to run."""
+        not_implemented()
+
+    def configuration(self, name):
+        """This function should return the settings associated with test
+        'name'"""
+        not_implemented()
+
+    def testBySlug1(self):
+        """firmant.datasource.atom.Feed.by_slug
+        A feed object should be returned for the given name."""
+        settings = self.configuration('BySlug1')
+        provider = self.provider(settings)
+        feed     = provider.feed
+
+        expected = feeds['general']
+        returned = feed.by_slug('general')
+
+        self.assertEqual(expected, returned)
+
+    def testBySlug2(self):
+        """firmant.datasource.atom.Feed.by_slug
+        A ValueError should be raised for an invalid slug."""
+        settings = self.configuration('BySlug2')
+        provider = self.provider(settings)
+        feed     = provider.feed
+
+        raises   = ValueError
+        function = lambda: feed.by_slug('!@#$')
+
+        self.assertRaises(raises, function)
+
+    def testDefault(self):
+        """firmant.datasource.atom.Feed.by_slug
+        The default feed object should be returned."""
+        settings = self.configuration('Default')
+        provider = self.provider(settings)
+        feed     = provider.feed
+
+        expected = feeds['default']
+        returned = feed.default()
 
         self.assertEqual(expected, returned)
 
