@@ -94,6 +94,11 @@ class FlatfileAtomProvider(AtomProvider):
                 return entry
 
             @classmethod
+            def _load_many(cls, entries):
+                return filter(lambda e: e is not None,
+                              map(lambda e: cls._load_one(*e), entries))
+
+            @classmethod
             def single(cls, slug, year, month, day):
                 if provider_self.slug_re.match(slug) == None:
                     raise ValueError("Invalid slug")
@@ -108,6 +113,30 @@ class FlatfileAtomProvider(AtomProvider):
 
                 entry = cls._load_one(slug, dt)
                 return entry
+
+            @classmethod
+            def day(cls, year, month, day):
+                try:
+                    year  = int(year)
+                    month = int(month)
+                    day   = int(day)
+                    dt = datetime.date(year, month, day)
+                except ValueError:
+                    raise
+                return cls._day(dt)
+
+            @classmethod
+            def _day(cls, dt):
+                entry_path = os.path.join(settings['FLATFILE_BASE'],
+                                    'entries',
+                                    '%02i' % dt.year,
+                                    '%02i' % dt.month,
+                                    '%02i' % dt.day)
+                if not os.access(entry_path, os.R_OK):
+                    return []
+
+                slugs = os.listdir(entry_path)
+                return cls._load_many(map(lambda e: (e, dt), slugs))
 
         provider_self.entry = FlatFileEntry
 
