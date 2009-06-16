@@ -153,7 +153,7 @@ feeds = {}
 feeds['general'] = Feed()
 feeds['general'].slug     = "general"
 feeds['general'].title    = "General Content"
-feeds['general'].rights   = "Same as source."
+feeds['general'].rights   = "Same as source.\n"
 feeds['general'].subtitle = "This is a feed that holds general content"
 feeds['general'].updated  = \
         A_NY.localize(datetime.datetime(2009, 2, 17, 11, 31, 30))
@@ -164,7 +164,7 @@ feeds['default'] = Feed()
 feeds['default'].slug     = ""
 feeds['default'].title    = "Firmant Atom Feed"
 feeds['default'].rights   = "Same as source."
-feeds['default'].subtitle = "The default atom  feed"
+feeds['default'].subtitle = "The default atom feed"
 feeds['default'].updated  = \
         A_NY.localize(datetime.datetime(2009, 3, 29, 10, 53, 26))
 feeds['default'].entries  = [entries['2009-03-29-markdown'],
