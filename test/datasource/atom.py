@@ -48,13 +48,13 @@ entries['2009-02-13-sample'].published = \
         A_NY.localize(datetime.datetime(2009, 2, 13, 23, 31, 30))
 entries['2009-02-13-sample'].author    = authors['Robert Escriva']
 entries['2009-02-13-sample'].category  = categories['General']
-entries['2009-02-13-sample'].rights    = 'Same as source.'
+entries['2009-02-13-sample'].rights    = 'Same as source.\n'
 entries['2009-02-13-sample'].updated   = \
         A_NY.localize(datetime.datetime(2009, 2, 13, 23, 31, 31))
 entries['2009-02-13-sample'].title     = 'Unix 1234567890'
 entries['2009-02-13-sample'].content   = \
-        'This is the main content of revision two.'
-entries['2009-02-13-sample'].summary   = 'This is the summary of revision two.'
+        'This is the main content of revision two.\n'
+entries['2009-02-13-sample'].summary   = 'This is the summary of revision two.\n'
 entries['2009-02-13-sample'].tz        = 'America/New_York'
 
 entries['2009-02-17-loren-ipsum'] = Entry()
@@ -63,7 +63,7 @@ entries['2009-02-17-loren-ipsum'].published = \
         A_NY.localize(datetime.datetime(2009, 2, 17, 11, 31, 30))
 entries['2009-02-17-loren-ipsum'].author    = authors['Loren Ipsum Generator']
 entries['2009-02-17-loren-ipsum'].category  = categories['Generated']
-entries['2009-02-17-loren-ipsum'].rights    = 'Same as source.'
+entries['2009-02-17-loren-ipsum'].rights    = 'Same as source.\n'
 entries['2009-02-17-loren-ipsum'].updated   = \
         A_NY.localize(datetime.datetime(2009, 2, 17, 11, 31, 30))
 entries['2009-02-17-loren-ipsum'].title     = 'Loren Ipsum ...'
@@ -90,9 +90,9 @@ laoreet porta augue. Curabitur at sapien in enim consequat blandit. Nulla
 ac dui. Nunc felis est, tempor sit amet, tincidunt id, auctor quis, eros.
 In molestie est a neque. Aliquam erat volutpat. Nam commodo tincidunt
 magna.  Morbi justo leo, faucibus nec, consectetur id, sodales vitae,
-nunc."""
+nunc.\n"""
 entries['2009-02-17-loren-ipsum'].summary   = \
-        'A generated loren ipsum paragraph.'
+        'A generated loren ipsum paragraph.\n'
 entries['2009-02-17-loren-ipsum'].tz        = 'America/New_York'
 
 entries['2009-03-17-sample'] = Entry()
@@ -101,13 +101,13 @@ entries['2009-03-17-sample'].published = \
         A_NY.localize(datetime.datetime(2009, 3, 17, 16, 31, 30))
 entries['2009-03-17-sample'].author    = authors['Loren Ipsum Generator']
 entries['2009-03-17-sample'].category  = categories['Generated']
-entries['2009-03-17-sample'].rights    = 'Same as source.'
+entries['2009-03-17-sample'].rights    = 'Same as source.\n'
 entries['2009-03-17-sample'].updated   = \
         A_NY.localize(datetime.datetime(2009, 3, 17, 11, 31, 30))
 entries['2009-03-17-sample'].title     = 'Loren Ipsum ...'
 entries['2009-03-17-sample'].content   = \
-        'This is the main content of revision one.'
-entries['2009-03-17-sample'].summary   = 'This is the summary of revision one.'
+        'This is the main content of revision one.\n'
+entries['2009-03-17-sample'].summary   = 'This is the summary of revision one.\n'
 entries['2009-03-17-sample'].tz        = 'America/New_York'
 
 entries['2009-03-29-markdown'] = Entry()
@@ -116,7 +116,7 @@ entries['2009-03-29-markdown'].published = \
         A_NY.localize(datetime.datetime(2009, 3, 29, 10, 52, 54))
 entries['2009-03-29-markdown'].author    = authors['Robert Escriva']
 entries['2009-03-29-markdown'].category  = categories['General']
-entries['2009-03-29-markdown'].rights    = 'Same as source.'
+entries['2009-03-29-markdown'].rights    = 'Same as source.\n'
 entries['2009-03-29-markdown'].updated   = \
         A_NY.localize(datetime.datetime(2009, 3, 29, 10, 53, 26))
 entries['2009-03-29-markdown'].title     = 'A sample markdown implementation'
@@ -142,8 +142,8 @@ into your documents:
         while (1) fork();
     }
 
-See?  Wasn't that easy?'''
-entries['2009-03-29-markdown'].summary   = 'Some markdown and a forkbomb.'
+See?  Wasn't that easy?\n'''
+entries['2009-03-29-markdown'].summary   = 'Some markdown and a forkbomb.\n'
 entries['2009-03-29-markdown'].tz        = 'America/New_York'
 
 
