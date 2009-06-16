@@ -53,6 +53,20 @@ class AtomObjectFilter(Filter):
         return self.cls.from_json(obj)
 
 
+class AtomObjectListFilter(Filter):
+
+    def __init__(self, cls):
+        self.cls = cls
+
+    def to_json(self, obj_list):
+        serialized_objs = map(lambda obj: obj.to_json(), obj_list)
+        return json.dumps(serialized_objs)
+
+    def from_json(self, obj_list):
+        serialized_objs = json.loads(obj_list)
+        return map(lambda s: self.cls.from_json(s), serialized_objs)
+
+
 class AtomBase(object):
 
     filters = {}

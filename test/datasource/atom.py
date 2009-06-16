@@ -6,6 +6,7 @@ from firmant.datasource.atom import AtomProvider, \
                                     AtomBase, \
                                     DatetimeFilter, \
                                     AtomObjectFilter, \
+                                    AtomObjectListFilter, \
                                     Author, \
                                     Category, \
                                     Entry, \
@@ -377,6 +378,37 @@ class TestAtomObjectFilter(unittest.TestCase):
         self.assertTrue(b == c)
 
 
+class TestAtomObjectListFilter(unittest.TestCase):
+
+    def setUp(self):
+        class TestData(AtomBase):
+            fields    = ['foo', 'bar', 'baz', 'quux']
+            __slots__ = fields
+
+        class MoreTestData(TestData):
+            filters = {}
+            filters['quux'] = AtomObjectListFilter(TestData)
+
+        self.filtered   = MoreTestData
+        self.unfiltered = TestData
+
+    def testAtomObjectFilter1(self):
+        """firmant.datasource.atom.AtomObjectListFilter
+        Test serialization to JSON of an object with a list of AtomObjects."""
+
+        a      = self.unfiltered()
+        a.foo  = 'quux'
+        b      = self.unfiltered()
+        b.bar  = 'bar'
+        c      = self.filtered()
+        c.quux = [a, b]
+
+        j = c.to_json()
+        d = self.filtered.from_json(j)
+
+        self.assertTrue(c == d)
+
+
 class TestAuthor(unittest.TestCase):
 
     def setUp(self):
@@ -680,4 +712,5 @@ class TestEntry(unittest.TestCase):
 suite = unittest.TestSuite()
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestAtomBase))
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestAtomObjectFilter))
+suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestAtomObjectListFilter))
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestDatetimeFilter))
