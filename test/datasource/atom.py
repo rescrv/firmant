@@ -146,12 +146,6 @@ entries['2009-03-29-markdown'].summary   = 'Some markdown and a forkbomb.'
 entries['2009-03-29-markdown'].tz        = 'America/New_York'
 
 
-e1 = entries['2009-02-13-sample']
-e2 = entries['2009-02-17-loren-ipsum']
-e3 = entries['2009-03-17-sample']
-e4 = entries['2009-03-29-markdown']
-
-
 class TestAtomBase(unittest.TestCase):
 
     def setUp(self):
@@ -472,9 +466,9 @@ class TestEntry(unittest.TestCase):
 
     def testSinglePresent(self):
         e = self.Entry.single('sample', datetime.date(2009, 2, 13))
-        self.assertEqual(e, self.e1)
+        self.assertEqual(e, entries['2009-02-13-sample'])
         e = self.Entry.single('loren-ipsum', datetime.date(2009, 2, 17))
-        self.assertEqual(e, self.e2)
+        self.assertEqual(e, entries['2009-02-17-loren-ipsum'])
 
     def testSingleSlugInvalid(self):
         self.assertRaises(ValueError,
@@ -490,7 +484,7 @@ class TestEntry(unittest.TestCase):
 
     def testDayPresent(self):
         e = self.Entry.day('2009', '02', '13')
-        self.assertEqual(e, [self.e1])
+        self.assertEqual(e, [entries['2009-02-13-sample']])
 
     def testDayInvalidDate(self):
         self.assertRaises(ValueError, self.Entry.day, 2009, 0, 0)
@@ -501,7 +495,8 @@ class TestEntry(unittest.TestCase):
 
     def testMonthPresent(self):
         e = self.Entry.month('2009', '02')
-        self.assertEqual(e, [self.e2, self.e1])
+        self.assertEqual(e, [entries['2009-02-17-loren-ipsum'],
+            entries['2009-02-13-sample']])
 
     def testYearEmpty(self):
         e = self.Entry.year('2008')
@@ -509,11 +504,15 @@ class TestEntry(unittest.TestCase):
 
     def testYearPresent(self):
         e = self.Entry.year('2009')
-        self.assertEqual(e, [self.e4, self.e3, self.e2, self.e1])
+        self.assertEqual(e, [entries['2009-03-29-markdown'],
+            entries['2009-03-17-sample'], entries['2009-02-17-loren-ipsum'],
+            entries['2009-02-13-sample']])
 
     def testRecentPresent(self):
         e = self.Entry.recent()
-        self.assertEqual(e, [self.e4, self.e3, self.e2, self.e1])
+        self.assertEqual(e, [entries['2009-03-29-markdown'],
+            entries['2009-03-17-sample'], entries['2009-02-17-loren-ipsum'],
+            entries['2009-02-13-sample']])
 
     def testRecentEmpty(self):
         e = self.Entry.recent(datetime.datetime.min)
@@ -524,7 +523,8 @@ class TestEntry(unittest.TestCase):
 
     def testForFeedPresent(self):
         results = self.Entry.for_feed('general')
-        self.assertEqual([self.e2, self.e1], results)
+        self.assertEqual([entries['2009-02-17-loren-ipsum'],
+            entries['2009-02-13-sample']], results)
 
 
 suite = unittest.TestSuite()
