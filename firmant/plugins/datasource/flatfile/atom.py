@@ -220,7 +220,8 @@ class FlatfileAtomProvider(AtomProvider):
 
             @classmethod
             def for_feed(cls, feedslug):
-                if provider_self.slug_re.match(feedslug) == None:
+                if feedslug != '' and \
+                   provider_self.slug_re.match(feedslug) == None:
                     raise ValueError("Invalid slug")
                 feed_path = os.path.join(settings['FLATFILE_BASE'],
                                         'feeds',
@@ -246,7 +247,60 @@ class FlatfileAtomProvider(AtomProvider):
         provider_self.entry = FlatFileEntry
 
         class FlatFileFeed(Feed):
+
             provider = provider_self
+
+            @classmethod
+            def by_slug(cls, slug):
+                if slug != '' and provider_self.slug_re.match(slug) == None:
+                    raise ValueError("Invalid slug")
+
+                feed_path = os.path.join(settings['FLATFILE_BASE'],
+                                        'feeds',
+                                        slug)
+
+                rights_path = os.path.join(feed_path, 'rights')
+                meta_path   = os.path.join(feed_path, 'meta')
+
+                if not os.access(feed_path,   os.R_OK) or \
+                   not os.access(rights_path, os.R_OK) or \
+                   not os.access(meta_path,   os.R_OK):
+                    return None
+
+                rights_file = open(rights_path)
+                meta_file   = open(meta_path)
+
+                rights_data = rights_file.read()
+                meta_data   = json.loads(meta_file.read())
+
+                rights_file.close()
+                meta_file  .close()
+
+                feed = cls()
+                feed.slug     = slug
+                feed.title    = meta_data['title']
+                feed.rights   = rights_data
+                feed.subtitle = meta_data['subtitle']
+                feed.entries  = provider_self.entry.for_feed(slug)
+                if len(feed.entries) > 0:
+                    feed.updated  = feed.entries[0].updated
+                else:
+                    feed.updated  = datetime.datetime.min
+                return feed
+
+            @classmethod
+            def default(cls):
+                feed = cls()
+                feed.slug     = ''
+                feed.title    = settings['ATOM_DEFAULT_TITLE']
+                feed.rights   = settings['ATOM_DEFAULT_RIGHTS']
+                feed.subtitle = settings['ATOM_DEFAULT_SUBTITLE']
+                feed.entries  = provider_self.entry.for_feed('')
+                if len(feed.entries) > 0:
+                    feed.updated  = feed.entries[0].updated
+                else:
+                    feed.updated  = datetime.datetime.min
+                return feed
 
         provider_self.feed = FlatFileFeed
 
