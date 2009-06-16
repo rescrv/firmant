@@ -20,6 +20,6 @@ if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTests(configuration_tests)
     suite.addTests(atom_tests)
-    #suite.addTests(flatfile_atom_tests)
+    suite.addTests(flatfile_atom_tests)
     suite.addTests(resolvers_tests)
     unittest.TextTestRunner(verbosity=2).run(suite)

@@ -7,6 +7,16 @@ from test.datasource.atom import generate_e1, \
                               generate_e3, \
                               generate_e4
 from test.datasource.atom import TestEntry as BaseTestEntry
+from test.datasource.atom import TestAuthor as BaseTestAuthor
+
+
+class TestAuthor(BaseTestAuthor):
+
+    def setUp(self):
+        self.provider = FlatfileAtomProvider
+
+    def configuration(self, name):
+        return settings
 
 
 class TestEntry(BaseTestEntry):
@@ -27,4 +37,5 @@ class TestEntry(BaseTestEntry):
 
 
 suite = unittest.TestSuite()
+suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestAuthor))
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestEntry))
