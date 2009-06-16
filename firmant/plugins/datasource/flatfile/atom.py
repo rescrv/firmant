@@ -14,7 +14,7 @@ from firmant.datasource.atom import AtomProvider, \
 
 
 slug_re = re.compile('^[-\\_a-zA-Z0-9]{1,96}$')
-date_re = re.compile('^\d{4}-\d{1,2}-\d{1,2}$')
+date_re = re.compile('^\d{4},\d{2},\d{2}$')
 
 
 class FlatfileAtomProvider(AtomProvider):
@@ -217,6 +217,28 @@ class FlatfileAtomProvider(AtomProvider):
                 clean_years = filter(lambda e: e, map(invalid_year, years))
                 return reduce(lambda x, y: x + y,
                               map(cls._year, clean_years))
+
+            @classmethod
+            def for_feed(cls, feedslug):
+                if provider_self.slug_re.match(feedslug) == None:
+                    raise ValueError("Invalid slug")
+                feed_path = os.path.join(settings['FLATFILE_BASE'],
+                                        'feeds',
+                                        feedslug)
+                if not os.access(feed_path, os.R_OK):
+                    return None
+                entries = reversed(sorted(os.listdir(feed_path)))
+                def is_entry(entry):
+                    return date_re.match(entry[:10]) is not None and \
+                           slug_re.match(entry[11:]) is not None
+                cleaned_entries = filter(is_entry, entries)
+                def parse(entry):
+                    strptime = datetime.datetime.strptime
+                    dt = strptime(entry[:10], '%Y,%m,%d').date()
+                    slug = entry[11:]
+                    return (slug, dt)
+                parsed_entries = map(parse, cleaned_entries)
+                return cls._load_many(parsed_entries)
 
             def permalink(self):
                 return provider_self.entry_permalink(self)
