@@ -178,6 +178,7 @@ class Entry(AtomBase):
     def recent(cls):
         not_implemented()
 
+    @property
     def permalink(self):
         not_implemented()
 
@@ -197,6 +198,7 @@ class Feed(AtomBase):
     def default(cls):
         not_implemented()
 
+    @property
     def permalink(self):
         not_implemented()
 

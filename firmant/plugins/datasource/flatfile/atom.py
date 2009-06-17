@@ -241,6 +241,7 @@ class FlatfileAtomProvider(AtomProvider):
                 parsed_entries = map(parse, cleaned_entries)
                 return cls._load_many(parsed_entries)
 
+            @property
             def permalink(self):
                 return provider_self.entry_permalink(self)
 
@@ -301,6 +302,10 @@ class FlatfileAtomProvider(AtomProvider):
                 else:
                     feed.updated  = datetime.datetime.min
                 return feed
+
+            @property
+            def permalink(self):
+                return provider_self.feed_permalink(self)
 
         provider_self.feed = FlatFileFeed
 
