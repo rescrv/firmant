@@ -10,7 +10,9 @@ from firmant.datasource.atom import AtomProvider, \
                                     Author, \
                                     Category, \
                                     Entry, \
-                                    Feed
+                                    Feed, \
+                                    EntryPermalinkProvider, \
+                                    FeedPermalinkProvider
 from firmant.utils import ProxyObject, \
                           not_implemented
 
@@ -795,6 +797,24 @@ class TestFeed(unittest.TestCase):
         returned = feed.default()
 
         self.assertEqual(expected, returned)
+
+
+class DummyEntryPermalinkProvider(EntryPermalinkProvider):
+
+    def __init__(self, settings):
+        self.settings = settings
+
+    def authoritative(self, entry):
+        return ''
+
+
+class DummyFeedPermalinkProvider(FeedPermalinkProvider):
+
+    def __init__(self, settings):
+        self.settings = settings
+
+    def authoritative(self, entry):
+        return ''
 
 
 suite = unittest.TestSuite()
