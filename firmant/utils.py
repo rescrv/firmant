@@ -13,6 +13,15 @@ def get_module(plugin):
         raise
 
 
+def mod_to_dict(module):
+    dictionary = {}
+    for attr in dir(module):
+        if attr.upper() == attr:
+            value = getattr(module, attr)
+            dictionary[attr] = value
+    return dictionary
+
+
 class ProxyObject(object):
 
     def __init__(self, obj):
