@@ -7,8 +7,11 @@ HOST = 'http://localhost:8080/'
 GENERATOR = 'Firmant 0.10'
 
 # Our enabled components
-PLUGINS = ['test.datasource.atom', 'firmant.plugins.filters.markdown',
-           'firmant.plugins.datasource.flatfile.atom']
+PLUGINS = ['test.datasource.atom',
+           'firmant.plugins.filters.markdown',
+           'firmant.plugins.datasource.flatfile.atom',
+           'firmant.views']
+ENABLED_VIEWS = ['firmant.views.CatchallProvider']
 ENTRY_PERMALINK = 'test.datasource.atom'
 FEED_PERMALINK  = 'test.datasource.atom'
 
