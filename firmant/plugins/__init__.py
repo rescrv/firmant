@@ -1,4 +1,3 @@
-from firmant.configuration import settings
 from firmant.utils import get_module
 
 
@@ -20,17 +19,3 @@ class PluginMount(type):
             # Simply appending it to the list is all that's needed to keep
             # track of it later.
             cls.plugins.append(cls)
-
-
-resolver_list = []
-
-
-def load_plugins():
-    for plugin in settings['PLUGINS']:
-        try:
-            mod = get_module(plugin)
-            if hasattr(mod, 'load'):
-                mod.load()
-                print 'Oldstyle plugin', plugin
-        except ImportError:
-            raise

@@ -1,6 +1,5 @@
 from firmant.configuration import settings
 from firmant.plugins import resolver_list
-from firmant.plugins import load_plugins
 
 
 class Request(object):
@@ -56,6 +55,5 @@ def application(environ, start_response):
     global configured
     if not configured:
         settings.configure(environ['firmant.settings'])
-        load_plugins()
         configured = True
     return Application(environ, start_response)
