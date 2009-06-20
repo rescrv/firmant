@@ -8,7 +8,6 @@ from firmant.configuration import settings
 from test.configuration import suite as configuration_tests
 from test.datasource.atom import suite as atom_tests
 from test.plugins.datasource.flatfile.atom import suite as flatfile_atom_tests
-from test.resolvers import suite as resolvers_tests
 
 if __name__ == '__main__':
     settings.reconfigure('test_settings')
@@ -21,5 +20,4 @@ if __name__ == '__main__':
     suite.addTests(configuration_tests)
     suite.addTests(atom_tests)
     suite.addTests(flatfile_atom_tests)
-    suite.addTests(resolvers_tests)
     unittest.TextTestRunner(verbosity=2).run(suite)

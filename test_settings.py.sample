@@ -7,24 +7,10 @@ HOST = 'http://localhost:8080/'
 GENERATOR = 'Firmant 0.10'
 
 # Our enabled components
-PLUGINS = ['firmant.frontend.txt',
-           'firmant.frontend.jinja2',
-           'firmant.frontend.jinja2.resolvers',
-           'firmant.frontend.atom',
-           'firmant.frontend.atom.resolvers',
-           'firmant.plugins.filters.markdown',
+PLUGINS = ['test.datasource.atom', 'firmant.plugins.filters.markdown',
            'firmant.plugins.datasource.flatfile.atom']
-ENTRY_PERMALINK = 'firmant.frontend.jinja2.resolvers'
-FEED_PERMALINK  = 'firmant.frontend.atom.resolvers'
-
-FRONTEND_TXT_PREFIX = ''
-FRONTEND_JINJA2_PREFIX = 'jinja2'
-FRONTEND_JINJA2_ENCODING = 'utf-8'
-FRONTEND_JINJA2_MIME = 'text/html'
-FRONTEND_ATOM_PREFIX = 'atom'
-
-import os
-TEMPLATES = [os.path.join(os.getcwd(), 'templates')]
+ENTRY_PERMALINK = 'test.datasource.atom'
+FEED_PERMALINK  = 'test.datasource.atom'
 
 # Atom Default Feed ('/atom/')
 ATOM_DEFAULT_TITLE = 'Firmant Atom Feed'
