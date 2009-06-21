@@ -1,3 +1,4 @@
+from werkzeug import Request
 from werkzeug.exceptions import HTTPException, \
                                 InternalServerError
 
@@ -17,6 +18,7 @@ class Application(object):
 
     def __call__(self, environ, start_response):
         urls = self.url_map.bind_to_environ(environ)
+        request = Request(environ)
         try:
             endpoint, args = urls.match()
             klass, func = tuple(endpoint.rsplit('.', 1))
@@ -28,5 +30,4 @@ class Application(object):
                 raise InternalServerError()
         except HTTPException, e:
             return e(environ, start_response)
-        start_response('200 OK', [('Content-Type', 'text/plain')])
-        return ['Response was: %s' % func(klass, *args)]
+        return func(request, **args)(environ, start_response)

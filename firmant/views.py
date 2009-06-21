@@ -1,4 +1,5 @@
 from werkzeug.routing import Map, Rule
+from werkzeug import Response
 
 from firmant.plugins import PluginMount
 
@@ -41,5 +42,5 @@ class CatchallProvider(ViewProvider):
         return url_rules
 
     def catchall(self, request, p):
-        return '''If you're reading this the catchall provider functions well on
-        your system.'''
+        return Response('''If you're reading this the catchall provider
+            functions well on your system (%s).''' % p, mimetype='text/plain')
