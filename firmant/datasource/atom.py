@@ -5,6 +5,7 @@ import pytz
 from firmant.plugins import PluginMount
 from firmant.utils import not_implemented
 from firmant.constants import isoformat
+from firmant.utils import xml
 
 
 # Base classes for Atom data.
@@ -125,6 +126,13 @@ class Author(AtomBase):
     # TODO:
     #def permalink(self):
     #    not_implemented()
+
+    def to_xml(self):
+        author = xml.etree.Element('author')
+        xml.add_text_subelement(author, 'name', self.name)
+        xml.add_text_subelement(author, 'uri', self.uri)
+        xml.add_text_subelement(author, 'email', self.email)
+        return author
 
 
 class Category(AtomBase):

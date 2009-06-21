@@ -14,7 +14,8 @@ from firmant.datasource.atom import AtomProvider, \
                                     EntryPermalinkProvider, \
                                     FeedPermalinkProvider
 from firmant.utils import ProxyObject, \
-                          not_implemented
+                          not_implemented, \
+                          xml
 
 
 # Defined Authors.
@@ -471,6 +472,27 @@ class TestAuthor(unittest.TestCase):
         author   = provider.author
 
         self.assertEqual(expected, author.by_name('Jane Doe'))
+
+    def testToXML1(self):
+        """firmant.datasource.atom.Author.to_xml
+        Convert author 'Robert Escriva' to xml"""
+        settings = self.configuration('ToXML1')
+        expected = '<author><name>Robert Escriva</name><uri>http://rob' + \
+                   'escriva.com</uri><email>rob@example.org</email></author>'
+        returned = xml.etree.tostring(authors['Robert Escriva'].to_xml())
+
+        self.assertEqual(expected, returned)
+
+    def testToXML2(self):
+        """firmant.datasource.atom.Author.to_xml
+        Convert author 'Loren Ipsum Generator' to xml"""
+        settings = self.configuration('ToXML2')
+        expected = '<author><name>Loren Ipsum Generator</name>' + \
+                   '<uri>http://www.lipsum.com</uri>' + \
+                   '<email>lipsum@example.org</email></author>'
+        returned = xml.etree.tostring(authors['Loren Ipsum Generator'].to_xml())
+
+        self.assertEqual(expected, returned)
 
 
 class TestCategory(unittest.TestCase):
