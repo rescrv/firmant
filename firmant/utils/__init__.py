@@ -68,3 +68,9 @@ def curry(to_curry, *c_args, **c_kwargs):
         return to_curry(*(c_args + args),
                         **dict(c_kwargs.items() + kwargs.items()))
     return new_function
+
+
+def RFC3339(dt):
+    frmt_str = '%Y-%m-%dT%H:%M:%S%z'
+    ret = dt.strftime(frmt_str)
+    return ret[:-2] + ':' + ret[-2:]
