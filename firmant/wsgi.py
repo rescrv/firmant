@@ -28,6 +28,7 @@ class Application(object):
             func = getattr(klass, func)
             if not callable(func):
                 raise InternalServerError()
+            response = func(request, **args)
         except HTTPException, e:
             return e(environ, start_response)
-        return func(request, **args)(environ, start_response)
+        return response(environ, start_response)
