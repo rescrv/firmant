@@ -113,6 +113,14 @@ class AtomBase(object):
                 setattr(entry, field, value)
         return entry
 
+    @classmethod
+    def cast(cls, other):
+        ret = cls()
+        for field in cls.fields:
+            if hasattr(other, field):
+                setattr(ret, field, getattr(other, field))
+        return ret
+
 
 class Author(AtomBase):
 
