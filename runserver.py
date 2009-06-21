@@ -30,7 +30,7 @@ except ImportError:
 def make_app():
     return Application(settings)
 
-action_runserver = script.make_runserver(make_app, use_reloader=True)
+action_runserver = script.make_runserver(make_app, use_reloader=False)
 
 if __name__ == '__main__':
     print 'Starting local WSGI Server'
