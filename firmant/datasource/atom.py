@@ -148,6 +148,12 @@ class Category(AtomBase):
     #def permalink(self):
     #    not_implemented()
 
+    def to_xml(self):
+        category = xml.etree.Element('category')
+        category.set('term', self.term)
+        category.set('label', self.label)
+        return category
+
 
 class Entry(AtomBase):
 

@@ -530,6 +530,25 @@ class TestCategory(unittest.TestCase):
 
         self.assertEqual(expected, category.by_term('NOEXIST'))
 
+    def testToXML1(self):
+        """firmant.datasource.atom.Category.to_xml
+        Convert category 'General' to xml"""
+        settings = self.configuration('ToXML1')
+        expected = '<category term="General" label="All topics"/>'
+        returned = xml.etree.tostring(categories['General'].to_xml())
+
+        self.assertEqual(expected, returned)
+
+    def testToXML2(self):
+        """firmant.datasource.atom.Category.to_xml
+        Convert category 'Generated' to xml"""
+        settings = self.configuration('ToXML2')
+        expected = '<category term="Generated" ' + \
+                   'label="You can\'t tell a computer wrote it."/>'
+        returned = xml.etree.tostring(categories['Generated'].to_xml())
+
+        self.assertEqual(expected, returned)
+
 
 class TestEntry(unittest.TestCase):
 
