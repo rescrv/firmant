@@ -5,7 +5,9 @@ import pytz
 from firmant.plugins import PluginMount
 from firmant.utils import not_implemented
 from firmant.constants import isoformat
-from firmant.utils import xml
+from firmant.filters import FilterProvider
+from firmant.utils import xml, \
+                          RFC3339
 
 
 # Base classes for Atom data.
@@ -203,6 +205,46 @@ class Entry(AtomBase):
     @property
     def permalink(self):
         not_implemented()
+
+    def to_xml(self, filter=None):
+        '''Convert an entry to XML.
+        Filter should be a function that will convert content to a valid etree
+        XML Element.'''
+
+        if filter is None:
+            def filter(content):
+                ret = xml.etree.Element('div')
+                ret.set('xmlns', 'http://www.w3.org/1999/xhtml')
+                ret.text = content
+                return ret
+        entry = xml.etree.Element('entry')
+
+        xml.add_text_subelement(entry, 'title', self.title)
+        xml.add_text_subelement(entry, 'updated', RFC3339(self.updated))
+        xml.add_text_subelement(entry, 'published', RFC3339(self.published))
+        author = self.author.to_xml()
+        entry.append(author)
+
+        content = xml.etree.SubElement(entry, 'content')
+        content.set('type', 'xhtml')
+        e = filter(self.content)
+        content.append(e)
+
+        l_alt = xml.etree.SubElement(entry, 'link')
+        l_alt.set('href', self.permalink)
+        l_alt.set('rel', 'alternate')
+
+        xml.add_text_subelement(entry, 'id', self.permalink)
+        xml.add_text_subelement(entry, 'rights', self.rights)
+
+        summary = xml.etree.SubElement(entry, 'summary')
+        summary.set('type', 'xhtml')
+        e = filter(self.summary)
+        summary.append(e)
+
+        category = self.category.to_xml()
+        entry.append(category)
+        return entry
 
 
 class Feed(AtomBase):

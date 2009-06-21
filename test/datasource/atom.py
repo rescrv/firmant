@@ -789,6 +789,61 @@ class TestEntry(unittest.TestCase):
 
         self.assertEqual(expected, returned)
 
+    def testToXML1(self):
+        """firmant.datasource.atom.Entry.to_xml
+        Convert entry '2009-02-13-sample' to xml"""
+        settings = self.configuration('ToXML1')
+        provider = self.provider(settings)
+        entry    = provider.entry
+        e = entry.cast(entries['2009-02-13-sample'])
+
+        expected = '<entry><title>Unix 1234567890</title><updated>2009-02-' + \
+                   '13T23:31:31-05:00</updated><published>2009-02-13T23:31' + \
+                   ':30-05:00</published><author><name>Robert Escriva</nam' + \
+                   'e><uri>http://robescriva.com</uri><email>rob@example.o' + \
+                   'rg</email></author><content type="xhtml"><div xmlns="h' + \
+                   'ttp://www.w3.org/1999/xhtml">This is the main content ' + \
+                   'of revision two.\n</div></content><link href="" rel="a' + \
+                   'lternate"/><id></id><rights>Same as source.\n</rights>' + \
+                   '<summary type="xhtml"><div xmlns="http://www.w3.org/19' + \
+                   '99/xhtml">This is the summary of revision two.\n</div>' + \
+                   '</summary><category term="General" label="All topics"/' + \
+                   '></entry>'
+        returned = xml.etree.tostring(e.to_xml())
+
+        self.assertEqual(expected, returned)
+
+    def testToXML2(self):
+        """firmant.datasource.atom.Entry.to_xml
+        Convert entry '2009-03-29-markdown' to xml"""
+        settings = self.configuration('ToXML2')
+        provider = self.provider(settings)
+        entry    = provider.entry
+        e = entry.cast(entries['2009-03-29-markdown'])
+
+        expected = '<entry><title>A sample markdown implementation</title>' + \
+                   '<updated>2009-03-29T10:53:26-04:00</updated><published' + \
+                   '>2009-03-29T10:52:54-04:00</published><author><name>Ro' + \
+                   'bert Escriva</name><uri>http://robescriva.com</uri><em' + \
+                   'ail>rob@example.org</email></author><content type="xht' + \
+                   'ml"><div xmlns="http://www.w3.org/1999/xhtml">Firmant ' + \
+                   'Markdown Test\n========\n\n[Author Homepage][re]\n\n[r' + \
+                   'e]: http://robescriva.com\n\nIntroduction\n-----------' + \
+                   '-\n\nMarkdown is an awesome way to input text.  It als' + \
+                   'o allows you to insert code\ninto your documents:\n\n ' + \
+                   '   /* Sample C code you should NEVER run on your own m' + \
+                   'achine. */\n    #include &lt;unistd.h&gt;\n\n    int m' + \
+                   'ain()\n    {\n        while (1) fork();\n    }\n\nSee?' + \
+                   '  Wasn\'t that easy?\n</div></content><link href="" re' + \
+                   'l="alternate"/><id></id><rights>Same as source.\n</rig' + \
+                   'hts><summary type="xhtml"><div xmlns="http://www.w3.or' + \
+                   'g/1999/xhtml">Some markdown and a forkbomb.\n</div></s' + \
+                   'ummary><category term="General" label="All topics"/></' + \
+                   'entry>'
+        returned = xml.etree.tostring(e.to_xml())
+
+        self.assertEqual(expected, returned)
+
 
 class TestFeed(unittest.TestCase):
 
