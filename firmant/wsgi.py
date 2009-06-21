@@ -9,12 +9,12 @@ from firmant.utils import get_module
 class Application(object):
 
     def __init__(self, settings):
+        for plugin in settings['PLUGINS']:
+            get_module(plugin)
         self.settings = settings
         self.vp       = ViewProvider(settings)
         self.url_map  = self.vp.url_map
         self.views    = {}
-        for plugin in settings['PLUGINS']:
-            get_module(plugin)
 
     def __call__(self, environ, start_response):
         urls = self.url_map.bind_to_environ(environ)
