@@ -10,8 +10,10 @@ GENERATOR = 'Firmant 0.10'
 PLUGINS = ['test.datasource.atom',
            'firmant.plugins.filters.markdown',
            'firmant.plugins.datasource.flatfile.atom',
-           'firmant.views']
-ENABLED_VIEWS = ['firmant.views.CatchallProvider']
+           'firmant.views',
+           'firmant.plugins.views.txt']
+ENABLED_VIEWS = ['firmant.plugins.views.txt.TxtFrontendViewProvider',
+                 'firmant.views.CatchallProvider']
 ENTRY_PERMALINK = 'test.datasource.atom'
 FEED_PERMALINK  = 'test.datasource.atom'
 
