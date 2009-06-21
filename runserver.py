@@ -1,9 +1,9 @@
 #!/usr/bin/python
+from wsgiref.simple_server import make_server
 from optparse import OptionParser
 from sys import stderr
+import socket
 import pytz
-from werkzeug import script
-from werkzeug.script import make_runserver
 
 from firmant.wsgi import Application
 from firmant.utils import mod_to_dict
@@ -27,12 +27,18 @@ except ImportError:
     stderr.write('Please specify a settings module that can be imported.\n')
     exit(1)
 
-def make_app():
-    return Application(settings)
+try:
+    server = make_server(options.host, options.port, Application(settings))
+except socket.error:
+    stderr.write('Please specify a host/port to which you may bind (the '
+                 'defaults usually work well)\n')
+    exit(1)
 
-action_runserver = script.make_runserver(make_app, use_reloader=False)
 
 if __name__ == '__main__':
     print 'Starting local WSGI Server'
     print 'Please do not use this server for production'
-    script.run()
+    print 'Settings: %s' % options.settings
+    print 'Bound to: http://%s:%i/' % (options.host, options.port)
+    print '============================================'
+    server.serve_forever()
