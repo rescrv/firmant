@@ -1,5 +1,6 @@
 import datetime
-from werkzeug.routing import Rule
+from werkzeug.routing import Rule, \
+                             Submount
 from werkzeug import Response
 from werkzeug.exceptions import NotFound
 
@@ -26,7 +27,11 @@ class TxtFrontendViewProvider(ViewProvider):
             Rule('/<int(fixed_digits=4):year>/<int(fixed_digits=2):month>' + \
                  '/<int(fixed_digits=2):day>/<slug>', endpoint=name + 'single')
         ]
-        return url_rules
+        prefix = self.settings.get('VIEW_TXT_FRONTEND_PREFIX', '')
+        if prefix != '':
+            return [Submount('/' + prefix, url_rules)]
+        else:
+            return url_rules
 
     def recent(self, request):
         entries = self.ap.entry.recent()

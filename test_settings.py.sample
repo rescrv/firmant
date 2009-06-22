@@ -31,4 +31,5 @@ ATOM_PROVIDER = 'firmant.plugins.datasource.flatfile.atom'
 # Flatfile options
 FLATFILE_BASE = 'checkout/'
 
+VIEW_TXT_FRONTEND_PREFIX = 'txt'
 VIEW_ATOM_FEED_PREFIX = 'atom'
