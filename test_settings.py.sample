@@ -2,10 +2,6 @@
 # urlparse.urljoin
 HOST = 'http://localhost:8080/'
 
-# The generator string.  Please leave as 'firmant' just to spread the word (or
-# change it if you absolutely must).
-GENERATOR = 'Firmant 0.10'
-
 # Our enabled components
 PLUGINS = ['test.datasource.atom',
            'firmant.plugins.filters.markdown',
