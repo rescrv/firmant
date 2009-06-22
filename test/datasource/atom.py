@@ -1,5 +1,6 @@
 import unittest
 import datetime
+import os
 import pytz
 
 from firmant.datasource.atom import AtomProvider, \
@@ -891,6 +892,40 @@ class TestFeed(unittest.TestCase):
 
         expected = feeds['default']
         returned = feed.default()
+
+        self.assertEqual(expected, returned)
+
+    def testToXML1(self):
+        """firmant.datasource.atom.Feed.to_xml
+        Convert default feed to xml"""
+        settings = self.configuration('ToXML1')
+        provider = self.provider(settings)
+        feed     = provider.feed
+        f = feed.cast(feeds['default'])
+        f.entries = map(provider.entry.cast, f.entries)
+
+        import test.data
+        file = open(os.path.join(test.data.__path__[0], 'feed-default'))
+        expected = file.read()
+        file.close()
+        returned = xml.etree.tostring(f.to_xml())
+
+        self.assertEqual(expected, returned)
+
+    def testToXML2(self):
+        """firmant.datasource.atom.Feed.to_xml
+        Convert feed 'general' to xml"""
+        settings = self.configuration('ToXML2')
+        provider = self.provider(settings)
+        feed     = provider.feed
+        f = feed.cast(feeds['general'])
+        f.entries = map(provider.entry.cast, f.entries)
+
+        import test.data
+        file = open(os.path.join(test.data.__path__[0], 'feed-general'))
+        expected = file.read()
+        file.close()
+        returned = xml.etree.tostring(f.to_xml())
 
         self.assertEqual(expected, returned)
 

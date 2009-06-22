@@ -249,7 +249,7 @@ class Entry(AtomBase):
 
 class Feed(AtomBase):
 
-    fields    = ['slug', 'title', 'rights', 'subtitle', 'updated']
+    fields    = ['slug', 'title', 'rights', 'subtitle', 'updated', 'entries']
     __slots__ = fields
     filters              = {}
     filters['updated']   = DatetimeFilter()
@@ -265,6 +265,29 @@ class Feed(AtomBase):
     @property
     def permalink(self):
         not_implemented()
+
+    def to_xml(self, filter=None):
+        '''Convert a feed to XML.
+        Filter should be a function that will convert content to a valid etree
+        XML Element.'''
+
+        feed = xml.etree.Element('feed')
+        feed.set('xmlns', 'http://www.w3.org/2005/Atom')
+
+        xml.add_text_subelement(feed, 'generator', 'Firmant')
+        xml.add_text_subelement(feed, 'title', self.title)
+        xml.add_text_subelement(feed, 'rights', self.rights)
+        xml.add_text_subelement(feed, 'updated', RFC3339(self.updated))
+        xml.add_text_subelement(feed, 'id', self.permalink)
+
+        link = xml.etree.SubElement(feed, 'link')
+        link.set('href', self.permalink)
+        link.set('rel', 'self')
+
+        for entry in self.entries:
+            feed.append(entry.to_xml(filter))
+
+        return feed
 
 
 # Plugin Code
