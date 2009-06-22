@@ -7,8 +7,10 @@ PLUGINS = ['test.datasource.atom',
            'firmant.plugins.filters.markdown',
            'firmant.plugins.datasource.flatfile.atom',
            'firmant.views',
-           'firmant.plugins.views.txt']
-ENABLED_VIEWS = ['firmant.plugins.views.txt.TxtFrontendViewProvider',
+           'firmant.plugins.views.txt',
+           'firmant.plugins.views.atom']
+ENABLED_VIEWS = ['firmant.plugins.views.atom.AtomFeedViewProvider',
+                 'firmant.plugins.views.txt.TxtFrontendViewProvider',
                  'firmant.views.CatchallProvider']
 ENTRY_PERMALINK = 'test.datasource.atom'
 FEED_PERMALINK  = 'test.datasource.atom'
@@ -28,3 +30,5 @@ ATOM_PROVIDER = 'firmant.plugins.datasource.flatfile.atom'
 
 # Flatfile options
 FLATFILE_BASE = 'checkout/'
+
+VIEW_ATOM_FEED_PREFIX = 'atom'
