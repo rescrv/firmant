@@ -8,8 +8,11 @@ PLUGINS = ['test.datasource.atom',
            'firmant.plugins.datasource.flatfile.atom',
            'firmant.views',
            'firmant.plugins.views.txt',
-           'firmant.plugins.views.atom']
-ENABLED_VIEWS = ['firmant.plugins.views.atom.AtomFeedViewProvider',
+           'firmant.plugins.views.atom',
+           'firmant.plugins.views.jinja2viewprovider']
+ENABLED_VIEWS = [
+'firmant.plugins.views.jinja2viewprovider.Jinja2FrontendViewProvider',
+                 'firmant.plugins.views.atom.AtomFeedViewProvider',
                  'firmant.plugins.views.txt.TxtFrontendViewProvider',
                  'firmant.views.CatchallProvider']
 ENTRY_PERMALINK = 'test.datasource.atom'
@@ -32,4 +35,7 @@ ATOM_PROVIDER = 'firmant.plugins.datasource.flatfile.atom'
 FLATFILE_BASE = 'checkout/'
 
 VIEW_TXT_FRONTEND_PREFIX = 'txt'
+VIEW_JINJA2_FRONTEND_PREFIX = 'jinja2'
 VIEW_ATOM_FEED_PREFIX = 'atom'
+
+JINJA2_TEMPLATE_DIR = 'templates/'
