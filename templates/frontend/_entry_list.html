@@ -1,7 +1,7 @@
 {% if entries %}
     {% for entry in entries %}
     <div class="entry">
-        <h2>{{ entry.title | escape }}</h2>
+        <h2><a href="{{ entry.permalink }}">{{ entry.title | escape }}</a></h2>
         <div class="summary">
             {{ entry.summary }}
         </div>
