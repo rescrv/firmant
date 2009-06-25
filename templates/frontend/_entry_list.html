@@ -6,7 +6,8 @@
             {{ entry.summary }}
         </div>
         <div class="metadata">
-            <span>Written by {{ entry.author.name | escape }}.</span>
+            <span>Written by <a href="{{ entry.author.uri }}">
+                    {{ entry.author.name | escape }}<a/>.</span>
             <span>Published on {{ entry.published.strftime("%Y-%m-%d") }} at
                 {{ entry.published.strftime("%H:%M") }}.</span>
             <span>Filed under {{ entry.category.term | escape }}.</span>
