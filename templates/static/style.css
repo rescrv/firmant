@@ -1,3 +1,9 @@
+/* This work is licensed under a Creative Commons Attribution 3.0 United States
+ * License.  All redistributions, either as part of a theme package, or in use
+ * on a website should include this copyright notice.
+ *
+ * Copyright 2009 Robert Escriva
+ */
 html {
     background-image: url('zigzag.png');
     margin: 0;
@@ -32,6 +38,10 @@ html {
 }
 
 #ft {
+    color: #eeeeec;
+}
+
+#ft a {
     color: #eeeeec;
 }
 
