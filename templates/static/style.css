@@ -34,3 +34,17 @@ html {
 #ft {
     color: #eeeeec;
 }
+
+.entry {
+    background: #eeeeec;
+    border-style: solid none;
+    border-color: #babdb6;
+    border-width: 0.077em;
+    padding: 0 0.769em;
+    margin-bottom: 0.769em;
+}
+
+.metadata {
+    text-align: center;
+    padding-bottom: 0.769em;
+}
