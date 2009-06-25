@@ -1,4 +1,5 @@
-from werkzeug import Request
+from werkzeug import Request, \
+                     SharedDataMiddleware
 from werkzeug.exceptions import HTTPException, \
                                 InternalServerError
 
@@ -15,8 +16,11 @@ class Application(object):
         self.vp       = ViewProvider(settings)
         self.url_map  = self.vp.url_map
         self.views    = {}
+        if settings.get('MEDIA_FS_PATH', None) != None:
+            self.dispatch = SharedDataMiddleware(self.dispatch,
+                     {settings['MEDIA_URL_PATH']: settings['MEDIA_FS_PATH']})
 
-    def __call__(self, environ, start_response):
+    def dispatch(self, environ, start_response):
         urls = self.url_map.bind_to_environ(environ)
         request = Request(environ)
         try:
@@ -32,3 +36,6 @@ class Application(object):
         except HTTPException, e:
             return e(environ, start_response)
         return response(environ, start_response)
+
+    def __call__(self, environ, start_response):
+        return self.dispatch(environ, start_response)
