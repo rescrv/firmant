@@ -1,10 +1,13 @@
 from werkzeug import Request, \
-                     SharedDataMiddleware
+                     SharedDataMiddleware, \
+                     ClosingIterator
 from werkzeug.exceptions import HTTPException, \
                                 InternalServerError
 
 from firmant.views import ViewProvider
 from firmant.utils import get_module
+from firmant.utils import local
+from firmant.utils import local_manager
 
 
 class Application(object):
@@ -35,7 +38,8 @@ class Application(object):
             response = func(request, **args)
         except HTTPException, e:
             return e(environ, start_response)
-        return response(environ, start_response)
+        return ClosingIterator(response(environ, start_response),
+                [local_manager.cleanup])
 
     def __call__(self, environ, start_response):
         return self.dispatch(environ, start_response)
