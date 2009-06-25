@@ -22,13 +22,6 @@ def mod_to_dict(module):
     return dictionary
 
 
-def curry(to_curry, *c_args, **c_kwargs):
-    def new_function(*args, **kwargs):
-        return to_curry(*(c_args + args),
-                        **dict(c_kwargs.items() + kwargs.items()))
-    return new_function
-
-
 def RFC3339(dt):
     frmt_str = '%Y-%m-%dT%H:%M:%S%z'
     ret = dt.strftime(frmt_str)
