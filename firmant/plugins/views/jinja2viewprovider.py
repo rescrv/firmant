@@ -19,6 +19,7 @@ class Jinja2FrontendViewProvider(ViewProvider):
         self.fp = FilterProvider(settings)
         loader = FileSystemLoader(settings['JINJA2_TEMPLATE_DIR'])
         self.env = Environment(loader=loader)
+        self.env.globals['MEDIA_PATH'] = settings['MEDIA_URL_PATH']
 
     @property
     def rules(self):

@@ -1,0 +1,36 @@
+html {
+    background-image: url('zigzag.png');
+    margin: 0;
+}
+
+#doc4 {
+    background: #ffffff;
+    border-style: solid ;
+    border-color: #000000;
+    border-width: 0.769em 0.077em;
+    margin: 0.769em auto;
+}
+
+#hd {
+    background: #eeeeec;
+    border-style: solid none;
+    border-color: #ef2929;
+    border-width: 0.154em;
+    font-size: 123.1%;
+    padding: 1em;
+}
+
+#hd h1 {
+    margin: 0;
+}
+
+#bd {
+    padding: 0 1em;
+    border-bottom-style: solid;
+    border-bottom-color: #ef2929;
+    border-bottom-width: 0.154em;
+}
+
+#ft {
+    color: #eeeeec;
+}

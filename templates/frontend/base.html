@@ -2,9 +2,30 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="EN" lang="EN">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.5.2/build/reset-fonts-grids/reset-fonts-grids.css" />
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.5.2/build/base/base-min.css" />
+    <link rel="stylesheet" href="{{ MEDIA_PATH }}/style.css" type="text/css" media="screen" />
+
     <title>{% block title %}Firmant{% endblock %}</title>
 </head>
 <body>
-    {%- block content %}{% endblock %}
+    <div id="doc4" class="yui-t5">
+        <div id="hd">
+            <h1 class="title">Firmant-Powered Blog</h1>
+        </div>
+        <div id="bd">
+            <div id="yui-main">
+                <div class="yui-b">
+                    {%- block content %}{% endblock %}
+                </div>
+            </div>
+            <div class="yui-b sidebar">
+            </div>
+        </div>
+    </div>
+    <div id="ft">
+        <p>This is the footer of the site.</p>
+    </div>
 </body>
 </html>
