@@ -6,6 +6,7 @@ from werkzeug.exceptions import NotFound
 from firmant.datasource.atom import AtomProvider
 from firmant.datasource.atom import FeedPermalinkProvider
 from firmant.views import ViewProvider
+from firmant.filters import FilterProvider
 from firmant.utils import xml
 from firmant.utils import local
 
@@ -32,6 +33,7 @@ class AtomFeedViewProvider(ViewProvider):
     def __init__(self, settings):
         self.settings = settings
         self.ap = AtomProvider(settings)
+        self.fp = FilterProvider(settings)
 
     @property
     def rules(self):
@@ -60,5 +62,10 @@ class AtomFeedViewProvider(ViewProvider):
         return self.common(request, feed)
 
     def common(self, request, feed):
-        content = xml.etree.tostring(feed.to_xml())
+        def filter(content):
+            open_div = '<div xmlns="http://www.w3.org/1999/xhtml">'
+            close_div = '</div>'
+            filtered_content = self.fp.filter('XHTML', content)
+            return xml.etree.fromstring(open_div + filtered_content + close_div)
+        content = xml.etree.tostring(feed.to_xml(filter))
         return Response(content, mimetype='application/atom+xml')
