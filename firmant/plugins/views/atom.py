@@ -9,6 +9,20 @@ from firmant.views import ViewProvider
 from firmant.utils import xml
 
 
+class AtomFeedPermalinkProvier(FeedPermalinkProvider):
+
+    def __init__(self, settings):
+        self.settings = settings
+
+    def authoritative(self, feed):
+        postfix = '/' + feed.slug
+        prefix = self.settings.get('VIEW_ATOM_FEED_PREFIX', '')
+        if prefix != '':
+            return '/' + prefix + postfix
+        else:
+            return postfix
+
+
 class AtomFeedViewProvider(ViewProvider):
 
     def __init__(self, settings):
