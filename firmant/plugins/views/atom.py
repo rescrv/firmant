@@ -7,6 +7,7 @@ from firmant.datasource.atom import AtomProvider
 from firmant.datasource.atom import FeedPermalinkProvider
 from firmant.views import ViewProvider
 from firmant.utils import xml
+from firmant.utils import local
 
 
 class AtomFeedPermalinkProvier(FeedPermalinkProvider):
@@ -15,12 +16,15 @@ class AtomFeedPermalinkProvier(FeedPermalinkProvider):
         self.settings = settings
 
     def authoritative(self, feed):
-        postfix = '/' + feed.slug
-        prefix = self.settings.get('VIEW_ATOM_FEED_PREFIX', '')
-        if prefix != '':
-            return '/' + prefix + postfix
+        endpoint = __name__ + '.AtomFeedViewProvider.'
+        values = {}
+        if feed.slug == '':
+            endpoint += 'default'
         else:
-            return postfix
+            endpoint += 'named'
+            values['slug']  = feed.slug
+
+        return local.urls.build(endpoint, values, force_external=True)
 
 
 class AtomFeedViewProvider(ViewProvider):

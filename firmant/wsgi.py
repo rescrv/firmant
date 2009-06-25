@@ -24,7 +24,7 @@ class Application(object):
                      {settings['MEDIA_URL_PATH']: settings['MEDIA_FS_PATH']})
 
     def dispatch(self, environ, start_response):
-        urls = self.url_map.bind_to_environ(environ)
+        local.urls = urls = self.url_map.bind_to_environ(environ)
         request = Request(environ)
         try:
             endpoint, args = urls.match()

@@ -10,6 +10,7 @@ from firmant.datasource.atom import AtomProvider
 from firmant.datasource.atom import EntryPermalinkProvider
 from firmant.views import ViewProvider
 from firmant.filters import FilterProvider
+from firmant.utils import local
 
 
 class Jinja2EntryPermalinkProvier(EntryPermalinkProvider):
@@ -18,12 +19,14 @@ class Jinja2EntryPermalinkProvier(EntryPermalinkProvider):
         self.settings = settings
 
     def authoritative(self, entry):
-        postfix = entry.published.strftime("/%Y/%m/%d/") + entry.slug
-        prefix = self.settings.get('VIEW_JINJA2_FRONTEND_PREFIX', '')
-        if prefix != '':
-            return '/' + prefix + postfix
-        else:
-            return postfix
+        endpoint = __name__ + '.Jinja2FrontendViewProvider.single'
+        values = {}
+        values['year']  = entry.published.year
+        values['month'] = entry.published.month
+        values['day']   = entry.published.day
+        values['slug']  = entry.slug
+
+        return local.urls.build(endpoint, values, force_external=True)
 
 
 class Jinja2FrontendViewProvider(ViewProvider):
