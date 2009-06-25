@@ -14,8 +14,7 @@ from firmant.datasource.atom import AtomProvider, \
                                     Feed, \
                                     EntryPermalinkProvider, \
                                     FeedPermalinkProvider
-from firmant.utils import ProxyObject, \
-                          not_implemented, \
+from firmant.utils import not_implemented, \
                           xml
 
 
