@@ -7,8 +7,23 @@ from jinja2 import Environment, \
                    FileSystemLoader
 
 from firmant.datasource.atom import AtomProvider
+from firmant.datasource.atom import EntryPermalinkProvider
 from firmant.views import ViewProvider
 from firmant.filters import FilterProvider
+
+
+class Jinja2EntryPermalinkProvier(EntryPermalinkProvider):
+
+    def __init__(self, settings):
+        self.settings = settings
+
+    def authoritative(self, entry):
+        postfix = entry.published.strftime("/%Y/%m/%d/") + entry.slug
+        prefix = self.settings.get('VIEW_JINJA2_FRONTEND_PREFIX', '')
+        if prefix != '':
+            return '/' + prefix + postfix
+        else:
+            return postfix
 
 
 class Jinja2FrontendViewProvider(ViewProvider):
