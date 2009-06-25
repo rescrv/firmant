@@ -3,21 +3,20 @@
 {% block title %}Firmant Post{% endblock %}
 
 {% block content %}
-{% if entry %}
-    <h1>{{ entry.title | escape }}</h1>
-    <div class="published">Published on: {{ entry.published.strftime("%Y-%m-%d") }}</div>
-    <div class="updated">Last updated: {{ entry.updated }}</div>
-    <div class="author_name">Authored by: {{ entry.author.name | escape }}</div>
-    <div class="author_email">Author email: {{ entry.author.email | escape }}</div>
-    <div class="author_uri">Author uri: {{ entry.author.uri | escape }}</div>
-    <div class="category">Filed in: {{ entry.category.term | escape }}</div>
-    <div class="category">Category description: {{ entry.category.label | escape }}</div>
-    <div class="rights">Rights: {{ entry.rights | escape }}</div>
-    <div class="slug">Slug: {{ entry.slug | escape }}</div>
-    {{ entry.summary }}
-    <hr />
-    {{ entry.content }}
-{% else %}
-<p>There are no entries in the system.</p>
-{% endif %}
+<h1 class="title">{{ entry.title | escape }}</h1>
+<div class="entry single">
+    <div class="metadata">
+        <span>Written by {{ entry.author.name | escape }}.</span>
+        <span>Published on {{ entry.published.strftime("%Y-%m-%d") }} at
+            {{ entry.published.strftime("%H:%M") }}.</span>
+    </div>
+    <div class="content">
+        {{ entry.content }}
+    </div>
+    <div class="metadata">
+        <span>Filed under {{ entry.category.term | escape }}.</span>
+        <span>Last updated on {{ entry.updated.strftime("%Y-%m-%d") }} at
+            {{ entry.updated.strftime("%H:%M") }}.</span>
+    </div>
+</div>
 {% endblock %}
