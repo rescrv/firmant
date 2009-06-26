@@ -2,7 +2,10 @@ import re
 import os.path
 import datetime
 import pytz
-import json
+try:
+    import json
+except ImportError:
+    import simplejson as json
 
 from firmant.datasource.atom import AtomProvider, \
                                     Entry, \
