@@ -14,6 +14,7 @@ from firmant.datasource.atom import AtomProvider, \
                                     Category, \
                                     EntryPermalinkProvider, \
                                     FeedPermalinkProvider
+from firmant.utils import strptime
 
 
 slug_re = re.compile('^[-\\_a-zA-Z0-9]{1,96}$')
@@ -74,8 +75,7 @@ class FlatfileAtomProvider(AtomProvider):
                 entry.published = \
                         tz_obj.localize \
                         (datetime.datetime.combine \
-                            (date, datetime.datetime.strptime \
-                                (meta_data['time'], '%H%M%S').time()
+                            (date, strptime(meta_data['time'], '%H%M%S').time()
                             )
                         )
                 entry.author    = \
@@ -85,9 +85,7 @@ class FlatfileAtomProvider(AtomProvider):
                 entry.rights    = rights_data
                 entry.updated   = \
                         tz_obj.localize \
-                        (datetime.datetime.strptime \
-                            (meta_data['updated'], '%Y-%m-%d %H%M%S')
-                        )
+                        (strptime(meta_data['updated'], '%Y-%m-%d %H%M%S')                        )
                 entry.title     = meta_data['title']
                 entry.content   = content_data
                 entry.summary   = summary_data
@@ -237,7 +235,6 @@ class FlatfileAtomProvider(AtomProvider):
                            slug_re.match(entry[11:]) is not None
                 cleaned_entries = filter(is_entry, entries)
                 def parse(entry):
-                    strptime = datetime.datetime.strptime
                     dt = strptime(entry[:10], '%Y,%m,%d').date()
                     slug = entry[11:]
                     return (slug, dt)

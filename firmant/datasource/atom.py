@@ -10,7 +10,8 @@ from firmant.utils import not_implemented
 from firmant.constants import isoformat
 from firmant.filters import FilterProvider
 from firmant.utils import xml, \
-                          RFC3339
+                          RFC3339, \
+                          strptime
 
 
 # Base classes for Atom data.
@@ -38,10 +39,9 @@ class DatetimeFilter(Filter):
 
     def from_json(self, dt):
         if dt[1] is None:
-            return datetime.datetime.strptime(dt[0], isoformat)
+            return strptime(dt[0], isoformat)
         else:
-            dt_obj = pytz.UTC.localize(datetime.datetime.strptime(dt[0],
-                isoformat))
+            dt_obj = pytz.UTC.localize(strptime(dt[0], isoformat))
             tz_obj = pytz.timezone(dt[1])
             new_dt = dt_obj.astimezone(tz_obj)
             return tz_obj.normalize(new_dt)
