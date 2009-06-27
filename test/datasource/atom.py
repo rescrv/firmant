@@ -15,7 +15,8 @@ from firmant.datasource.atom import AtomProvider, \
                                     EntryPermalinkProvider, \
                                     FeedPermalinkProvider
 from firmant.utils import not_implemented, \
-                          xml
+                          xml, \
+                          RFC3339
 
 
 # Defined Authors.
@@ -477,8 +478,11 @@ class TestAuthor(unittest.TestCase):
         """firmant.datasource.atom.Author.to_xml
         Convert author 'Robert Escriva' to xml"""
         settings = self.configuration('ToXML1')
-        expected = '<author><name>Robert Escriva</name><uri>http://rob' + \
-                   'escriva.com</uri><email>rob@example.org</email></author>'
+        author   = xml.etree.Element('author')
+        xml.add_text_subelement(author, 'name', 'Robert Escriva')
+        xml.add_text_subelement(author, 'uri', 'http://robescriva.com')
+        xml.add_text_subelement(author, 'email', 'rob@example.org')
+        expected = xml.etree.tostring(author)
         returned = xml.etree.tostring(authors['Robert Escriva'].to_xml())
 
         self.assertEqual(expected, returned)
@@ -487,9 +491,11 @@ class TestAuthor(unittest.TestCase):
         """firmant.datasource.atom.Author.to_xml
         Convert author 'Loren Ipsum Generator' to xml"""
         settings = self.configuration('ToXML2')
-        expected = '<author><name>Loren Ipsum Generator</name>' + \
-                   '<uri>http://www.lipsum.com</uri>' + \
-                   '<email>lipsum@example.org</email></author>'
+        author   = xml.etree.Element('author')
+        xml.add_text_subelement(author, 'name', 'Loren Ipsum Generator')
+        xml.add_text_subelement(author, 'uri', 'http://www.lipsum.com')
+        xml.add_text_subelement(author, 'email', 'lipsum@example.org')
+        expected = xml.etree.tostring(author)
         returned = xml.etree.tostring(authors['Loren Ipsum Generator'].to_xml())
 
         self.assertEqual(expected, returned)
@@ -534,7 +540,10 @@ class TestCategory(unittest.TestCase):
         """firmant.datasource.atom.Category.to_xml
         Convert category 'General' to xml"""
         settings = self.configuration('ToXML1')
-        expected = '<category term="General" label="All topics"/>'
+        category = xml.etree.Element('category')
+        category.set('term', 'General')
+        category.set('label', 'All topics')
+        expected = xml.etree.tostring(category)
         returned = xml.etree.tostring(categories['General'].to_xml())
 
         self.assertEqual(expected, returned)
@@ -543,8 +552,11 @@ class TestCategory(unittest.TestCase):
         """firmant.datasource.atom.Category.to_xml
         Convert category 'Generated' to xml"""
         settings = self.configuration('ToXML2')
-        expected = '<category term="Generated" ' + \
-                   'label="You can\'t tell a computer wrote it."/>'
+        settings = self.configuration('ToXML1')
+        category = xml.etree.Element('category')
+        category.set('term', 'Generated')
+        category.set('label', 'You can\'t tell a computer wrote it.')
+        expected = xml.etree.tostring(category)
         returned = xml.etree.tostring(categories['Generated'].to_xml())
 
         self.assertEqual(expected, returned)
@@ -797,18 +809,28 @@ class TestEntry(unittest.TestCase):
         entry    = provider.entry
         e = entry.cast(entries['2009-02-13-sample'])
 
-        expected = '<entry><title>Unix 1234567890</title><updated>2009-02-' + \
-                   '13T23:31:31-05:00</updated><published>2009-02-13T23:31' + \
-                   ':30-05:00</published><author><name>Robert Escriva</nam' + \
-                   'e><uri>http://robescriva.com</uri><email>rob@example.o' + \
-                   'rg</email></author><content type="xhtml"><div xmlns="h' + \
-                   'ttp://www.w3.org/1999/xhtml">This is the main content ' + \
-                   'of revision two.\n</div></content><link href="" rel="a' + \
-                   'lternate"/><id></id><rights>Same as source.\n</rights>' + \
-                   '<summary type="xhtml"><div xmlns="http://www.w3.org/19' + \
-                   '99/xhtml">This is the summary of revision two.\n</div>' + \
-                   '</summary><category term="General" label="All topics"/' + \
-                   '></entry>'
+        xml_entry = xml.etree.Element('entry')
+        xml.add_text_subelement(xml_entry, 'title', e.title)
+        xml.add_text_subelement(xml_entry, 'updated', RFC3339(e.updated))
+        xml.add_text_subelement(xml_entry, 'published', RFC3339(e.published))
+        xml_entry.append(e.author.to_xml())
+        content = xml.etree.SubElement(xml_entry, 'content')
+        content.set('type', 'xhtml')
+        div = xml.etree.SubElement(content, 'div')
+        div.set('xmlns', 'http://www.w3.org/1999/xhtml')
+        div.text = e.content
+        link = xml.etree.SubElement(xml_entry, 'link')
+        link.set('href', '')
+        link.set('rel', 'alternate')
+        xml.add_text_subelement(xml_entry, 'id', '')
+        xml.add_text_subelement(xml_entry, 'rights', e.rights)
+        summary = xml.etree.SubElement(xml_entry, 'summary')
+        summary.set('type', 'xhtml')
+        div = xml.etree.SubElement(summary, 'div')
+        div.set('xmlns', 'http://www.w3.org/1999/xhtml')
+        div.text = e.summary
+        xml_entry.append(e.category.to_xml())
+        expected = xml.etree.tostring(xml_entry)
         returned = xml.etree.tostring(e.to_xml())
 
         self.assertEqual(expected, returned)
@@ -821,25 +843,28 @@ class TestEntry(unittest.TestCase):
         entry    = provider.entry
         e = entry.cast(entries['2009-03-29-markdown'])
 
-        expected = '<entry><title>A sample markdown implementation</title>' + \
-                   '<updated>2009-03-29T10:53:26-04:00</updated><published' + \
-                   '>2009-03-29T10:52:54-04:00</published><author><name>Ro' + \
-                   'bert Escriva</name><uri>http://robescriva.com</uri><em' + \
-                   'ail>rob@example.org</email></author><content type="xht' + \
-                   'ml"><div xmlns="http://www.w3.org/1999/xhtml">Firmant ' + \
-                   'Markdown Test\n========\n\n[Author Homepage][re]\n\n[r' + \
-                   'e]: http://robescriva.com\n\nIntroduction\n-----------' + \
-                   '-\n\nMarkdown is an awesome way to input text.  It als' + \
-                   'o allows you to insert code\ninto your documents:\n\n ' + \
-                   '   /* Sample C code you should NEVER run on your own m' + \
-                   'achine. */\n    #include &lt;unistd.h&gt;\n\n    int m' + \
-                   'ain()\n    {\n        while (1) fork();\n    }\n\nSee?' + \
-                   '  Wasn\'t that easy?\n</div></content><link href="" re' + \
-                   'l="alternate"/><id></id><rights>Same as source.\n</rig' + \
-                   'hts><summary type="xhtml"><div xmlns="http://www.w3.or' + \
-                   'g/1999/xhtml">Some markdown and a forkbomb.\n</div></s' + \
-                   'ummary><category term="General" label="All topics"/></' + \
-                   'entry>'
+        xml_entry = xml.etree.Element('entry')
+        xml.add_text_subelement(xml_entry, 'title', e.title)
+        xml.add_text_subelement(xml_entry, 'updated', RFC3339(e.updated))
+        xml.add_text_subelement(xml_entry, 'published', RFC3339(e.published))
+        xml_entry.append(e.author.to_xml())
+        content = xml.etree.SubElement(xml_entry, 'content')
+        content.set('type', 'xhtml')
+        div = xml.etree.SubElement(content, 'div')
+        div.set('xmlns', 'http://www.w3.org/1999/xhtml')
+        div.text = e.content
+        link = xml.etree.SubElement(xml_entry, 'link')
+        link.set('href', '')
+        link.set('rel', 'alternate')
+        xml.add_text_subelement(xml_entry, 'id', '')
+        xml.add_text_subelement(xml_entry, 'rights', e.rights)
+        summary = xml.etree.SubElement(xml_entry, 'summary')
+        summary.set('type', 'xhtml')
+        div = xml.etree.SubElement(summary, 'div')
+        div.set('xmlns', 'http://www.w3.org/1999/xhtml')
+        div.text = e.summary
+        xml_entry.append(e.category.to_xml())
+        expected = xml.etree.tostring(xml_entry)
         returned = xml.etree.tostring(e.to_xml())
 
         self.assertEqual(expected, returned)
@@ -903,10 +928,19 @@ class TestFeed(unittest.TestCase):
         f = feed.cast(feeds['default'])
         f.entries = map(provider.entry.cast, f.entries)
 
-        import test.data
-        file = open(os.path.join(test.data.__path__[0], 'feed-default'))
-        expected = file.read()
-        file.close()
+        xml_feed  = xml.etree.Element('feed')
+        xml_feed.set('xmlns', 'http://www.w3.org/2005/Atom')
+        xml.add_text_subelement(xml_feed, 'generator', 'Firmant')
+        xml.add_text_subelement(xml_feed, 'title', f.title)
+        xml.add_text_subelement(xml_feed, 'rights', f.rights)
+        xml.add_text_subelement(xml_feed, 'updated', RFC3339(f.updated))
+        xml.add_text_subelement(xml_feed, 'id', '')
+        link = xml.etree.SubElement(xml_feed, 'link')
+        link.set('href', '')
+        link.set('rel', 'self')
+        for entry in f.entries:
+            xml_feed.append(entry.to_xml())
+        expected = xml.etree.tostring(xml_feed)
         returned = xml.etree.tostring(f.to_xml())
 
         self.assertEqual(expected, returned)
@@ -920,10 +954,19 @@ class TestFeed(unittest.TestCase):
         f = feed.cast(feeds['general'])
         f.entries = map(provider.entry.cast, f.entries)
 
-        import test.data
-        file = open(os.path.join(test.data.__path__[0], 'feed-general'))
-        expected = file.read()
-        file.close()
+        xml_feed  = xml.etree.Element('feed')
+        xml_feed.set('xmlns', 'http://www.w3.org/2005/Atom')
+        xml.add_text_subelement(xml_feed, 'generator', 'Firmant')
+        xml.add_text_subelement(xml_feed, 'title', f.title)
+        xml.add_text_subelement(xml_feed, 'rights', f.rights)
+        xml.add_text_subelement(xml_feed, 'updated', RFC3339(f.updated))
+        xml.add_text_subelement(xml_feed, 'id', '')
+        link = xml.etree.SubElement(xml_feed, 'link')
+        link.set('href', '')
+        link.set('rel', 'self')
+        for entry in f.entries:
+            xml_feed.append(entry.to_xml())
+        expected = xml.etree.tostring(xml_feed)
         returned = xml.etree.tostring(f.to_xml())
 
         self.assertEqual(expected, returned)
