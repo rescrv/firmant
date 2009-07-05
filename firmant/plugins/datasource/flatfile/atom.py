@@ -139,20 +139,12 @@ class FlatfileAtomProvider(AtomProvider):
                     dt = datetime.date(year, month, day)
                 except ValueError:
                     raise
-                return cls._day(dt)
-
-            @classmethod
-            def _day(cls, dt):
-                entry_path = os.path.join(settings['FLATFILE_BASE'],
-                                    'entries',
-                                    '%02i' % dt.year,
-                                    '%02i' % dt.month,
-                                    '%02i' % dt.day)
-                if not os.access(entry_path, os.R_OK):
-                    return []
-
-                slugs = os.listdir(entry_path)
-                return cls._load_many(map(lambda e: (dt, e), slugs))
+                def entry_in_day(entry):
+                    return entry[0].year == dt.year and \
+                           entry[0].month == dt.month and \
+                           entry[0].day == dt.day
+                entries_names = filter(entry_in_day, cls.list())
+                return cls._load_many(entries_names)
 
             @classmethod
             def month(cls, year, month):
