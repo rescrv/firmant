@@ -262,6 +262,29 @@ class FlatfileAtomProvider(AtomProvider):
             def permalink(self):
                 return provider_self.entry_permalink(self)
 
+            @classmethod
+            def list(cls):
+                entry_path = os.path.join(settings['FLATFILE_BASE'], 'entries')
+                entry_path = os.path.abspath(entry_path)
+
+                ret = []
+                for dirpath, dirnames, filenames in os.walk(entry_path):
+                    if not dirpath.startswith(entry_path):
+                        raise ValueError('dirpath outside entry_path')
+                    path = dirpath[len(entry_path):]
+                    head, tail = os.path.split(path)
+                    match_tail = slug_re.match(tail)
+                    match_head = re.match(r'/(\d{4})/(\d{2})/(\d{2})', head)
+                    if match_head is not None and \
+                       match_tail is not None:
+                        groups = match_head.groups()
+                        d = datetime.date(int(groups[0]),
+                                          int(groups[1]),
+                                          int(groups[2]))
+                        if cls._validate(tail, d) is not None:
+                            ret.append((d, tail))
+                return [x for x in reversed(sorted(ret))]
+
         provider_self.entry = FlatFileEntry
 
         class FlatFileFeed(Feed):
