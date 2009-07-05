@@ -302,6 +302,12 @@ class FlatfileAtomProvider(AtomProvider):
                 months = map(lambda x: trunc_month(x[0]), entries)
                 return uniq_presorted(months)
 
+            @classmethod
+            def list_days(cls):
+                entries = cls.list()
+                days = map(lambda x: x[0], entries)
+                return uniq_presorted(days)
+
         provider_self.entry = FlatFileEntry
 
         class FlatFileFeed(Feed):
