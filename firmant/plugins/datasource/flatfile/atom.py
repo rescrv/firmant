@@ -162,30 +162,11 @@ class FlatfileAtomProvider(AtomProvider):
                     dt = datetime.date(year, month, 1)
                 except ValueError:
                     raise
-                return cls._month(dt)
-
-            @classmethod
-            def _month(cls, dt):
-                entry_path = os.path.join(settings['FLATFILE_BASE'],
-                                    'entries',
-                                    '%02i' % dt.year,
-                                    '%02i' % dt.month)
-                if not os.access(entry_path, os.R_OK):
-                    return []
-
-                days = reversed(sorted(os.listdir(entry_path)))
-                def invalid_day(day):
-                    """Returns False if it cannot be converted to int or
-                    produces an invalid date.  Returns the date object
-                    otherwise."""
-                    try:
-                        day = int(day)
-                        return datetime.date(dt.year, dt.month, day)
-                    except ValueError:
-                        return False
-                clean_days = filter(lambda e: e, map(invalid_day, days))
-                return reduce(lambda x, y: x + y,
-                              map(cls._day, clean_days))
+                def entry_in_month(entry):
+                    return entry[0].year == dt.year and \
+                           entry[0].month == dt.month
+                entries_names = filter(entry_in_month, cls.list())
+                return cls._load_many(entries_names)
 
             @classmethod
             def year(cls, year):
