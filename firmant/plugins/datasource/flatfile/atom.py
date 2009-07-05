@@ -219,23 +219,8 @@ class FlatfileAtomProvider(AtomProvider):
 
             @classmethod
             def recent(cls):
-                entry_path = os.path.join(settings['FLATFILE_BASE'],
-                                        'entries')
-                if not os.access(entry_path, os.R_OK):
-                    return []
-                years = reversed(sorted(os.listdir(entry_path)))
-                def invalid_year(year):
-                    """Returns False if it cannot be converted to int or
-                    produces an invalid date.  Returns the date object
-                    otherwise."""
-                    try:
-                        year = int(year)
-                        return datetime.date(year, 1, 1)
-                    except ValueError:
-                        return False
-                clean_years = filter(lambda e: e, map(invalid_year, years))
-                return reduce(lambda x, y: x + y,
-                              map(cls._year, clean_years))
+                entries_names = cls.list()
+                return cls._load_many(entries_names)
 
             @classmethod
             def for_feed(cls, feedslug):
