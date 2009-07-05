@@ -15,6 +15,7 @@ from firmant.datasource.atom import AtomProvider, \
                                     EntryPermalinkProvider, \
                                     FeedPermalinkProvider
 from firmant.utils import strptime
+from firmant.utils import uniq_presorted
 
 
 slug_re = re.compile('^[-\\_a-zA-Z0-9]{1,96}$')
@@ -284,6 +285,14 @@ class FlatfileAtomProvider(AtomProvider):
                         if cls._validate(tail, d) is not None:
                             ret.append((d, tail))
                 return [x for x in reversed(sorted(ret))]
+
+            @classmethod
+            def list_years(cls):
+                entries = cls.list()
+                def trunc_year(dt):
+                    return datetime.date(dt.year, 1, 1)
+                years = map(lambda x: trunc_year(x[0]), entries)
+                return uniq_presorted(years)
 
         provider_self.entry = FlatFileEntry
 

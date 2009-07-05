@@ -39,6 +39,20 @@ else:
         struct_time = time.strptime(date_string, format)
         return datetime.datetime(*struct_time[0:6])
 
+def uniq(l):
+    l.sort()
+    uniq_presorted(l)
+
+def uniq_presorted(l):
+    if (len(l) > 0):
+        ret = []
+        ret.append(l[0])
+        for i in range(1, len(l)):
+            if l[i] != l[i - 1]:
+                ret.append(l[i])
+        return ret
+    else:
+        return []
 
 local = Local()
 local_manager = LocalManager([local])
