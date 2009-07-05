@@ -57,7 +57,7 @@ class FlatfileAtomProvider(AtomProvider):
                 return (content_path, meta_path, rights_path, summary_path)
 
             @classmethod
-            def _load_one(cls, slug, date):
+            def _load_one(cls, date, slug):
                 """We assume that slug and date are validated elsehwere"""
 
                 paths = cls._validate(slug, date)
@@ -127,7 +127,7 @@ class FlatfileAtomProvider(AtomProvider):
                 except ValueError:
                     raise
 
-                entry = cls._load_one(slug, dt)
+                entry = cls._load_one(dt, slug)
                 return entry
 
             @classmethod
@@ -152,7 +152,7 @@ class FlatfileAtomProvider(AtomProvider):
                     return []
 
                 slugs = os.listdir(entry_path)
-                return cls._load_many(map(lambda e: (e, dt), slugs))
+                return cls._load_many(map(lambda e: (dt, e), slugs))
 
             @classmethod
             def month(cls, year, month):
@@ -255,7 +255,7 @@ class FlatfileAtomProvider(AtomProvider):
                 def parse(entry):
                     dt = strptime(entry[:10], '%Y,%m,%d').date()
                     slug = entry[11:]
-                    return (slug, dt)
+                    return (dt, slug)
                 parsed_entries = map(parse, cleaned_entries)
                 return cls._load_many(parsed_entries)
 
