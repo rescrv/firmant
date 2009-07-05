@@ -869,6 +869,61 @@ class TestEntry(unittest.TestCase):
 
         self.assertEqual(expected, returned)
 
+    def testList1(self):
+        """firmant.datasource.atom.Entry.list
+        Get the list of entries published."""
+        settings = self.configuration('List1')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = [(datetime.date(2009, 3, 29), 'markdown'),
+                    (datetime.date(2009, 3, 17), 'sample'),
+                    (datetime.date(2009, 2, 17), 'loren-ipsum'),
+                    (datetime.date(2009, 2, 13), 'sample')]
+        returned = entry.list()
+
+        self.assertEqual(expected, returned)
+
+    def testListYears1(self):
+        """firmant.datasource.atom.Entry.list_years
+        Get the list of years for which entries were published."""
+        settings = self.configuration('ListYears1')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = [datetime.date(2009, 1, 1)]
+        returned = entry.list_years()
+
+        self.assertEqual(expected, returned)
+
+    def testListMonths1(self):
+        """firmant.datasource.atom.Entry.list_months
+        Get the list of months for which entries were published."""
+        settings = self.configuration('ListMonths1')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = [datetime.date(2009, 3, 1),
+                    datetime.date(2009, 2, 1)]
+        returned = entry.list_months()
+
+        self.assertEqual(expected, returned)
+
+    def testListDays1(self):
+        """firmant.datasource.atom.Entry.list_days
+        Get the list of days for which entries were published."""
+        settings = self.configuration('Days1')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = [datetime.date(2009, 3, 29),
+                    datetime.date(2009, 3, 17),
+                    datetime.date(2009, 2, 17),
+                    datetime.date(2009, 2, 13)]
+        returned = entry.list_days()
+
+        self.assertEqual(expected, returned)
+
 
 class TestFeed(unittest.TestCase):
 
