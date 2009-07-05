@@ -33,14 +33,15 @@ class FlatfileAtomProvider(AtomProvider):
             provider = provider_self
 
             @classmethod
-            def _load_one(cls, slug, date):
-                """We assume that slug and date are validated elsehwere"""
+            def _validate(cls, slug, date):
+                """Check all files exist.  We assume that slug and date are correct."""
                 entry_path = os.path.join(settings['FLATFILE_BASE'],
                                     'entries',
                                     '%02i' % date.year,
                                     '%02i' % date.month,
                                     '%02i' % date.day,
                                     slug)
+
                 content_path = os.path.join(entry_path, 'content')
                 meta_path    = os.path.join(entry_path, 'meta')
                 rights_path  = os.path.join(entry_path, 'rights')
@@ -51,6 +52,22 @@ class FlatfileAtomProvider(AtomProvider):
                    not os.access(rights_path,  os.R_OK) or \
                    not os.access(summary_path, os.R_OK):
                     return None
+
+                return (content_path, meta_path, rights_path, summary_path)
+
+            @classmethod
+            def _load_one(cls, slug, date):
+                """We assume that slug and date are validated elsehwere"""
+
+                paths = cls._validate(slug, date)
+
+                if paths is None:
+                    return None
+
+                content_path = paths[0]
+                meta_path    = paths[1]
+                rights_path  = paths[2]
+                summary_path = paths[3]
 
                 content_file = open(content_path)
                 meta_file    = open(meta_path)
