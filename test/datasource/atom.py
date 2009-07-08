@@ -1040,10 +1040,10 @@ class TestEntry(unittest.TestCase):
 
         self.assertRaises(raises, function)
 
-    def testRecent(self):
+    def testRecent1(self):
         """firmant.datasource.atom.Entry.recent
         A list of entries should be returned."""
-        settings = self.configuration('Year2')
+        settings = self.configuration('Recent1')
         provider = self.provider(settings)
         entry    = provider.entry
 
