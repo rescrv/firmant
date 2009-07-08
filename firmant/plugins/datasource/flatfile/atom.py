@@ -181,7 +181,7 @@ class FlatfileAtomProvider(AtomProvider):
                 return cls._paginate(entries_names, limit, offset)
 
             @classmethod
-            def year(cls, year):
+            def year(cls, year, limit=None, offset=None):
                 try:
                     year  = int(year)
                     dt = datetime.date(year, 1, 1)
@@ -190,7 +190,7 @@ class FlatfileAtomProvider(AtomProvider):
                 def entry_in_year(entry):
                     return entry[0].year == dt.year
                 entries_names = filter(entry_in_year, cls.list())
-                return cls._load_many(entries_names)
+                return cls._paginate(entries_names, limit, offset)
 
             @classmethod
             def recent(cls):
