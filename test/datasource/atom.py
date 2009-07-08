@@ -780,6 +780,66 @@ class TestEntry(unittest.TestCase):
 
         self.assertRaises(raises, function)
 
+    def testDay4(self):
+        """firmant.datasource.atom.Entry.day
+        Test valid pagination."""
+        settings = self.configuration('Day4')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = ([entries['2009-02-13-sample']], 0)
+        returned = entry.day('2009', '02', '13', limit=1, offset=0)
+
+        self.assertEqual(expected, returned)
+
+    def testDay5(self):
+        """firmant.datasource.atom.Entry.day
+        Test valid pagination."""
+        settings = self.configuration('Day5')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = ([], 1)
+        returned = entry.day('2009', '02', '13', limit=0, offset=0)
+
+        self.assertEqual(expected, returned)
+
+    def testDay6(self):
+        """firmant.datasource.atom.Entry.day
+        Test valid termination of pagination."""
+        settings = self.configuration('Day6')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = (None, 0)
+        returned = entry.day('2009', '02', '13', limit=1, offset=1)
+
+        self.assertEqual(expected, returned)
+
+    def testDay7(self):
+        """firmant.datasource.atom.Entry.day
+        Test that checks exist for sane values of limit/offset."""
+        settings = self.configuration('Day7')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        raises   = ValueError
+        function = lambda: entry.day('2009', '02', '13', limit=0, offset=-1)
+
+        self.assertRaises(raises, function)
+
+    def testDay8(self):
+        """firmant.datasource.atom.Entry.day
+        Test that checks exist for sane values of limit/offset."""
+        settings = self.configuration('Day8')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        raises   = ValueError
+        function = lambda: entry.day('2009', '02', '13', limit=-1, offset=0)
+
+        self.assertRaises(raises, function)
+
     def testMonth1(self):
         """firmant.datasource.atom.Entry.month
         A list of entries for a month for which there are entries."""
