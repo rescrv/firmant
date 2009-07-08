@@ -877,6 +877,66 @@ class TestEntry(unittest.TestCase):
 
         self.assertRaises(raises, function)
 
+    def testMonth4(self):
+        """firmant.datasource.atom.Entry.month
+        Test valid pagination."""
+        settings = self.configuration('Month4')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = ([entries['2009-02-17-loren-ipsum']], 1)
+        returned = entry.month('2009', '02', limit=1, offset=0)
+
+        self.assertEqual(expected, returned)
+
+    def testMonth5(self):
+        """firmant.datasource.atom.Entry.month
+        Test valid pagination."""
+        settings = self.configuration('Month5')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = ([entries['2009-02-13-sample']], 0)
+        returned = entry.month('2009', '02', limit=1, offset=1)
+
+        self.assertEqual(expected, returned)
+
+    def testMonth6(self):
+        """firmant.datasource.atom.Entry.month
+        Test valid pagination."""
+        settings = self.configuration('Month6')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = (None, 0)
+        returned = entry.month('2009', '02', limit=1, offset=2)
+
+        self.assertEqual(expected, returned)
+
+    def testMonth7(self):
+        """firmant.datasource.atom.Entry.month
+        Test that checks exist for sane values of limit/offset."""
+        settings = self.configuration('Month7')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        raises   = ValueError
+        function = lambda: entry.month('2009', '02', limit=0, offset=-1)
+
+        self.assertRaises(raises, function)
+
+    def testMonth8(self):
+        """firmant.datasource.atom.Entry.month
+        Test that checks exist for sane values of limit/offset."""
+        settings = self.configuration('Month8')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        raises   = ValueError
+        function = lambda: entry.month('2009', '02', limit=-1, offset=0)
+
+        self.assertRaises(raises, function)
+
     def testYear1(self):
         """firmant.datasource.atom.Entry.year
         A list of entries should be returned for a year for which there are
