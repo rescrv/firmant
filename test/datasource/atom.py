@@ -600,6 +600,78 @@ class TestEntry(unittest.TestCase):
 
         self.assertEqual(expected, returned)
 
+    def testForFeed3(self):
+        """firmant.datasource.atom.Entry.for_feed
+        When pagination parameters provided, we get different results."""
+        settings = self.configuration('ForFeed3')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = ([entries['2009-02-17-loren-ipsum']], 1)
+        returned = entry.for_feed('general', limit=1, offset=0)
+
+        self.assertEqual(expected, returned)
+
+    def testForFeed4(self):
+        """firmant.datasource.atom.Entry.for_feed
+        If we overrun the end, there is no results, and none remaining."""
+        settings = self.configuration('ForFeed4')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = (None, 0)
+        returned = entry.for_feed('general', limit=1, offset=2)
+
+        self.assertEqual(expected, returned)
+
+    def testForFeed5(self):
+        """firmant.datasource.atom.Entry.for_feed
+        We test the offset for the for_feed method."""
+        settings = self.configuration('ForFeed5')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = ([entries['2009-02-13-sample']], 0)
+        returned = entry.for_feed('general', limit=1, offset=1)
+
+        self.assertEqual(expected, returned)
+
+    def testForFeed6(self):
+        """firmant.datasource.atom.Entry.for_feed
+        Test that a limit of 0 returns a list if the offset is not too high."""
+        settings = self.configuration('ForFeed6')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = ([], 2)
+        returned = entry.for_feed('general', limit=0, offset=0)
+
+        self.assertEqual(expected, returned)
+
+    def testForFeed7(self):
+        """firmant.datasource.atom.Entry.for_feed
+        Test that limit cannot be negative."""
+        settings = self.configuration('ForFeed7')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        raises   = ValueError
+        function = lambda: entry.for_feed('general', limit=-1, offset=0)
+
+        self.assertRaises(raises, function)
+
+    def testForFeed8(self):
+        """firmant.datasource.atom.Entry.for_feed
+        Test that offset cannot be negative."""
+        settings = self.configuration('ForFeed8')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        raises   = ValueError
+        function = lambda: entry.for_feed('general', limit=0, offset=-1)
+
+        self.assertRaises(raises, function)
+
     def testSingle1(self):
         """firmant.datasource.atom.Entry.single
         A valid entry should be returned for the given date."""
