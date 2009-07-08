@@ -193,9 +193,9 @@ class FlatfileAtomProvider(AtomProvider):
                 return cls._paginate(entries_names, limit, offset)
 
             @classmethod
-            def recent(cls):
+            def recent(cls, limit=None, offset=None):
                 entries_names = cls.list()
-                return cls._load_many(entries_names)
+                return cls._paginate(entries_names, limit, offset)
 
             @classmethod
             def for_feed(cls, feedslug, limit=None, offset=None):
