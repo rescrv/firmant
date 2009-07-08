@@ -1055,6 +1055,68 @@ class TestEntry(unittest.TestCase):
 
         self.assertEqual(expected, returned)
 
+    def testRecent2(self):
+        """firmant.datasource.atom.Entry.recent
+        A list of entries should be returned."""
+        settings = self.configuration('Recent2')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = ([entries['2009-03-29-markdown'],
+                    entries['2009-03-17-sample']], 2)
+        returned = entry.recent(limit=2, offset=0)
+
+        self.assertEqual(expected, returned)
+
+    def testRecent3(self):
+        """firmant.datasource.atom.Entry.recent
+        A list of entries should be returned."""
+        settings = self.configuration('Recent3')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = ([entries['2009-02-17-loren-ipsum'],
+                    entries['2009-02-13-sample']], 0)
+        returned = entry.recent(limit=2, offset=2)
+
+        self.assertEqual(expected, returned)
+
+    def testRecent4(self):
+        """firmant.datasource.atom.Entry.recent
+        A list of entries should be returned."""
+        settings = self.configuration('Recent4')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = (None, 0)
+        returned = entry.recent(limit=2, offset=4)
+
+        self.assertEqual(expected, returned)
+
+    def testRecent5(self):
+        """firmant.datasource.atom.Entry.recent
+        Test for sanity checks on offset."""
+        settings = self.configuration('Recent5')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        raises   = ValueError
+        function = lambda: entry.recent(limit=0, offset=-1)
+
+        self.assertRaises(raises, function)
+
+    def testRecent6(self):
+        """firmant.datasource.atom.Entry.recent
+        Test for sanity checks on offset."""
+        settings = self.configuration('Recent6')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        raises   = ValueError
+        function = lambda: entry.recent(limit=-1, offset=0)
+
+        self.assertRaises(raises, function)
+
     def testToXML1(self):
         """firmant.datasource.atom.Entry.to_xml
         Convert entry '2009-02-13-sample' to xml"""
