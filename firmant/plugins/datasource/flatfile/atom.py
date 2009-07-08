@@ -115,6 +115,26 @@ class FlatfileAtomProvider(AtomProvider):
                               map(lambda e: cls._load_one(*e), entries))
 
             @classmethod
+            def _paginate(cls, entry_list, limit, offset):
+                if limit is not None or offset is not None:
+                    if limit is None:
+                        limit = 10
+                    if offset is None:
+                        offset = 0
+                    if limit < 0:
+                        raise ValueError("Cannot have negative limit value.")
+                    if offset < 0:
+                        raise ValueError("Cannot have negative offset value.")
+                    if offset >= len(entry_list):
+                        return (None, 0)
+                    else:
+                        length = len(entry_list) - limit - offset
+                        length = max(length, 0)
+                        sliced_entries = entry_list[offset:limit + offset]
+                        return (cls._load_many(sliced_entries), length)
+                return cls._load_many(entry_list)
+
+            @classmethod
             def single(cls, slug, year, month, day):
                 if provider_self.slug_re.match(slug) == None:
                     raise ValueError("Invalid slug")
@@ -178,7 +198,7 @@ class FlatfileAtomProvider(AtomProvider):
                 return cls._load_many(entries_names)
 
             @classmethod
-            def for_feed(cls, feedslug):
+            def for_feed(cls, feedslug, limit=None, offset=None):
                 if feedslug != '' and \
                    provider_self.slug_re.match(feedslug) == None:
                     raise ValueError("Invalid slug")
@@ -197,7 +217,7 @@ class FlatfileAtomProvider(AtomProvider):
                     slug = entry[11:]
                     return (dt, slug)
                 parsed_entries = map(parse, cleaned_entries)
-                return cls._load_many(parsed_entries)
+                return cls._paginate(parsed_entries, limit, offset)
 
             @property
             def permalink(self):
