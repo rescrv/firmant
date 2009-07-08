@@ -978,6 +978,68 @@ class TestEntry(unittest.TestCase):
 
         self.assertRaises(raises, function)
 
+    def testYear4(self):
+        """firmant.datasource.atom.Entry.year
+        Test valid pagination."""
+        settings = self.configuration('Year4')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = ([entries['2009-03-29-markdown'],
+                    entries['2009-03-17-sample']], 2)
+        returned = entry.year('2009', limit=2, offset=0)
+
+        self.assertEqual(expected, returned)
+
+    def testYear5(self):
+        """firmant.datasource.atom.Entry.year
+        Test valid pagination."""
+        settings = self.configuration('Year5')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = ([entries['2009-02-17-loren-ipsum'],
+                    entries['2009-02-13-sample']], 0)
+        returned = entry.year('2009', limit=2, offset=2)
+
+        self.assertEqual(expected, returned)
+
+    def testYear6(self):
+        """firmant.datasource.atom.Entry.year
+        Test valid pagination."""
+        settings = self.configuration('Year6')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        expected = (None, 0)
+        returned = entry.year('2009', limit=2, offset=4)
+
+        self.assertEqual(expected, returned)
+
+    def testYear7(self):
+        """firmant.datasource.atom.Entry.year
+        Test for sanity checks on limit."""
+        settings = self.configuration('Year7')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        raises   = ValueError
+        function = lambda: entry.year('2009', limit=-1, offset=0)
+
+        self.assertRaises(raises, function)
+
+    def testYear8(self):
+        """firmant.datasource.atom.Entry.year
+        Test for sanity checks on offset."""
+        settings = self.configuration('Year8')
+        provider = self.provider(settings)
+        entry    = provider.entry
+
+        raises   = ValueError
+        function = lambda: entry.year('2009', limit=0, offset=-1)
+
+        self.assertRaises(raises, function)
+
     def testRecent(self):
         """firmant.datasource.atom.Entry.recent
         A list of entries should be returned."""
