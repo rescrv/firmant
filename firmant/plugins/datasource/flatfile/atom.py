@@ -151,7 +151,7 @@ class FlatfileAtomProvider(AtomProvider):
                 return entry
 
             @classmethod
-            def day(cls, year, month, day):
+            def day(cls, year, month, day, limit=None, offset=None):
                 try:
                     year  = int(year)
                     month = int(month)
@@ -164,7 +164,7 @@ class FlatfileAtomProvider(AtomProvider):
                            entry[0].month == dt.month and \
                            entry[0].day == dt.day
                 entries_names = filter(entry_in_day, cls.list())
-                return cls._load_many(entries_names)
+                return cls._paginate(entries_names, limit, offset)
 
             @classmethod
             def month(cls, year, month):
