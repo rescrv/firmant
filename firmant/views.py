@@ -20,15 +20,17 @@ class ViewProvider(object):
 
     @property
     def url_map(self):
-        objects = map(lambda obj: obj(self.rc, self.settings), self.enabled)
+        rc = self.rc()
+        objects = map(lambda obj: rc.get(obj), self.enabled)
         rules_l = reduce(lambda x, y: x + y.rules, objects, [])
         return Map(rules_l)
 
     def get_class(self, klass):
+        rc = self.rc()
         potential = filter(lambda c: str(c)[8:-2] == klass, self.enabled)
         if len(potential) < 1:
             return None
-        return potential[0](self.rc, self.settings)
+        return rc.get(potential[0])
 
 
 class CatchallProvider(ViewProvider):

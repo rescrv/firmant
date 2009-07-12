@@ -1,3 +1,4 @@
+import weakref
 from werkzeug import Request, \
                      SharedDataMiddleware, \
                      ClosingIterator
@@ -17,12 +18,13 @@ class RequestContext(object):
     def __init__(self, settings):
         self.settings = settings
         self.objects = {}
+        self.weakref = weakref.ref(self)
 
     def get(self, cls):
         try:
             return self.objects[cls]
         except KeyError:
-            self.objects[cls] = cls(self, self.settings)
+            self.objects[cls] = cls(self.weakref, self.settings)
             return self.objects[cls]
 
     def set(self, cls, value):
