@@ -31,7 +31,8 @@ class Jinja2EntryPermalinkProvier(EntryPermalinkProvider):
 
 class Jinja2FrontendViewProvider(ViewProvider):
 
-    def __init__(self, settings):
+    def __init__(self, rc, settings):
+        self.rc = rc
         self.settings = settings
         self.ap = AtomProvider(settings)
         self.fp = FilterProvider(settings)

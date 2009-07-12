@@ -8,7 +8,8 @@ class ViewProvider(object):
 
     __metaclass__ = PluginMount
 
-    def __init__(self, settings):
+    def __init__(self, rc, settings):
+        self.rc = rc
         self.settings = settings
 
     @property
@@ -19,7 +20,7 @@ class ViewProvider(object):
 
     @property
     def url_map(self):
-        objects = map(lambda obj: obj(self.settings), self.enabled)
+        objects = map(lambda obj: obj(self.rc, self.settings), self.enabled)
         rules_l = reduce(lambda x, y: x + y.rules, objects, [])
         return Map(rules_l)
 
@@ -27,7 +28,7 @@ class ViewProvider(object):
         potential = filter(lambda c: str(c)[8:-2] == klass, self.enabled)
         if len(potential) < 1:
             return None
-        return potential[0](self.settings)
+        return potential[0](self.rc, self.settings)
 
 
 class CatchallProvider(ViewProvider):

@@ -10,7 +10,8 @@ from firmant.views import ViewProvider
 
 class TxtFrontendViewProvider(ViewProvider):
 
-    def __init__(self, settings):
+    def __init__(self, rc, settings):
+        self.rc = rc
         self.settings = settings
         self.ap = AtomProvider(settings)
 

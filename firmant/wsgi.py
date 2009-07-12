@@ -10,26 +10,49 @@ from firmant.utils import local
 from firmant.utils import local_manager
 
 
+class RequestContext(object):
+
+    default = 'default'
+
+    def __init__(self, settings):
+        self.settings = settings
+        self.objects = {}
+
+    def get(self, cls):
+        try:
+            return self.objects[cls]
+        except KeyError:
+            self.objects[cls] = cls(self, self.settings)
+            return self.objects[cls]
+
+    def set(self, cls, value):
+        self.objects[cls] = value
+
+
 class Application(object):
 
     def __init__(self, settings):
         for plugin in settings['PLUGINS']:
             get_module(plugin)
         self.settings = settings
-        self.vp       = ViewProvider(settings)
-        self.url_map  = self.vp.url_map
-        self.views    = {}
+
         if settings.get('MEDIA_FS_PATH', None) != None:
             self.dispatch = SharedDataMiddleware(self.dispatch,
                      {settings['MEDIA_URL_PATH']: settings['MEDIA_FS_PATH']})
 
     def dispatch(self, environ, start_response):
-        local.urls = urls = self.url_map.bind_to_environ(environ)
+        rc = RequestContext(self.settings)
         request = Request(environ)
+        rc.set(Request, request)
+
+        vp = rc.get(ViewProvider)
+        url_map = vp.url_map
+
+        local.urls = urls = url_map.bind_to_environ(environ)
         try:
             endpoint, args = urls.match()
             klass, func = tuple(endpoint.rsplit('.', 1))
-            klass = self.vp.get_class(klass)
+            klass = vp.get_class(klass)
             if not hasattr(klass, func):
                 raise InternalServerError()
             func = getattr(klass, func)
