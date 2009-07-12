@@ -62,7 +62,7 @@ class AtomFeedViewProvider(ViewProvider):
 
     def common(self, request, feed):
         rc = self.rc()
-        fp = FilterProvider(self.settings)
+        fp = rc.get(FilterProvider)
         def filter(content):
             open_div = '<div xmlns="http://www.w3.org/1999/xhtml">'
             close_div = '</div>'

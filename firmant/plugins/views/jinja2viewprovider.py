@@ -32,9 +32,7 @@ class Jinja2EntryPermalinkProvier(EntryPermalinkProvider):
 class Jinja2FrontendViewProvider(ViewProvider):
 
     def __init__(self, rc, settings):
-        self.rc = rc
-        self.settings = settings
-        self.fp = FilterProvider(settings)
+        super(Jinja2FrontendViewProvider, self).__init__(rc, settings)
         loader = FileSystemLoader(settings['JINJA2_TEMPLATE_DIR'])
         self.env = Environment(loader=loader)
         self.env.globals['MEDIA_PATH'] = settings['MEDIA_URL_PATH']
@@ -129,8 +127,10 @@ class Jinja2FrontendViewProvider(ViewProvider):
         return self.render_response(template, context)
 
     def XHTML_filter(self, entry):
-        entry.summary = self.fp.filter('XHTML', entry.summary)
-        entry.content = self.fp.filter('XHTML', entry.content)
+        rc = self.rc()
+        fp = rc.get(FilterProvider)
+        entry.summary = fp.filter('XHTML', entry.summary)
+        entry.content = fp.filter('XHTML', entry.content)
         return entry
 
     def render_response(self, template, context):

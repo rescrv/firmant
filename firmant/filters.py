@@ -4,12 +4,13 @@ from firmant.plugins import PluginMount
 class FilterProvider(object):
     __metaclass__ = PluginMount
 
-    def __init__(self, settings):
+    def __init__(self, rc, settings):
+        self.rc = rc
         self.settings = settings
 
     def filter(self, slot, content):
-        plugins = map(lambda obj: obj(self.settings), self.plugins)
-        providers = filter(lambda x: x.provides(slot), plugins)
+        rc = self.rc()
+        providers = filter(lambda o: rc.get(o).provides(slot), self.plugins)
         if len(providers):
-            return providers[0].filter(slot, content)
+            return rc.get(providers[0]).filter(slot, content)
         raise RuntimeError("No filter defines slot '%s'" % slot)

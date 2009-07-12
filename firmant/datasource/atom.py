@@ -8,7 +8,6 @@ import pytz
 from firmant.plugins import PluginMount
 from firmant.utils import not_implemented
 from firmant.constants import isoformat
-from firmant.filters import FilterProvider
 from firmant.utils import xml, \
                           RFC3339, \
                           strptime
