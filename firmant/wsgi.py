@@ -1,14 +1,11 @@
 import weakref
 from werkzeug import Request, \
-                     SharedDataMiddleware, \
-                     ClosingIterator
+                     SharedDataMiddleware
 from werkzeug.exceptions import HTTPException, \
                                 InternalServerError
 
 from firmant.views import ViewProvider
 from firmant.utils import get_module
-from firmant.utils import local
-from firmant.utils import local_manager
 
 
 class RequestContext(object):
@@ -50,7 +47,8 @@ class Application(object):
         vp = rc.get(ViewProvider)
         url_map = vp.url_map
 
-        local.urls = urls = url_map.bind_to_environ(environ)
+        urls = url_map.bind_to_environ(environ)
+        rc.set('urls', urls)
         try:
             endpoint, args = urls.match()
             klass, func = tuple(endpoint.rsplit('.', 1))
@@ -63,8 +61,7 @@ class Application(object):
             response = func(request, **args)
         except HTTPException, e:
             return e(environ, start_response)
-        return ClosingIterator(response(environ, start_response),
-                [local_manager.cleanup])
+        return response(environ, start_response)
 
     def __call__(self, environ, start_response):
         return self.dispatch(environ, start_response)

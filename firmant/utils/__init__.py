@@ -1,5 +1,3 @@
-from werkzeug import Local
-from werkzeug import LocalManager
 import datetime
 import time
 
@@ -53,6 +51,3 @@ def uniq_presorted(l):
         return ret
     else:
         return []
-
-local = Local()
-local_manager = LocalManager([local])

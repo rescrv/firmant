@@ -10,7 +10,6 @@ from firmant.datasource.atom import AtomProvider
 from firmant.datasource.atom import EntryPermalinkProvider
 from firmant.views import ViewProvider
 from firmant.filters import FilterProvider
-from firmant.utils import local
 
 
 class Jinja2EntryPermalinkProvier(EntryPermalinkProvider):
@@ -27,7 +26,8 @@ class Jinja2EntryPermalinkProvier(EntryPermalinkProvider):
         values['day']   = entry.published.day
         values['slug']  = entry.slug
 
-        return local.urls.build(endpoint, values, force_external=True)
+        urls = self.rc().get('urls')
+        return urls.build(endpoint, values, force_external=True)
 
 
 class Jinja2FrontendViewProvider(ViewProvider):

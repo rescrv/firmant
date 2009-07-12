@@ -8,7 +8,6 @@ from firmant.datasource.atom import FeedPermalinkProvider
 from firmant.views import ViewProvider
 from firmant.filters import FilterProvider
 from firmant.utils import xml
-from firmant.utils import local
 
 
 class AtomFeedPermalinkProvier(FeedPermalinkProvider):
@@ -26,7 +25,8 @@ class AtomFeedPermalinkProvier(FeedPermalinkProvider):
             endpoint += 'named'
             values['slug']  = feed.slug
 
-        return local.urls.build(endpoint, values, force_external=True)
+        urls = self.rc().get('urls')
+        return urls.build(endpoint, values, force_external=True)
 
 
 class AtomFeedViewProvider(ViewProvider):
