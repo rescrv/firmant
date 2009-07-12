@@ -373,7 +373,7 @@ class FlatfileAtomProvider(AtomProvider):
         provider_self.category = FlatFileCategory
 
         provider_self.entry_permalink = \
-                EntryPermalinkProvider(settings).authoritative
+                rc().get(EntryPermalinkProvider).authoritative
 
         provider_self.feed_permalink = \
-                FeedPermalinkProvider(settings).authoritative
+                rc().get(FeedPermalinkProvider).authoritative

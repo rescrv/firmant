@@ -334,10 +334,10 @@ class EntryPermalinkProvider(object):
 
     __metaclass__ = PluginMount
 
-    def __init__(self, settings):
+    def __init__(self, rc, settings):
         self._provider = select_canonical_plugin(self.plugins,
                                                  settings,
-                                                 'ENTRY_PERMALINK')(settings)
+                                                 'ENTRY_PERMALINK')(rc, settings)
 
     def authoritative(self, entry):
         return self._provider.authoritative(entry)
@@ -347,10 +347,10 @@ class FeedPermalinkProvider(object):
 
     __metaclass__ = PluginMount
 
-    def __init__(self, settings):
+    def __init__(self, rc, settings):
         self._provider = select_canonical_plugin(self.plugins,
                                                  settings,
-                                                 'FEED_PERMALINK')(settings)
+                                                 'FEED_PERMALINK')(rc, settings)
 
     def authoritative(self, feed):
         return self._provider.authoritative(feed)

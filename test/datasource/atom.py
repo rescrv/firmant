@@ -1288,7 +1288,8 @@ class TestFeed(unittest.TestCase):
 
 class DummyEntryPermalinkProvider(EntryPermalinkProvider):
 
-    def __init__(self, settings):
+    def __init__(self, rc, settings):
+        self.rc = rc
         self.settings = settings
 
     def authoritative(self, entry):
@@ -1297,7 +1298,8 @@ class DummyEntryPermalinkProvider(EntryPermalinkProvider):
 
 class DummyFeedPermalinkProvider(FeedPermalinkProvider):
 
-    def __init__(self, settings):
+    def __init__(self, rc, settings):
+        self.rc = rc
         self.settings = settings
 
     def authoritative(self, entry):

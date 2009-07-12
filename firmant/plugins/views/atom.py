@@ -13,7 +13,8 @@ from firmant.utils import local
 
 class AtomFeedPermalinkProvier(FeedPermalinkProvider):
 
-    def __init__(self, settings):
+    def __init__(self, rc, settings):
+        self.rc = rc
         self.settings = settings
 
     def authoritative(self, feed):

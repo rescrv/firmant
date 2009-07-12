@@ -15,7 +15,8 @@ from firmant.utils import local
 
 class Jinja2EntryPermalinkProvier(EntryPermalinkProvider):
 
-    def __init__(self, settings):
+    def __init__(self, rc, settings):
+        self.rc = rc
         self.settings = settings
 
     def authoritative(self, entry):
