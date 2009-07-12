@@ -30,12 +30,6 @@ class AtomFeedPermalinkProvier(FeedPermalinkProvider):
 
 class AtomFeedViewProvider(ViewProvider):
 
-    def __init__(self, rc, settings):
-        self.rc = rc
-        self.settings = settings
-        self.ap = AtomProvider(settings)
-        self.fp = FilterProvider(settings)
-
     @property
     def rules(self):
         name = __name__ + '.AtomFeedViewProvider.'
@@ -50,11 +44,15 @@ class AtomFeedViewProvider(ViewProvider):
             return url_rules
 
     def default(self, request):
-        return self.common(request, self.ap.feed.default())
+        rc = self.rc()
+        ap = rc.get(AtomProvider)
+        return self.common(request, ap.feed.default())
 
     def named(self, request, slug):
+        rc = self.rc()
+        ap = rc.get(AtomProvider)
         try:
-            feed = self.ap.feed.by_slug(slug)
+            feed = ap.feed.by_slug(slug)
         except ValueError:
             feed = None
         if feed is None:
@@ -63,10 +61,12 @@ class AtomFeedViewProvider(ViewProvider):
         return self.common(request, feed)
 
     def common(self, request, feed):
+        rc = self.rc()
+        fp = FilterProvider(self.settings)
         def filter(content):
             open_div = '<div xmlns="http://www.w3.org/1999/xhtml">'
             close_div = '</div>'
-            filtered_content = self.fp.filter('XHTML', content)
+            filtered_content = fp.filter('XHTML', content)
             return xml.etree.fromstring(open_div + filtered_content + close_div)
         content = xml.etree.tostring(feed.to_xml(filter))
         return Response(content, mimetype='application/atom+xml')

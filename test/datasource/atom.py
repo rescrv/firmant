@@ -442,46 +442,43 @@ class TestAtomObjectListFilter(unittest.TestCase):
 class TestAuthor(unittest.TestCase):
 
     def setUp(self):
-        """The setup function should alias the AtomProvider class to
-        self.provider so that the test functions can access it.  It also must
-        setup whatever data is necessary for the test cases to run."""
+        """Setup all data necessary for test case."""
         not_implemented()
 
-    def configuration(self, name):
-        """This function should return the settings associated with test
-        'name'"""
+    def get_provider(self, name):
+        """This function should return the AtomProvider for the test."""
         not_implemented()
 
     def testByName1(self):
         """firmant.datasource.atom.Author.by_name
         Load a valid atom Author object using the by_name function"""
-        settings = self.configuration('ByName1')
+        provider = self.get_provider('ByName1')
+
         expected = authors['Robert Escriva']
+        returned = provider.author.by_name('Robert Escriva')
 
-        provider = self.provider(settings)
-        author   = provider.author
-
-        self.assertEqual(expected, author.by_name('Robert Escriva'))
+        self.assertEqual(expected, returned)
 
     def testByName2(self):
         """firmant.datasource.atom.Author.by_name
         No such Author object using the by_name function"""
-        settings = self.configuration('ByName2')
+        provider = self.get_provider('ByName2')
+
         expected = None
+        returned = provider.author.by_name('Jane Doe')
 
-        provider = self.provider(settings)
-        author   = provider.author
-
-        self.assertEqual(expected, author.by_name('Jane Doe'))
+        self.assertEqual(expected, returned)
 
     def testToXML1(self):
         """firmant.datasource.atom.Author.to_xml
         Convert author 'Robert Escriva' to xml"""
-        settings = self.configuration('ToXML1')
+        provider = self.get_provider('ToXML1')
+
         author   = xml.etree.Element('author')
         xml.add_text_subelement(author, 'name', 'Robert Escriva')
         xml.add_text_subelement(author, 'uri', 'http://robescriva.com')
         xml.add_text_subelement(author, 'email', 'rob@example.org')
+
         expected = xml.etree.tostring(author)
         returned = xml.etree.tostring(authors['Robert Escriva'].to_xml())
 
@@ -490,11 +487,13 @@ class TestAuthor(unittest.TestCase):
     def testToXML2(self):
         """firmant.datasource.atom.Author.to_xml
         Convert author 'Loren Ipsum Generator' to xml"""
-        settings = self.configuration('ToXML2')
+        provider = self.get_provider('ToXML2')
+
         author   = xml.etree.Element('author')
         xml.add_text_subelement(author, 'name', 'Loren Ipsum Generator')
         xml.add_text_subelement(author, 'uri', 'http://www.lipsum.com')
         xml.add_text_subelement(author, 'email', 'lipsum@example.org')
+
         expected = xml.etree.tostring(author)
         returned = xml.etree.tostring(authors['Loren Ipsum Generator'].to_xml())
 
@@ -509,40 +508,39 @@ class TestCategory(unittest.TestCase):
         setup whatever data is necessary for the test cases to run."""
         not_implemented()
 
-    def configuration(self, name):
-        """This function should return the settings associated with test
-        'name'"""
+    def get_provider(self, name):
+        """This function should return the AtomProvider for the test."""
         not_implemented()
 
     def testByTerm1(self):
         """firmant.datasource.atom.Category.by_term
         Load a valid atom Category object using the by_term function"""
-        settings = self.configuration('ByTerm1')
+        provider = self.get_provider('ByTerm1')
+
         expected = categories['General']
+        returned = provider.category.by_term('General')
 
-        provider = self.provider(settings)
-        category = provider.category
-
-        self.assertEqual(expected, category.by_term('General'))
+        self.assertEqual(expected, returned)
 
     def testByTerm2(self):
         """firmant.datasource.atom.Category.by_term
         No such Category object using the by_term function"""
-        settings = self.configuration('ByTerm2')
+        provider = self.get_provider('ByTerm2')
+
         expected = None
+        returned = provider.category.by_term('NOEXIST')
 
-        provider = self.provider(settings)
-        category = provider.category
-
-        self.assertEqual(expected, category.by_term('NOEXIST'))
+        self.assertEqual(expected, returned)
 
     def testToXML1(self):
         """firmant.datasource.atom.Category.to_xml
         Convert category 'General' to xml"""
-        settings = self.configuration('ToXML1')
+        provider = self.get_provider('ToXML1')
+
         category = xml.etree.Element('category')
         category.set('term', 'General')
         category.set('label', 'All topics')
+
         expected = xml.etree.tostring(category)
         returned = xml.etree.tostring(categories['General'].to_xml())
 
@@ -551,11 +549,12 @@ class TestCategory(unittest.TestCase):
     def testToXML2(self):
         """firmant.datasource.atom.Category.to_xml
         Convert category 'Generated' to xml"""
-        settings = self.configuration('ToXML2')
-        settings = self.configuration('ToXML1')
+        provider = self.get_provider('ToXML2')
+
         category = xml.etree.Element('category')
         category.set('term', 'Generated')
         category.set('label', 'You can\'t tell a computer wrote it.')
+
         expected = xml.etree.tostring(category)
         returned = xml.etree.tostring(categories['Generated'].to_xml())
 
@@ -570,16 +569,14 @@ class TestEntry(unittest.TestCase):
         setup whatever data is necessary for the test cases to run."""
         not_implemented()
 
-    def configuration(self, name):
-        """This function should return the settings associated with test
-        'name'"""
+    def get_provider(self, name):
+        """This function should return the AtomProvider for the test."""
         not_implemented()
 
     def testForFeed1(self):
         """firmant.datasource.atom.Entry.for_feed
         The entries associated with a valid feed should be returned."""
-        settings = self.configuration('ForFeed1')
-        provider = self.provider(settings)
+        provider = self.get_provider('ForFeed1')
         entry    = provider.entry
 
         expected = [entries['2009-02-17-loren-ipsum'],
@@ -591,8 +588,7 @@ class TestEntry(unittest.TestCase):
     def testForFeed2(self):
         """firmant.datasource.atom.Entry.for_feed
         None should be returned for an invalid feed."""
-        settings = self.configuration('ForFeed2')
-        provider = self.provider(settings)
+        provider = self.get_provider('ForFeed2')
         entry    = provider.entry
 
         expected = None
@@ -603,8 +599,7 @@ class TestEntry(unittest.TestCase):
     def testForFeed3(self):
         """firmant.datasource.atom.Entry.for_feed
         When pagination parameters provided, we get different results."""
-        settings = self.configuration('ForFeed3')
-        provider = self.provider(settings)
+        provider = self.get_provider('ForFeed3')
         entry    = provider.entry
 
         expected = ([entries['2009-02-17-loren-ipsum']], 1)
@@ -615,8 +610,7 @@ class TestEntry(unittest.TestCase):
     def testForFeed4(self):
         """firmant.datasource.atom.Entry.for_feed
         If we overrun the end, there is no results, and none remaining."""
-        settings = self.configuration('ForFeed4')
-        provider = self.provider(settings)
+        provider = self.get_provider('ForFeed4')
         entry    = provider.entry
 
         expected = (None, 0)
@@ -627,8 +621,7 @@ class TestEntry(unittest.TestCase):
     def testForFeed5(self):
         """firmant.datasource.atom.Entry.for_feed
         We test the offset for the for_feed method."""
-        settings = self.configuration('ForFeed5')
-        provider = self.provider(settings)
+        provider = self.get_provider('ForFeed5')
         entry    = provider.entry
 
         expected = ([entries['2009-02-13-sample']], 0)
@@ -639,8 +632,7 @@ class TestEntry(unittest.TestCase):
     def testForFeed6(self):
         """firmant.datasource.atom.Entry.for_feed
         Test that a limit of 0 returns a list if the offset is not too high."""
-        settings = self.configuration('ForFeed6')
-        provider = self.provider(settings)
+        provider = self.get_provider('ForFeed6')
         entry    = provider.entry
 
         expected = ([], 2)
@@ -651,8 +643,7 @@ class TestEntry(unittest.TestCase):
     def testForFeed7(self):
         """firmant.datasource.atom.Entry.for_feed
         Test that limit cannot be negative."""
-        settings = self.configuration('ForFeed7')
-        provider = self.provider(settings)
+        provider = self.get_provider('ForFeed7')
         entry    = provider.entry
 
         raises   = ValueError
@@ -663,8 +654,7 @@ class TestEntry(unittest.TestCase):
     def testForFeed8(self):
         """firmant.datasource.atom.Entry.for_feed
         Test that offset cannot be negative."""
-        settings = self.configuration('ForFeed8')
-        provider = self.provider(settings)
+        provider = self.get_provider('ForFeed8')
         entry    = provider.entry
 
         raises   = ValueError
@@ -675,8 +665,7 @@ class TestEntry(unittest.TestCase):
     def testSingle1(self):
         """firmant.datasource.atom.Entry.single
         A valid entry should be returned for the given date."""
-        settings = self.configuration('Single1')
-        provider = self.provider(settings)
+        provider = self.get_provider('Single1')
         entry    = provider.entry
 
         expected = entries['2009-02-13-sample']
@@ -687,8 +676,7 @@ class TestEntry(unittest.TestCase):
     def testSingle2(self):
         """firmant.datasource.atom.Entry.single
         A valid entry should be returned for the given date."""
-        settings = self.configuration('Single2')
-        provider = self.provider(settings)
+        provider = self.get_provider('Single2')
         entry    = provider.entry
 
         expected = entries['2009-02-17-loren-ipsum']
@@ -699,8 +687,7 @@ class TestEntry(unittest.TestCase):
     def testSingle3(self):
         """firmant.datasource.atom.Entry.single
         None should be returned for a non-existent entry."""
-        settings = self.configuration('Single3')
-        provider = self.provider(settings)
+        provider = self.get_provider('Single3')
         entry    = provider.entry
 
         expected = None
@@ -711,8 +698,7 @@ class TestEntry(unittest.TestCase):
     def testSingle4(self):
         """firmant.datasource.atom.Entry.single
         A ValueError should be raised for invalid slug."""
-        settings = self.configuration('Single4')
-        provider = self.provider(settings)
+        provider = self.get_provider('Single4')
         entry    = provider.entry
 
         raises   = ValueError
@@ -723,8 +709,7 @@ class TestEntry(unittest.TestCase):
     def testSingle5(self):
         """firmant.datasource.atom.Entry.single
         A ValueError should be raised for invalid datetime."""
-        settings = self.configuration('Single5')
-        provider = self.provider(settings)
+        provider = self.get_provider('Single5')
         entry    = provider.entry
 
         raises   = ValueError
@@ -735,8 +720,7 @@ class TestEntry(unittest.TestCase):
     def testSingle6(self):
         """firmant.datasource.atom.Entry.single
         A ValueError should be raised for invalid datetime."""
-        settings = self.configuration('Single6')
-        provider = self.provider(settings)
+        provider = self.get_provider('Single6')
         entry    = provider.entry
 
         raises   = ValueError
@@ -747,8 +731,7 @@ class TestEntry(unittest.TestCase):
     def testDay1(self):
         """firmant.datasource.atom.Entry.day
         A valid list of entries for a given day should be returned."""
-        settings = self.configuration('Day1')
-        provider = self.provider(settings)
+        provider = self.get_provider('Day1')
         entry    = provider.entry
 
         expected = [entries['2009-02-13-sample']]
@@ -759,8 +742,7 @@ class TestEntry(unittest.TestCase):
     def testDay2(self):
         """firmant.datasource.atom.Entry.day
         An empty list for a day for which there are no entries."""
-        settings = self.configuration('Day2')
-        provider = self.provider(settings)
+        provider = self.get_provider('Day2')
         entry    = provider.entry
 
         expected = []
@@ -771,8 +753,7 @@ class TestEntry(unittest.TestCase):
     def testDay3(self):
         """firmant.datasource.atom.Entry.day
         A ValueError should be raised for an invalid date."""
-        settings = self.configuration('Day3')
-        provider = self.provider(settings)
+        provider = self.get_provider('Day3')
         entry    = provider.entry
 
         raises   = ValueError
@@ -783,8 +764,7 @@ class TestEntry(unittest.TestCase):
     def testDay4(self):
         """firmant.datasource.atom.Entry.day
         Test valid pagination."""
-        settings = self.configuration('Day4')
-        provider = self.provider(settings)
+        provider = self.get_provider('Day4')
         entry    = provider.entry
 
         expected = ([entries['2009-02-13-sample']], 0)
@@ -795,8 +775,7 @@ class TestEntry(unittest.TestCase):
     def testDay5(self):
         """firmant.datasource.atom.Entry.day
         Test valid pagination."""
-        settings = self.configuration('Day5')
-        provider = self.provider(settings)
+        provider = self.get_provider('Day5')
         entry    = provider.entry
 
         expected = ([], 1)
@@ -807,8 +786,7 @@ class TestEntry(unittest.TestCase):
     def testDay6(self):
         """firmant.datasource.atom.Entry.day
         Test valid termination of pagination."""
-        settings = self.configuration('Day6')
-        provider = self.provider(settings)
+        provider = self.get_provider('Day6')
         entry    = provider.entry
 
         expected = (None, 0)
@@ -819,8 +797,7 @@ class TestEntry(unittest.TestCase):
     def testDay7(self):
         """firmant.datasource.atom.Entry.day
         Test that checks exist for sane values of limit/offset."""
-        settings = self.configuration('Day7')
-        provider = self.provider(settings)
+        provider = self.get_provider('Day7')
         entry    = provider.entry
 
         raises   = ValueError
@@ -831,8 +808,7 @@ class TestEntry(unittest.TestCase):
     def testDay8(self):
         """firmant.datasource.atom.Entry.day
         Test that checks exist for sane values of limit/offset."""
-        settings = self.configuration('Day8')
-        provider = self.provider(settings)
+        provider = self.get_provider('Day8')
         entry    = provider.entry
 
         raises   = ValueError
@@ -843,8 +819,7 @@ class TestEntry(unittest.TestCase):
     def testMonth1(self):
         """firmant.datasource.atom.Entry.month
         A list of entries for a month for which there are entries."""
-        settings = self.configuration('Month1')
-        provider = self.provider(settings)
+        provider = self.get_provider('Month1')
         entry    = provider.entry
 
         expected = [entries['2009-02-17-loren-ipsum'],
@@ -856,8 +831,7 @@ class TestEntry(unittest.TestCase):
     def testMonth2(self):
         """firmant.datasource.atom.Entry.month
         An empty list for a month for which there are no entries."""
-        settings = self.configuration('Month2')
-        provider = self.provider(settings)
+        provider = self.get_provider('Month2')
         entry    = provider.entry
 
         expected = []
@@ -868,8 +842,7 @@ class TestEntry(unittest.TestCase):
     def testMonth3(self):
         """firmant.datasource.atom.Entry.month
         A ValueError should be raised for an invalid date."""
-        settings = self.configuration('Month3')
-        provider = self.provider(settings)
+        provider = self.get_provider('Month3')
         entry    = provider.entry
 
         raises   = ValueError
@@ -880,8 +853,7 @@ class TestEntry(unittest.TestCase):
     def testMonth4(self):
         """firmant.datasource.atom.Entry.month
         Test valid pagination."""
-        settings = self.configuration('Month4')
-        provider = self.provider(settings)
+        provider = self.get_provider('Month4')
         entry    = provider.entry
 
         expected = ([entries['2009-02-17-loren-ipsum']], 1)
@@ -892,8 +864,7 @@ class TestEntry(unittest.TestCase):
     def testMonth5(self):
         """firmant.datasource.atom.Entry.month
         Test valid pagination."""
-        settings = self.configuration('Month5')
-        provider = self.provider(settings)
+        provider = self.get_provider('Month5')
         entry    = provider.entry
 
         expected = ([entries['2009-02-13-sample']], 0)
@@ -904,8 +875,7 @@ class TestEntry(unittest.TestCase):
     def testMonth6(self):
         """firmant.datasource.atom.Entry.month
         Test valid pagination."""
-        settings = self.configuration('Month6')
-        provider = self.provider(settings)
+        provider = self.get_provider('Month6')
         entry    = provider.entry
 
         expected = (None, 0)
@@ -916,8 +886,7 @@ class TestEntry(unittest.TestCase):
     def testMonth7(self):
         """firmant.datasource.atom.Entry.month
         Test that checks exist for sane values of limit/offset."""
-        settings = self.configuration('Month7')
-        provider = self.provider(settings)
+        provider = self.get_provider('Month7')
         entry    = provider.entry
 
         raises   = ValueError
@@ -928,8 +897,7 @@ class TestEntry(unittest.TestCase):
     def testMonth8(self):
         """firmant.datasource.atom.Entry.month
         Test that checks exist for sane values of limit/offset."""
-        settings = self.configuration('Month8')
-        provider = self.provider(settings)
+        provider = self.get_provider('Month8')
         entry    = provider.entry
 
         raises   = ValueError
@@ -941,8 +909,7 @@ class TestEntry(unittest.TestCase):
         """firmant.datasource.atom.Entry.year
         A list of entries should be returned for a year for which there are
         entries."""
-        settings = self.configuration('Year1')
-        provider = self.provider(settings)
+        provider = self.get_provider('Year1')
         entry    = provider.entry
 
         expected = [entries['2009-03-29-markdown'],
@@ -957,8 +924,7 @@ class TestEntry(unittest.TestCase):
         """firmant.datasource.atom.Entry.year
         An empty list of entries should be returned for a year for which there
         are no entries."""
-        settings = self.configuration('Year2')
-        provider = self.provider(settings)
+        provider = self.get_provider('Year2')
         entry    = provider.entry
 
         expected = []
@@ -969,8 +935,7 @@ class TestEntry(unittest.TestCase):
     def testYear3(self):
         """firmant.datasource.atom.Entry.year
         A ValueError should be raised for an invalid date."""
-        settings = self.configuration('Month3')
-        provider = self.provider(settings)
+        provider = self.get_provider('Month3')
         entry    = provider.entry
 
         raises   = ValueError
@@ -981,8 +946,7 @@ class TestEntry(unittest.TestCase):
     def testYear4(self):
         """firmant.datasource.atom.Entry.year
         Test valid pagination."""
-        settings = self.configuration('Year4')
-        provider = self.provider(settings)
+        provider = self.get_provider('Year4')
         entry    = provider.entry
 
         expected = ([entries['2009-03-29-markdown'],
@@ -994,8 +958,7 @@ class TestEntry(unittest.TestCase):
     def testYear5(self):
         """firmant.datasource.atom.Entry.year
         Test valid pagination."""
-        settings = self.configuration('Year5')
-        provider = self.provider(settings)
+        provider = self.get_provider('Year5')
         entry    = provider.entry
 
         expected = ([entries['2009-02-17-loren-ipsum'],
@@ -1007,8 +970,7 @@ class TestEntry(unittest.TestCase):
     def testYear6(self):
         """firmant.datasource.atom.Entry.year
         Test valid pagination."""
-        settings = self.configuration('Year6')
-        provider = self.provider(settings)
+        provider = self.get_provider('Year6')
         entry    = provider.entry
 
         expected = (None, 0)
@@ -1019,8 +981,7 @@ class TestEntry(unittest.TestCase):
     def testYear7(self):
         """firmant.datasource.atom.Entry.year
         Test for sanity checks on limit."""
-        settings = self.configuration('Year7')
-        provider = self.provider(settings)
+        provider = self.get_provider('Year7')
         entry    = provider.entry
 
         raises   = ValueError
@@ -1031,8 +992,7 @@ class TestEntry(unittest.TestCase):
     def testYear8(self):
         """firmant.datasource.atom.Entry.year
         Test for sanity checks on offset."""
-        settings = self.configuration('Year8')
-        provider = self.provider(settings)
+        provider = self.get_provider('Year8')
         entry    = provider.entry
 
         raises   = ValueError
@@ -1043,8 +1003,7 @@ class TestEntry(unittest.TestCase):
     def testRecent1(self):
         """firmant.datasource.atom.Entry.recent
         A list of entries should be returned."""
-        settings = self.configuration('Recent1')
-        provider = self.provider(settings)
+        provider = self.get_provider('Recent1')
         entry    = provider.entry
 
         expected = [entries['2009-03-29-markdown'],
@@ -1058,8 +1017,7 @@ class TestEntry(unittest.TestCase):
     def testRecent2(self):
         """firmant.datasource.atom.Entry.recent
         A list of entries should be returned."""
-        settings = self.configuration('Recent2')
-        provider = self.provider(settings)
+        provider = self.get_provider('Recent2')
         entry    = provider.entry
 
         expected = ([entries['2009-03-29-markdown'],
@@ -1071,8 +1029,7 @@ class TestEntry(unittest.TestCase):
     def testRecent3(self):
         """firmant.datasource.atom.Entry.recent
         A list of entries should be returned."""
-        settings = self.configuration('Recent3')
-        provider = self.provider(settings)
+        provider = self.get_provider('Recent3')
         entry    = provider.entry
 
         expected = ([entries['2009-02-17-loren-ipsum'],
@@ -1084,8 +1041,7 @@ class TestEntry(unittest.TestCase):
     def testRecent4(self):
         """firmant.datasource.atom.Entry.recent
         A list of entries should be returned."""
-        settings = self.configuration('Recent4')
-        provider = self.provider(settings)
+        provider = self.get_provider('Recent4')
         entry    = provider.entry
 
         expected = (None, 0)
@@ -1096,8 +1052,7 @@ class TestEntry(unittest.TestCase):
     def testRecent5(self):
         """firmant.datasource.atom.Entry.recent
         Test for sanity checks on offset."""
-        settings = self.configuration('Recent5')
-        provider = self.provider(settings)
+        provider = self.get_provider('Recent5')
         entry    = provider.entry
 
         raises   = ValueError
@@ -1108,8 +1063,7 @@ class TestEntry(unittest.TestCase):
     def testRecent6(self):
         """firmant.datasource.atom.Entry.recent
         Test for sanity checks on offset."""
-        settings = self.configuration('Recent6')
-        provider = self.provider(settings)
+        provider = self.get_provider('Recent6')
         entry    = provider.entry
 
         raises   = ValueError
@@ -1120,8 +1074,7 @@ class TestEntry(unittest.TestCase):
     def testToXML1(self):
         """firmant.datasource.atom.Entry.to_xml
         Convert entry '2009-02-13-sample' to xml"""
-        settings = self.configuration('ToXML1')
-        provider = self.provider(settings)
+        provider = self.get_provider('ToXML1')
         entry    = provider.entry
         e = entry.cast(entries['2009-02-13-sample'])
 
@@ -1154,8 +1107,7 @@ class TestEntry(unittest.TestCase):
     def testToXML2(self):
         """firmant.datasource.atom.Entry.to_xml
         Convert entry '2009-03-29-markdown' to xml"""
-        settings = self.configuration('ToXML2')
-        provider = self.provider(settings)
+        provider = self.get_provider('ToXML2')
         entry    = provider.entry
         e = entry.cast(entries['2009-03-29-markdown'])
 
@@ -1188,8 +1140,7 @@ class TestEntry(unittest.TestCase):
     def testList1(self):
         """firmant.datasource.atom.Entry.list
         Get the list of entries published."""
-        settings = self.configuration('List1')
-        provider = self.provider(settings)
+        provider = self.get_provider('List1')
         entry    = provider.entry
 
         expected = [(datetime.date(2009, 3, 29), 'markdown'),
@@ -1203,8 +1154,7 @@ class TestEntry(unittest.TestCase):
     def testListYears1(self):
         """firmant.datasource.atom.Entry.list_years
         Get the list of years for which entries were published."""
-        settings = self.configuration('ListYears1')
-        provider = self.provider(settings)
+        provider = self.get_provider('ListYears1')
         entry    = provider.entry
 
         expected = [datetime.date(2009, 1, 1)]
@@ -1215,8 +1165,7 @@ class TestEntry(unittest.TestCase):
     def testListMonths1(self):
         """firmant.datasource.atom.Entry.list_months
         Get the list of months for which entries were published."""
-        settings = self.configuration('ListMonths1')
-        provider = self.provider(settings)
+        provider = self.get_provider('ListMonths1')
         entry    = provider.entry
 
         expected = [datetime.date(2009, 3, 1),
@@ -1228,8 +1177,7 @@ class TestEntry(unittest.TestCase):
     def testListDays1(self):
         """firmant.datasource.atom.Entry.list_days
         Get the list of days for which entries were published."""
-        settings = self.configuration('Days1')
-        provider = self.provider(settings)
+        provider = self.get_provider('Days1')
         entry    = provider.entry
 
         expected = [datetime.date(2009, 3, 29),
@@ -1257,8 +1205,7 @@ class TestFeed(unittest.TestCase):
     def testBySlug1(self):
         """firmant.datasource.atom.Feed.by_slug
         A feed object should be returned for the given name."""
-        settings = self.configuration('BySlug1')
-        provider = self.provider(settings)
+        provider = self.get_provider('BySlug1')
         feed     = provider.feed
 
         expected = feeds['general']
@@ -1269,8 +1216,7 @@ class TestFeed(unittest.TestCase):
     def testBySlug2(self):
         """firmant.datasource.atom.Feed.by_slug
         A ValueError should be raised for an invalid slug."""
-        settings = self.configuration('BySlug2')
-        provider = self.provider(settings)
+        provider = self.get_provider('BySlug2')
         feed     = provider.feed
 
         raises   = ValueError
@@ -1281,8 +1227,7 @@ class TestFeed(unittest.TestCase):
     def testDefault(self):
         """firmant.datasource.atom.Feed.default
         The default feed object should be returned."""
-        settings = self.configuration('Default')
-        provider = self.provider(settings)
+        provider = self.get_provider('Default')
         feed     = provider.feed
 
         expected = feeds['default']
@@ -1293,8 +1238,7 @@ class TestFeed(unittest.TestCase):
     def testToXML1(self):
         """firmant.datasource.atom.Feed.to_xml
         Convert default feed to xml"""
-        settings = self.configuration('ToXML1')
-        provider = self.provider(settings)
+        provider = self.get_provider('ToXML1')
         feed     = provider.feed
         f = feed.cast(feeds['default'])
         f.entries = map(provider.entry.cast, f.entries)
@@ -1319,8 +1263,7 @@ class TestFeed(unittest.TestCase):
     def testToXML2(self):
         """firmant.datasource.atom.Feed.to_xml
         Convert feed 'general' to xml"""
-        settings = self.configuration('ToXML2')
-        provider = self.provider(settings)
+        provider = self.get_provider('ToXML2')
         feed     = provider.feed
         f = feed.cast(feeds['general'])
         f.entries = map(provider.entry.cast, f.entries)

@@ -309,10 +309,11 @@ class AtomProvider(object):
 
     __metaclass__ = PluginMount
 
-    def __init__(self, settings):
+    def __init__(self, rc, settings):
+        self.rc = rc
         self._provider = select_canonical_plugin(self.plugins,
                                                  settings,
-                                                 'ATOM_PROVIDER')(settings)
+                                                 'ATOM_PROVIDER')(rc, settings)
 
     entry    = property(lambda self: self._provider.entry,
                         doc="The Atom Entry class")

@@ -10,11 +10,6 @@ from firmant.views import ViewProvider
 
 class TxtFrontendViewProvider(ViewProvider):
 
-    def __init__(self, rc, settings):
-        self.rc = rc
-        self.settings = settings
-        self.ap = AtomProvider(settings)
-
     @property
     def rules(self):
         name = __name__ + '.TxtFrontendViewProvider.'
@@ -35,13 +30,17 @@ class TxtFrontendViewProvider(ViewProvider):
             return url_rules
 
     def recent(self, request):
-        entries = self.ap.entry.recent()
+        rc = self.rc()
+        ap = rc.get(AtomProvider)
+        entries = ap.entry.recent()
         return Response(repr(entries), mimetype='text/plain')
 
     def year(self, request, year):
+        rc = self.rc()
+        ap = rc.get(AtomProvider)
         try:
             dt = datetime.datetime(int(year), 1, 1)
-            entries = self.ap.entry.year(dt.year)
+            entries = ap.entry.year(dt.year)
         except ValueError:
             entries = None
         if entries is None:
@@ -52,9 +51,11 @@ class TxtFrontendViewProvider(ViewProvider):
         return Response(repr(entries), mimetype='text/plain')
 
     def month(self, request, year, month):
+        rc = self.rc()
+        ap = rc.get(AtomProvider)
         try:
             dt = datetime.datetime(int(year), int(month), 1)
-            entries = self.ap.entry.month(dt.year, dt.month)
+            entries = ap.entry.month(dt.year, dt.month)
         except ValueError:
             entries = None
         if entries is None:
@@ -65,9 +66,11 @@ class TxtFrontendViewProvider(ViewProvider):
         return Response(repr(entries), mimetype='text/plain')
 
     def day(self, request, year, month, day):
+        rc = self.rc()
+        ap = rc.get(AtomProvider)
         try:
             dt = datetime.datetime(int(year), int(month), int(day))
-            entries = self.ap.entry.day(dt.year, dt.month, dt.day)
+            entries = ap.entry.day(dt.year, dt.month, dt.day)
         except ValueError:
             entries = None
         if entries is None:
@@ -78,12 +81,14 @@ class TxtFrontendViewProvider(ViewProvider):
         return Response(repr(entries), mimetype='text/plain')
 
     def single(self, request, slug, year, month, day):
+        rc = self.rc()
+        ap = rc.get(AtomProvider)
         try:
             dt = datetime.datetime(int(year), int(month), int(day))
-            if self.ap.slug_re.match(slug) == None:
+            if ap.slug_re.match(slug) == None:
                 entry = None
             else:
-                entry = self.ap.entry.single(slug, dt.year, dt.month, dt.day)
+                entry = ap.entry.single(slug, dt.year, dt.month, dt.day)
         except ValueError:
             entry = None
         if entry is None:

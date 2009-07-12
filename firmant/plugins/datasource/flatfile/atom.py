@@ -27,7 +27,8 @@ class FlatfileAtomProvider(AtomProvider):
     __slots__ = ['feed', 'entry', 'author', 'category']
     slug_re = slug_re
 
-    def __init__(provider_self, settings):
+    def __init__(provider_self, rc, settings):
+        provider_self.rc = rc
 
         class FlatFileEntry(Entry):
 

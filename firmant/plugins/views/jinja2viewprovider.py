@@ -34,7 +34,6 @@ class Jinja2FrontendViewProvider(ViewProvider):
     def __init__(self, rc, settings):
         self.rc = rc
         self.settings = settings
-        self.ap = AtomProvider(settings)
         self.fp = FilterProvider(settings)
         loader = FileSystemLoader(settings['JINJA2_TEMPLATE_DIR'])
         self.env = Environment(loader=loader)
@@ -60,19 +59,23 @@ class Jinja2FrontendViewProvider(ViewProvider):
             return url_rules
 
     def recent(self, request):
-        entries = self.ap.entry.recent()
+        rc = self.rc()
+        ap = rc.get(AtomProvider)
+        entries = ap.entry.recent()
         entries = map(self.XHTML_filter, entries)
         context = {}
         context['entries'] = entries
         return self.render_response('frontend/recent.html', context)
 
     def single(self, request, slug, year, month, day):
+        rc = self.rc()
+        ap = rc.get(AtomProvider)
         try:
             dt = datetime.datetime(int(year), int(month), int(day))
-            if self.ap.slug_re.match(slug) == None:
+            if ap.slug_re.match(slug) == None:
                 entry = None
             else:
-                entry = self.ap.entry.single(slug, dt.year, dt.month, dt.day)
+                entry = ap.entry.single(slug, dt.year, dt.month, dt.day)
         except ValueError:
             entry = None
         if entry is None:
@@ -87,18 +90,24 @@ class Jinja2FrontendViewProvider(ViewProvider):
         return self.render_response('frontend/single.html', context)
 
     def year(self, request, year):
+        rc = self.rc()
+        ap = rc.get(AtomProvider)
         def func(year, month, day):
-            return self.ap.entry.year(year)
+            return ap.entry.year(year)
         return self.date_view(func, 'frontend/year.html', year, 1, 1)
 
     def month(self, request, year, month):
+        rc = self.rc()
+        ap = rc.get(AtomProvider)
         def func(year, month, day):
-            return self.ap.entry.month(year, month)
+            return ap.entry.month(year, month)
         return self.date_view(func, 'frontend/month.html', year, month, 1)
 
     def day(self, request, year, month, day):
+        rc = self.rc()
+        ap = rc.get(AtomProvider)
         def func(year, month, day):
-            return self.ap.entry.day(year, month, day)
+            return ap.entry.day(year, month, day)
         return self.date_view(func, 'frontend/day.html', year, month, day)
 
     def date_view(self, entry_func, template, year, month, day):
