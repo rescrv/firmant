@@ -35,12 +35,12 @@ class TxtFrontendViewProvider(ViewProvider):
         entries = ap.entry.recent()
         return Response(repr(entries), mimetype='text/plain')
 
-    def year(self, request, year):
+    def common(self, entry_func, year, month, day):
         rc = self.rc()
         ap = rc.get(AtomProvider)
         try:
-            dt = datetime.datetime(int(year), 1, 1)
-            entries = ap.entry.year(dt.year)
+            dt = datetime.datetime(int(year), int(month), int(day))
+            entries = entry_func(ap, dt.year, dt.month, dt.day)
         except ValueError:
             entries = None
         if entries is None:
@@ -49,48 +49,23 @@ class TxtFrontendViewProvider(ViewProvider):
             return Response('No entries match.', status=404,
                     mimetype='text/plain')
         return Response(repr(entries), mimetype='text/plain')
+
+    def year(self, request, year):
+        entry_func = lambda ap, y, m, d: ap.entry.year(y)
+        return self.common(entry_func, year, 1, 1)
 
     def month(self, request, year, month):
-        rc = self.rc()
-        ap = rc.get(AtomProvider)
-        try:
-            dt = datetime.datetime(int(year), int(month), 1)
-            entries = ap.entry.month(dt.year, dt.month)
-        except ValueError:
-            entries = None
-        if entries is None:
-            return Response('Invalid date', status=404, mimetype='text/plain')
-        if entries == []:
-            return Response('No entries match.', status=404,
-                    mimetype='text/plain')
-        return Response(repr(entries), mimetype='text/plain')
+        entry_func = lambda ap, y, m, d: ap.entry.month(y, m)
+        return self.common(entry_func, year, month, 1)
 
     def day(self, request, year, month, day):
-        rc = self.rc()
-        ap = rc.get(AtomProvider)
-        try:
-            dt = datetime.datetime(int(year), int(month), int(day))
-            entries = ap.entry.day(dt.year, dt.month, dt.day)
-        except ValueError:
-            entries = None
-        if entries is None:
-            return Response('Invalid date', status=404, mimetype='text/plain')
-        if entries == []:
-            return Response('No entries match.', status=404,
-                    mimetype='text/plain')
-        return Response(repr(entries), mimetype='text/plain')
+        entry_func = lambda ap, y, m, d: ap.entry.day(y, m, d)
+        return self.common(entry_func, year, month, day)
 
     def single(self, request, slug, year, month, day):
-        rc = self.rc()
-        ap = rc.get(AtomProvider)
-        try:
-            dt = datetime.datetime(int(year), int(month), int(day))
+        def entry_func(ap, y, m, d):
             if ap.slug_re.match(slug) == None:
-                entry = None
+                return []
             else:
-                entry = ap.entry.single(slug, dt.year, dt.month, dt.day)
-        except ValueError:
-            entry = None
-        if entry is None:
-            return Response('Not found.', status=404, mimetype='text/plain')
-        return Response(repr(entry), mimetype='text/plain')
+                return ap.entry.single(slug, y, m, d)
+        return self.common(entry_func, year, month, day)
