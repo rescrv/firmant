@@ -76,11 +76,11 @@ class FlatfileAtomProvider(AtomProvider):
                 rights_file  = open(rights_path)
                 summary_file = open(summary_path)
 
-                content_data = content_file.read()
-                meta_data    = meta_file.read()
+                content_data = content_file.read().decode('utf-8')
+                meta_data    = meta_file.read().decode('utf-8')
                 meta_data    = json.loads(meta_data)
-                rights_data  = rights_file.read()
-                summary_data = summary_file.read()
+                rights_data  = rights_file.read().decode('utf-8')
+                summary_data = summary_file.read().decode('utf-8')
 
                 content_file.close()
                 meta_file   .close()
@@ -88,7 +88,7 @@ class FlatfileAtomProvider(AtomProvider):
                 summary_file.close()
 
                 entry = cls()
-                entry.slug      = slug
+                entry.slug      = unicode(slug)
                 entry.tz        = meta_data['timezone']
                 tz_obj          = pytz.timezone(entry.tz)
                 entry.published = \
@@ -295,8 +295,8 @@ class FlatfileAtomProvider(AtomProvider):
                 rights_file = open(rights_path)
                 meta_file   = open(meta_path)
 
-                rights_data = rights_file.read()
-                meta_data   = json.loads(meta_file.read())
+                rights_data = rights_file.read().decode('utf-8')
+                meta_data   = json.loads(meta_file.read().decode('utf-8'))
 
                 rights_file.close()
                 meta_file  .close()
@@ -343,7 +343,7 @@ class FlatfileAtomProvider(AtomProvider):
                 if not os.access(path, os.R_OK):
                     return None
                 file = open(path)
-                data = file.read()
+                data = file.read().decode('utf-8')
                 file.close()
                 author = cls.from_json(data)
                 author.name = name
@@ -363,7 +363,7 @@ class FlatfileAtomProvider(AtomProvider):
                 if not os.access(path, os.R_OK):
                     return None
                 file = open(path)
-                data = file.read()
+                data = file.read().decode('utf-8')
                 file.close()
                 category       = cls()
                 category.term  = term
