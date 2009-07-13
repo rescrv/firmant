@@ -22,23 +22,23 @@ from firmant.utils import not_implemented, \
 # Defined Authors.
 authors = {}
 authors['Robert Escriva']       = Author()
-authors['Robert Escriva'].name  = 'Robert Escriva'
-authors['Robert Escriva'].uri   = 'http://robescriva.com'
-authors['Robert Escriva'].email = 'rob@example.org'
+authors['Robert Escriva'].name  = u'Robert Escriva'
+authors['Robert Escriva'].uri   = u'http://robescriva.com'
+authors['Robert Escriva'].email = u'rob@example.org'
 authors['Loren Ipsum Generator']       = Author()
-authors['Loren Ipsum Generator'].name  = 'Loren Ipsum Generator'
-authors['Loren Ipsum Generator'].uri   = 'http://www.lipsum.com'
-authors['Loren Ipsum Generator'].email = 'lipsum@example.org'
+authors['Loren Ipsum Generator'].name  = u'Loren Ipsum Generator'
+authors['Loren Ipsum Generator'].uri   = u'http://www.lipsum.com'
+authors['Loren Ipsum Generator'].email = u'lipsum@example.org'
 
 
 # Defined Categories
 categories = {}
 categories['General']       = Category()
-categories['General'].term  = 'General'
-categories['General'].label = 'All topics'
+categories['General'].term  = u'General'
+categories['General'].label = u'All topics'
 categories['Generated']       = Category()
-categories['Generated'].term  = 'Generated'
-categories['Generated'].label = "You can't tell a computer wrote it."
+categories['Generated'].term  = u'Generated'
+categories['Generated'].label = u"You can't tell a computer wrote it."
 
 
 A_NY = pytz.timezone('America/New_York')
@@ -47,32 +47,32 @@ A_NY = pytz.timezone('America/New_York')
 # Defined Entries
 entries = {}
 entries['2009-02-13-sample'] = Entry()
-entries['2009-02-13-sample'].slug      = 'sample'
+entries['2009-02-13-sample'].slug      = u'sample'
 entries['2009-02-13-sample'].published = \
         A_NY.localize(datetime.datetime(2009, 2, 13, 23, 31, 30))
 entries['2009-02-13-sample'].author    = authors['Robert Escriva']
 entries['2009-02-13-sample'].category  = categories['General']
-entries['2009-02-13-sample'].rights    = 'Same as source.\n'
+entries['2009-02-13-sample'].rights    = u'Same as source.\n'
 entries['2009-02-13-sample'].updated   = \
         A_NY.localize(datetime.datetime(2009, 2, 13, 23, 31, 31))
-entries['2009-02-13-sample'].title     = 'Unix 1234567890'
+entries['2009-02-13-sample'].title     = u'Unix 1234567890'
 entries['2009-02-13-sample'].content   = \
-        'This is the main content of revision two.\n'
-entries['2009-02-13-sample'].summary   = 'This is the summary of revision two.\n'
-entries['2009-02-13-sample'].tz        = 'America/New_York'
+        u'This is the main content of revision two.\n'
+entries['2009-02-13-sample'].summary   = u'This is the summary of revision two.\n'
+entries['2009-02-13-sample'].tz        = u'America/New_York'
 
 entries['2009-02-17-loren-ipsum'] = Entry()
-entries['2009-02-17-loren-ipsum'].slug      = 'loren-ipsum'
+entries['2009-02-17-loren-ipsum'].slug      = u'loren-ipsum'
 entries['2009-02-17-loren-ipsum'].published = \
         A_NY.localize(datetime.datetime(2009, 2, 17, 11, 31, 30))
 entries['2009-02-17-loren-ipsum'].author    = authors['Loren Ipsum Generator']
 entries['2009-02-17-loren-ipsum'].category  = categories['Generated']
-entries['2009-02-17-loren-ipsum'].rights    = 'Same as source.\n'
+entries['2009-02-17-loren-ipsum'].rights    = u'Same as source.\n'
 entries['2009-02-17-loren-ipsum'].updated   = \
         A_NY.localize(datetime.datetime(2009, 2, 17, 11, 31, 30))
-entries['2009-02-17-loren-ipsum'].title     = 'Loren Ipsum ...'
+entries['2009-02-17-loren-ipsum'].title     = u'Loren Ipsum ...'
 entries['2009-02-17-loren-ipsum'].content   = \
-"""Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus eget
+u"""Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus eget
 ante sit amet elit condimentum varius. Nullam blandit pede quis neque.
 Suspendisse elit erat, malesuada quis, ultrices cursus, pretium eget,
 tortor. Sed volutpat pede in neque rhoncus aliquet. In vulputate, tellus id
@@ -96,36 +96,36 @@ In molestie est a neque. Aliquam erat volutpat. Nam commodo tincidunt
 magna.  Morbi justo leo, faucibus nec, consectetur id, sodales vitae,
 nunc.\n"""
 entries['2009-02-17-loren-ipsum'].summary   = \
-        'A generated loren ipsum paragraph.\n'
-entries['2009-02-17-loren-ipsum'].tz        = 'America/New_York'
+        u'A generated loren ipsum paragraph.\n'
+entries['2009-02-17-loren-ipsum'].tz        = u'America/New_York'
 
 entries['2009-03-17-sample'] = Entry()
-entries['2009-03-17-sample'].slug      = 'sample'
+entries['2009-03-17-sample'].slug      = u'sample'
 entries['2009-03-17-sample'].published = \
         A_NY.localize(datetime.datetime(2009, 3, 17, 16, 31, 30))
 entries['2009-03-17-sample'].author    = authors['Loren Ipsum Generator']
 entries['2009-03-17-sample'].category  = categories['Generated']
-entries['2009-03-17-sample'].rights    = 'Same as source.\n'
+entries['2009-03-17-sample'].rights    = u'Same as source.\n'
 entries['2009-03-17-sample'].updated   = \
         A_NY.localize(datetime.datetime(2009, 3, 17, 11, 31, 30))
-entries['2009-03-17-sample'].title     = 'Loren Ipsum ...'
+entries['2009-03-17-sample'].title     = u'Loren Ipsum ...'
 entries['2009-03-17-sample'].content   = \
-        'This is the main content of revision one.\n'
-entries['2009-03-17-sample'].summary   = 'This is the summary of revision one.\n'
-entries['2009-03-17-sample'].tz        = 'America/New_York'
+        u'This is the main content of revision one.\n'
+entries['2009-03-17-sample'].summary   = u'This is the summary of revision one.\n'
+entries['2009-03-17-sample'].tz        = u'America/New_York'
 
 entries['2009-03-29-markdown'] = Entry()
-entries['2009-03-29-markdown'].slug      = 'markdown'
+entries['2009-03-29-markdown'].slug      = u'markdown'
 entries['2009-03-29-markdown'].published = \
         A_NY.localize(datetime.datetime(2009, 3, 29, 10, 52, 54))
 entries['2009-03-29-markdown'].author    = authors['Robert Escriva']
 entries['2009-03-29-markdown'].category  = categories['General']
-entries['2009-03-29-markdown'].rights    = 'Same as source.\n'
+entries['2009-03-29-markdown'].rights    = u'Same as source.\n'
 entries['2009-03-29-markdown'].updated   = \
         A_NY.localize(datetime.datetime(2009, 3, 29, 10, 53, 26))
-entries['2009-03-29-markdown'].title     = 'A sample markdown implementation'
+entries['2009-03-29-markdown'].title     = u'A sample markdown implementation'
 entries['2009-03-29-markdown'].content   = \
-'''Firmant Markdown Test
+u'''Firmant Markdown Test
 ========
 
 [Author Homepage][re]
@@ -147,28 +147,28 @@ into your documents:
     }
 
 See?  Wasn't that easy?\n'''
-entries['2009-03-29-markdown'].summary   = 'Some markdown and a forkbomb.\n'
-entries['2009-03-29-markdown'].tz        = 'America/New_York'
+entries['2009-03-29-markdown'].summary   = u'Some markdown and a forkbomb.\n'
+entries['2009-03-29-markdown'].tz        = u'America/New_York'
 
 
 # Defined Feeds
 
 feeds = {}
 feeds['general'] = Feed()
-feeds['general'].slug     = "general"
-feeds['general'].title    = "General Content"
-feeds['general'].rights   = "Same as source.\n"
-feeds['general'].subtitle = "This is a feed that holds general content"
+feeds['general'].slug     = u"general"
+feeds['general'].title    = u"General Content"
+feeds['general'].rights   = u"Same as source.\n"
+feeds['general'].subtitle = u"This is a feed that holds general content"
 feeds['general'].updated  = \
         A_NY.localize(datetime.datetime(2009, 2, 17, 11, 31, 30))
 feeds['general'].entries  = [entries['2009-02-17-loren-ipsum'],
                              entries['2009-02-13-sample']]
 
 feeds['default'] = Feed()
-feeds['default'].slug     = ""
-feeds['default'].title    = "Firmant Atom Feed"
-feeds['default'].rights   = "Same as source."
-feeds['default'].subtitle = "The default atom feed"
+feeds['default'].slug     = u""
+feeds['default'].title    = u"Firmant Atom Feed"
+feeds['default'].rights   = u"Same as source."
+feeds['default'].subtitle = u"The default atom feed"
 feeds['default'].updated  = \
         A_NY.localize(datetime.datetime(2009, 3, 29, 10, 53, 26))
 feeds['default'].entries  = [entries['2009-03-29-markdown'],
