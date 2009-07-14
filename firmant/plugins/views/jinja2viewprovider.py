@@ -48,13 +48,6 @@ class Jinja2GlobalProvider(object):
 
 class Jinja2FrontendViewProvider(ViewProvider):
 
-    def __init__(self, rc, settings):
-        super(Jinja2FrontendViewProvider, self).__init__(rc, settings)
-        loader = FileSystemLoader(settings['JINJA2_TEMPLATE_DIR'])
-        self.env = Environment(loader=loader)
-        self.env.globals['MEDIA_PATH'] = settings['MEDIA_URL_PATH']
-        self.env.globals.update(rc().get(Jinja2GlobalProvider).globals_dict())
-
     @property
     def rules(self):
         name = __name__ + '.Jinja2FrontendViewProvider.'
@@ -152,5 +145,9 @@ class Jinja2FrontendViewProvider(ViewProvider):
         return entry
 
     def render_response(self, template, context):
-        tmpl = self.env.get_template(template)
+        loader = FileSystemLoader(self.settings['JINJA2_TEMPLATE_DIR'])
+        env = Environment(loader=loader)
+        env.globals['MEDIA_PATH'] = self.settings['MEDIA_URL_PATH']
+        env.globals.update(self.rc().get(Jinja2GlobalProvider).globals_dict())
+        tmpl = env.get_template(template)
         return Response(tmpl.render(context), mimetype='text/html')

@@ -10,7 +10,7 @@
     <title>{% block title %}Firmant{% endblock %}</title>
 </head>
 <body>
-    <div id="doc4">
+    <div id="doc4" class="yui-t5">
         <div id="hd">
             <h1>Firmant-Powered Blog</h1>
         </div>
@@ -21,6 +21,22 @@
                 </div>
             </div>
             <div class="yui-b sidebar">
+                <div class="sidebox">
+                    <h3>Recent Posts</h3>
+                    <ul>
+                        {% for entry in recent_entries %}
+                        <li><a href="{{ entry[1] }}">{{ entry[0] }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="sidebox">
+                    <h3>Archives</h3>
+                    <ul>
+                        {% for month in list_months %}
+                        <li><a href="{{ month[1] }}">{{ month[0] }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

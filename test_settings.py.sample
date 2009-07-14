@@ -9,7 +9,8 @@ PLUGINS = ['test.datasource.atom',
            'firmant.views',
            'firmant.plugins.views.txt',
            'firmant.plugins.views.atom',
-           'firmant.plugins.views.jinja2viewprovider']
+           'firmant.plugins.views.jinja2viewprovider',
+           'firmant.plugins.views.jinja2globalplugins']
 ENABLED_VIEWS = [
 'firmant.plugins.views.jinja2viewprovider.Jinja2FrontendViewProvider',
                  'firmant.plugins.views.atom.AtomFeedViewProvider',
