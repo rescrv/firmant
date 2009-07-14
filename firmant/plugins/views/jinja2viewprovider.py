@@ -8,6 +8,7 @@ from jinja2 import Environment, \
 
 from firmant.datasource.atom import AtomProvider
 from firmant.datasource.atom import EntryPermalinkProvider
+from firmant.plugins import PluginMount
 from firmant.views import ViewProvider
 from firmant.filters import FilterProvider
 
@@ -30,6 +31,21 @@ class Jinja2EntryPermalinkProvier(EntryPermalinkProvider):
         return urls.build(endpoint, values, force_external=True)
 
 
+class Jinja2GlobalProvider(object):
+
+    __metaclass__ = PluginMount
+
+    def __init__(self, rc, settings):
+        self.rc = rc
+        self.settings = settings
+
+    def globals_dict(self):
+        ret = {}
+        for plugin in self.plugins:
+            ret.update(self.rc().get(plugin).globals_dict())
+        return ret
+
+
 class Jinja2FrontendViewProvider(ViewProvider):
 
     def __init__(self, rc, settings):
@@ -37,6 +53,7 @@ class Jinja2FrontendViewProvider(ViewProvider):
         loader = FileSystemLoader(settings['JINJA2_TEMPLATE_DIR'])
         self.env = Environment(loader=loader)
         self.env.globals['MEDIA_PATH'] = settings['MEDIA_URL_PATH']
+        self.env.globals.update(rc().get(Jinja2GlobalProvider).globals_dict())
 
     @property
     def rules(self):
