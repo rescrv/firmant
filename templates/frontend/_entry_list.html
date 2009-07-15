@@ -16,8 +16,11 @@
     {% endfor %}
     {% if page.has_older or page.has_newer %}
     <div class="navigation">
-        {% if page.has_older %}<div class="alignright"><a href="{{ page.older }}">Older Entries</div></a>{% endif %}
-        {% if page.has_newer %}<div class="alignleft"><a href="{{ page.newer }}">Newer Entries</div></a>{% endif %}
+        {% if page.has_older %}<div class="alignright">
+            <a href="{{ page.older }}">Older Entries &raquo;</div></a>{% endif %}
+        {% if page.has_newer %}<div class="alignleft">
+            <a href="{{ page.newer }}">&laquo; Newer Entries</div></a>{% endif
+        %}
     </div>
     {% endif %}
 {% else %}
