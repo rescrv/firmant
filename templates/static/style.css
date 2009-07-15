@@ -70,3 +70,11 @@ html {
 .title {
     font-size: 146.5%;
 }
+
+.alignleft {
+    float: left;
+}
+
+.alignright {
+    float: right;
+}
