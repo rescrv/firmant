@@ -92,10 +92,6 @@ class Jinja2FrontendViewProvider(ViewProvider):
         entry = self.XHTML_filter(entry)
         context = {}
         context['entry'] = entry
-        context['year']  = year
-        context['month'] = month
-        context['day']   = day
-        context['slug']  = slug
         return self.render_response('frontend/single.html', context)
 
     def year(self, request, year):
@@ -132,9 +128,7 @@ class Jinja2FrontendViewProvider(ViewProvider):
         entries = map(self.XHTML_filter, entries)
         context = {}
         context['entries'] = entries
-        context['year']    = dt.year
-        context['month']   = dt.month
-        context['day']     = dt.day
+        context['dt']      = dt
         return self.render_response(template, context)
 
     def XHTML_filter(self, entry):

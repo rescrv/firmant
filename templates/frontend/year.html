@@ -1,9 +1,9 @@
 {% extends 'frontend/base.html' %}
 
-{% block title %}Firmant Archive {{ year }}{% endblock %}
+{% block title %}Firmant Archive for {{ dt.strftime("%Y") }}{% endblock %}
 
 {% block content %}
-<h1 class="title">Firmant Archive for the Year {{ year }}</h1>
+<h1 class="title">Firmant Archive for {{ dt.strftime("%Y") }}</h1>
 
 {% include 'frontend/_entry_list.html' %}
 
