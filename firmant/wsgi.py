@@ -51,6 +51,8 @@ class Application(object):
         rc.set('urls', urls)
         try:
             endpoint, args = urls.match()
+            rc.set('endpoint', endpoint)
+            rc.set('args', args)
             klass, func = tuple(endpoint.rsplit('.', 1))
             klass = vp.get_class(klass)
             if not hasattr(klass, func):

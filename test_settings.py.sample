@@ -40,6 +40,7 @@ VIEW_JINJA2_FRONTEND_PREFIX = 'jinja2'
 VIEW_ATOM_FEED_PREFIX = 'atom'
 
 JINJA2_TEMPLATE_DIR = 'templates/'
+JINJA2_ENTRIES_PER_PAGE = 1
 
 MEDIA_FS_PATH = 'templates/static'
 MEDIA_URL_PATH = '/static/'

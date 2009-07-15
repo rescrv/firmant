@@ -14,6 +14,12 @@
         </div>
     </div>
     {% endfor %}
+    {% if page.has_older or page.has_newer %}
+    <div class="navigation">
+        {% if page.has_older %}<a href="{{ page.older }}">Older Entries</a>{% endif %}
+        {% if page.has_newer %}<a href="{{ page.newer }}">Newer Entries</a>{% endif %}
+    </div>
+    {% endif %}
 {% else %}
 <p>There are no entries in the system.</p>
 {% endif %}
