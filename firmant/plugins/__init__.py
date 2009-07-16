@@ -44,3 +44,17 @@ class SingleProviderPlugin(object):
             raise ValueError('Please set "%s"', self.provider_setting)
         plugin         = load_plugin(full_path)
         self._provider = plugin(rc, settings)
+
+
+class MultiProviderPlugin(object):
+
+    def __init__(self, rc, settings):
+        self.rc        = rc
+        self.settings  = settings
+
+        plugin_list    = self.settings.get(self.providers_setting, None)
+        if plugin_list is None:
+            raise ValueError('Please set "%s"', self.providers_setting)
+
+        plugin_objects = map(load_plugin, plugin_list)
+        self._plugins  = map(lambda x: x(rc, settings), plugin_objects)
