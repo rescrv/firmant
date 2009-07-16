@@ -1,6 +1,11 @@
 import datetime
 import time
 
+try:
+    import json # pragma: no cover
+except ImportError: # pragma: no cover
+    import simplejson as json
+
 def not_implemented(*args, **kwargs):
     raise NotImplementedError("This function is not implemented")
 

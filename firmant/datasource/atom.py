@@ -1,8 +1,4 @@
 import datetime
-try:
-    import json
-except ImportError:
-    import simplejson as json
 import pytz
 
 from firmant.plugins import SingleProviderPlugin
@@ -11,6 +7,7 @@ from firmant.constants import isoformat
 from firmant.utils import xml, \
                           RFC3339, \
                           strptime
+from firmant.utils import json
 
 
 # Base classes for Atom data.

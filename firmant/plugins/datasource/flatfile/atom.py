@@ -2,10 +2,6 @@ import re
 import os.path
 import datetime
 import pytz
-try:
-    import json
-except ImportError:
-    import simplejson as json
 
 from firmant.datasource.atom import AtomProvider, \
                                     Entry, \
@@ -16,6 +12,7 @@ from firmant.datasource.atom import AtomProvider, \
                                     FeedPermalinkProvider
 from firmant.utils import strptime
 from firmant.utils import uniq_presorted
+from firmant.utils import json
 
 
 slug_re = re.compile('^[-\\_a-zA-Z0-9]{1,96}$')
