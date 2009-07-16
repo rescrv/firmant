@@ -30,7 +30,7 @@ MARKDOWN_XHTML_ENABLED = True
 MARKDOWN_XHTML_SAFE_MODE = 'escape'
 
 # Backend options
-ATOM_PROVIDER = 'firmant.plugins.datasource.flatfile.atom'
+ATOM_PROVIDER = 'firmant.plugins.datasource.flatfile.atom.FlatfileAtomProvider'
 
 # Flatfile options
 FLATFILE_BASE = 'checkout/'

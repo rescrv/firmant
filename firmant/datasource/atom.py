@@ -6,6 +6,7 @@ except ImportError:
 import pytz
 
 from firmant.plugins import PluginMount
+from firmant.plugins import SingleProviderPlugin
 from firmant.utils import not_implemented
 from firmant.constants import isoformat
 from firmant.utils import xml, \
@@ -304,15 +305,9 @@ def select_canonical_plugin(plugins, settings, config_var):
     return provider[0]
 
 
-class AtomProvider(object):
+class AtomProvider(SingleProviderPlugin):
 
-    __metaclass__ = PluginMount
-
-    def __init__(self, rc, settings):
-        self.rc = rc
-        self._provider = select_canonical_plugin(self.plugins,
-                                                 settings,
-                                                 'ATOM_PROVIDER')(rc, settings)
+    provider_setting = 'ATOM_PROVIDER'
 
     entry    = property(lambda self: self._provider.entry,
                         doc="The Atom Entry class")
