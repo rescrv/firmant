@@ -443,11 +443,11 @@ class TestAuthor(unittest.TestCase):
 
     def setUp(self):
         """Setup all data necessary for test case."""
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     def get_provider(self, name):
         """This function should return the AtomProvider for the test."""
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     def testByName1(self):
         """firmant.datasource.atom.Author.by_name
@@ -506,11 +506,11 @@ class TestCategory(unittest.TestCase):
         """The setup function should alias the AtomProvider class to
         self.provider so that the test functions can access it.  It also must
         setup whatever data is necessary for the test cases to run."""
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     def get_provider(self, name):
         """This function should return the AtomProvider for the test."""
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     def testByTerm1(self):
         """firmant.datasource.atom.Category.by_term
@@ -567,11 +567,11 @@ class TestEntry(unittest.TestCase):
         """The setup function should alias the AtomProvider class to
         self.provider so that the test functions can access it.  It also must
         setup whatever data is necessary for the test cases to run."""
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     def get_provider(self, name):
         """This function should return the AtomProvider for the test."""
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     def testForFeed1(self):
         """firmant.datasource.atom.Entry.for_feed
@@ -1195,12 +1195,12 @@ class TestFeed(unittest.TestCase):
         """The setup function should alias the AtomProvider class to
         self.provider so that the test functions can access it.  It also must
         setup whatever data is necessary for the test cases to run."""
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     def configuration(self, name):
         """This function should return the settings associated with test
         'name'"""
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     def testBySlug1(self):
         """firmant.datasource.atom.Feed.by_slug

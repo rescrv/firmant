@@ -133,7 +133,7 @@ class Author(AtomBase):
 
     @classmethod
     def by_name(cls, name):
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     # TODO:
     #def permalink(self):
@@ -154,7 +154,7 @@ class Category(AtomBase):
 
     @classmethod
     def by_term(cls, term):
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     # TODO:
     #def permalink(self):
@@ -182,31 +182,31 @@ class Entry(AtomBase):
 
     @classmethod
     def for_feed(cls, feedslug):
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     @classmethod
     def single(cls, slug, year, month, day):
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     @classmethod
     def day(cls, year, month, day):
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     @classmethod
     def month(cls, year, month):
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     @classmethod
     def year(cls, year):
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     @classmethod
     def recent(cls):
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     @property
     def permalink(self):
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     def to_xml(self, filter=None):
         '''Convert an entry to XML.
@@ -258,15 +258,15 @@ class Feed(AtomBase):
 
     @classmethod
     def by_slug(cls, slug):
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     @classmethod
     def default(cls):
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     @property
     def permalink(self):
-        not_implemented()
+        not_implemented() # pragma: no cover
 
     def to_xml(self, filter=None):
         '''Convert a feed to XML.
