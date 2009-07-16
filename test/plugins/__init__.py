@@ -1,6 +1,7 @@
 import unittest
 
 from firmant.plugins import SingleProviderPlugin
+from firmant.plugins import load_plugin
 from firmant.utils import not_implemented
 
 
@@ -36,26 +37,34 @@ class SingleProviderPluginTest(unittest.TestCase):
 
         self.assertRaises(raises, function)
 
+
+class LoadPluginTest(unittest.TestCase):
+
     def testInvalidImport(self):
-        '''firmant.plugins.SingleProviderPlugin.__init__'''
-        settings = {'DUMMY_PROVIDER': 'test.noexist.Plugin'}
-        rc       = None
+        '''firmant.plugins.load_plugin'''
 
         raises   = ImportError
-        function = lambda: self.DummySinglePlugin(rc, settings)
+        function = lambda: load_plugin('test.noexist.Plugin')
 
         self.assertRaises(raises, function)
 
     def testValidModuleInvalidAttribute(self):
-        '''firmant.plugins.SingleProviderPlugin.__init__'''
-        settings = {'DUMMY_PROVIDER': 'test.plugins.NoExist'}
-        rc       = None
+        '''firmant.plugins.load_plugin'''
 
         raises   = AttributeError
-        function = lambda: self.DummySinglePlugin(rc, settings)
+        function = lambda: load_plugin('test.plugins.NoExist')
 
         self.assertRaises(raises, function)
+
+    def testValid(self):
+        '''firmant.plugins.load_plugin'''
+
+        expected = DummyPlugin
+        returned = load_plugin('test.plugins.DummyPlugin')
+
+        self.assertEqual(expected, returned)
 
 
 suite = unittest.TestSuite()
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(SingleProviderPluginTest))
+suite.addTests(unittest.TestLoader().loadTestsFromTestCase(LoadPluginTest))

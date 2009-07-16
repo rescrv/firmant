@@ -20,25 +20,27 @@ class PluginMount(type):
             # track of it later.
             cls.plugins.append(cls)
 
+
+def load_plugin(full_path):
+    module_name = '.'.join(full_path.split('.')[:-1])
+    object_name = full_path.split('.')[-1]
+    module      = get_module(module_name)
+
+    if not hasattr(module, object_name):
+        raise AttributeError('Module "%s" has no attribute "%s"' % \
+                (module_name, object_name))
+
+    plugin = getattr(module, object_name)
+    return plugin
+
+
 class SingleProviderPlugin(object):
 
     def __init__(self, rc, settings):
-        self.rc       = rc
-        self.settings = settings
-
-        full_path = settings.get(self.provider_setting, None)
-
+        self.rc        = rc
+        self.settings  = settings
+        full_path      = settings.get(self.provider_setting, None)
         if full_path is None:
             raise ValueError('Please set "%s"', self.provider_setting)
-
-        module_name = '.'.join(full_path.split('.')[:-1])
-        object_name = full_path.split('.')[-1]
-        module      = get_module(module_name)
-
-        if not hasattr(module, object_name):
-            raise AttributeError('Module "%s" has no attribute "%s"' % \
-                    (module_name, object_name))
-
-        plugin = getattr(module, object_name)
-
+        plugin         = load_plugin(full_path)
         self._provider = plugin(rc, settings)
