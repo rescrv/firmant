@@ -13,7 +13,7 @@ from firmant.views import ViewProvider
 from firmant.filters import FilterProvider
 
 
-class Jinja2EntryPermalinkProvier(EntryPermalinkProvider):
+class Jinja2EntryPermalinkProvider(EntryPermalinkProvider):
 
     def __init__(self, rc, settings):
         self.rc = rc

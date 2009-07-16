@@ -325,14 +325,9 @@ class AtomProvider(SingleProviderPlugin):
                         doc="The Atom slug re")
 
 
-class EntryPermalinkProvider(object):
+class EntryPermalinkProvider(SingleProviderPlugin):
 
-    __metaclass__ = PluginMount
-
-    def __init__(self, rc, settings):
-        self._provider = select_canonical_plugin(self.plugins,
-                                                 settings,
-                                                 'ENTRY_PERMALINK')(rc, settings)
+    provider_setting = 'ENTRY_PERMALINK'
 
     def authoritative(self, entry):
         return self._provider.authoritative(entry)
