@@ -12,10 +12,9 @@ from test.datasource.atom import DummyFeedPermalinkProvider
 
 
 settings = {
-        'PLUGINS': ['firmant.plugins.datasource.flatfile.atom',
-                    'test.datasource.atom.DummyFeedPermalinkProvider'],
+        'PLUGINS': ['firmant.plugins.datasource.flatfile.atom'],
         'ENTRY_PERMALINK': 'test.datasource.atom.DummyEntryPermalinkProvider',
-        'FEED_PERMALINK': 'test.datasource.atom',
+        'FEED_PERMALINK': 'test.datasource.atom.DummyFeedPermalinkProvider',
         'ATOM_DEFAULT_TITLE': 'Firmant Atom Feed',
         'ATOM_DEFAULT_RIGHTS': 'Same as source.',
         'ATOM_DEFAULT_SUBTITLE': 'The default atom feed',

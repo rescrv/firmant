@@ -10,7 +10,7 @@ from firmant.filters import FilterProvider
 from firmant.utils import xml
 
 
-class AtomFeedPermalinkProvier(FeedPermalinkProvider):
+class AtomFeedPermalinkProvider(FeedPermalinkProvider):
 
     def __init__(self, rc, settings):
         self.rc = rc

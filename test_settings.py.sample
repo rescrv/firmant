@@ -17,7 +17,7 @@ ENABLED_VIEWS = [
                  'firmant.plugins.views.txt.TxtFrontendViewProvider',
                  'firmant.views.CatchallProvider']
 ENTRY_PERMALINK = 'firmant.plugins.views.jinja2viewprovider.Jinja2EntryPermalinkProvider'
-FEED_PERMALINK  = 'firmant.plugins.views.atom'
+FEED_PERMALINK  = 'firmant.plugins.views.atom.AtomFeedPermalinkProvider'
 
 # Atom Default Feed ('/atom/')
 ATOM_DEFAULT_TITLE = 'Firmant Atom Feed'

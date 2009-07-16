@@ -5,7 +5,6 @@ except ImportError:
     import simplejson as json
 import pytz
 
-from firmant.plugins import PluginMount
 from firmant.plugins import SingleProviderPlugin
 from firmant.utils import not_implemented
 from firmant.constants import isoformat
@@ -333,14 +332,9 @@ class EntryPermalinkProvider(SingleProviderPlugin):
         return self._provider.authoritative(entry)
 
 
-class FeedPermalinkProvider(object):
+class FeedPermalinkProvider(SingleProviderPlugin):
 
-    __metaclass__ = PluginMount
-
-    def __init__(self, rc, settings):
-        self._provider = select_canonical_plugin(self.plugins,
-                                                 settings,
-                                                 'FEED_PERMALINK')(rc, settings)
+    provider_setting = 'FEED_PERMALINK'
 
     def authoritative(self, feed):
         return self._provider.authoritative(feed)
