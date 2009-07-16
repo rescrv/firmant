@@ -1,9 +1,10 @@
 import markdown
 
-from firmant.filters import FilterProvider
 
+class MarkdownFilter(object):
 
-class MarkdownFilter(FilterProvider):
+    def __init__(self, rc, settings):
+        self.settings = settings
 
     def filter(self, slot, content):
         if self.settings['MARKDOWN_XHTML_SAFE_MODE'] != None:

@@ -1,16 +1,12 @@
-from firmant.plugins import PluginMount
+from firmant.plugins import MultiProviderPlugin
 
 
-class FilterProvider(object):
-    __metaclass__ = PluginMount
+class FilterProvider(MultiProviderPlugin):
 
-    def __init__(self, rc, settings):
-        self.rc = rc
-        self.settings = settings
+    providers_setting = 'TEXT_FILTERS'
 
     def filter(self, slot, content):
-        rc = self.rc()
-        providers = filter(lambda o: rc.get(o).provides(slot), self.plugins)
+        providers = filter(lambda o: o.provides(slot), self._plugins)
         if len(providers):
-            return rc.get(providers[0]).filter(slot, content)
+            return providers[0].filter(slot, content)
         raise RuntimeError("No filter defines slot '%s'" % slot)
