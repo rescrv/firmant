@@ -292,15 +292,6 @@ class Feed(AtomBase):
 # Plugin Code
 
 
-def select_canonical_plugin(plugins, settings, config_var):
-    provider = filter(lambda m: m.__module__ == settings[config_var], plugins)
-    if len(provider) < 1:
-        raise RuntimeError('No plugin for "%s" specified' % config_var)
-    if len(provider) > 1:
-        raise RuntimeError('Multiple plugins for "%s" available' % config_var)
-    return provider[0]
-
-
 class AtomProvider(SingleProviderPlugin):
 
     provider_setting = 'ATOM_PROVIDER'
