@@ -7,13 +7,12 @@ from jinja2 import Environment, \
                    FileSystemLoader
 
 from firmant.datasource.atom import AtomProvider
-from firmant.datasource.atom import EntryPermalinkProvider
 from firmant.plugins import PluginMount
 from firmant.views import ViewProvider
 from firmant.filters import FilterProvider
 
 
-class Jinja2EntryPermalinkProvider(EntryPermalinkProvider):
+class Jinja2EntryPermalinkProvider(object):
 
     def __init__(self, rc, settings):
         self.rc = rc

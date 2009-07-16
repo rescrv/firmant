@@ -4,13 +4,12 @@ from werkzeug import Response
 from werkzeug.exceptions import NotFound
 
 from firmant.datasource.atom import AtomProvider
-from firmant.datasource.atom import FeedPermalinkProvider
 from firmant.views import ViewProvider
 from firmant.filters import FilterProvider
 from firmant.utils import xml
 
 
-class AtomFeedPermalinkProvider(FeedPermalinkProvider):
+class AtomFeedPermalinkProvider(object):
 
     def __init__(self, rc, settings):
         self.rc = rc
