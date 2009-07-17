@@ -228,8 +228,6 @@ class FlatfileAtomProvider(AtomProvider):
 
                 ret = []
                 for dirpath, dirnames, filenames in os.walk(entry_path):
-                    if not dirpath.startswith(entry_path):
-                        raise ValueError('dirpath outside entry_path')
                     path = dirpath[len(entry_path):]
                     head, tail = os.path.split(path)
                     match_tail = slug_re.match(tail)
