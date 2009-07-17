@@ -4,7 +4,7 @@ HOST = 'http://localhost:8080/'
 
 # Our enabled components
 PLUGINS = ['test.datasource.atom',
-           'firmant.plugins.filters.markdown',
+           'firmant.plugins.filters.markdownfilter',
            'firmant.plugins.datasource.flatfile.atom',
            'firmant.views',
            'firmant.plugins.views.txt',
@@ -19,7 +19,7 @@ VIEWS = [
 ENTRY_PERMALINK = 'firmant.plugins.views.jinja2viewprovider.Jinja2EntryPermalinkProvider'
 FEED_PERMALINK  = 'firmant.plugins.views.atom.AtomFeedPermalinkProvider'
 
-TEXT_FILTERS = ['firmant.plugins.filters.markdown.MarkdownFilter']
+TEXT_FILTERS = ['firmant.plugins.filters.markdownfilter.MarkdownFilter']
 
 # Atom Default Feed ('/atom/')
 ATOM_DEFAULT_TITLE = 'Firmant Atom Feed'
