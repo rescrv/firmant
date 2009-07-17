@@ -9,6 +9,7 @@ from test.datasource.atom import suite as atom_tests
 from test.plugins.datasource.flatfile.atom import suite as flatfile_atom_tests
 from test.plugins import suite as plugins_tests
 from test.filters import suite as filters_tests
+from test.plugins.filters.markdownfilter import suite as markdown_tests
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
@@ -17,4 +18,5 @@ if __name__ == '__main__':
     suite.addTests(utils_tests)
     suite.addTests(plugins_tests)
     suite.addTests(filters_tests)
+    suite.addTests(markdown_tests)
     unittest.TextTestRunner(verbosity=2).run(suite)
