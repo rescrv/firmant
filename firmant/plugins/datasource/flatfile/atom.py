@@ -197,8 +197,8 @@ class FlatfileAtomProvider(AtomProvider):
 
             @classmethod
             def for_feed(cls, feedslug, limit=None, offset=None):
-                if feedslug != '' and \
-                   provider_self.slug_re.match(feedslug) == None:
+                if feedslug != '=default' and feedslug != '' and \
+                        provider_self.slug_re.match(feedslug) == None:
                     raise ValueError("Invalid slug")
                 feed_path = os.path.join(settings['FLATFILE_BASE'],
                                         'feeds',
@@ -272,9 +272,12 @@ class FlatfileAtomProvider(AtomProvider):
 
             @classmethod
             def by_slug(cls, slug):
-                if slug != '' and provider_self.slug_re.match(slug) == None:
+                if provider_self.slug_re.match(slug) == None:
                     raise ValueError("Invalid slug")
+                return cls._common(slug)
 
+            @classmethod
+            def _common(cls, slug):
                 feed_path = os.path.join(settings['FLATFILE_BASE'],
                                         'feeds',
                                         slug)
@@ -310,16 +313,8 @@ class FlatfileAtomProvider(AtomProvider):
 
             @classmethod
             def default(cls):
-                feed = cls()
-                feed.slug     = ''
-                feed.title    = settings['ATOM_DEFAULT_TITLE']
-                feed.rights   = settings['ATOM_DEFAULT_RIGHTS']
-                feed.subtitle = settings['ATOM_DEFAULT_SUBTITLE']
-                feed.entries  = provider_self.entry.for_feed('')
-                if len(feed.entries) > 0:
-                    feed.updated  = feed.entries[0].updated
-                else:
-                    feed.updated  = datetime.datetime.min
+                feed = cls._common('=default')
+                feed.slug = ''
                 return feed
 
             @property
