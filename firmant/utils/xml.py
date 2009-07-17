@@ -1,6 +1,6 @@
 try:
     from lxml import etree
-except ImportError:
+except ImportError: # pragma: no cover
     try:
         # Python 2.5
         import xml.etree.cElementTree as etree
