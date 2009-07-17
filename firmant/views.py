@@ -1,39 +1,32 @@
 from werkzeug.routing import Map, Rule
 from werkzeug import Response
 
-from firmant.plugins import PluginMount
+from firmant.plugins import MultiProviderPlugin
 
 
-class ViewProvider(object):
+class ViewProvider(MultiProviderPlugin):
 
-    __metaclass__ = PluginMount
-
-    def __init__(self, rc, settings):
-        self.rc = rc
-        self.settings = settings
-
-    @property
-    def enabled(self):
-        def enabled_plugin(plugin):
-            return str(plugin)[8:-2] in self.settings['ENABLED_VIEWS']
-        return filter(enabled_plugin, self.plugins)
+    providers_setting = 'VIEWS'
 
     @property
     def url_map(self):
-        rc = self.rc()
-        objects = map(lambda obj: rc.get(obj), self.enabled)
-        rules_l = reduce(lambda x, y: x + y.rules, objects, [])
+        rules_l = reduce(lambda x, y: x + y.rules, self._plugins, [])
         return Map(rules_l)
 
     def get_class(self, klass):
-        rc = self.rc()
-        potential = filter(lambda c: str(c)[8:-2] == klass, self.enabled)
+        def classname(instance):
+            return str(instance.__class__)[8:-2]
+        potential = filter(lambda c: classname(c) == klass, self._plugins)
         if len(potential) < 1:
             return None
-        return rc.get(potential[0])
+        return potential[0]
 
 
-class CatchallProvider(ViewProvider):
+class CatchallProvider(object):
+
+    def __init__(self, rc, settings):
+        self.rc       = rc
+        self.settings = settings
 
     @property
     def rules(self):

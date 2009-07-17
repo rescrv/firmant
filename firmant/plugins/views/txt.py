@@ -5,10 +5,13 @@ from werkzeug import Response
 from werkzeug.exceptions import NotFound
 
 from firmant.datasource.atom import AtomProvider
-from firmant.views import ViewProvider
 
 
-class TxtFrontendViewProvider(ViewProvider):
+class TxtFrontendViewProvider(object):
+
+    def __init__(self, rc, settings):
+        self.rc       = rc
+        self.settings = settings
 
     @property
     def rules(self):

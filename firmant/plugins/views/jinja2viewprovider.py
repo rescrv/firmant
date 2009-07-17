@@ -8,7 +8,6 @@ from jinja2 import Environment, \
 
 from firmant.datasource.atom import AtomProvider
 from firmant.plugins import PluginMount
-from firmant.views import ViewProvider
 from firmant.filters import FilterProvider
 
 
@@ -45,7 +44,11 @@ class Jinja2GlobalProvider(object):
         return ret
 
 
-class Jinja2FrontendViewProvider(ViewProvider):
+class Jinja2FrontendViewProvider(object):
+
+    def __init__(self, rc, settings):
+        self.rc       = rc
+        self.settings = settings
 
     class MultiPageList(object):
 

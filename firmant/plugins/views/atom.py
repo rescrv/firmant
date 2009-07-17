@@ -4,7 +4,6 @@ from werkzeug import Response
 from werkzeug.exceptions import NotFound
 
 from firmant.datasource.atom import AtomProvider
-from firmant.views import ViewProvider
 from firmant.filters import FilterProvider
 from firmant.utils import xml
 
@@ -28,7 +27,11 @@ class AtomFeedPermalinkProvider(object):
         return urls.build(endpoint, values, force_external=True)
 
 
-class AtomFeedViewProvider(ViewProvider):
+class AtomFeedViewProvider(object):
+
+    def __init__(self, rc, settings):
+        self.rc       = rc
+        self.settings = settings
 
     @property
     def rules(self):
