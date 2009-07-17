@@ -42,13 +42,13 @@ def RFC3339(dt):
 if hasattr(datetime.datetime, 'strptime'):
     strptime = datetime.datetime.strptime
 else:
-    def strptime(date_string, format):
+    def strptime(date_string, format): # pragma: no cover
         struct_time = time.strptime(date_string, format)
         return datetime.datetime(*struct_time[0:6])
 
 def uniq(l):
     l.sort()
-    uniq_presorted(l)
+    return uniq_presorted(l)
 
 def uniq_presorted(l):
     if (len(l) > 0):

@@ -6,6 +6,8 @@ from firmant.utils import not_implemented
 from firmant.utils import get_module
 from firmant.utils import mod_to_dict
 from firmant.utils import RFC3339
+from firmant.utils import uniq
+from firmant.utils import uniq_presorted
 from test.data.settings import full
 
 
@@ -77,8 +79,36 @@ class TestRFC3339(unittest.TestCase):
         self.assertEqual(expected, returned)
 
 
+class TestUniq(unittest.TestCase):
+
+    def testUnsorted(self):
+        '''firmant.utils.uniq'''
+
+        expected = [1, 2, 3]
+        returned = uniq([3, 2, 2, 2, 3, 1, 1, 3, 2])
+
+        self.assertEqual(expected, returned)
+
+    def testEmpty(self):
+        '''firmant.utils.uniq'''
+
+        expected = []
+        returned = uniq([])
+
+        self.assertEqual(expected, returned)
+
+    def testPresorted(self):
+        '''firmant.utils.uniq_presorted'''
+
+        expected = [1, 2, 3]
+        returned = uniq_presorted([1, 1, 2, 2, 2, 2, 3, 3, 3])
+
+        self.assertEqual(expected, returned)
+
+
 suite = unittest.TestSuite()
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestNotImplemented))
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestGetModule))
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestModToDict))
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestRFC3339))
+suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestUniq))
