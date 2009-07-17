@@ -1,8 +1,11 @@
 import unittest
+import datetime
+import pytz
 
 from firmant.utils import not_implemented
 from firmant.utils import get_module
 from firmant.utils import mod_to_dict
+from firmant.utils import RFC3339
 from test.data.settings import full
 
 
@@ -56,7 +59,26 @@ class TestModToDict(unittest.TestCase):
         self.assertEqual(expected, returned)
 
 
+class TestRFC3339(unittest.TestCase):
+
+    def testTimezone(self):
+        '''firmant.utils.RFC3339'''
+        pacific = pytz.timezone('US/Pacific')
+        dt      = pacific.localize(datetime.datetime(1996, 12, 19, 16, 39, 57))
+
+        expected = '1996-12-19T16:39:57-08:00'
+        returned = RFC3339(dt)
+        self.assertEqual(expected, returned)
+
+    def testNoTimezone(self):
+        '''firmant.utils.RFC3339'''
+        expected = '1996-12-19T16:39:57Z'
+        returned = RFC3339(datetime.datetime(1996, 12, 19, 16, 39, 57))
+        self.assertEqual(expected, returned)
+
+
 suite = unittest.TestSuite()
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestNotImplemented))
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestGetModule))
 suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestModToDict))
+suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestRFC3339))

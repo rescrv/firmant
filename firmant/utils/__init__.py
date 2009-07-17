@@ -31,9 +31,13 @@ def mod_to_dict(module):
 
 
 def RFC3339(dt):
-    frmt_str = '%Y-%m-%dT%H:%M:%S%z'
-    ret = dt.strftime(frmt_str)
-    return ret[:-2] + ':' + ret[-2:]
+    frmt_str = '%Y-%m-%dT%H:%M:%S'
+    timestamp = dt.strftime(frmt_str)
+    timezone  = dt.strftime('%z')
+    if timezone != '':
+        return timestamp + timezone[:-2] + ':' + timezone[-2:]
+    else:
+        return timestamp + 'Z'
 
 if hasattr(datetime.datetime, 'strptime'):
     strptime = datetime.datetime.strptime
