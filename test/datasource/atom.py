@@ -662,6 +662,41 @@ class TestEntry(unittest.TestCase):
 
         self.assertRaises(raises, function)
 
+    def testForFeed9(self):
+        """firmant.datasource.atom.Entry.for_feed
+        Test that an unspecified offset is equivalent to 0."""
+        provider = self.get_provider('ForFeed9')
+        entry    = provider.entry
+
+        expected = ([entries['2009-02-17-loren-ipsum']], 1)
+        returned = entry.for_feed('general', limit=1)
+
+        self.assertEqual(expected, returned)
+
+    def testForFeed10(self):
+        """firmant.datasource.atom.Entry.for_feed
+        Test that an unspecified limit is equivalent to the set value of
+        JINJA2_ENTRIES_PER_PAGE."""
+        provider = self.get_provider('ForFeed10')
+        entry    = provider.entry
+
+        expected = ([entries['2009-02-17-loren-ipsum'],
+                     entries['2009-02-13-sample']], 0)
+        returned = entry.for_feed('general', offset=0)
+
+        self.assertEqual(expected, returned)
+
+    def testForFeed11(self):
+        """firmant.datasource.atom.Entry.single
+        A ValueError should be raised for invalid slug."""
+        provider = self.get_provider('ForFeed11')
+        entry    = provider.entry
+
+        raises   = ValueError
+        function = lambda: entry.for_feed('s@mpl3')
+
+        self.assertRaises(raises, function)
+
     def testSingle1(self):
         """firmant.datasource.atom.Entry.single
         A valid entry should be returned for the given date."""
@@ -816,6 +851,28 @@ class TestEntry(unittest.TestCase):
 
         self.assertRaises(raises, function)
 
+    def testDay9(self):
+        """firmant.datasource.atom.Entry.day
+        An unspecified offset is equivalent to 0."""
+        provider = self.get_provider('Day9')
+        entry    = provider.entry
+
+        expected = ([entries['2009-02-13-sample']], 0)
+        returned = entry.day('2009', '02', '13', limit=1)
+
+        self.assertEqual(expected, returned)
+
+    def testDay10(self):
+        """firmant.datasource.atom.Entry.day
+        An unspecified limit is equivalent to the default."""
+        provider = self.get_provider('Day10')
+        entry    = provider.entry
+
+        expected = ([entries['2009-02-13-sample']], 0)
+        returned = entry.day('2009', '02', '13', offset=0)
+
+        self.assertEqual(expected, returned)
+
     def testMonth1(self):
         """firmant.datasource.atom.Entry.month
         A list of entries for a month for which there are entries."""
@@ -904,6 +961,29 @@ class TestEntry(unittest.TestCase):
         function = lambda: entry.month('2009', '02', limit=-1, offset=0)
 
         self.assertRaises(raises, function)
+
+    def testMonth9(self):
+        """firmant.datasource.atom.Entry.month
+        An unspecified offset is equivalent to 0."""
+        provider = self.get_provider('Month9')
+        entry    = provider.entry
+
+        expected = ([entries['2009-02-17-loren-ipsum']], 1)
+        returned = entry.month('2009', '02', limit=1)
+
+        self.assertEqual(expected, returned)
+
+    def testMonth10(self):
+        """firmant.datasource.atom.Entry.month
+        An unspecified limit is equivalent to the default."""
+        provider = self.get_provider('Month10')
+        entry    = provider.entry
+
+        expected = ([entries['2009-02-17-loren-ipsum'],
+                     entries['2009-02-13-sample']], 0)
+        returned = entry.month('2009', '02', offset=0)
+
+        self.assertEqual(expected, returned)
 
     def testYear1(self):
         """firmant.datasource.atom.Entry.year
@@ -1000,6 +1080,32 @@ class TestEntry(unittest.TestCase):
 
         self.assertRaises(raises, function)
 
+    def testYear9(self):
+        """firmant.datasource.atom.Entry.year
+        An unspecified offset is equivalent to 0."""
+        provider = self.get_provider('Year9')
+        entry    = provider.entry
+
+        expected = ([entries['2009-03-29-markdown'],
+                    entries['2009-03-17-sample']], 2)
+        returned = entry.year('2009', limit=2)
+
+        self.assertEqual(expected, returned)
+
+    def testYear10(self):
+        """firmant.datasource.atom.Entry.year
+        An unspecified limit is equivalent to the default."""
+        provider = self.get_provider('Year10')
+        entry    = provider.entry
+
+        expected = ([entries['2009-03-29-markdown'],
+                    entries['2009-03-17-sample'],
+                    entries['2009-02-17-loren-ipsum'],
+                    entries['2009-02-13-sample']], 0)
+        returned = entry.year('2009', offset=0)
+
+        self.assertEqual(expected, returned)
+
     def testRecent1(self):
         """firmant.datasource.atom.Entry.recent
         A list of entries should be returned."""
@@ -1070,6 +1176,32 @@ class TestEntry(unittest.TestCase):
         function = lambda: entry.recent(limit=-1, offset=0)
 
         self.assertRaises(raises, function)
+
+    def testRecent7(self):
+        """firmant.datasource.atom.Entry.recent
+        An unspecified offset is 0."""
+        provider = self.get_provider('Recent7')
+        entry    = provider.entry
+
+        expected = ([entries['2009-03-29-markdown'],
+                    entries['2009-03-17-sample']], 2)
+        returned = entry.recent(limit=2)
+
+        self.assertEqual(expected, returned)
+
+    def testRecent8(self):
+        """firmant.datasource.atom.Entry.recent
+        An unspecified limit is the default."""
+        provider = self.get_provider('Recent8')
+        entry    = provider.entry
+
+        expected = ([entries['2009-03-29-markdown'],
+                    entries['2009-03-17-sample'],
+                    entries['2009-02-17-loren-ipsum'],
+                    entries['2009-02-13-sample']], 0)
+        returned = entry.recent(offset=0)
+
+        self.assertEqual(expected, returned)
 
     def testToXML1(self):
         """firmant.datasource.atom.Entry.to_xml
