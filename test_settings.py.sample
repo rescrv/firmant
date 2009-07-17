@@ -3,14 +3,6 @@
 HOST = 'http://localhost:8080/'
 
 # Our enabled components
-PLUGINS = ['test.datasource.atom',
-           'firmant.plugins.filters.markdownfilter',
-           'firmant.plugins.datasource.flatfile.atom',
-           'firmant.views',
-           'firmant.plugins.views.txt',
-           'firmant.plugins.views.atom',
-           'firmant.plugins.views.jinja2viewprovider',
-           'firmant.plugins.views.jinja2globalplugins']
 VIEWS = [
 'firmant.plugins.views.jinja2viewprovider.Jinja2FrontendViewProvider',
                  'firmant.plugins.views.atom.AtomFeedViewProvider',

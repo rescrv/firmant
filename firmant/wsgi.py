@@ -31,8 +31,6 @@ class RequestContext(object):
 class Application(object):
 
     def __init__(self, settings):
-        for plugin in settings['PLUGINS']:
-            get_module(plugin)
         self.settings = settings
 
         if settings.get('MEDIA_FS_PATH', None) != None:
