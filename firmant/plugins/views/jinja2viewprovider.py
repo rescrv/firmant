@@ -7,7 +7,7 @@ from jinja2 import Environment, \
                    FileSystemLoader
 
 from firmant.datasource.atom import AtomProvider
-from firmant.plugins import PluginMount
+from firmant.plugins import MultiProviderPlugin
 from firmant.filters import FilterProvider
 
 
@@ -29,18 +29,14 @@ class Jinja2EntryPermalinkProvider(object):
         return urls.build(endpoint, values, force_external=True)
 
 
-class Jinja2GlobalProvider(object):
+class Jinja2GlobalProvider(MultiProviderPlugin):
 
-    __metaclass__ = PluginMount
-
-    def __init__(self, rc, settings):
-        self.rc = rc
-        self.settings = settings
+    providers_setting = 'JINJA2_GLOBALS'
 
     def globals_dict(self):
         ret = {}
-        for plugin in self.plugins:
-            ret.update(self.rc().get(plugin).globals_dict())
+        for plugin in self._plugins:
+            ret.update(plugin.globals_dict())
         return ret
 
 

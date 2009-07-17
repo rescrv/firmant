@@ -2,7 +2,11 @@ from firmant.plugins.views.jinja2viewprovider import Jinja2GlobalProvider
 from firmant.datasource.atom import AtomProvider
 
 
-class RecentEntriesPostedGlobalProvider(Jinja2GlobalProvider):
+class RecentEntriesPostedGlobalProvider(object):
+
+    def __init__(self, rc, settings):
+        self.rc       = rc
+        self.settings = settings
 
     def globals_dict(self):
         entries, remain = self.rc().get(AtomProvider).entry.recent(limit=5)
@@ -13,7 +17,11 @@ class RecentEntriesPostedGlobalProvider(Jinja2GlobalProvider):
             return {'recent_entries': permalinks}
 
 
-class MonthsPostedGlobalProvider(Jinja2GlobalProvider):
+class MonthsPostedGlobalProvider(object):
+
+    def __init__(self, rc, settings):
+        self.rc       = rc
+        self.settings = settings
 
     def globals_dict(self):
         months = self.rc().get(AtomProvider).entry.list_months()

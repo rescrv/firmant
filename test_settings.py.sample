@@ -26,6 +26,9 @@ ATOM_DEFAULT_TITLE = 'Firmant Atom Feed'
 ATOM_DEFAULT_RIGHTS = 'Same as source.'
 ATOM_DEFAULT_SUBTITLE = 'The default atom feed'
 
+JINJA2_GLOBALS = ['firmant.plugins.views.jinja2globalplugins.RecentEntriesPostedGlobalProvider',
+                  'firmant.plugins.views.jinja2globalplugins.MonthsPostedGlobalProvider']
+
 # Markdown options
 MARKDOWN_XHTML_ENABLED = True
 # Valid options: 'replace', 'remove', 'escape'
