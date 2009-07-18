@@ -164,6 +164,14 @@ feeds['general'].updated  = \
 feeds['general'].entries  = [entries['2009-02-17-loren-ipsum'],
                              entries['2009-02-13-sample']]
 
+feeds['empty'] = Feed()
+feeds['empty'].slug       = u"empty"
+feeds['empty'].title      = u"An Empty Feed"
+feeds['empty'].rights     = u"Same as source.\n"
+feeds['empty'].subtitle   = u"This feed has no entries."
+feeds['empty'].updated    = datetime.datetime.min
+feeds['empty'].entries    = []
+
 feeds['default'] = Feed()
 feeds['default'].slug     = u""
 feeds['default'].title    = u"Firmant Atom Feed"
@@ -1355,6 +1363,17 @@ class TestFeed(unittest.TestCase):
         function = lambda: feed.by_slug('!@#$')
 
         self.assertRaises(raises, function)
+
+    def testBySlug3(self):
+        """firmant.datasource.atom.Feed.by_slug
+        Test selecting feed with no entries."""
+        provider = self.get_provider('BySlug3')
+        feed     = provider.feed
+
+        expected = feeds['empty']
+        returned = feed.by_slug('empty')
+
+        self.assertEqual(expected, returned)
 
     def testDefault(self):
         """firmant.datasource.atom.Feed.default
