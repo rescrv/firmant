@@ -57,6 +57,18 @@ class TestFeed(BaseTestFeed):
     def setUp(self):
         pass
 
+    def testBadPerms(self):
+        '''firmant.plugins.datasource.flatfile.FlatfileAtomProvider.feed.by_slug
+        Test the case that permissions are not adequately set on feeds.'''
+        provider = self.get_provider('BySlug1')
+        feed     = provider.feed
+
+        expected = None
+        returned = feed.by_slug('badperms')
+
+        self.assertEqual(expected, returned)
+
+
     def get_provider(self, name):
         rc = RequestContext(settings)
         return rc.get(FlatfileAtomProvider)
