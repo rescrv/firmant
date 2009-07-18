@@ -55,5 +55,6 @@ class TestMarkdownFilter(unittest.TestCase):
         self.assertEqual(expected, returned)
 
 
+from test import add_test
 suite = unittest.TestSuite()
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestMarkdownFilter))
+add_test(suite, TestMarkdownFilter)

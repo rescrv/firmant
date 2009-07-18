@@ -1457,8 +1457,9 @@ class DummyFeedPermalinkProvider(FeedPermalinkProvider):
         return ''
 
 
+from test import add_test
 suite = unittest.TestSuite()
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestAtomBase))
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestAtomObjectFilter))
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestAtomObjectListFilter))
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestDatetimeFilter))
+add_test(suite, TestAtomBase)
+add_test(suite, TestAtomObjectFilter)
+add_test(suite, TestAtomObjectListFilter)
+add_test(suite, TestDatetimeFilter)

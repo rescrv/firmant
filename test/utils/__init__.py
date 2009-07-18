@@ -106,9 +106,10 @@ class TestUniq(unittest.TestCase):
         self.assertEqual(expected, returned)
 
 
+from test import add_test
 suite = unittest.TestSuite()
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestNotImplemented))
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestGetModule))
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestModToDict))
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestRFC3339))
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestUniq))
+add_test(suite, TestNotImplemented)
+add_test(suite, TestGetModule)
+add_test(suite, TestModToDict)
+add_test(suite, TestRFC3339)
+add_test(suite, TestUniq)

@@ -59,5 +59,6 @@ class FilterProviderTest(unittest.TestCase):
         self.assertRaises(raises, function)
 
 
+from test import add_test
 suite = unittest.TestSuite()
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(FilterProviderTest))
+add_test(suite, FilterProviderTest)

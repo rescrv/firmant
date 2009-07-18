@@ -74,8 +74,9 @@ class TestFeed(BaseTestFeed):
         return rc.get(FlatfileAtomProvider)
 
 
+from test import add_test
 suite = unittest.TestSuite()
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestAuthor))
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestCategory))
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestEntry))
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestFeed))
+add_test(suite, TestAuthor)
+add_test(suite, TestCategory)
+add_test(suite, TestEntry)
+add_test(suite, TestFeed)

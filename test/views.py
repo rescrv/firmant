@@ -44,5 +44,6 @@ class TestCatchallProvider(unittest.TestCase):
         self.assertEqual(expected, returned)
 
 
+from test import add_test
 suite = unittest.TestSuite()
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(TestCatchallProvider))
+add_test(suite, TestCatchallProvider)

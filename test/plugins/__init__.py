@@ -98,7 +98,8 @@ class LoadPluginTest(unittest.TestCase):
         self.assertEqual(expected, returned)
 
 
+from test import add_test
 suite = unittest.TestSuite()
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(SingleProviderPluginTest))
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(MultiProviderPluginTest))
-suite.addTests(unittest.TestLoader().loadTestsFromTestCase(LoadPluginTest))
+add_test(suite, SingleProviderPluginTest)
+add_test(suite, MultiProviderPluginTest)
+add_test(suite, LoadPluginTest)
