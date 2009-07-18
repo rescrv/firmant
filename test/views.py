@@ -1,7 +1,78 @@
 import unittest
-from werkzeug.routing import Map
+from werkzeug.routing import Map, Rule
+from werkzeug import Response
 
 from firmant.views import CatchallProvider
+from firmant.views import ViewProvider
+from firmant.wsgi import RequestContext
+
+
+class DummyViewProvider(object):
+
+    def __init__(self, rc, settings):
+        pass
+
+    @property
+    def rules(self):
+        url_rules = [
+            Rule('/' + self.name, endpoint=self.name + 'ViewProvider')
+        ]
+        return url_rules
+
+
+class FooViewProvider(DummyViewProvider):
+    name = 'Foo'
+
+class BarViewProvider(DummyViewProvider):
+    name = 'Bar'
+
+class BazViewProvider(DummyViewProvider):
+    name = 'Baz'
+
+class QuuxViewProvider(DummyViewProvider):
+    name = 'Quux'
+
+
+class TestViewProvider(unittest.TestCase):
+
+    def setUp(self):
+        views    = map(lambda x: 'test.views.%sViewProvider' % x,
+                        ['Foo', 'Bar', 'Baz', 'Quux'])
+        self.settings = {'VIEWS': views}
+        self.rc       = RequestContext(self.settings)
+        self.vp       = self.rc.get(ViewProvider)
+        self.urlmap   = self.vp.url_map
+
+    def testUrlMap(self):
+        '''firmant.views.ViewProvider.url_map'''
+
+        urlmap   = self.urlmap
+
+        expected = [('FooViewProvider', '/Foo'),
+                    ('BarViewProvider', '/Bar'),
+                    ('BazViewProvider', '/Baz'),
+                    ('QuuxViewProvider', '/Quux')]
+        returned = map(lambda x: (x.endpoint, x.rule), urlmap.iter_rules())
+
+        self.assertEqual(expected, returned)
+
+    def testGetClass1(self):
+        '''firmant.views.ViewProvider.get_class
+        Get the instantiated class for valid endpoint.'''
+
+        instance = self.vp.get_class('test.views.FooViewProvider')
+        returned = isinstance(instance, FooViewProvider)
+
+        self.assertTrue(returned)
+
+    def testGetClass2(self):
+        '''firmant.views.ViewProvider.get_class
+        Receive 'None' if we ask for an invalid endpoint'''
+
+        expected = None
+        returned = self.vp.get_class('Invalid Endpoint')
+
+        self.assertEqual(expected, returned)
 
 
 class TestCatchallProvider(unittest.TestCase):
@@ -46,4 +117,5 @@ class TestCatchallProvider(unittest.TestCase):
 
 from test import add_test
 suite = unittest.TestSuite()
+add_test(suite, TestViewProvider)
 add_test(suite, TestCatchallProvider)
