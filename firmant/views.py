@@ -25,8 +25,7 @@ class ViewProvider(MultiProviderPlugin):
 class CatchallProvider(object):
 
     def __init__(self, rc, settings):
-        self.rc       = rc
-        self.settings = settings
+        pass
 
     @property
     def rules(self):
