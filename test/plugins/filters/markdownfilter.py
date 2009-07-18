@@ -1,4 +1,5 @@
 import unittest
+import markdown
 
 from firmant.plugins.filters.markdownfilter import MarkdownFilter
 
@@ -36,7 +37,7 @@ class TestMarkdownFilter(unittest.TestCase):
         settings = {'MARKDOWN_XHTML_SAFE_MODE': None}
         filter   = MarkdownFilter(None, settings)
 
-        expected = '<p>Hello World\n</p>'
+        expected = markdown.markdown('Hello World')
         returned = filter.filter('XHMTL', 'Hello World')
 
         self.assertEqual(expected, returned)
@@ -48,8 +49,8 @@ class TestMarkdownFilter(unittest.TestCase):
         settings = {'MARKDOWN_XHTML_SAFE_MODE': 'remove'}
         filter   = MarkdownFilter(None, settings)
 
-        expected = '<p>Hello World\n</p>'
-        returned = filter.filter('XHMTL', '<em>Hello World</em>')
+        expected = markdown.markdown('<em>HelloWorld</em>', safe_mode='remove')
+        returned = filter.filter('XHMTL', '<em>HelloWorld</em>')
 
         self.assertEqual(expected, returned)
 
