@@ -1,10 +1,14 @@
 #!/usr/bin/python
 import unittest
-from firmant.utils import get_module
+import sys
+
 # Import this now to avoid it throwing errors.
 import pytz
 
 from test import suite
 
 if __name__ == '__main__':
-    unittest.TextTestRunner(verbosity=2).run(suite)
+    results = unittest.TextTestRunner(verbosity=2).run(suite)
+
+    if not results.wasSuccessful():
+        sys.exit(1)
