@@ -103,3 +103,9 @@ suite = unittest.TestSuite()
 add_test(suite, SingleProviderPluginTest)
 add_test(suite, MultiProviderPluginTest)
 add_test(suite, LoadPluginTest)
+
+from test.plugins.datasource import suite as datasource_tests
+suite.addTests(datasource_tests)
+
+from test.plugins.filters import suite as filters_tests
+suite.addTests(filters_tests)
