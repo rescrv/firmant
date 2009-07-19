@@ -21,6 +21,8 @@ MARKDOWN_XHTML_ENABLED = True
 # Valid options: 'replace', 'remove', 'escape'
 MARKDOWN_XHTML_SAFE_MODE = 'escape'
 
+RESTRUCTUREDTEXT_XHTML_ENABLED = True
+
 # Backend options
 ATOM_PROVIDER = 'firmant.plugins.datasource.flatfile.atom.FlatfileAtomProvider'
 
