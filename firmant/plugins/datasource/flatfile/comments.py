@@ -20,7 +20,23 @@ class FlatfileCommentProvider(object):
         self.settings = settings
 
     def for_entry(self, status, slug, year, month, day):
-        not_implemented()
+        try:
+            dt = datetime.date(int(year), int(month), int(day))
+        except ValueError:
+            raise
+        if status == '':
+            raise ValueError("Status is ''")
+        comments_list = self._list()
+        def status_filter(comment):
+            if status is None:
+                return True
+            else:
+                return comment[0] == status
+        comments_list = filter(status_filter, comments_list)
+        def entry_filter(comment):
+            return comment[1] == (dt, slug)
+        comments_list = filter(entry_filter, comments_list)
+        return map(lambda x: self._load_one(*x), comments_list)
 
     def _list(self):
         '''Returns a list of comments.  It's a tuple:
