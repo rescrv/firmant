@@ -2,6 +2,8 @@ import datetime
 import pytz
 import os
 import re
+import time
+import calendar
 
 from firmant.utils import not_implemented
 from firmant.datasource.comments import Comment
@@ -19,6 +21,44 @@ class FlatfileCommentProvider(object):
 
     def for_entry(self, status, slug, year, month, day):
         not_implemented()
+
+    def _list(self):
+        '''Returns a list of comments.  It's a tuple:
+        (status, entry_pkey (date, slug), time_published, comment_id).
+        This tuple is unique to this implementation.'''
+        comment_base = os.path.join(self.settings['FLATFILE_BASE'], 'comments')
+        ret = []
+        statuses = os.listdir(comment_base)
+        for status in statuses:
+            comments = os.listdir(os.path.join(comment_base, status))
+            for comment in comments:
+                match = comment_re.match(comment)
+                if match != None:
+                    groups = match.groupdict()
+                    try:
+                        dt = datetime.date(int(groups['year']),
+                                           int(groups['month']),
+                                           int(groups['day']))
+                        slug = groups['slug']
+                        created = int(groups['created'])
+                        id = groups['id']
+                        ret.append((status, (dt, slug), created, id))
+                    except ValueError:
+                        pass
+        def sort_results(a, b):
+            if a[1] == b[1]:
+                if a[2] < b[2]:
+                    return -1
+                elif a[2] > b[2]:
+                    return 1
+                else:
+                    return 0
+            elif a[1] < b[1]:
+                return -1
+            elif a[1] > b[1]:
+                return 1
+        ret.sort(sort_results)
+        return ret
 
     def _load_one(self, status, entry_pkey, created, id):
         comment_dt       = entry_pkey[0].strftime('%Y,%m,%d')
@@ -58,7 +98,7 @@ class FlatfileCommentProvider(object):
         comment.status = status
         comment.entry_pkey = entry_pkey
 
-        created_dt      = datetime.datetime.fromtimestamp(created)
-        comment.created = pytz.utc.localize(created_dt)
+        comment.created = datetime.datetime(*time.gmtime(created)[:6],
+                tzinfo=pytz.utc)
 
         return comment
