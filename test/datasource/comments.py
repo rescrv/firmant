@@ -4,6 +4,7 @@ import pytz
 
 from firmant.utils import not_implemented
 from firmant.datasource.comments import Comment
+from firmant.datasource.comments import CommentProvider
 
 
 comments = {}
@@ -205,3 +206,29 @@ class TestCommentProvider(unittest.TestCase):
         function = lambda: provider.for_entry('spam', 'comments', 2009, 2, '1$')
 
         self.assertRaises(raised, function)
+
+    def testDelete1(self):
+        '''firmant.datasource.comments.CommentProvider.delete
+        Use a non-existent comment object.  When delete is called, it should
+        return ExistenceError.'''
+        provider = self.provider
+        c        = comments["jsmith'"]
+
+        raised   = CommentProvider.DoesNotExistError
+        function = lambda: provider.delete(c)
+
+        self.assertRaises(raised, function)
+
+    def testDelete2(self):
+        '''firmant.datasource.comments.CommentProvider.delete
+        Delete a comment known to be in the system.  Should throw no errors.'''
+        provider = self.provider
+        todelete = comments['rescriva2']
+
+        expected = None
+        returned = provider.delete(todelete)
+        self.assertEqual(expected, returned)
+
+        expected = [comments['rescriva']]
+        returned = provider.for_entry('published', 'comments-enabled', 2009, 7, 18)
+        self.assertEqual(expected, returned)

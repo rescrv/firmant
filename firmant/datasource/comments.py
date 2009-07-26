@@ -32,3 +32,7 @@ class CommentProvider(SingleProviderPlugin):
 
     def for_entry(self, status, slug, year, month, day):
         return self._provider.for_entry(status, slug, year, month, day)
+
+    class DoesNotExistError(Exception): pass
+    class StorageError(Exception): pass
+    class UniqueViolationError(Exception): pass
