@@ -63,6 +63,24 @@ class TestCommentProvider(BaseTestCommentProvider):
 
         self.assertEqual(expected, returned)
 
+    def testList1(self):
+        '''firmant.plugins.datasource.flatfile.comments.FlatfileCommentProvider._list'''
+        expected = [('published',
+                     (datetime.date(2009, 7, 18), 'comments-enabled'),
+                     1247916306, 'ad9d83756efde485089bdf27119fe37c3cc9da6d'),
+                    ('published',
+                     (datetime.date(2009, 7, 18), 'comments-enabled'),
+                     1248002706, 'ad9d83756efde485089bdf27119fe37c3cc9da6d'),
+                    ('unpublished',
+                     (datetime.date(2009, 7, 18), 'comments-enabled'),
+                     1248003150, '0279dd3ca037767782fed2e788ab68da40b2a445'),
+                    ('spam',
+                     (datetime.date(2009, 7, 18), 'comments-enabled'),
+                     1248003454, 'e6f4aadf75637bb4649a9a12eee7f32ee9b81a1c')]
+        returned = self.provider._list()
+
+        self.assertEqual(expected, returned)
+
 
 from test import add_test
 suite = unittest.TestSuite()
