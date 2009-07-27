@@ -7,13 +7,17 @@ from firmant.plugins.datasource.flatfile.comments import FlatfileCommentProvider
 
 from test.datasource.comments import TestCommentProvider as BaseTestCommentProvider
 from test.datasource.comments import comments
+from test.utils import clone_dir_to_tmp
 
 
 class TestCommentProvider(BaseTestCommentProvider):
 
     def setUp(self):
-        settings = {'FLATFILE_BASE': 'checkout/'}
-        self.provider = FlatfileCommentProvider(None, settings)
+        self.tmpdir = tmp = clone_dir_to_tmp('checkout/')
+        self.provider = FlatfileCommentProvider(None, {'FLATFILE_BASE': tmp})
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir)
 
     def testLoadOne1(self):
         '''firmant.plugins.datasource.flatfile.comments.FlatfileCommentProvider._load_one'''

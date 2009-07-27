@@ -1,4 +1,5 @@
 import datetime
+import time
 import pytz
 import os
 import re
@@ -7,6 +8,8 @@ import calendar
 
 from firmant.utils import not_implemented
 from firmant.datasource.comments import Comment
+from firmant.datasource.comments import CommentProvider
+from firmant.utils import sha1
 
 
 comment_re = r'(?P<year>\d{4}),(?P<month>\d{2}),(?P<day>\d{2}),(?P<slug>.+)' +\
@@ -37,6 +40,37 @@ class FlatfileCommentProvider(object):
             return comment[1] == (dt, slug)
         comments_list = filter(entry_filter, comments_list)
         return map(lambda x: self._load_one(*x), comments_list)
+
+    def save(self, comment):
+        try:
+            comment_path = self._file(comment)
+            if os.path.exists(comment_path):
+                raise CommentProvider.UniqueViolationError('Comment already exists')
+            contents = self._file_contents(comment)
+            f = open(comment_path, 'w')
+            f.write(contents)
+            f.flush()
+            f.close()
+        except CommentProvider.UniqueViolationError:
+            raise
+        except:
+            raise CommentProvider.StorageError()
+
+    def _file(self, comment):
+        status     = comment.status
+        entry_pkey = comment.entry_pkey
+        created    = calendar.timegm(comment.created.utctimetuple())
+        id         = sha1(self._file_contents(comment))
+        return self.__file(status, entry_pkey, created, id)
+
+    def _file_contents(self, comment):
+        file_contents  = 'Name:\t%s\n' % comment.name
+        file_contents += 'Email:\t%s\n' % comment.email
+        file_contents += 'URL:\t%s\n' % comment.url
+        file_contents += 'Host:\t%s\n' % comment.ip
+        file_contents += 'Agent:\t%s\n' % comment.useragent
+        file_contents += '\n%s\n' % comment.content
+        return file_contents
 
     def __file(self, status, entry_pkey, created, id):
         comment_dt       = entry_pkey[0].strftime('%Y,%m,%d')

@@ -1,6 +1,9 @@
 import unittest
 import datetime
 import pytz
+import tempfile
+import os
+import shutil
 
 from firmant.utils import not_implemented
 from firmant.utils import get_module
@@ -114,6 +117,18 @@ class TestSha1(unittest.TestCase):
 
         expected = '8819d19069fae6b4bac183d1f16553abab16b54f'
         returned = sha1('potatoes')
+
+
+def clone_dir_to_tmp(dirpath):
+    tmpdir = tempfile.mkdtemp()
+    tomove = os.listdir(dirpath)
+    for file in tomove:
+        full_path = os.path.join(dirpath, file)
+        if os.path.isfile(full_path):
+            shutil.copy2(full_path, os.path.join(tmpdir, file))
+        elif os.path.isdir(full_path):
+            shutil.copytree(full_path, os.path.join(tmpdir, file))
+    return tmpdir
 
 
 from test import add_test
