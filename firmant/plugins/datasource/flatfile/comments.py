@@ -163,7 +163,8 @@ class FlatfileCommentProvider(object):
         comment.status = status
         comment.entry_pkey = entry_pkey
 
-        comment.created = datetime.datetime(*time.gmtime(created)[:6],
+        year, month, day, hour, min, sec = tuple(time.gmtime(created)[:6])
+        comment.created = datetime.datetime(year, month, day, hour, min, sec,
                 tzinfo=pytz.utc)
 
         return comment
