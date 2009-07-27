@@ -60,3 +60,13 @@ def uniq_presorted(l):
         return ret
     else:
         return []
+
+def sha1(text):
+    try:
+        import hashlib
+        s = hashlib.new('sha1')
+    except ImportError: # pragma: no cover
+        import sha
+        s = sha.new()
+    s.update(text)
+    return s.hexdigest()

@@ -7,6 +7,7 @@ from firmant.utils import get_module
 from firmant.utils import mod_to_dict
 from firmant.utils import RFC3339
 from firmant.utils import uniq
+from firmant.utils import sha1
 from firmant.utils import uniq_presorted
 from test.data.settings import full
 
@@ -106,6 +107,15 @@ class TestUniq(unittest.TestCase):
         self.assertEqual(expected, returned)
 
 
+class TestSha1(unittest.TestCase):
+
+    def testSha1(self):
+        '''firmant.utils.sha1'''
+
+        expected = '8819d19069fae6b4bac183d1f16553abab16b54f'
+        returned = sha1('potatoes')
+
+
 from test import add_test
 suite = unittest.TestSuite()
 add_test(suite, TestNotImplemented)
@@ -113,3 +123,4 @@ add_test(suite, TestGetModule)
 add_test(suite, TestModToDict)
 add_test(suite, TestRFC3339)
 add_test(suite, TestUniq)
+add_test(suite, TestSha1)
