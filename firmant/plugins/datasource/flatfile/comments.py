@@ -56,6 +56,17 @@ class FlatfileCommentProvider(object):
         except:
             raise CommentProvider.StorageError()
 
+    def delete(self, comment):
+        try:
+            comment_path = self._file(comment)
+            if not os.path.exists(comment_path):
+                raise CommentProvider.DoesNotExistError('Comment does not exist')
+            os.unlink(comment_path)
+        except CommentProvider.DoesNotExistError:
+            raise
+        except:
+            raise CommentProvider.StorageError()
+
     def _file(self, comment):
         status     = comment.status
         entry_pkey = comment.entry_pkey
