@@ -38,6 +38,16 @@ class FlatfileCommentProvider(object):
         comments_list = filter(entry_filter, comments_list)
         return map(lambda x: self._load_one(*x), comments_list)
 
+    def __file(self, status, entry_pkey, created, id):
+        comment_dt       = entry_pkey[0].strftime('%Y,%m,%d')
+        comment_filename = '%s,%s,%i,%s' % \
+                (comment_dt, entry_pkey[1], created, id)
+        comment_path     = os.path.join(self.settings['FLATFILE_BASE'],
+                                    'comments',
+                                    status,
+                                    comment_filename)
+        return comment_path
+
     def _list(self):
         '''Returns a list of comments.  It's a tuple:
         (status, entry_pkey (date, slug), time_published, comment_id).
@@ -77,13 +87,7 @@ class FlatfileCommentProvider(object):
         return ret
 
     def _load_one(self, status, entry_pkey, created, id):
-        comment_dt       = entry_pkey[0].strftime('%Y,%m,%d')
-        comment_filename = '%s,%s,%i,%s' % \
-                (comment_dt, entry_pkey[1], created, id)
-        comment_path     = os.path.join(self.settings['FLATFILE_BASE'],
-                                    'comments',
-                                    status,
-                                    comment_filename)
+        comment_path = self.__file(status, entry_pkey, created, id)
 
         if not os.access(comment_path, os.R_OK):
             return None
