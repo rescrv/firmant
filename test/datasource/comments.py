@@ -232,3 +232,40 @@ class TestCommentProvider(unittest.TestCase):
         expected = [comments['rescriva']]
         returned = provider.for_entry('published', 'comments-enabled', 2009, 7, 18)
         self.assertEqual(expected, returned)
+
+    def testSave1(self):
+        '''firmant.datasource.comments.CommentProvider.save
+        Save a comment successfully.'''
+        provider      = self.provider
+        c             = Comment()
+        c.name        = 'Foo Bar'
+        c.email       = 'foobar@example.org'
+        c.url         = 'http://example.org/'
+        c.ip          = '127.0.0.1'
+        c.useragent   = "No User Agent"
+        c.created     = \
+                datetime.datetime(2009, 7, 22, 16, 16, 28, tzinfo=pytz.utc)
+        c.content     = "Newly created comment"
+        c.status      = "published"
+        c.entry_pkey  = \
+                (datetime.date(2009, 7, 18), "comments-enabled")
+
+        provider.save(c)
+
+        expected = [comments['rescriva2'],
+                    comments['rescriva'],
+                    c]
+        returned = provider.for_entry('published', 'comments-enabled', 2009, 7, 18)
+
+        self.assertEqual(expected, returned)
+
+    def testSave2(self):
+        '''firmant.datasource.comments.CommentProvider.save
+        Save a comment object identical to an already saved object.  Should
+        throw a UniqueViolationError.'''
+        provider = self.provider
+
+        raised   = CommentProvider.UniqueViolationError
+        function = lambda: provider.save(comments['rescriva'])
+
+        self.assertRaises(raised, function)
