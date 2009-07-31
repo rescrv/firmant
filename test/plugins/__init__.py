@@ -109,3 +109,6 @@ suite.addTests(datasource_tests)
 
 from test.plugins.filters import suite as filters_tests
 suite.addTests(filters_tests)
+
+from test.plugins.csrf import suite as csrf_tests
+suite.addTests(csrf_tests)
