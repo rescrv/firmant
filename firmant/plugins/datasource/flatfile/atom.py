@@ -133,6 +133,20 @@ class FlatfileAtomProvider(AtomProvider):
                 return cls._load_many(entry_list)
 
             @classmethod
+            def exists(cls, slug, year, month, day):
+                if provider_self.slug_re.match(slug) == None:
+                    return False
+                try:
+                    year  = int(year)
+                    month = int(month)
+                    day   = int(day)
+                    dt    = datetime.date(year, month, day)
+                except ValueError:
+                    return False
+                valid_paths = cls._validate(slug, dt)
+                return valid_paths is not None
+
+            @classmethod
             def single(cls, slug, year, month, day):
                 if provider_self.slug_re.match(slug) == None:
                     raise ValueError("Invalid slug")

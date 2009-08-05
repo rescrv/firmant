@@ -1328,6 +1328,28 @@ class TestEntry(unittest.TestCase):
 
         self.assertEqual(expected, returned)
 
+    def testExists1(self):
+        """firmant.datasource.atom.Entry.exists
+        Returns true for an existing entry."""
+        provider = self.get_provider('Exists1')
+        entry    = provider.entry
+
+        expected = True
+        returned = entry.exists('markdown', 2009, 3, 29)
+
+        self.assertEqual(expected, returned)
+
+    def testExists2(self):
+        """firmant.datasource.atom.Entry.exists
+        Returns true for an existing entry."""
+        provider = self.get_provider('Exists2')
+        entry    = provider.entry
+
+        expected = False
+        returned = entry.exists('noexist', 2009, 3, 29)
+
+        self.assertEqual(expected, returned)
+
 
 class TestFeed(unittest.TestCase):
 
