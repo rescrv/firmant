@@ -7,6 +7,7 @@ VIEWS = [
 'firmant.plugins.views.jinja2viewprovider.Jinja2FrontendViewProvider',
                  'firmant.plugins.views.atom.AtomFeedViewProvider',
                  'firmant.plugins.views.txt.TxtFrontendViewProvider',
+                 'firmant.plugins.views.comments.CommentSubmissionHandler',
                  'firmant.views.CatchallProvider']
 ENTRY_PERMALINK = 'firmant.plugins.views.jinja2viewprovider.Jinja2EntryPermalinkProvider'
 FEED_PERMALINK  = 'firmant.plugins.views.atom.AtomFeedPermalinkProvider'
@@ -15,7 +16,8 @@ TEXT_FILTERS = ['firmant.plugins.filters.markdownfilter.MarkdownFilter']
 
 JINJA2_GLOBALS = ['firmant.plugins.views.jinja2globalplugins.RecentEntriesPostedGlobalProvider',
                   'firmant.plugins.views.jinja2globalplugins.MonthsPostedGlobalProvider',
-                  'firmant.plugins.views.jinja2globalplugins.CSRFTokenGlobalProvider']
+                  'firmant.plugins.views.jinja2globalplugins.CSRFTokenGlobalProvider',
+                  'firmant.plugins.views.comments.CommentDataGlobalProvider']
 
 # Markdown options
 MARKDOWN_XHTML_ENABLED = True
@@ -45,3 +47,10 @@ import tempfile
 CSRF_TOKENS_DIR = tempfile.gettempdir()
 CSRF_TOKEN_TTL = 3600
 CSRF_TOKEN_PROVIDER = 'firmant.plugins.csrf.flatfile.FlatfileCSRFTokenProvider'
+
+COMMENT_SUBMISSION_PREFIX = 'comments'
+COMMENT_SUBMISSION_ENABLED = True
+
+COMMENT_STATUS_DEFAULT = 'unpublished'
+
+COMMENT_PROVIDER = 'firmant.plugins.datasource.flatfile.comments.FlatfileCommentProvider'

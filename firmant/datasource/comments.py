@@ -33,6 +33,12 @@ class CommentProvider(SingleProviderPlugin):
     def for_entry(self, status, slug, year, month, day):
         return self._provider.for_entry(status, slug, year, month, day)
 
+    def save(self, comment):
+        return self._provider.save(comment)
+
+    def delete(self, comment):
+        return self._provider.delete(comment)
+
     class DoesNotExistError(Exception): pass
     class StorageError(Exception): pass
     class UniqueViolationError(Exception): pass
