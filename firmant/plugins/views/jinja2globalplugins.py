@@ -1,5 +1,8 @@
+from werkzeug import Request
+
 from firmant.plugins.views.jinja2viewprovider import Jinja2GlobalProvider
 from firmant.datasource.atom import AtomProvider
+from firmant.csrf import CSRFTokenProvider
 
 
 class RecentEntriesPostedGlobalProvider(object):
@@ -38,3 +41,17 @@ class MonthsPostedGlobalProvider(object):
                 return (dt.strftime('%B %Y'),
                         urls.build(endpoint, values, force_external=True))
             return {'list_months': map(to_permalink, months)}
+
+
+class CSRFTokenGlobalProvider(object):
+
+    def __init__(self, rc, settings):
+        self.rc       = rc
+        self.settings = settings
+
+    def globals_dict(self):
+        rc = self.rc()
+        csrf_provider = rc.get(CSRFTokenProvider)
+        ip_addr = rc.get(Request).remote_addr
+
+        return {'csrf_token': lambda: csrf_provider.request_token(ip_addr)}

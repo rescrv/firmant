@@ -20,4 +20,29 @@
             {{ entry.updated.strftime("%H:%M") }}.</span>
     </div>
 </div>
+<div class="entry">
+    <h1>Share your thoughts</h1>
+    <form action="" method="post" id="commentform">
+        <p>
+            <input type="text" id="author" name="author" value="" size="22" tabindex="1" />
+            <label for="author">Name (required)</label>
+        </p>
+        <p>
+            <input type="text" id="email" name="email" value="" size="22" tabindex="2" />
+            <label for="email">Mail (will not be published) (required)</label>
+        </p>
+        <p>
+            <input type="text" id="url" name="url" value="" size="22" tabindex="3" />
+            <label for="url">Website</label>
+        </p>
+        <p>
+            <textarea name="comment" cols="150" rows="10" tabindex="4">
+            </textarea>
+        </p>
+        <p>
+            <input name="submit" type="submit" tabindex="5" value="Submit Comment" />
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        </p>
+    </form>
+</div>
 {% endblock %}

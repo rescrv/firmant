@@ -14,7 +14,8 @@ FEED_PERMALINK  = 'firmant.plugins.views.atom.AtomFeedPermalinkProvider'
 TEXT_FILTERS = ['firmant.plugins.filters.markdownfilter.MarkdownFilter']
 
 JINJA2_GLOBALS = ['firmant.plugins.views.jinja2globalplugins.RecentEntriesPostedGlobalProvider',
-                  'firmant.plugins.views.jinja2globalplugins.MonthsPostedGlobalProvider']
+                  'firmant.plugins.views.jinja2globalplugins.MonthsPostedGlobalProvider',
+                  'firmant.plugins.views.jinja2globalplugins.CSRFTokenGlobalProvider']
 
 # Markdown options
 MARKDOWN_XHTML_ENABLED = True
@@ -38,3 +39,9 @@ JINJA2_ENTRIES_PER_PAGE = 1
 
 MEDIA_FS_PATH = 'templates/static'
 MEDIA_URL_PATH = '/static/'
+
+CSRF_SERVER_SECRET = 'A SECRET KNOWN TO THE SERVER'
+import tempfile
+CSRF_TOKENS_DIR = tempfile.gettempdir()
+CSRF_TOKEN_TTL = 3600
+CSRF_TOKEN_PROVIDER = 'firmant.plugins.csrf.flatfile.FlatfileCSRFTokenProvider'
