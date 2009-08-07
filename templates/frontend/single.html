@@ -20,23 +20,32 @@
             {{ entry.updated.strftime("%H:%M") }}.</span>
     </div>
 </div>
+{% if comments_enabled %}
 <div class="entry">
-    <h1>Share your thoughts</h1>
+    <h2>Share your thoughts</h2>
+    {% if comment_message == 'CSRF' %}
+    <p>Your submission did not submit properly.  This could be because you
+    waited too long to submit, or because someone is trying to forge a comment
+    submission from your IP.  In either case, you're free to submit again.</p>
+    {% elif comment_message == 'DATA' %}
+    <p>Your submission did not validate.  Did you fill in all fields?
+    Is the url or email a proper one?</p>
+    {% endif %}
     <form action="{{ comment_post_url(entry.published, entry.slug) }}" method="post" id="commentform">
         <p>
-            <input type="text" id="name" name="name" value="" size="22" tabindex="1" />
+            <input type="text" id="name" name="name" value="{{ comment_name|escape }}" size="22" tabindex="1" />
             <label for="name">Name (required)</label>
         </p>
         <p>
-            <input type="text" id="email" name="email" value="" size="22" tabindex="2" />
+            <input type="text" id="email" name="email" value="{{ comment_email|escape }}" size="22" tabindex="2" />
             <label for="email">Mail (will not be published) (required)</label>
         </p>
         <p>
-            <input type="text" id="url" name="url" value="" size="22" tabindex="3" />
+            <input type="text" id="url" name="url" value="{{ comment_url|escape }}" size="22" tabindex="3" />
             <label for="url">Website</label>
         </p>
         <p>
-            <textarea name="comment" cols="150" rows="10" tabindex="4"></textarea>
+            <textarea name="comment" cols="150" rows="10" tabindex="4">{{ comment_comment|escape }}</textarea>
         </p>
         <p>
             <input name="submit" type="submit" tabindex="5" value="Submit Comment" />
@@ -44,4 +53,9 @@
         </p>
     </form>
 </div>
+{% else %}
+<div class="entry">
+    <h2>Comments Are Disabled.</h2>
+</div>
+{% endif %}
 {% endblock %}

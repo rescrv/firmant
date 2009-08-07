@@ -1,12 +1,21 @@
 import datetime
+import urlparse
+import urllib
+from werkzeug import Request
 from werkzeug import Response
+from werkzeug.exceptions import MethodNotAllowed
+from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import InternalServerError
 from werkzeug.routing import Rule, \
                              Submount
+from werkzeug.utils import redirect
 
 from firmant.csrf import CSRFTokenProvider
 from firmant.datasource.atom import AtomProvider
+from firmant.datasource.atom import EntryPermalinkProvider
 from firmant.datasource.comments import Comment
 from firmant.datasource.comments import CommentProvider
+from firmant.plugins.views.jinja2viewprovider import Jinja2FrontendViewProvider
 
 
 class CommentDataGlobalProvider(object):
@@ -26,7 +35,18 @@ class CommentDataGlobalProvider(object):
 
             urls = self.rc().get('urls')
             return urls.build(endpoint, values, force_external=True)
-        return {'comment_post_url': comment_post_url}
+        ret = {}
+        ret['comment_post_url'] = comment_post_url
+        enabled = self.settings.get('COMMENT_SUBMISSION_ENABLED', False)
+        ret['comments_enabled'] = enabled
+
+        request = self.rc().get(Request)
+        ret['comment_name']    = request.args.get('name', '')
+        ret['comment_email']   = request.args.get('email', '')
+        ret['comment_url']     = request.args.get('url', '')
+        ret['comment_comment'] = request.args.get('comment', '')
+        ret['comment_message'] = request.args.get('message', '')
+        return ret
 
 
 class CommentSubmissionHandler(object):
@@ -77,50 +97,75 @@ class CommentSubmissionHandler(object):
             c.entry_pkey = \
                     (datetime.date(int(year), int(month), int(day)), slug)
         except ValueError:
-            return self.invalid_data()
+            return self.invalid_data(request, c)
         if c.name == '' or \
             c.email == '' or \
             c.url == '' or \
             c.content == '':
-            return self.invalid_data()
+            return self.invalid_data(request, c)
 
         # Check for valid csrf token.
         csrf_token = request.form.get('csrf_token', '')
         ip_addr    = request.remote_addr
         if not rc.get(CSRFTokenProvider).consume_token(csrf_token, ip_addr):
-            return self.invalid_csrf_token()
+            return self.invalid_csrf_token(request, c)
 
         # Store comment object
         comment_provider = rc.get(CommentProvider)
         try:
             comment_provider.save(c)
         except CommentProvider.UniqueViolationError:
-            return self.unique_error()
+            return self.unique_error(c)
         except CommentProvider.StorageError:
             return self.storage_error()
 
-        return self.success()
+        return self.success(c)
 
     def method_not_allowed(self):
-        return Response('Method not allowed.', mimetype='text/plain')
+        raise MethodNotAllowed(['POST'], 'You may only POST to this URL.')
 
     def comments_disabled(self):
-        return Response('Submission of comments is disabled.', mimetype='text/plain')
+        jinja = self.rc().get(Jinja2FrontendViewProvider)
+        return jinja.render_response('frontend/comments/disabled.html', {})
 
     def entry_doesnot_exist(self):
-        return Response('Entry does not exist.', mimetype='text/plain')
+        raise NotFound()
 
-    def invalid_csrf_token(self):
-        return Response('Invalid CSRF Token.', mimetype='text/plain')
+    def invalid_csrf_token(self, request, c):
+        return self.common(request, c, 'CSRF')
 
-    def invalid_data(self):
-        return Response("Something didn't validate.", mimetype='text/plain')
+    def invalid_data(self, request, c):
+        return self.common(request, c, 'DATA')
+
+    def common(self, request, c, message):
+        referer_l = filter(lambda x: x[0] == 'Referer', request.headers)
+        qs = {}
+        qs['name']    = c.name
+        qs['email']   = c.email
+        qs['url']     = c.url
+        qs['comment'] = c.content
+        qs['message'] = message
+        if len(referer_l) > 0:
+            referer_url = referer_l[-1][1]
+        else:
+            rc             = self.rc()
+            permalink_func = rc.get(EntryPermalinkProvider).authoritative
+            referer_url    = permalink_func(c.entry_pkey[1], c.entry_pkey[0])
+        parts = tuple(urlparse.urlparse(referer_url))
+        _qs = urlparse.parse_qs(parts[4])
+        _qs.update(qs)
+        s = urllib.urlencode(_qs)
+        newparts = (parts[0], parts[1], parts[2], parts[3], s, parts[5])
+        return redirect(urlparse.urlunparse(newparts), code=302)
 
     def storage_error(self):
-        return Response("Storage error storing comment.", mimetype='text/plain')
+        raise InternalServerError()
 
-    def unique_error(self):
-        return Response("Comment already saved.", mimetype='text/plain')
+    def unique_error(self, comment):
+        return self.success(comment)
 
-    def success(self):
-        return Response('IT WORKED', mimetype='text/plain')
+    def success(self, c):
+        rc             = self.rc()
+        permalink_func = rc.get(EntryPermalinkProvider).authoritative
+        permalink      = permalink_func(c.entry_pkey[1], c.entry_pkey[0])
+        return redirect(permalink, code=302)
