@@ -17,13 +17,13 @@ class Jinja2EntryPermalinkProvider(object):
         self.rc = rc
         self.settings = settings
 
-    def authoritative(self, entry):
+    def authoritative(self, slug, published):
         endpoint = __name__ + '.Jinja2FrontendViewProvider.single'
         values = {}
-        values['year']  = entry.published.year
-        values['month'] = entry.published.month
-        values['day']   = entry.published.day
-        values['slug']  = entry.slug
+        values['year']  = published.year
+        values['month'] = published.month
+        values['day']   = published.day
+        values['slug']  = slug
 
         urls = self.rc().get('urls')
         return urls.build(endpoint, values, force_external=True)

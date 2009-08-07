@@ -1465,7 +1465,7 @@ class DummyEntryPermalinkProvider(EntryPermalinkProvider):
         self.rc = rc
         self.settings = settings
 
-    def authoritative(self, entry):
+    def authoritative(self, slug, published):
         return ''
 
 
@@ -1475,7 +1475,7 @@ class DummyFeedPermalinkProvider(FeedPermalinkProvider):
         self.rc = rc
         self.settings = settings
 
-    def authoritative(self, entry):
+    def authoritative(self, slug):
         return ''
 
 

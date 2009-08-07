@@ -14,14 +14,14 @@ class AtomFeedPermalinkProvider(object):
         self.rc = rc
         self.settings = settings
 
-    def authoritative(self, feed):
+    def authoritative(self, slug):
         endpoint = __name__ + '.AtomFeedViewProvider.'
         values = {}
-        if feed.slug == '':
+        if slug == '':
             endpoint += 'default'
         else:
             endpoint += 'named'
-            values['slug']  = feed.slug
+            values['slug']  = slug
 
         urls = self.rc().get('urls')
         return urls.build(endpoint, values, force_external=True)

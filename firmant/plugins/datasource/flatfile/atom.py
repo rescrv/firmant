@@ -233,7 +233,7 @@ class FlatfileAtomProvider(AtomProvider):
 
             @property
             def permalink(self):
-                return provider_self.entry_permalink(self)
+                return provider_self.entry_permalink(self.slug, self.published)
 
             @classmethod
             def list(cls):
@@ -333,7 +333,7 @@ class FlatfileAtomProvider(AtomProvider):
 
             @property
             def permalink(self):
-                return provider_self.feed_permalink(self)
+                return provider_self.feed_permalink(self.slug)
 
         provider_self.feed = FlatFileFeed
 

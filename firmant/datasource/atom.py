@@ -316,13 +316,13 @@ class EntryPermalinkProvider(SingleProviderPlugin):
 
     provider_setting = 'ENTRY_PERMALINK'
 
-    def authoritative(self, entry):
-        return self._provider.authoritative(entry)
+    def authoritative(self, slug, published):
+        return self._provider.authoritative(slug, published)
 
 
 class FeedPermalinkProvider(SingleProviderPlugin):
 
     provider_setting = 'FEED_PERMALINK'
 
-    def authoritative(self, feed):
-        return self._provider.authoritative(feed)
+    def authoritative(self, slug):
+        return self._provider.authoritative(slug)
