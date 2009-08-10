@@ -13,65 +13,7 @@ from firmant.utils import json
 # Base classes for Atom data.
 
 
-class Filter(object):
-
-    __slots__ = ['to_json', 'from_json']
-
-    def __init__(self, to_json=None, from_json=None):
-        if not hasattr(self, 'to_json'):
-            self.to_json   = to_json   or (lambda self: self)
-        if not hasattr(self, 'from_json'):
-            self.from_json = from_json or (lambda self: self)
-
-
-class DatetimeFilter(Filter):
-
-    def to_json(self, dt):
-        if dt.tzinfo is None:
-            return (dt.strftime(isoformat), None)
-        else:
-            utc_dt = dt.astimezone(pytz.UTC)
-            return (utc_dt.strftime(isoformat), dt.tzinfo.zone)
-
-    def from_json(self, dt):
-        if dt[1] is None:
-            return strptime(dt[0], isoformat)
-        else:
-            dt_obj = pytz.UTC.localize(strptime(dt[0], isoformat))
-            tz_obj = pytz.timezone(dt[1])
-            new_dt = dt_obj.astimezone(tz_obj)
-            return tz_obj.normalize(new_dt)
-
-
-class AtomObjectFilter(Filter):
-
-    def __init__(self, cls):
-        self.cls = cls
-
-    def to_json(self, obj):
-        return obj.to_json()
-
-    def from_json(self, obj):
-        return self.cls.from_json(obj)
-
-
-class AtomObjectListFilter(Filter):
-
-    def __init__(self, cls):
-        self.cls = cls
-
-    def to_json(self, obj_list):
-        serialized_objs = map(lambda obj: obj.to_json(), obj_list)
-        return json.dumps(serialized_objs)
-
-    def from_json(self, obj_list):
-        serialized_objs = json.loads(obj_list)
-        return map(lambda s: self.cls.from_json(s), serialized_objs)
-
-
 class AtomBase(object):
-
-    filters = {}
 
     def __eq__(self, other):
         for field in self.fields:
@@ -89,30 +31,6 @@ class AtomBase(object):
 
     def __ne__(self, other):
         return not (self == other)
-
-    @classmethod
-    def json_filter(cls, field):
-        return cls.filters.get(field, Filter())
-
-    def to_json(self):
-        data = {}
-        for field in self.fields:
-            if hasattr(self, field):
-                filter = self.json_filter(field)
-                value  = filter.to_json(getattr(self, field))
-                data[field] = value
-        return json.dumps(data)
-
-    @classmethod
-    def from_json(cls, string):
-        data = json.loads(string)
-        entry = cls()
-        for field in cls.fields:
-            if data.has_key(field):
-                filter = cls.json_filter(field)
-                value  = filter.from_json(data[field])
-                setattr(entry, field, value)
-        return entry
 
     @classmethod
     def cast(cls, other):
@@ -171,11 +89,6 @@ class Entry(AtomBase):
     fields    = ['slug', 'published', 'author', 'category', 'rights', 'updated',
                  'title', 'content', 'summary', 'tz']
     __slots__ = fields
-    filters              = {}
-    filters['published'] = DatetimeFilter()
-    filters['updated']   = DatetimeFilter()
-    filters['author']    = AtomObjectFilter(Author)
-    filters['category']  = AtomObjectFilter(Category)
 
     @classmethod
     def for_feed(cls, feedslug):
@@ -250,8 +163,6 @@ class Feed(AtomBase):
 
     fields    = ['slug', 'title', 'rights', 'subtitle', 'updated', 'entries']
     __slots__ = fields
-    filters              = {}
-    filters['updated']   = DatetimeFilter()
 
     @classmethod
     def by_slug(cls, slug):

@@ -5,9 +5,6 @@ import pytz
 
 from firmant.datasource.atom import AtomProvider, \
                                     AtomBase, \
-                                    DatetimeFilter, \
-                                    AtomObjectFilter, \
-                                    AtomObjectListFilter, \
                                     Author, \
                                     Category, \
                                     Entry, \
@@ -291,160 +288,6 @@ class TestAtomBase(unittest.TestCase):
         b.quux = 'foo'
 
         self.assertTrue(a != b)
-
-    def testJson1(self):
-        """firmant.datasource.atom.AtomBase. to_json, from_json
-        Test JSON serialization with all fields present"""
-
-        a      = self.cls()
-        a.foo  = 'quux'
-        a.bar  = 'baz'
-        a.baz  = 'bar'
-        a.quux = 'foo'
-
-        j = a.to_json()
-        b = self.cls.from_json(j)
-
-        self.assertTrue(a == b)
-
-    def testJson2(self):
-        """firmant.datasource.atom.AtomBase. to_json, from_json
-        Test JSON serialization with just one field present"""
-
-        a      = self.cls()
-        a.foo  = 'quux'
-
-        j = a.to_json()
-        b = self.cls.from_json(j)
-
-        self.assertTrue(a == b)
-
-    def testJson3(self):
-        """firmant.datasource.atom.AtomBase. to_json, from_json
-        Test JSON serialization with no fields present"""
-
-        a      = self.cls()
-
-        j = a.to_json()
-        b = self.cls.from_json(j)
-
-        self.assertTrue(a == b)
-
-
-class TestDatetimeFilter(unittest.TestCase):
-
-    def setUp(self):
-        class TestData(AtomBase):
-            fields    = ['foo', 'bar', 'baz', 'quux']
-            __slots__ = fields
-            filters = {}
-            filters['quux'] = DatetimeFilter()
-
-        self.cls = TestData
-
-    def testDatetimeFilter1(self):
-        """firmant.datasource.atom.DatetimeFilter
-        Test serialization to JSON of an AtomBase object with a pytz localized
-        datetime object in one field.  The datetime object observes daylight
-        savings time."""
-
-        a      = self.cls()
-        A_NY   = pytz.timezone('America/New_York')
-        a.quux = A_NY.localize(datetime.datetime(2009, 6, 15, 14, 40, 59))
-
-        j = a.to_json()
-        b = self.cls.from_json(j)
-
-        self.assertTrue(a == b)
-
-    def testDatetimeFilter2(self):
-        """firmant.datasource.atom.DatetimeFilter
-        Test serialization to JSON of an AtomBase object with a pytz localized
-        datetime object in one field.  The datetime object is outside daylight
-        savings time"""
-
-        a      = self.cls()
-        A_NY   = pytz.timezone('America/New_York')
-        a.quux = A_NY.localize(datetime.datetime(2009, 1, 15, 14, 40, 59))
-
-        j = a.to_json()
-        b = self.cls.from_json(j)
-
-        self.assertTrue(a == b)
-
-    def testDatetimeFilter3(self):
-        """firmant.datasource.atom.DatetimeFilter
-        Test serialization to JSON of an AtomBase object with a naive datetime
-        object in one field."""
-
-        a      = self.cls()
-        a.quux = datetime.datetime(2009, 6, 15, 14, 40, 59)
-
-        j = a.to_json()
-        b = self.cls.from_json(j)
-
-        self.assertTrue(a == b)
-
-
-class TestAtomObjectFilter(unittest.TestCase):
-
-    def setUp(self):
-        class TestData(AtomBase):
-            fields    = ['foo', 'bar', 'baz', 'quux']
-            __slots__ = fields
-
-        class MoreTestData(TestData):
-            filters = {}
-            filters['quux'] = AtomObjectFilter(TestData)
-
-        self.filtered   = MoreTestData
-        self.unfiltered = TestData
-
-    def testAtomObjectFilter1(self):
-        """firmant.datasource.atom.AtomObjectFilter
-        Test serialization to JSON of a
-        Test serialization to JSON of naive datetime object."""
-
-        a      = self.unfiltered()
-        a.foo  = 'quux'
-        b      = self.filtered()
-        b.quux = a
-
-        j = b.to_json()
-        c = self.filtered.from_json(j)
-
-        self.assertTrue(b == c)
-
-
-class TestAtomObjectListFilter(unittest.TestCase):
-
-    def setUp(self):
-        class TestData(AtomBase):
-            fields    = ['foo', 'bar', 'baz', 'quux']
-            __slots__ = fields
-
-        class MoreTestData(TestData):
-            filters = {}
-            filters['quux'] = AtomObjectListFilter(TestData)
-
-        self.filtered   = MoreTestData
-        self.unfiltered = TestData
-
-    def testAtomObjectFilter1(self):
-        """firmant.datasource.atom.AtomObjectListFilter
-        Test serialization to JSON of an object with a list of AtomObjects."""
-
-        a      = self.unfiltered()
-        a.foo  = 'quux'
-        b      = self.unfiltered()
-        b.bar  = 'bar'
-        c      = self.filtered()
-        c.quux = [a, b]
-
-        j = c.to_json()
-        d = self.filtered.from_json(j)
-
-        self.assertTrue(c == d)
 
 
 class TestAuthor(unittest.TestCase):
@@ -1482,6 +1325,3 @@ class DummyFeedPermalinkProvider(FeedPermalinkProvider):
 from test import add_test
 suite = unittest.TestSuite()
 add_test(suite, TestAtomBase)
-add_test(suite, TestAtomObjectFilter)
-add_test(suite, TestAtomObjectListFilter)
-add_test(suite, TestDatetimeFilter)
