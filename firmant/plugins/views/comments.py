@@ -25,6 +25,7 @@ class CommentDataGlobalProvider(object):
         self.settings = settings
 
     def globals_dict(self):
+        rc = self.rc()
         def comment_post_url(published, slug):
             endpoint = __name__ + '.CommentSubmissionHandler.post'
             values = {}
@@ -33,14 +34,15 @@ class CommentDataGlobalProvider(object):
             values['day']   = published.day
             values['slug']  = slug
 
-            urls = self.rc().get('urls')
+            urls = rc.get('urls')
             return urls.build(endpoint, values, force_external=True)
         ret = {}
         ret['comment_post_url'] = comment_post_url
         enabled = self.settings.get('COMMENT_SUBMISSION_ENABLED', False)
         ret['comments_enabled'] = enabled
+        ret['comments_for_entry'] = rc.get(CommentProvider).for_entry
 
-        request = self.rc().get(Request)
+        request = rc.get(Request)
         ret['comment_name']    = request.args.get('name', '')
         ret['comment_email']   = request.args.get('email', '')
         ret['comment_url']     = request.args.get('url', '')

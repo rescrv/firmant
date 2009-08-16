@@ -22,6 +22,17 @@
 </div>
 {% if comments_enabled %}
 <div class="entry">
+    <h2>Comments</h2>
+    {% for comment in comments_for_entry('published', entry.slug,
+    entry.published.year, entry.published.month, entry.published.day) %}
+        <div class="comment">
+            <div><p>Posted by
+                <a href="{{ comment.url|escape }}">{{ comment.name|escape }}</a>
+                on {{ comment.created|escape }}.
+            </p></div>
+            <div>{{ comment.content|escape }}</div>
+        </div>
+    {% endfor %}
     <h2>Share your thoughts</h2>
     {% if comment_message == 'CSRF' %}
     <p>Your submission did not submit properly.  This could be because you

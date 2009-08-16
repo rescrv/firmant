@@ -45,7 +45,7 @@ html {
     color: #eeeeec;
 }
 
-.entry, .sidebox {
+.entry, .sidebox, .comment {
     background: #eeeeec;
     border-style: solid none;
     border-color: #babdb6;
