@@ -1,5 +1,6 @@
 import datetime
 import time
+import re
 
 try:
     import json # pragma: no cover
@@ -70,3 +71,10 @@ def sha1(text):
         s = sha.new()
     s.update(text)
     return s.hexdigest()
+
+
+# While it most certainly is not perfect, this regular expression makes sure
+# users at least attempt to form a valid email.  An invalid email is not
+# necessarily indicative of spammers, but of users of software that does not
+# conform to RFCs.
+email_re = re.compile('^[a-zA-Z0-9._%-+]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$')
