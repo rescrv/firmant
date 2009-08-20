@@ -32,6 +32,9 @@
             </p></div>
             <div>{{ comment.content|escape }}</div>
         </div>
+    {% else %}
+        <p>Nobody has had anything to say.  Be the first
+            and share your thoughts with us.</p>
     {% endfor %}
     <h2>Share your thoughts</h2>
     {% if comment_message == 'CSRF' %}
