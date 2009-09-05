@@ -296,27 +296,23 @@ class TestAuthor(unittest.TestCase):
         """Setup all data necessary for test case."""
         not_implemented() # pragma: no cover
 
-    def get_provider(self, name):
-        """This function should return the AtomProvider for the test."""
-        not_implemented() # pragma: no cover
-
     def testByName1(self):
         """firmant.datasource.atom.Author.by_name
         Load a valid atom Author object using the by_name function"""
-        provider = self.get_provider('ByName1')
+        provider = self.provider
 
         expected = authors['Robert Escriva']
-        returned = provider.author.by_name('Robert Escriva')
+        returned = provider.by_name('Robert Escriva')
 
         self.assertEqual(expected, returned)
 
     def testByName2(self):
         """firmant.datasource.atom.Author.by_name
         No such Author object using the by_name function"""
-        provider = self.get_provider('ByName2')
+        provider = self.provider
 
         expected = None
-        returned = provider.author.by_name('Jane Doe')
+        returned = provider.by_name('Jane Doe')
 
         self.assertEqual(expected, returned)
 

@@ -38,13 +38,15 @@ class Author(AtomBase):
     fields    = ['name', 'uri', 'email']
     __slots__ = fields
 
-    @classmethod
-    def by_name(cls, name):
-        not_implemented() # pragma: no cover
-
     # TODO:
     #def permalink(self):
     #    not_implemented()
+
+
+class AtomAuthorProvider(SingleProviderPlugin):
+
+    def by_name(self, name):
+        not_implemented() # pragma: no cover
 
 
 class Category(AtomBase):

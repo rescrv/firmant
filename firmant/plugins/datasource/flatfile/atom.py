@@ -95,7 +95,8 @@ class FlatfileAtomProvider(AtomProvider):
                             )
                         )
                 entry.author    = \
-                        provider_self.author.by_name(meta_data['author'])
+                        provider_self.rc().get(AtomFlatfileAuthorProvider).\
+                        by_name(meta_data['author'])
                 entry.category  = \
                         provider_self.rc().get(AtomFlatfileCategoryProvider)
                 entry.rights    = rights_data
@@ -337,27 +338,6 @@ class FlatfileAtomProvider(AtomProvider):
 
         provider_self.feed = FlatFileFeed
 
-        class FlatFileAuthor(Author):
-
-            provider = provider_self
-
-            @classmethod
-            def by_name(cls, name):
-                path = os.path.join(settings['FLATFILE_BASE'], 'people', name)
-                if not os.access(path, os.R_OK):
-                    return None
-                file = open(path)
-                data = file.read().decode('utf-8')
-                file.close()
-                jdata        = json.loads(data)
-                author       = cls()
-                author.name  = name
-                author.uri   = jdata['uri']
-                author.email = jdata['email']
-                return author
-
-        provider_self.author = FlatFileAuthor
-
         provider_self.entry_permalink = \
                 rc().get(EntryPermalinkProvider).authoritative
 
@@ -383,3 +363,23 @@ class AtomFlatfileCategoryProvider(object):
         category.term  = term
         category.label = data
         return category
+
+
+class AtomFlatfileAuthorProvider(object):
+
+    def __init__(self, rc, settings):
+        self.settings = settings
+
+    def by_name(self, name):
+        path = os.path.join(self.settings['FLATFILE_BASE'], 'people', name)
+        if not os.access(path, os.R_OK):
+            return None
+        file = open(path)
+        data = file.read().decode('utf-8')
+        file.close()
+        jdata        = json.loads(data)
+        author       = Author
+        author.name  = name
+        author.uri   = jdata['uri']
+        author.email = jdata['email']
+        return author
