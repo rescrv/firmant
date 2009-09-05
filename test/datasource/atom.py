@@ -320,36 +320,6 @@ class TestAuthor(unittest.TestCase):
 
         self.assertEqual(expected, returned)
 
-    def testToXML1(self):
-        """firmant.datasource.atom.Author.to_xml
-        Convert author 'Robert Escriva' to xml"""
-        provider = self.get_provider('ToXML1')
-
-        author   = xml.etree.Element('author')
-        xml.add_text_subelement(author, 'name', 'Robert Escriva')
-        xml.add_text_subelement(author, 'uri', 'http://robescriva.com')
-        xml.add_text_subelement(author, 'email', 'rob@example.org')
-
-        expected = xml.etree.tostring(author)
-        returned = xml.etree.tostring(authors['Robert Escriva'].to_xml())
-
-        self.assertEqual(expected, returned)
-
-    def testToXML2(self):
-        """firmant.datasource.atom.Author.to_xml
-        Convert author 'Loren Ipsum Generator' to xml"""
-        provider = self.get_provider('ToXML2')
-
-        author   = xml.etree.Element('author')
-        xml.add_text_subelement(author, 'name', 'Loren Ipsum Generator')
-        xml.add_text_subelement(author, 'uri', 'http://www.lipsum.com')
-        xml.add_text_subelement(author, 'email', 'lipsum@example.org')
-
-        expected = xml.etree.tostring(author)
-        returned = xml.etree.tostring(authors['Loren Ipsum Generator'].to_xml())
-
-        self.assertEqual(expected, returned)
-
 
 class TestCategory(unittest.TestCase):
 
@@ -380,34 +350,6 @@ class TestCategory(unittest.TestCase):
 
         expected = None
         returned = provider.category.by_term('NOEXIST')
-
-        self.assertEqual(expected, returned)
-
-    def testToXML1(self):
-        """firmant.datasource.atom.Category.to_xml
-        Convert category 'General' to xml"""
-        provider = self.get_provider('ToXML1')
-
-        category = xml.etree.Element('category')
-        category.set('term', 'General')
-        category.set('label', 'All topics')
-
-        expected = xml.etree.tostring(category)
-        returned = xml.etree.tostring(categories['General'].to_xml())
-
-        self.assertEqual(expected, returned)
-
-    def testToXML2(self):
-        """firmant.datasource.atom.Category.to_xml
-        Convert category 'Generated' to xml"""
-        provider = self.get_provider('ToXML2')
-
-        category = xml.etree.Element('category')
-        category.set('term', 'Generated')
-        category.set('label', 'You can\'t tell a computer wrote it.')
-
-        expected = xml.etree.tostring(category)
-        returned = xml.etree.tostring(categories['Generated'].to_xml())
 
         self.assertEqual(expected, returned)
 
@@ -1054,72 +996,6 @@ class TestEntry(unittest.TestCase):
 
         self.assertEqual(expected, returned)
 
-    def testToXML1(self):
-        """firmant.datasource.atom.Entry.to_xml
-        Convert entry '2009-02-13-sample' to xml"""
-        provider = self.get_provider('ToXML1')
-        entry    = provider.entry
-        e = entry.cast(entries['2009-02-13-sample'])
-
-        xml_entry = xml.etree.Element('entry')
-        xml.add_text_subelement(xml_entry, 'title', e.title)
-        xml.add_text_subelement(xml_entry, 'updated', RFC3339(e.updated))
-        xml.add_text_subelement(xml_entry, 'published', RFC3339(e.published))
-        xml_entry.append(e.author.to_xml())
-        content = xml.etree.SubElement(xml_entry, 'content')
-        content.set('type', 'xhtml')
-        div = xml.etree.SubElement(content, 'div')
-        div.set('xmlns', 'http://www.w3.org/1999/xhtml')
-        div.text = e.content
-        link = xml.etree.SubElement(xml_entry, 'link')
-        link.set('href', '')
-        link.set('rel', 'alternate')
-        xml.add_text_subelement(xml_entry, 'id', '')
-        xml.add_text_subelement(xml_entry, 'rights', e.rights)
-        summary = xml.etree.SubElement(xml_entry, 'summary')
-        summary.set('type', 'xhtml')
-        div = xml.etree.SubElement(summary, 'div')
-        div.set('xmlns', 'http://www.w3.org/1999/xhtml')
-        div.text = e.summary
-        xml_entry.append(e.category.to_xml())
-        expected = xml.etree.tostring(xml_entry)
-        returned = xml.etree.tostring(e.to_xml())
-
-        self.assertEqual(expected, returned)
-
-    def testToXML2(self):
-        """firmant.datasource.atom.Entry.to_xml
-        Convert entry '2009-03-29-markdown' to xml"""
-        provider = self.get_provider('ToXML2')
-        entry    = provider.entry
-        e = entry.cast(entries['2009-03-29-markdown'])
-
-        xml_entry = xml.etree.Element('entry')
-        xml.add_text_subelement(xml_entry, 'title', e.title)
-        xml.add_text_subelement(xml_entry, 'updated', RFC3339(e.updated))
-        xml.add_text_subelement(xml_entry, 'published', RFC3339(e.published))
-        xml_entry.append(e.author.to_xml())
-        content = xml.etree.SubElement(xml_entry, 'content')
-        content.set('type', 'xhtml')
-        div = xml.etree.SubElement(content, 'div')
-        div.set('xmlns', 'http://www.w3.org/1999/xhtml')
-        div.text = e.content
-        link = xml.etree.SubElement(xml_entry, 'link')
-        link.set('href', '')
-        link.set('rel', 'alternate')
-        xml.add_text_subelement(xml_entry, 'id', '')
-        xml.add_text_subelement(xml_entry, 'rights', e.rights)
-        summary = xml.etree.SubElement(xml_entry, 'summary')
-        summary.set('type', 'xhtml')
-        div = xml.etree.SubElement(summary, 'div')
-        div.set('xmlns', 'http://www.w3.org/1999/xhtml')
-        div.text = e.summary
-        xml_entry.append(e.category.to_xml())
-        expected = xml.etree.tostring(xml_entry)
-        returned = xml.etree.tostring(e.to_xml())
-
-        self.assertEqual(expected, returned)
-
     def testList1(self):
         """firmant.datasource.atom.Entry.list
         Get the list of entries published."""
@@ -1248,56 +1124,6 @@ class TestFeed(unittest.TestCase):
 
         expected = feeds['default']
         returned = feed.default()
-
-        self.assertEqual(expected, returned)
-
-    def testToXML1(self):
-        """firmant.datasource.atom.Feed.to_xml
-        Convert default feed to xml"""
-        provider = self.get_provider('ToXML1')
-        feed     = provider.feed
-        f = feed.cast(feeds['default'])
-        f.entries = map(provider.entry.cast, f.entries)
-
-        xml_feed  = xml.etree.Element('feed')
-        xml_feed.set('xmlns', 'http://www.w3.org/2005/Atom')
-        xml.add_text_subelement(xml_feed, 'generator', 'Firmant')
-        xml.add_text_subelement(xml_feed, 'title', f.title)
-        xml.add_text_subelement(xml_feed, 'rights', f.rights)
-        xml.add_text_subelement(xml_feed, 'updated', RFC3339(f.updated))
-        xml.add_text_subelement(xml_feed, 'id', '')
-        link = xml.etree.SubElement(xml_feed, 'link')
-        link.set('href', '')
-        link.set('rel', 'self')
-        for entry in f.entries:
-            xml_feed.append(entry.to_xml())
-        expected = xml.etree.tostring(xml_feed)
-        returned = xml.etree.tostring(f.to_xml())
-
-        self.assertEqual(expected, returned)
-
-    def testToXML2(self):
-        """firmant.datasource.atom.Feed.to_xml
-        Convert feed 'general' to xml"""
-        provider = self.get_provider('ToXML2')
-        feed     = provider.feed
-        f = feed.cast(feeds['general'])
-        f.entries = map(provider.entry.cast, f.entries)
-
-        xml_feed  = xml.etree.Element('feed')
-        xml_feed.set('xmlns', 'http://www.w3.org/2005/Atom')
-        xml.add_text_subelement(xml_feed, 'generator', 'Firmant')
-        xml.add_text_subelement(xml_feed, 'title', f.title)
-        xml.add_text_subelement(xml_feed, 'rights', f.rights)
-        xml.add_text_subelement(xml_feed, 'updated', RFC3339(f.updated))
-        xml.add_text_subelement(xml_feed, 'id', '')
-        link = xml.etree.SubElement(xml_feed, 'link')
-        link.set('href', '')
-        link.set('rel', 'self')
-        for entry in f.entries:
-            xml_feed.append(entry.to_xml())
-        expected = xml.etree.tostring(xml_feed)
-        returned = xml.etree.tostring(f.to_xml())
 
         self.assertEqual(expected, returned)
 

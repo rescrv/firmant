@@ -54,13 +54,6 @@ class Author(AtomBase):
     #def permalink(self):
     #    not_implemented()
 
-    def to_xml(self):
-        author = xml.etree.Element('author')
-        xml.add_text_subelement(author, 'name', self.name)
-        xml.add_text_subelement(author, 'uri', self.uri)
-        xml.add_text_subelement(author, 'email', self.email)
-        return author
-
 
 class Category(AtomBase):
 
@@ -74,12 +67,6 @@ class Category(AtomBase):
     # TODO:
     #def permalink(self):
     #    not_implemented()
-
-    def to_xml(self):
-        category = xml.etree.Element('category')
-        category.set('term', self.term)
-        category.set('label', self.label)
-        return category
 
 
 class Entry(AtomBase):
@@ -118,46 +105,6 @@ class Entry(AtomBase):
     def permalink(self):
         not_implemented() # pragma: no cover
 
-    def to_xml(self, filter=None):
-        '''Convert an entry to XML.
-        Filter should be a function that will convert content to a valid etree
-        XML Element.'''
-
-        if filter is None:
-            def filter(content):
-                ret = xml.etree.Element('div')
-                ret.set('xmlns', 'http://www.w3.org/1999/xhtml')
-                ret.text = content
-                return ret
-        entry = xml.etree.Element('entry')
-
-        xml.add_text_subelement(entry, 'title', self.title)
-        xml.add_text_subelement(entry, 'updated', RFC3339(self.updated))
-        xml.add_text_subelement(entry, 'published', RFC3339(self.published))
-        author = self.author.to_xml()
-        entry.append(author)
-
-        content = xml.etree.SubElement(entry, 'content')
-        content.set('type', 'xhtml')
-        e = filter(self.content)
-        content.append(e)
-
-        l_alt = xml.etree.SubElement(entry, 'link')
-        l_alt.set('href', self.permalink)
-        l_alt.set('rel', 'alternate')
-
-        xml.add_text_subelement(entry, 'id', self.permalink)
-        xml.add_text_subelement(entry, 'rights', self.rights)
-
-        summary = xml.etree.SubElement(entry, 'summary')
-        summary.set('type', 'xhtml')
-        e = filter(self.summary)
-        summary.append(e)
-
-        category = self.category.to_xml()
-        entry.append(category)
-        return entry
-
 
 class Feed(AtomBase):
 
@@ -175,29 +122,6 @@ class Feed(AtomBase):
     @property
     def permalink(self):
         not_implemented() # pragma: no cover
-
-    def to_xml(self, filter=None):
-        '''Convert a feed to XML.
-        Filter should be a function that will convert content to a valid etree
-        XML Element.'''
-
-        feed = xml.etree.Element('feed')
-        feed.set('xmlns', 'http://www.w3.org/2005/Atom')
-
-        xml.add_text_subelement(feed, 'generator', 'Firmant')
-        xml.add_text_subelement(feed, 'title', self.title)
-        xml.add_text_subelement(feed, 'rights', self.rights)
-        xml.add_text_subelement(feed, 'updated', RFC3339(self.updated))
-        xml.add_text_subelement(feed, 'id', self.permalink)
-
-        link = xml.etree.SubElement(feed, 'link')
-        link.set('href', self.permalink)
-        link.set('rel', 'self')
-
-        for entry in self.entries:
-            feed.append(entry.to_xml(filter))
-
-        return feed
 
 
 # Plugin Code
