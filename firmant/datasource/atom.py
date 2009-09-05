@@ -32,14 +32,6 @@ class AtomBase(object):
     def __ne__(self, other):
         return not (self == other)
 
-    @classmethod
-    def cast(cls, other):
-        ret = cls()
-        for field in cls.fields:
-            if hasattr(other, field):
-                setattr(ret, field, getattr(other, field))
-        return ret
-
 
 class Author(AtomBase):
 
