@@ -10,6 +10,7 @@ from firmant.utils import not_implemented
 from firmant.datasource.comments import Comment
 from firmant.datasource.comments import CommentProvider
 from firmant.utils import sha1
+from firmant.datasource import Storage
 
 
 comment_re = r'(?P<year>\d{4}),(?P<month>\d{2}),(?P<day>\d{2}),(?P<slug>.+)' +\
@@ -17,7 +18,7 @@ comment_re = r'(?P<year>\d{4}),(?P<month>\d{2}),(?P<day>\d{2}),(?P<slug>.+)' +\
 comment_re = re.compile(comment_re)
 
 
-class FlatfileCommentProvider(object):
+class FlatfileCommentProvider(Storage, object):
 
     def __init__(self, rc, settings):
         self.settings = settings
@@ -41,31 +42,21 @@ class FlatfileCommentProvider(object):
         comments_list = filter(entry_filter, comments_list)
         return map(lambda x: self._load_one(*x), comments_list)
 
-    def save(self, comment):
-        try:
-            comment_path = self._file(comment)
-            if os.path.exists(comment_path):
-                raise CommentProvider.UniqueViolationError('Comment already exists')
-            contents = self._file_contents(comment)
-            f = open(comment_path, 'w')
-            f.write(contents)
-            f.flush()
-            f.close()
-        except CommentProvider.UniqueViolationError:
-            raise
-        except:
-            raise CommentProvider.StorageError()
+    def _save(self, comment):
+        comment_path = self._file(comment)
+        if os.path.exists(comment_path):
+            raise Storage.UniqueViolationError('Comment already exists')
+        contents = self._file_contents(comment)
+        f = open(comment_path, 'w')
+        f.write(contents)
+        f.flush()
+        f.close()
 
-    def delete(self, comment):
-        try:
-            comment_path = self._file(comment)
-            if not os.path.exists(comment_path):
-                raise CommentProvider.DoesNotExistError('Comment does not exist')
-            os.unlink(comment_path)
-        except CommentProvider.DoesNotExistError:
-            raise
-        except:
-            raise CommentProvider.StorageError()
+    def _delete(self, comment):
+        comment_path = self._file(comment)
+        if not os.path.exists(comment_path):
+            raise Storage.DoesNotExistError('Comment does not exist')
+        os.unlink(comment_path)
 
     def _file(self, comment):
         status     = comment.status

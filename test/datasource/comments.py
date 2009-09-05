@@ -4,7 +4,7 @@ import pytz
 
 from firmant.utils import not_implemented
 from firmant.datasource.comments import Comment
-from firmant.datasource.comments import CommentProvider
+from firmant.datasource import Storage
 
 
 comments = {}
@@ -214,7 +214,7 @@ class TestCommentProvider(unittest.TestCase):
         provider = self.provider
         c        = comments["jsmith'"]
 
-        raised   = CommentProvider.DoesNotExistError
+        raised   = Storage.DoesNotExistError
         function = lambda: provider.delete(c)
 
         self.assertRaises(raised, function)
@@ -265,7 +265,7 @@ class TestCommentProvider(unittest.TestCase):
         throw a UniqueViolationError.'''
         provider = self.provider
 
-        raised   = CommentProvider.UniqueViolationError
+        raised   = Storage.UniqueViolationError
         function = lambda: provider.save(comments['rescriva'])
 
         self.assertRaises(raised, function)

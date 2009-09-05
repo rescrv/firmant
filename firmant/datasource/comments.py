@@ -42,10 +42,6 @@ class CommentProvider(SingleProviderPlugin):
     def delete(self, comment):
         return self._provider.delete(comment)
 
-    class DoesNotExistError(Exception): pass
-    class StorageError(Exception): pass
-    class UniqueViolationError(Exception): pass
-
 
 class CommentValidator(MultiProviderPlugin):
 
