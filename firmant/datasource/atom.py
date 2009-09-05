@@ -52,8 +52,10 @@ class Category(AtomBase):
     fields    = ['term', 'label']
     __slots__ = fields
 
-    @classmethod
-    def by_term(cls, term):
+
+class AtomCategoryProvider(SingleProviderPlugin):
+
+    def by_term(self, term):
         not_implemented() # pragma: no cover
 
     # TODO:

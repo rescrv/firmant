@@ -329,27 +329,23 @@ class TestCategory(unittest.TestCase):
         setup whatever data is necessary for the test cases to run."""
         not_implemented() # pragma: no cover
 
-    def get_provider(self, name):
-        """This function should return the AtomProvider for the test."""
-        not_implemented() # pragma: no cover
-
     def testByTerm1(self):
         """firmant.datasource.atom.Category.by_term
         Load a valid atom Category object using the by_term function"""
-        provider = self.get_provider('ByTerm1')
+        provider = self.provider
 
         expected = categories['General']
-        returned = provider.category.by_term('General')
+        returned = provider.by_term('General')
 
         self.assertEqual(expected, returned)
 
     def testByTerm2(self):
         """firmant.datasource.atom.Category.by_term
         No such Category object using the by_term function"""
-        provider = self.get_provider('ByTerm2')
+        provider = self.provider
 
         expected = None
-        returned = provider.category.by_term('NOEXIST')
+        returned = provider.by_term('NOEXIST')
 
         self.assertEqual(expected, returned)
 

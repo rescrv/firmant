@@ -97,7 +97,7 @@ class FlatfileAtomProvider(AtomProvider):
                 entry.author    = \
                         provider_self.author.by_name(meta_data['author'])
                 entry.category  = \
-                        provider_self.category.by_term(meta_data['category'])
+                        provider_self.rc().get(AtomFlatfileCategoryProvider)
                 entry.rights    = rights_data
                 entry.updated   = \
                         tz_obj.localize \
@@ -358,29 +358,28 @@ class FlatfileAtomProvider(AtomProvider):
 
         provider_self.author = FlatFileAuthor
 
-        class FlatFileCategory(Category):
-
-            provider = provider_self
-
-            @classmethod
-            def by_term(cls, term):
-                path = os.path.join(settings['FLATFILE_BASE'],
-                                    'categories',
-                                    term)
-                if not os.access(path, os.R_OK):
-                    return None
-                file = open(path)
-                data = file.read().decode('utf-8')
-                file.close()
-                category       = cls()
-                category.term  = term
-                category.label = data
-                return category
-
-        provider_self.category = FlatFileCategory
-
         provider_self.entry_permalink = \
                 rc().get(EntryPermalinkProvider).authoritative
 
         provider_self.feed_permalink = \
                 rc().get(FeedPermalinkProvider).authoritative
+
+
+class AtomFlatfileCategoryProvider(object):
+
+    def __init__(self, rc, settings):
+        self.settings = settings
+
+    def by_term(self, term):
+        path = os.path.join(self.settings['FLATFILE_BASE'],
+                            'categories',
+                            term)
+        if not os.access(path, os.R_OK):
+            return None
+        file = open(path)
+        data = file.read().decode('utf-8')
+        file.close()
+        category       = Category()
+        category.term  = term
+        category.label = data
+        return category
