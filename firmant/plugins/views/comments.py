@@ -16,8 +16,8 @@ from firmant.datasource.atom import AtomProvider
 from firmant.datasource.atom import EntryPermalinkProvider
 from firmant.datasource.comments import Comment
 from firmant.datasource.comments import CommentProvider
+from firmant.datasource.comments import CommentValidator
 from firmant.plugins.views.jinja2viewprovider import Jinja2FrontendViewProvider
-from firmant.utils import email_re
 
 
 class CommentDataGlobalProvider(object):
@@ -102,15 +102,8 @@ class CommentSubmissionHandler(object):
                     (datetime.date(int(year), int(month), int(day)), slug)
         except ValueError:
             return self.invalid_data(request, c)
-        if '' in (c.name, c.email, c.url, c.content):
-            return self.invalid_data(request, c)
-        # Designed to make sure people don't enter random junk for email/url;
-        # not designed to be a serious filter (TODO: Make hooks to filter
-        # comments and accept/reject).
-        if not email_re.match(c.email):
-            return self.invalid_data(request, c)
-        url = urlparse.urlparse(c.url)
-        if '' in (url.scheme, url.netloc, url.path):
+        comment_validator = self.rc().get(CommentValidator)
+        if not comment_validator.is_valid(c):
             return self.invalid_data(request, c)
 
         # Check for valid csrf token.

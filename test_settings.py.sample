@@ -54,3 +54,7 @@ COMMENT_SUBMISSION_ENABLED = True
 COMMENT_STATUS_DEFAULT = 'unpublished'
 
 COMMENT_PROVIDER = 'firmant.plugins.datasource.flatfile.comments.FlatfileCommentProvider'
+COMMENT_VALIDATORS = ['firmant.datasource.comments.CommentEmailValidator',
+                      'firmant.datasource.comments.CommentURLValidator',
+                      'firmant.datasource.comments.CommentNameValidator',
+                      'firmant.datasource.comments.CommentContentValidator']
