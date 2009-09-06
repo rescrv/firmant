@@ -97,6 +97,21 @@ class AtomEntryProvider(SingleProviderPlugin):
     def recent(self):
         not_implemented() # pragma: no cover
 
+    def exists(self, slug, year, month, day):
+        not_implemented() # pragma: no cover
+
+    def list(self):
+        not_implemented() # pragma: no cover
+
+    def list_years(self):
+        not_implemented() # pragma: no cover
+
+    def list_months(self):
+        not_implemented() # pragma: no cover
+
+    def list_days(self):
+        not_implemented() # pragma: no cover
+
 
 class Feed(AtomBase):
 
