@@ -22,18 +22,14 @@ date_re = re.compile('^\d{4},\d{2},\d{2}$')
 class FlatfileAtomProvider(AtomProvider):
 
     __slots__ = ['feed', 'entry', 'author', 'category']
-    slug_re = slug_re
 
-    def __init__(provider_self, rc, settings):
-        provider_self.rc = rc
+    def __init__(self, rc, settings):
 
-        provider_self.feed = FlatFileFeed
-
-        provider_self.entry_permalink = \
-                rc().get(EntryPermalinkProvider).authoritative
-
-        provider_self.feed_permalink = \
-                rc().get(FeedPermalinkProvider).authoritative
+        inst_rc       = rc()
+        self.entry    = inst_rc.get(AtomFlatfileEntryProvider)
+        self.feed     = inst_rc.get(AtomFlatfileFeedProvider)
+        self.author   = inst_rc.get(AtomFlatfileAuthorProvider)
+        self.category = inst_rc.get(AtomFlatfileCategoryProvider)
 
 
 class AtomFlatfileCategoryProvider(object):

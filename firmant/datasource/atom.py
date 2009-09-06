@@ -133,9 +133,6 @@ class AtomProvider(SingleProviderPlugin):
     category = property(lambda self: self._provider.category,
                         doc="The Atom Category class")
 
-    slug_re  = property(lambda self: self._provider.slug_re,
-                        doc="The Atom slug re")
-
 
 class EntryPermalinkProvider(SingleProviderPlugin):
 
