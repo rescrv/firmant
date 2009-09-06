@@ -5,6 +5,7 @@ from werkzeug import Response
 from werkzeug.exceptions import NotFound
 
 from firmant.datasource.atom import AtomProvider
+from firmant.datasource.atom import slug_re
 
 
 class TxtFrontendViewProvider(object):
@@ -67,7 +68,7 @@ class TxtFrontendViewProvider(object):
 
     def single(self, request, slug, year, month, day):
         def entry_func(ap, y, m, d):
-            if ap.slug_re.match(slug) == None:
+            if slug_re.match(slug) == None:
                 return []
             else:
                 return ap.entry.single(slug, y, m, d)

@@ -7,6 +7,7 @@ from jinja2 import Environment, \
                    FileSystemLoader
 
 from firmant.datasource.atom import AtomProvider
+from firmant.datasource.atom import slug_re
 from firmant.plugins import MultiProviderPlugin
 from firmant.filters import FilterProvider
 
@@ -132,7 +133,7 @@ class Jinja2FrontendViewProvider(object):
         ap = rc.get(AtomProvider)
         try:
             dt = datetime.datetime(int(year), int(month), int(day))
-            if ap.slug_re.match(slug) == None:
+            if slug_re.match(slug) == None:
                 entry = None
             else:
                 entry = ap.entry.single(slug, dt.year, dt.month, dt.day)
