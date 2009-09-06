@@ -1005,52 +1005,43 @@ class TestFeed(unittest.TestCase):
         setup whatever data is necessary for the test cases to run."""
         not_implemented() # pragma: no cover
 
-    def configuration(self, name):
-        """This function should return the settings associated with test
-        'name'"""
-        not_implemented() # pragma: no cover
-
     def testBySlug1(self):
         """firmant.datasource.atom.Feed.by_slug
         A feed object should be returned for the given name."""
-        provider = self.get_provider('BySlug1')
-        feed     = provider.feed
+        provider = self.provider
 
         expected = feeds['general']
-        returned = feed.by_slug('general')
+        returned = provider.by_slug('general')
 
         self.assertEqual(expected, returned)
 
     def testBySlug2(self):
         """firmant.datasource.atom.Feed.by_slug
         A ValueError should be raised for an invalid slug."""
-        provider = self.get_provider('BySlug2')
-        feed     = provider.feed
+        provider = self.provider
 
         raises   = ValueError
-        function = lambda: feed.by_slug('!@#$')
+        function = lambda: provider.by_slug('!@#$')
 
         self.assertRaises(raises, function)
 
     def testBySlug3(self):
         """firmant.datasource.atom.Feed.by_slug
         Test selecting feed with no entries."""
-        provider = self.get_provider('BySlug3')
-        feed     = provider.feed
+        provider = self.provider
 
         expected = feeds['empty']
-        returned = feed.by_slug('empty')
+        returned = provider.by_slug('empty')
 
         self.assertEqual(expected, returned)
 
     def testDefault(self):
         """firmant.datasource.atom.Feed.default
         The default feed object should be returned."""
-        provider = self.get_provider('Default')
-        feed     = provider.feed
+        provider = self.provider
 
         expected = feeds['default']
-        returned = feed.default()
+        returned = provider.default()
 
         self.assertEqual(expected, returned)
 

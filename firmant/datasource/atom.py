@@ -104,16 +104,13 @@ class Feed(AtomBase):
     fields    = ['slug', 'title', 'rights', 'subtitle', 'updated', 'entries']
     __slots__ = fields
 
-    @classmethod
-    def by_slug(cls, slug):
+
+class AtomFeedProvider(SingleProviderPlugin):
+
+    def by_slug(self, slug):
         not_implemented() # pragma: no cover
 
-    @classmethod
-    def default(cls):
-        not_implemented() # pragma: no cover
-
-    @property
-    def permalink(self):
+    def default(self):
         not_implemented() # pragma: no cover
 
 

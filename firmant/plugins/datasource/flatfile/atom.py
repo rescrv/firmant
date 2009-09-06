@@ -27,61 +27,6 @@ class FlatfileAtomProvider(AtomProvider):
     def __init__(provider_self, rc, settings):
         provider_self.rc = rc
 
-        class FlatFileFeed(Feed):
-
-            provider = provider_self
-
-            @classmethod
-            def by_slug(cls, slug):
-                if provider_self.slug_re.match(slug) == None:
-                    raise ValueError("Invalid slug")
-                return cls._common(slug)
-
-            @classmethod
-            def _common(cls, slug):
-                feed_path = os.path.join(settings['FLATFILE_BASE'],
-                                        'feeds',
-                                        slug)
-
-                rights_path = os.path.join(feed_path, 'rights')
-                meta_path   = os.path.join(feed_path, 'meta')
-
-                if not os.access(feed_path,   os.R_OK) or \
-                   not os.access(rights_path, os.R_OK) or \
-                   not os.access(meta_path,   os.R_OK):
-                    return None
-
-                rights_file = open(rights_path)
-                meta_file   = open(meta_path)
-
-                rights_data = rights_file.read().decode('utf-8')
-                meta_data   = json.loads(meta_file.read().decode('utf-8'))
-
-                rights_file.close()
-                meta_file  .close()
-
-                feed = cls()
-                feed.slug     = slug
-                feed.title    = meta_data['title']
-                feed.rights   = rights_data
-                feed.subtitle = meta_data['subtitle']
-                feed.entries  = provider_self.entry.for_feed(slug)
-                if len(feed.entries) > 0:
-                    feed.updated  = feed.entries[0].updated
-                else:
-                    feed.updated  = datetime.datetime.min
-                return feed
-
-            @classmethod
-            def default(cls):
-                feed = cls._common('=default')
-                feed.slug = ''
-                return feed
-
-            @property
-            def permalink(self):
-                return provider_self.feed_permalink(self.slug)
-
         provider_self.feed = FlatFileFeed
 
         provider_self.entry_permalink = \
@@ -366,3 +311,54 @@ class AtomFlatfileEntryProvider(object):
         entries = self.list()
         days = map(lambda x: x[0], entries)
         return uniq_presorted(days)
+
+
+class AtomFlatfileFeedProvider(object):
+
+    def __init__(self, rc, settings):
+        self.settings = settings
+        self.rc       = rc
+
+    def by_slug(self, slug):
+        if slug_re.match(slug) == None:
+            raise ValueError("Invalid slug")
+        return self._common(slug)
+
+    def _common(self, slug):
+        feed_path = os.path.join(self.settings['FLATFILE_BASE'],
+                                'feeds',
+                                slug)
+
+        rights_path = os.path.join(feed_path, 'rights')
+        meta_path   = os.path.join(feed_path, 'meta')
+
+        if not os.access(feed_path,   os.R_OK) or \
+           not os.access(rights_path, os.R_OK) or \
+           not os.access(meta_path,   os.R_OK):
+            return None
+
+        rights_file = open(rights_path)
+        meta_file   = open(meta_path)
+
+        rights_data = rights_file.read().decode('utf-8')
+        meta_data   = json.loads(meta_file.read().decode('utf-8'))
+
+        rights_file.close()
+        meta_file  .close()
+
+        feed          = Feed()
+        feed.slug     = slug
+        feed.title    = meta_data['title']
+        feed.rights   = rights_data
+        feed.subtitle = meta_data['subtitle']
+        feed.entries  = self.rc().get(AtomFlatfileEntryProvider).for_feed(slug)
+        if len(feed.entries) > 0:
+            feed.updated  = feed.entries[0].updated
+        else:
+            feed.updated  = datetime.datetime.min
+        return feed
+
+    def default(self):
+        feed = self._common('=default')
+        feed.slug = ''
+        return feed

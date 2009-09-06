@@ -5,6 +5,7 @@ from firmant.plugins.datasource.flatfile.atom import FlatfileAtomProvider
 from firmant.plugins.datasource.flatfile.atom import AtomFlatfileCategoryProvider
 from firmant.plugins.datasource.flatfile.atom import AtomFlatfileAuthorProvider
 from firmant.plugins.datasource.flatfile.atom import AtomFlatfileEntryProvider
+from firmant.plugins.datasource.flatfile.atom import AtomFlatfileFeedProvider
 from firmant.wsgi import RequestContext
 from test.datasource.atom import TestEntry as BaseTestEntry
 from test.datasource.atom import TestAuthor as BaseTestAuthor
@@ -49,23 +50,18 @@ class TestEntry(BaseTestEntry):
 class TestFeed(BaseTestFeed):
 
     def setUp(self):
-        pass
+        self.rc       = RequestContext(settings)
+        self.provider = self.rc.get(AtomFlatfileFeedProvider)
 
     def testBadPerms(self):
         '''firmant.plugins.datasource.flatfile.FlatfileAtomProvider.feed.by_slug
         Test the case that permissions are not adequately set on feeds.'''
-        provider = self.get_provider('BySlug1')
-        feed     = provider.feed
+        provider = self.provider
 
         expected = None
-        returned = feed.by_slug('badperms')
+        returned = provider.by_slug('badperms')
 
         self.assertEqual(expected, returned)
-
-
-    def get_provider(self, name):
-        rc = RequestContext(settings)
-        return rc.get(FlatfileAtomProvider)
 
 
 from test import add_test
