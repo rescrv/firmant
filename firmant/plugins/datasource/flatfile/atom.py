@@ -152,6 +152,9 @@ class AtomFlatfileEntryProvider(object):
         entry.title     = meta_data['title']
         entry.content   = content_data
         entry.summary   = summary_data
+        entry.permalink = \
+            self.rc().get(EntryPermalinkProvider).authoritative(entry.slug,
+                    entry.published.date())
         return entry
 
     def _load_many(self, entries):
