@@ -354,107 +354,94 @@ class TestEntry(unittest.TestCase):
         setup whatever data is necessary for the test cases to run."""
         not_implemented() # pragma: no cover
 
-    def get_provider(self, name):
-        """This function should return the AtomProvider for the test."""
-        not_implemented() # pragma: no cover
-
     def testForFeed1(self):
         """firmant.datasource.atom.Entry.for_feed
         The entries associated with a valid feed should be returned."""
-        provider = self.get_provider('ForFeed1')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = [entries['2009-02-17-loren-ipsum'],
                     entries['2009-02-13-sample']]
-        returned = entry.for_feed('general')
+        returned = provider.for_feed('general')
 
         self.assertEqual(expected, returned)
 
     def testForFeed2(self):
         """firmant.datasource.atom.Entry.for_feed
         None should be returned for an invalid feed."""
-        provider = self.get_provider('ForFeed2')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = None
-        returned = entry.for_feed('noexist')
+        returned = provider.for_feed('noexist')
 
         self.assertEqual(expected, returned)
 
     def testForFeed3(self):
         """firmant.datasource.atom.Entry.for_feed
         When pagination parameters provided, we get different results."""
-        provider = self.get_provider('ForFeed3')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([entries['2009-02-17-loren-ipsum']], 1)
-        returned = entry.for_feed('general', limit=1, offset=0)
+        returned = provider.for_feed('general', limit=1, offset=0)
 
         self.assertEqual(expected, returned)
 
     def testForFeed4(self):
         """firmant.datasource.atom.Entry.for_feed
         If we overrun the end, there is no results, and none remaining."""
-        provider = self.get_provider('ForFeed4')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = (None, 0)
-        returned = entry.for_feed('general', limit=1, offset=2)
+        returned = provider.for_feed('general', limit=1, offset=2)
 
         self.assertEqual(expected, returned)
 
     def testForFeed5(self):
         """firmant.datasource.atom.Entry.for_feed
         We test the offset for the for_feed method."""
-        provider = self.get_provider('ForFeed5')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([entries['2009-02-13-sample']], 0)
-        returned = entry.for_feed('general', limit=1, offset=1)
+        returned = provider.for_feed('general', limit=1, offset=1)
 
         self.assertEqual(expected, returned)
 
     def testForFeed6(self):
         """firmant.datasource.atom.Entry.for_feed
         Test that a limit of 0 returns a list if the offset is not too high."""
-        provider = self.get_provider('ForFeed6')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([], 2)
-        returned = entry.for_feed('general', limit=0, offset=0)
+        returned = provider.for_feed('general', limit=0, offset=0)
 
         self.assertEqual(expected, returned)
 
     def testForFeed7(self):
         """firmant.datasource.atom.Entry.for_feed
         Test that limit cannot be negative."""
-        provider = self.get_provider('ForFeed7')
-        entry    = provider.entry
+        provider = self.provider
 
         raises   = ValueError
-        function = lambda: entry.for_feed('general', limit=-1, offset=0)
+        function = lambda: provider.for_feed('general', limit=-1, offset=0)
 
         self.assertRaises(raises, function)
 
     def testForFeed8(self):
         """firmant.datasource.atom.Entry.for_feed
         Test that offset cannot be negative."""
-        provider = self.get_provider('ForFeed8')
-        entry    = provider.entry
+        provider = self.provider
 
         raises   = ValueError
-        function = lambda: entry.for_feed('general', limit=0, offset=-1)
+        function = lambda: provider.for_feed('general', limit=0, offset=-1)
 
         self.assertRaises(raises, function)
 
     def testForFeed9(self):
         """firmant.datasource.atom.Entry.for_feed
         Test that an unspecified offset is equivalent to 0."""
-        provider = self.get_provider('ForFeed9')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([entries['2009-02-17-loren-ipsum']], 1)
-        returned = entry.for_feed('general', limit=1)
+        returned = provider.for_feed('general', limit=1)
 
         self.assertEqual(expected, returned)
 
@@ -462,311 +449,283 @@ class TestEntry(unittest.TestCase):
         """firmant.datasource.atom.Entry.for_feed
         Test that an unspecified limit is equivalent to the set value of
         JINJA2_ENTRIES_PER_PAGE."""
-        provider = self.get_provider('ForFeed10')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([entries['2009-02-17-loren-ipsum'],
                      entries['2009-02-13-sample']], 0)
-        returned = entry.for_feed('general', offset=0)
+        returned = provider.for_feed('general', offset=0)
 
         self.assertEqual(expected, returned)
 
     def testForFeed11(self):
         """firmant.datasource.atom.Entry.single
         A ValueError should be raised for invalid slug."""
-        provider = self.get_provider('ForFeed11')
-        entry    = provider.entry
+        provider = self.provider
 
         raises   = ValueError
-        function = lambda: entry.for_feed('s@mpl3')
+        function = lambda: provider.for_feed('s@mpl3')
 
         self.assertRaises(raises, function)
 
     def testSingle1(self):
         """firmant.datasource.atom.Entry.single
         A valid entry should be returned for the given date."""
-        provider = self.get_provider('Single1')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = entries['2009-02-13-sample']
-        returned = entry.single('sample', 2009, 2, 13)
+        returned = provider.single('sample', 2009, 2, 13)
 
         self.assertEqual(expected, returned)
 
     def testSingle2(self):
         """firmant.datasource.atom.Entry.single
         A valid entry should be returned for the given date."""
-        provider = self.get_provider('Single2')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = entries['2009-02-17-loren-ipsum']
-        returned = entry.single('loren-ipsum', '2009', '2', '17')
+        returned = provider.single('loren-ipsum', '2009', '2', '17')
 
         self.assertEqual(expected, returned)
 
     def testSingle3(self):
         """firmant.datasource.atom.Entry.single
         None should be returned for a non-existent entry."""
-        provider = self.get_provider('Single3')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = None
-        returned = entry.single('IDONOTEXIST', 2009, 2, 13)
+        returned = provider.single('IDONOTEXIST', 2009, 2, 13)
 
         self.assertEqual(expected, returned)
 
     def testSingle4(self):
         """firmant.datasource.atom.Entry.single
         A ValueError should be raised for invalid slug."""
-        provider = self.get_provider('Single4')
-        entry    = provider.entry
+        provider = self.provider
 
         raises   = ValueError
-        function = lambda: entry.single('s@mpl3', 2009, 2, 13)
+        function = lambda: provider.single('s@mpl3', 2009, 2, 13)
 
         self.assertRaises(raises, function)
 
     def testSingle5(self):
         """firmant.datasource.atom.Entry.single
         A ValueError should be raised for invalid datetime."""
-        provider = self.get_provider('Single5')
-        entry    = provider.entry
+        provider = self.provider
 
         raises   = ValueError
-        function = lambda: entry.single('sample', 2009, 'a', 15)
+        function = lambda: provider.single('sample', 2009, 'a', 15)
 
         self.assertRaises(raises, function)
 
     def testSingle6(self):
         """firmant.datasource.atom.Entry.single
         A ValueError should be raised for invalid datetime."""
-        provider = self.get_provider('Single6')
-        entry    = provider.entry
+        provider = self.provider
 
         raises   = ValueError
-        function = lambda: entry.single('sample', 2009, 13, 15)
+        function = lambda: provider.single('sample', 2009, 13, 15)
 
         self.assertRaises(raises, function)
 
     def testDay1(self):
         """firmant.datasource.atom.Entry.day
         A valid list of entries for a given day should be returned."""
-        provider = self.get_provider('Day1')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = [entries['2009-02-13-sample']]
-        returned = entry.day('2009', '02', '13')
+        returned = provider.day('2009', '02', '13')
 
         self.assertEqual(expected, returned)
 
     def testDay2(self):
         """firmant.datasource.atom.Entry.day
         An empty list for a day for which there are no entries."""
-        provider = self.get_provider('Day2')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = []
-        returned = entry.day('2009', '01', '09')
+        returned = provider.day('2009', '01', '09')
 
         self.assertEqual(expected, returned)
 
     def testDay3(self):
         """firmant.datasource.atom.Entry.day
         A ValueError should be raised for an invalid date."""
-        provider = self.get_provider('Day3')
-        entry    = provider.entry
+        provider = self.provider
 
         raises   = ValueError
-        function = lambda: entry.day(2009, 0, 0)
+        function = lambda: provider.day(2009, 0, 0)
 
         self.assertRaises(raises, function)
 
     def testDay4(self):
         """firmant.datasource.atom.Entry.day
         Test valid pagination."""
-        provider = self.get_provider('Day4')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([entries['2009-02-13-sample']], 0)
-        returned = entry.day('2009', '02', '13', limit=1, offset=0)
+        returned = provider.day('2009', '02', '13', limit=1, offset=0)
 
         self.assertEqual(expected, returned)
 
     def testDay5(self):
         """firmant.datasource.atom.Entry.day
         Test valid pagination."""
-        provider = self.get_provider('Day5')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([], 1)
-        returned = entry.day('2009', '02', '13', limit=0, offset=0)
+        returned = provider.day('2009', '02', '13', limit=0, offset=0)
 
         self.assertEqual(expected, returned)
 
     def testDay6(self):
         """firmant.datasource.atom.Entry.day
         Test valid termination of pagination."""
-        provider = self.get_provider('Day6')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = (None, 0)
-        returned = entry.day('2009', '02', '13', limit=1, offset=1)
+        returned = provider.day('2009', '02', '13', limit=1, offset=1)
 
         self.assertEqual(expected, returned)
 
     def testDay7(self):
         """firmant.datasource.atom.Entry.day
         Test that checks exist for sane values of limit/offset."""
-        provider = self.get_provider('Day7')
-        entry    = provider.entry
+        provider = self.provider
 
         raises   = ValueError
-        function = lambda: entry.day('2009', '02', '13', limit=0, offset=-1)
+        function = lambda: provider.day('2009', '02', '13', limit=0, offset=-1)
 
         self.assertRaises(raises, function)
 
     def testDay8(self):
         """firmant.datasource.atom.Entry.day
         Test that checks exist for sane values of limit/offset."""
-        provider = self.get_provider('Day8')
-        entry    = provider.entry
+        provider = self.provider
 
         raises   = ValueError
-        function = lambda: entry.day('2009', '02', '13', limit=-1, offset=0)
+        function = lambda: provider.day('2009', '02', '13', limit=-1, offset=0)
 
         self.assertRaises(raises, function)
 
     def testDay9(self):
         """firmant.datasource.atom.Entry.day
         An unspecified offset is equivalent to 0."""
-        provider = self.get_provider('Day9')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([entries['2009-02-13-sample']], 0)
-        returned = entry.day('2009', '02', '13', limit=1)
+        returned = provider.day('2009', '02', '13', limit=1)
 
         self.assertEqual(expected, returned)
 
     def testDay10(self):
         """firmant.datasource.atom.Entry.day
         An unspecified limit is equivalent to the default."""
-        provider = self.get_provider('Day10')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([entries['2009-02-13-sample']], 0)
-        returned = entry.day('2009', '02', '13', offset=0)
+        returned = provider.day('2009', '02', '13', offset=0)
 
         self.assertEqual(expected, returned)
 
     def testMonth1(self):
         """firmant.datasource.atom.Entry.month
         A list of entries for a month for which there are entries."""
-        provider = self.get_provider('Month1')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = [entries['2009-02-17-loren-ipsum'],
                     entries['2009-02-13-sample']]
-        returned = entry.month('2009', '02')
+        returned = provider.month('2009', '02')
 
         self.assertEqual(expected, returned)
 
     def testMonth2(self):
         """firmant.datasource.atom.Entry.month
         An empty list for a month for which there are no entries."""
-        provider = self.get_provider('Month2')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = []
-        returned = entry.month('2009', '01')
+        returned = provider.month('2009', '01')
 
         self.assertEqual(expected, returned)
 
     def testMonth3(self):
         """firmant.datasource.atom.Entry.month
         A ValueError should be raised for an invalid date."""
-        provider = self.get_provider('Month3')
-        entry    = provider.entry
+        provider = self.provider
 
         raises   = ValueError
-        function = lambda: entry.month(2009, 0)
+        function = lambda: provider.month(2009, 0)
 
         self.assertRaises(raises, function)
 
     def testMonth4(self):
         """firmant.datasource.atom.Entry.month
         Test valid pagination."""
-        provider = self.get_provider('Month4')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([entries['2009-02-17-loren-ipsum']], 1)
-        returned = entry.month('2009', '02', limit=1, offset=0)
+        returned = provider.month('2009', '02', limit=1, offset=0)
 
         self.assertEqual(expected, returned)
 
     def testMonth5(self):
         """firmant.datasource.atom.Entry.month
         Test valid pagination."""
-        provider = self.get_provider('Month5')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([entries['2009-02-13-sample']], 0)
-        returned = entry.month('2009', '02', limit=1, offset=1)
+        returned = provider.month('2009', '02', limit=1, offset=1)
 
         self.assertEqual(expected, returned)
 
     def testMonth6(self):
         """firmant.datasource.atom.Entry.month
         Test valid pagination."""
-        provider = self.get_provider('Month6')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = (None, 0)
-        returned = entry.month('2009', '02', limit=1, offset=2)
+        returned = provider.month('2009', '02', limit=1, offset=2)
 
         self.assertEqual(expected, returned)
 
     def testMonth7(self):
         """firmant.datasource.atom.Entry.month
         Test that checks exist for sane values of limit/offset."""
-        provider = self.get_provider('Month7')
-        entry    = provider.entry
+        provider = self.provider
 
         raises   = ValueError
-        function = lambda: entry.month('2009', '02', limit=0, offset=-1)
+        function = lambda: provider.month('2009', '02', limit=0, offset=-1)
 
         self.assertRaises(raises, function)
 
     def testMonth8(self):
         """firmant.datasource.atom.Entry.month
         Test that checks exist for sane values of limit/offset."""
-        provider = self.get_provider('Month8')
-        entry    = provider.entry
+        provider = self.provider
 
         raises   = ValueError
-        function = lambda: entry.month('2009', '02', limit=-1, offset=0)
+        function = lambda: provider.month('2009', '02', limit=-1, offset=0)
 
         self.assertRaises(raises, function)
 
     def testMonth9(self):
         """firmant.datasource.atom.Entry.month
         An unspecified offset is equivalent to 0."""
-        provider = self.get_provider('Month9')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([entries['2009-02-17-loren-ipsum']], 1)
-        returned = entry.month('2009', '02', limit=1)
+        returned = provider.month('2009', '02', limit=1)
 
         self.assertEqual(expected, returned)
 
     def testMonth10(self):
         """firmant.datasource.atom.Entry.month
         An unspecified limit is equivalent to the default."""
-        provider = self.get_provider('Month10')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([entries['2009-02-17-loren-ipsum'],
                      entries['2009-02-13-sample']], 0)
-        returned = entry.month('2009', '02', offset=0)
+        returned = provider.month('2009', '02', offset=0)
 
         self.assertEqual(expected, returned)
 
@@ -774,14 +733,13 @@ class TestEntry(unittest.TestCase):
         """firmant.datasource.atom.Entry.year
         A list of entries should be returned for a year for which there are
         entries."""
-        provider = self.get_provider('Year1')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = [entries['2009-03-29-markdown'],
                     entries['2009-03-17-sample'],
                     entries['2009-02-17-loren-ipsum'],
                     entries['2009-02-13-sample']]
-        returned = entry.year('2009')
+        returned = provider.year('2009')
 
         self.assertEqual(expected, returned)
 
@@ -789,275 +747,252 @@ class TestEntry(unittest.TestCase):
         """firmant.datasource.atom.Entry.year
         An empty list of entries should be returned for a year for which there
         are no entries."""
-        provider = self.get_provider('Year2')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = []
-        returned = entry.year('2008')
+        returned = provider.year('2008')
 
         self.assertEqual(expected, returned)
 
     def testYear3(self):
         """firmant.datasource.atom.Entry.year
         A ValueError should be raised for an invalid date."""
-        provider = self.get_provider('Month3')
-        entry    = provider.entry
+        provider = self.provider
 
         raises   = ValueError
-        function = lambda: entry.year('abcd')
+        function = lambda: provider.year('abcd')
 
         self.assertRaises(raises, function)
 
     def testYear4(self):
         """firmant.datasource.atom.Entry.year
         Test valid pagination."""
-        provider = self.get_provider('Year4')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([entries['2009-03-29-markdown'],
                     entries['2009-03-17-sample']], 2)
-        returned = entry.year('2009', limit=2, offset=0)
+        returned = provider.year('2009', limit=2, offset=0)
 
         self.assertEqual(expected, returned)
 
     def testYear5(self):
         """firmant.datasource.atom.Entry.year
         Test valid pagination."""
-        provider = self.get_provider('Year5')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([entries['2009-02-17-loren-ipsum'],
                     entries['2009-02-13-sample']], 0)
-        returned = entry.year('2009', limit=2, offset=2)
+        returned = provider.year('2009', limit=2, offset=2)
 
         self.assertEqual(expected, returned)
 
     def testYear6(self):
         """firmant.datasource.atom.Entry.year
         Test valid pagination."""
-        provider = self.get_provider('Year6')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = (None, 0)
-        returned = entry.year('2009', limit=2, offset=4)
+        returned = provider.year('2009', limit=2, offset=4)
 
         self.assertEqual(expected, returned)
 
     def testYear7(self):
         """firmant.datasource.atom.Entry.year
         Test for sanity checks on limit."""
-        provider = self.get_provider('Year7')
-        entry    = provider.entry
+        provider = self.provider
 
         raises   = ValueError
-        function = lambda: entry.year('2009', limit=-1, offset=0)
+        function = lambda: provider.year('2009', limit=-1, offset=0)
 
         self.assertRaises(raises, function)
 
     def testYear8(self):
         """firmant.datasource.atom.Entry.year
         Test for sanity checks on offset."""
-        provider = self.get_provider('Year8')
-        entry    = provider.entry
+        provider = self.provider
 
         raises   = ValueError
-        function = lambda: entry.year('2009', limit=0, offset=-1)
+        function = lambda: provider.year('2009', limit=0, offset=-1)
 
         self.assertRaises(raises, function)
 
     def testYear9(self):
         """firmant.datasource.atom.Entry.year
         An unspecified offset is equivalent to 0."""
-        provider = self.get_provider('Year9')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([entries['2009-03-29-markdown'],
                     entries['2009-03-17-sample']], 2)
-        returned = entry.year('2009', limit=2)
+        returned = provider.year('2009', limit=2)
 
         self.assertEqual(expected, returned)
 
     def testYear10(self):
         """firmant.datasource.atom.Entry.year
         An unspecified limit is equivalent to the default."""
-        provider = self.get_provider('Year10')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([entries['2009-03-29-markdown'],
                     entries['2009-03-17-sample'],
                     entries['2009-02-17-loren-ipsum'],
                     entries['2009-02-13-sample']], 0)
-        returned = entry.year('2009', offset=0)
+        returned = provider.year('2009', offset=0)
 
         self.assertEqual(expected, returned)
 
     def testRecent1(self):
         """firmant.datasource.atom.Entry.recent
         A list of entries should be returned."""
-        provider = self.get_provider('Recent1')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = [entries['2009-03-29-markdown'],
                     entries['2009-03-17-sample'],
                     entries['2009-02-17-loren-ipsum'],
                     entries['2009-02-13-sample']]
-        returned = entry.recent()
+        returned = provider.recent()
 
         self.assertEqual(expected, returned)
 
     def testRecent2(self):
         """firmant.datasource.atom.Entry.recent
         A list of entries should be returned."""
-        provider = self.get_provider('Recent2')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([entries['2009-03-29-markdown'],
                     entries['2009-03-17-sample']], 2)
-        returned = entry.recent(limit=2, offset=0)
+        returned = provider.recent(limit=2, offset=0)
 
         self.assertEqual(expected, returned)
 
     def testRecent3(self):
         """firmant.datasource.atom.Entry.recent
         A list of entries should be returned."""
-        provider = self.get_provider('Recent3')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([entries['2009-02-17-loren-ipsum'],
                     entries['2009-02-13-sample']], 0)
-        returned = entry.recent(limit=2, offset=2)
+        returned = provider.recent(limit=2, offset=2)
 
         self.assertEqual(expected, returned)
 
     def testRecent4(self):
         """firmant.datasource.atom.Entry.recent
         A list of entries should be returned."""
-        provider = self.get_provider('Recent4')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = (None, 0)
-        returned = entry.recent(limit=2, offset=4)
+        returned = provider.recent(limit=2, offset=4)
 
         self.assertEqual(expected, returned)
 
     def testRecent5(self):
         """firmant.datasource.atom.Entry.recent
         Test for sanity checks on offset."""
-        provider = self.get_provider('Recent5')
-        entry    = provider.entry
+        provider = self.provider
 
         raises   = ValueError
-        function = lambda: entry.recent(limit=0, offset=-1)
+        function = lambda: provider.recent(limit=0, offset=-1)
 
         self.assertRaises(raises, function)
 
     def testRecent6(self):
         """firmant.datasource.atom.Entry.recent
         Test for sanity checks on offset."""
-        provider = self.get_provider('Recent6')
-        entry    = provider.entry
+        provider = self.provider
 
         raises   = ValueError
-        function = lambda: entry.recent(limit=-1, offset=0)
+        function = lambda: provider.recent(limit=-1, offset=0)
 
         self.assertRaises(raises, function)
 
     def testRecent7(self):
         """firmant.datasource.atom.Entry.recent
         An unspecified offset is 0."""
-        provider = self.get_provider('Recent7')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([entries['2009-03-29-markdown'],
                     entries['2009-03-17-sample']], 2)
-        returned = entry.recent(limit=2)
+        returned = provider.recent(limit=2)
 
         self.assertEqual(expected, returned)
 
     def testRecent8(self):
         """firmant.datasource.atom.Entry.recent
         An unspecified limit is the default."""
-        provider = self.get_provider('Recent8')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = ([entries['2009-03-29-markdown'],
                     entries['2009-03-17-sample'],
                     entries['2009-02-17-loren-ipsum'],
                     entries['2009-02-13-sample']], 0)
-        returned = entry.recent(offset=0)
+        returned = provider.recent(offset=0)
 
         self.assertEqual(expected, returned)
 
     def testList1(self):
         """firmant.datasource.atom.Entry.list
         Get the list of entries published."""
-        provider = self.get_provider('List1')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = [(datetime.date(2009, 3, 29), 'markdown'),
                     (datetime.date(2009, 3, 17), 'sample'),
                     (datetime.date(2009, 2, 17), 'loren-ipsum'),
                     (datetime.date(2009, 2, 13), 'sample')]
-        returned = entry.list()
+        returned = provider.list()
 
         self.assertEqual(expected, returned)
 
     def testListYears1(self):
         """firmant.datasource.atom.Entry.list_years
         Get the list of years for which entries were published."""
-        provider = self.get_provider('ListYears1')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = [datetime.date(2009, 1, 1)]
-        returned = entry.list_years()
+        returned = provider.list_years()
 
         self.assertEqual(expected, returned)
 
     def testListMonths1(self):
         """firmant.datasource.atom.Entry.list_months
         Get the list of months for which entries were published."""
-        provider = self.get_provider('ListMonths1')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = [datetime.date(2009, 3, 1),
                     datetime.date(2009, 2, 1)]
-        returned = entry.list_months()
+        returned = provider.list_months()
 
         self.assertEqual(expected, returned)
 
     def testListDays1(self):
         """firmant.datasource.atom.Entry.list_days
         Get the list of days for which entries were published."""
-        provider = self.get_provider('Days1')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = [datetime.date(2009, 3, 29),
                     datetime.date(2009, 3, 17),
                     datetime.date(2009, 2, 17),
                     datetime.date(2009, 2, 13)]
-        returned = entry.list_days()
+        returned = provider.list_days()
 
         self.assertEqual(expected, returned)
 
     def testExists1(self):
         """firmant.datasource.atom.Entry.exists
         Returns true for an existing entry."""
-        provider = self.get_provider('Exists1')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = True
-        returned = entry.exists('markdown', 2009, 3, 29)
+        returned = provider.exists('markdown', 2009, 3, 29)
 
         self.assertEqual(expected, returned)
 
     def testExists2(self):
         """firmant.datasource.atom.Entry.exists
         Returns true for an existing entry."""
-        provider = self.get_provider('Exists2')
-        entry    = provider.entry
+        provider = self.provider
 
         expected = False
-        returned = entry.exists('noexist', 2009, 3, 29)
+        returned = provider.exists('noexist', 2009, 3, 29)
 
         self.assertEqual(expected, returned)
 

@@ -1,5 +1,6 @@
 import datetime
 import pytz
+import re
 
 from firmant.plugins import SingleProviderPlugin
 from firmant.utils import not_implemented
@@ -11,6 +12,9 @@ from firmant.utils import json
 
 
 # Base classes for Atom data.
+
+
+slug_re = re.compile('^[-\\_a-zA-Z0-9]{1,96}$')
 
 
 class AtomBase(object):
@@ -73,32 +77,25 @@ class Entry(AtomBase):
                  'title', 'content', 'summary', 'tz']
     __slots__ = fields
 
-    @classmethod
-    def for_feed(cls, feedslug):
+
+class AtomEntryProvider(SingleProviderPlugin):
+
+    def for_feed(self, feedslug):
         not_implemented() # pragma: no cover
 
-    @classmethod
-    def single(cls, slug, year, month, day):
+    def single(self, slug, year, month, day):
         not_implemented() # pragma: no cover
 
-    @classmethod
-    def day(cls, year, month, day):
+    def day(self, year, month, day):
         not_implemented() # pragma: no cover
 
-    @classmethod
-    def month(cls, year, month):
+    def month(self, year, month):
         not_implemented() # pragma: no cover
 
-    @classmethod
-    def year(cls, year):
+    def year(self, year):
         not_implemented() # pragma: no cover
 
-    @classmethod
-    def recent(cls):
-        not_implemented() # pragma: no cover
-
-    @property
-    def permalink(self):
+    def recent(self):
         not_implemented() # pragma: no cover
 
 

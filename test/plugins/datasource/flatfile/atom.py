@@ -4,6 +4,7 @@ import weakref
 from firmant.plugins.datasource.flatfile.atom import FlatfileAtomProvider
 from firmant.plugins.datasource.flatfile.atom import AtomFlatfileCategoryProvider
 from firmant.plugins.datasource.flatfile.atom import AtomFlatfileAuthorProvider
+from firmant.plugins.datasource.flatfile.atom import AtomFlatfileEntryProvider
 from firmant.wsgi import RequestContext
 from test.datasource.atom import TestEntry as BaseTestEntry
 from test.datasource.atom import TestAuthor as BaseTestAuthor
@@ -41,11 +42,8 @@ class TestCategory(BaseTestCategory):
 class TestEntry(BaseTestEntry):
 
     def setUp(self):
-        pass
-
-    def get_provider(self, name):
-        rc = RequestContext(settings)
-        return rc.get(FlatfileAtomProvider)
+        self.rc       = RequestContext(settings)
+        self.provider = self.rc.get(AtomFlatfileEntryProvider)
 
 
 class TestFeed(BaseTestFeed):
