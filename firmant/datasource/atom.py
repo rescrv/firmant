@@ -3,7 +3,6 @@ import pytz
 import re
 
 from firmant.plugins import SingleProviderPlugin
-from firmant.utils import not_implemented
 from firmant.constants import isoformat
 from firmant.utils import xml, \
                           strptime
@@ -48,8 +47,10 @@ class Author(AtomBase):
 
 class AtomAuthorProvider(SingleProviderPlugin):
 
+    provider_setting = 'ATOM_AUTHOR_PROVIDER'
+
     def by_name(self, name):
-        not_implemented() # pragma: no cover
+        return self._provider.by_name(name)
 
 
 class Category(AtomBase):
@@ -60,8 +61,10 @@ class Category(AtomBase):
 
 class AtomCategoryProvider(SingleProviderPlugin):
 
+    provider_setting = 'ATOM_CATEGORY_PROVIDER'
+
     def by_term(self, term):
-        not_implemented() # pragma: no cover
+        return self._provider.by_term(term)
 
     # TODO:
     #def permalink(self):
@@ -79,38 +82,40 @@ class Entry(AtomBase):
 
 class AtomEntryProvider(SingleProviderPlugin):
 
-    def for_feed(self, feedslug):
-        not_implemented() # pragma: no cover
+    provider_setting = 'ATOM_ENTRY_PROVIDER'
+
+    def for_feed(self, feedslug, limit=None, offset=None):
+        return self._provider.for_feed(feedslug, limit, offset)
 
     def single(self, slug, year, month, day):
-        not_implemented() # pragma: no cover
+        return self._provider.single(slug, year, month, day)
 
-    def day(self, year, month, day):
-        not_implemented() # pragma: no cover
+    def day(self, year, month, day, limit=None, offset=None):
+        return self._provider.day(year, month, day, limit, offset)
 
-    def month(self, year, month):
-        not_implemented() # pragma: no cover
+    def month(self, year, month, limit=None, offset=None):
+        return self._provider.month(year, month, limit, offset)
 
-    def year(self, year):
-        not_implemented() # pragma: no cover
+    def year(self, year, limit=None, offset=None):
+        return self._provider.year(year, limit, offset)
 
-    def recent(self):
-        not_implemented() # pragma: no cover
+    def recent(self, limit=None, offset=None):
+        return self._provider.recent(limit, offset)
 
     def exists(self, slug, year, month, day):
-        not_implemented() # pragma: no cover
+        return self._provider.exists(slug, year, month, day)
 
     def list(self):
-        not_implemented() # pragma: no cover
+        return self._provider.list()
 
     def list_years(self):
-        not_implemented() # pragma: no cover
+        return self._provider.list_years()
 
     def list_months(self):
-        not_implemented() # pragma: no cover
+        return self._provider.list_months()
 
     def list_days(self):
-        not_implemented() # pragma: no cover
+        return self._provider.list_days()
 
 
 class Feed(AtomBase):
@@ -121,31 +126,26 @@ class Feed(AtomBase):
 
 class AtomFeedProvider(SingleProviderPlugin):
 
+    provider_setting = 'ATOM_FEED_PROVIDER'
+
     def by_slug(self, slug):
-        not_implemented() # pragma: no cover
+        return self._provider.by_slug(slug)
 
     def default(self):
-        not_implemented() # pragma: no cover
+        return self._provider.default()
 
 
 # Plugin Code
 
 
-class AtomProvider(SingleProviderPlugin):
+class AtomProvider(object):
 
-    provider_setting = 'ATOM_PROVIDER'
-
-    entry    = property(lambda self: self._provider.entry,
-                        doc="The Atom Entry class")
-
-    feed     = property(lambda self: self._provider.feed,
-                        doc="The Atom Feed class")
-
-    author   = property(lambda self: self._provider.author,
-                        doc="The Atom Author class")
-
-    category = property(lambda self: self._provider.category,
-                        doc="The Atom Category class")
+    def __init__(self, rc, settings):
+        inst_rc       = rc()
+        self.entry    = inst_rc.get(AtomEntryProvider)
+        self.feed     = inst_rc.get(AtomFeedProvider)
+        self.author   = inst_rc.get(AtomAuthorProvider)
+        self.category = inst_rc.get(AtomCategoryProvider)
 
 
 class EntryPermalinkProvider(SingleProviderPlugin):

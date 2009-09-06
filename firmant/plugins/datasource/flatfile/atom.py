@@ -10,6 +10,10 @@ from firmant.datasource.atom import AtomProvider, \
                                     Category, \
                                     EntryPermalinkProvider, \
                                     FeedPermalinkProvider
+from firmant.datasource.atom import AtomFeedProvider
+from firmant.datasource.atom import AtomEntryProvider
+from firmant.datasource.atom import AtomAuthorProvider
+from firmant.datasource.atom import AtomCategoryProvider
 from firmant.datasource.atom import slug_re
 from firmant.utils import strptime
 from firmant.utils import uniq_presorted
@@ -17,19 +21,6 @@ from firmant.utils import json
 
 
 date_re = re.compile('^\d{4},\d{2},\d{2}$')
-
-
-class FlatfileAtomProvider(AtomProvider):
-
-    __slots__ = ['feed', 'entry', 'author', 'category']
-
-    def __init__(self, rc, settings):
-
-        inst_rc       = rc()
-        self.entry    = inst_rc.get(AtomFlatfileEntryProvider)
-        self.feed     = inst_rc.get(AtomFlatfileFeedProvider)
-        self.author   = inst_rc.get(AtomFlatfileAuthorProvider)
-        self.category = inst_rc.get(AtomFlatfileCategoryProvider)
 
 
 class AtomFlatfileCategoryProvider(object):
@@ -140,10 +131,10 @@ class AtomFlatfileEntryProvider(object):
                     )
                 )
         entry.author    = \
-                self.rc().get(AtomFlatfileAuthorProvider).\
+                self.rc().get(AtomAuthorProvider).\
                 by_name(meta_data['author'])
         entry.category  = \
-                self.rc().get(AtomFlatfileCategoryProvider).\
+                self.rc().get(AtomCategoryProvider).\
                 by_term(meta_data['category'])
         entry.rights    = rights_data
         entry.updated   = \
@@ -350,7 +341,7 @@ class AtomFlatfileFeedProvider(object):
         feed.title    = meta_data['title']
         feed.rights   = rights_data
         feed.subtitle = meta_data['subtitle']
-        feed.entries  = self.rc().get(AtomFlatfileEntryProvider).for_feed(slug)
+        feed.entries  = self.rc().get(AtomEntryProvider).for_feed(slug)
         feed.permalink = \
             self.rc().get(FeedPermalinkProvider).authoritative(feed.slug)
         if len(feed.entries) > 0:
