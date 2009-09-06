@@ -6,7 +6,6 @@ from firmant.plugins import SingleProviderPlugin
 from firmant.utils import not_implemented
 from firmant.constants import isoformat
 from firmant.utils import xml, \
-                          RFC3339, \
                           strptime
 from firmant.utils import json
 

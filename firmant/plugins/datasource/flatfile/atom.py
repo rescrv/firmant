@@ -351,6 +351,8 @@ class AtomFlatfileFeedProvider(object):
         feed.rights   = rights_data
         feed.subtitle = meta_data['subtitle']
         feed.entries  = self.rc().get(AtomFlatfileEntryProvider).for_feed(slug)
+        feed.permalink = \
+            self.rc().get(FeedPermalinkProvider).authoritative(feed.slug)
         if len(feed.entries) > 0:
             feed.updated  = feed.entries[0].updated
         else:
