@@ -75,6 +75,12 @@ class AtomFlatfileAuthorProvider(object):
         f.flush()
         f.close()
 
+    def _delete(self, obj):
+        path = os.path.join(self.settings['FLATFILE_BASE'], 'people', obj.name)
+        if not os.access(path, os.F_OK):
+            raise Storage.DoesNotExistError('Author does not exist')
+        os.unlink(path)
+
 
 
 class AtomFlatfileEntryProvider(object):
