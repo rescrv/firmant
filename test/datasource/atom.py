@@ -16,6 +16,8 @@ from firmant.utils import not_implemented, \
                           xml, \
                           RFC3339
 
+from test.datasource import create_testSave1
+
 
 # Defined Authors.
 authors = {}
@@ -27,6 +29,10 @@ authors['Loren Ipsum Generator']       = Author()
 authors['Loren Ipsum Generator'].name  = u'Loren Ipsum Generator'
 authors['Loren Ipsum Generator'].uri   = u'http://www.lipsum.com'
 authors['Loren Ipsum Generator'].email = u'lipsum@example.org'
+authors['DNE']       = Author()
+authors['DNE'].name  = u'Does Not Exist'
+authors['DNE'].uri   = u'http://dne.example.com'
+authors['DNE'].email = u'dne@example.org'
 
 
 # Defined Categories
@@ -346,22 +352,10 @@ class TestAuthor(unittest.TestCase):
         returned = provider.by_name('Robert Escriva')
         self.assertEqual(expected, returned)
 
-    def testSave1(self):
-        """firmant.datasource.atom.Author.save
-        Save an author successfully."""
-        provider = self.provider
-        tosave   = Author()
-        tosave.name  = u'Does Not Exist'
-        tosave.uri   = u'http://dne.example.com'
-        tosave.email = u'dne@example.org'
-
-        expected = None
-        returned = provider.save(tosave)
-        self.assertEqual(expected, returned)
-
-        expected = tosave
-        returned = provider.by_name('Does Not Exist')
-        self.assertEqual(expected, returned)
+    testSave1 = create_testSave1(authors['DNE'],
+            """firmant.datasource.atom.Author.save
+            Save an author successfully.""",
+            authors['DNE'], 'by_name', 'Does Not Exist')
 
     def testSave2(self):
         """firmant.datasource.atom.Author.save

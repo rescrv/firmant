@@ -6,6 +6,8 @@ from firmant.utils import not_implemented
 from firmant.datasource.comments import Comment
 from firmant.datasource import Storage
 
+from test.datasource import create_testSave1
+
 
 comments = {}
 comments['rescriva']             = Comment()
@@ -76,6 +78,19 @@ comments['rescriva2'].created     = \
 comments['rescriva2'].content     = "Sample comment # 1"
 comments['rescriva2'].status      = "published"
 comments['rescriva2'].entry_pkey  = \
+        (datetime.date(2009, 7, 18), "comments-enabled")
+
+comments['DNE']             = Comment()
+comments['DNE'].name        = 'Does Not Exist'
+comments['DNE'].email       = ''
+comments['DNE'].url         = ''
+comments['DNE'].ip          = ''
+comments['DNE'].useragent   = ''
+comments['DNE'].created     = \
+        datetime.datetime(2009, 9, 12, 11, 25, 6, tzinfo=pytz.utc)
+comments['DNE'].content     = ''
+comments['DNE'].status      = 'published'
+comments['DNE'].entry_pkey  = \
         (datetime.date(2009, 7, 18), "comments-enabled")
 
 
@@ -233,31 +248,11 @@ class TestCommentProvider(unittest.TestCase):
         returned = provider.for_entry('published', 'comments-enabled', 2009, 7, 18)
         self.assertEqual(expected, returned)
 
-    def testSave1(self):
+    testSave1 = create_testSave1(comments['DNE'],
         '''firmant.datasource.comments.CommentProvider.save
-        Save a comment successfully.'''
-        provider      = self.provider
-        c             = Comment()
-        c.name        = 'Foo Bar'
-        c.email       = 'foobar@example.org'
-        c.url         = 'http://example.org/'
-        c.ip          = '127.0.0.1'
-        c.useragent   = "No User Agent"
-        c.created     = \
-                datetime.datetime(2009, 7, 22, 16, 16, 28, tzinfo=pytz.utc)
-        c.content     = "Newly created comment"
-        c.status      = "published"
-        c.entry_pkey  = \
-                (datetime.date(2009, 7, 18), "comments-enabled")
-
-        provider.save(c)
-
-        expected = [comments['rescriva2'],
-                    comments['rescriva'],
-                    c]
-        returned = provider.for_entry('published', 'comments-enabled', 2009, 7, 18)
-
-        self.assertEqual(expected, returned)
+        Save a comment successfully.''',
+        [comments['rescriva2'], comments['rescriva'], comments['DNE']],
+        'for_entry', 'published', 'comments-enabled', 2009, 7, 18)
 
     def testSave2(self):
         '''firmant.datasource.comments.CommentProvider.save
