@@ -52,8 +52,19 @@ class TestAuthor(BaseTestAuthor):
 class TestCategory(BaseTestCategory):
 
     def setUp(self):
-        self.rc       = RequestContext(settings)
+        s = settings.copy()
+        method = self.id().split('.')[-1]
+        if method in ('testSave1', 'testSave2', 'testDelete1', 'testDelete2'):
+            self.tmpdir = tmp = clone_dir_to_tmp('checkout/')
+            s['FLATFILE_BASE'] = tmp
+        else:
+            self.tmpdir = None
+        self.rc       = RequestContext(s)
         self.provider = self.rc.get(AtomCategoryProvider)
+
+    def tearDown(self):
+        if self.tmpdir is not None:
+            shutil.rmtree(self.tmpdir)
 
 
 class TestEntry(BaseTestEntry):

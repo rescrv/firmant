@@ -43,6 +43,16 @@ class AtomFlatfileCategoryProvider(object):
         category.label = data
         return category
 
+    def _save(self, obj):
+        path = os.path.join(self.settings['FLATFILE_BASE'], 'categories',
+                obj.term)
+        if os.access(path, os.F_OK):
+            raise Storage.UniqueViolationError('Category already exists')
+        f = open(path, 'w')
+        f.write(obj.label)
+        f.flush()
+        f.close()
+
 
 class AtomFlatfileAuthorProvider(object):
 
