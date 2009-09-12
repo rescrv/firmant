@@ -53,6 +53,13 @@ class AtomFlatfileCategoryProvider(object):
         f.flush()
         f.close()
 
+    def _delete(self, obj):
+        path = os.path.join(self.settings['FLATFILE_BASE'], 'categories',
+                obj.term)
+        if not os.access(path, os.F_OK):
+            raise Storage.DoesNotExistError('Category does not exist')
+        os.unlink(path)
+
 
 class AtomFlatfileAuthorProvider(object):
 
