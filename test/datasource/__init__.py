@@ -46,6 +46,25 @@ def create_testDelete1(dne, docstring):
     return testDelete1
 
 
+def create_testDelete2(todelete, docstring, expt, check_func, *args, **kwargs):
+    def testDelete2(self):
+        provider = self.provider
+
+        expected = None
+        returned = provider.delete(todelete)
+        self.assertEqual(expected, returned)
+
+        if not hasattr(provider, check_func):
+            self.fail()
+        check = getattr(provider, check_func)
+
+        expected = expt
+        returned = check(*args, **kwargs)
+        self.assertEqual(expected, returned)
+    testDelete2.__doc__ = docstring
+    return testDelete2
+
+
 suite = unittest.TestSuite()
 
 from test.datasource.atom import suite as atom_tests

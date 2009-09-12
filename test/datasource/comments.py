@@ -9,6 +9,7 @@ from firmant.datasource import Storage
 from test.datasource import create_testSave1
 from test.datasource import create_testSave2
 from test.datasource import create_testDelete1
+from test.datasource import create_testDelete2
 
 
 comments = {}
@@ -229,19 +230,11 @@ class TestCommentProvider(unittest.TestCase):
         Use a non-existent comment object.  When delete is called, it should
         return ExistenceError.''')
 
-    def testDelete2(self):
+    testDelete2 = create_testDelete2(comments['rescriva2'],
         '''firmant.datasource.comments.CommentProvider.delete
-        Delete a comment known to be in the system.  Should throw no errors.'''
-        provider = self.provider
-        todelete = comments['rescriva2']
-
-        expected = None
-        returned = provider.delete(todelete)
-        self.assertEqual(expected, returned)
-
-        expected = [comments['rescriva']]
-        returned = provider.for_entry('published', 'comments-enabled', 2009, 7, 18)
-        self.assertEqual(expected, returned)
+        Delete a comment known to be in the system.  Should throw no errors.''',
+        [comments['rescriva']], 'for_entry', 'published', 'comments-enabled',
+        2009, 7, 18)
 
     testSave1 = create_testSave1(comments['DNE'],
         '''firmant.datasource.comments.CommentProvider.save
