@@ -56,7 +56,7 @@ class AtomFlatfileAuthorProvider(object):
         data = file.read().decode('utf-8')
         file.close()
         jdata        = json.loads(data)
-        author       = Author
+        author       = Author()
         author.name  = name
         author.uri   = jdata['uri']
         author.email = jdata['email']
