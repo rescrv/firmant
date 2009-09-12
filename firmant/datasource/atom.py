@@ -2,6 +2,7 @@ import datetime
 import pytz
 import re
 
+from firmant.datasource import Storage
 from firmant.plugins import SingleProviderPlugin
 from firmant.constants import isoformat
 from firmant.utils import xml, \
@@ -45,12 +46,18 @@ class Author(AtomBase):
     #    not_implemented()
 
 
-class AtomAuthorProvider(SingleProviderPlugin):
+class AtomAuthorProvider(SingleProviderPlugin, Storage):
 
     provider_setting = 'ATOM_AUTHOR_PROVIDER'
 
     def by_name(self, name):
         return self._provider.by_name(name)
+
+    def _save(self, obj):
+        return self._provider._save(obj)
+
+    def _delete(self, obj):
+        return self._provider._delete(obj)
 
 
 class Category(AtomBase):

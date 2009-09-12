@@ -11,6 +11,7 @@ from firmant.datasource.atom import AtomProvider, \
                                     Feed, \
                                     EntryPermalinkProvider, \
                                     FeedPermalinkProvider
+from firmant.datasource import Storage
 from firmant.utils import not_implemented, \
                           xml, \
                           RFC3339
@@ -315,6 +316,63 @@ class TestAuthor(unittest.TestCase):
         returned = provider.by_name('Jane Doe')
 
         self.assertEqual(expected, returned)
+
+    def testDelete1(self):
+        """firmant.datasource.atom.Author.delete
+        Use a non-existent author object.  When delete is called, it should
+        raise a DoesNotExistError."""
+        provider = self.provider
+        a        = Author()
+        a.name   = u'Does Not Exist'
+        a.uri    = u'http://dne.example.com'
+        a.email  = u'dne@example.org'
+
+        raised   = Storage.DoesNotExistError
+        function = lambda: provider.delete(a)
+
+        self.assertRaises(raised, function)
+
+    def testDelete2(self):
+        """firmant.datasource.atom.Author.delete
+        Delete an author known to be in the system.  Should throw no errors."""
+        provider = self.provider
+        todelete = authors['Robert Escriva']
+
+        expected = None
+        returned = provider.delete(todelete)
+        self.assertEqual(expected, returned)
+
+        expected = None
+        returned = provider.by_name('Robert Escriva')
+        self.assertEqual(expected, returned)
+
+    def testSave1(self):
+        """firmant.datasource.atom.Author.save
+        Save an author successfully."""
+        provider = self.provider
+        tosave   = Author()
+        tosave.name  = u'Does Not Exist'
+        tosave.uri   = u'http://dne.example.com'
+        tosave.email = u'dne@example.org'
+
+        expected = None
+        returned = provider.save(tosave)
+        self.assertEqual(expected, returned)
+
+        expected = tosave
+        returned = provider.by_name('Does Not Exist')
+        self.assertEqual(expected, returned)
+
+    def testSave2(self):
+        """firmant.datasource.atom.Author.save
+        Save an author object identical to an already saved object.  Should
+        throw a UniqueViolationError."""
+        provider = self.provider
+
+        raised   = Storage.UniqueViolationError
+        function = lambda: provider.save(authors['Robert Escriva'])
+
+        self.assertRaises(raised, function)
 
 
 class TestCategory(unittest.TestCase):
