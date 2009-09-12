@@ -8,7 +8,8 @@ VIEWS = [
                  'firmant.plugins.views.atom.AtomFeedViewProvider',
                  'firmant.plugins.views.txt.TxtFrontendViewProvider',
                  'firmant.plugins.views.comments.CommentSubmissionHandler',
-                 'firmant.views.CatchallProvider']
+                 'firmant.views.CatchallProvider',
+                 'firmant.plugins.views.forwarder.UrlAliasViewProvider']
 ENTRY_PERMALINK = 'firmant.plugins.views.jinja2viewprovider.Jinja2EntryPermalinkProvider'
 FEED_PERMALINK  = 'firmant.plugins.views.atom.AtomFeedPermalinkProvider'
 
@@ -62,3 +63,5 @@ COMMENT_VALIDATORS = ['firmant.datasource.comments.CommentEmailValidator',
                       'firmant.datasource.comments.CommentURLValidator',
                       'firmant.datasource.comments.CommentNameValidator',
                       'firmant.datasource.comments.CommentContentValidator']
+
+URL_ALIASES = {'/foo/': (301, '/atom/'), '/bar/': (302, '/jinja2/')}
