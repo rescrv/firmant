@@ -18,6 +18,7 @@ from firmant.utils import not_implemented, \
 
 from test.datasource import create_testSave1
 from test.datasource import create_testSave2
+from test.datasource import create_testDelete1
 
 
 # Defined Authors.
@@ -324,20 +325,10 @@ class TestAuthor(unittest.TestCase):
 
         self.assertEqual(expected, returned)
 
-    def testDelete1(self):
-        """firmant.datasource.atom.Author.delete
-        Use a non-existent author object.  When delete is called, it should
-        raise a DoesNotExistError."""
-        provider = self.provider
-        a        = Author()
-        a.name   = u'Does Not Exist'
-        a.uri    = u'http://dne.example.com'
-        a.email  = u'dne@example.org'
-
-        raised   = Storage.DoesNotExistError
-        function = lambda: provider.delete(a)
-
-        self.assertRaises(raised, function)
+    testDelete1 = create_testDelete1(authors['DNE'],
+         """firmant.datasource.atom.Author.delete
+         Use a non-existent author object.  When delete is called, it should
+         raise a DoesNotExistError.""")
 
     def testDelete2(self):
         """firmant.datasource.atom.Author.delete

@@ -34,6 +34,18 @@ def create_testSave2(tosave, docstring):
     return testSave2
 
 
+def create_testDelete1(dne, docstring):
+    def testDelete1(self):
+        provider = self.provider
+
+        raised   = Storage.DoesNotExistError
+        function = lambda: provider.delete(dne)
+
+        self.assertRaises(raised, function)
+    testDelete1.__doc__ = docstring
+    return testDelete1
+
+
 suite = unittest.TestSuite()
 
 from test.datasource.atom import suite as atom_tests
