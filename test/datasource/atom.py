@@ -17,6 +17,7 @@ from firmant.utils import not_implemented, \
                           RFC3339
 
 from test.datasource import create_testSave1
+from test.datasource import create_testSave2
 
 
 # Defined Authors.
@@ -357,16 +358,10 @@ class TestAuthor(unittest.TestCase):
             Save an author successfully.""",
             authors['DNE'], 'by_name', 'Does Not Exist')
 
-    def testSave2(self):
+    testSave2 = create_testSave2(authors['Robert Escriva'],
         """firmant.datasource.atom.Author.save
         Save an author object identical to an already saved object.  Should
-        throw a UniqueViolationError."""
-        provider = self.provider
-
-        raised   = Storage.UniqueViolationError
-        function = lambda: provider.save(authors['Robert Escriva'])
-
-        self.assertRaises(raised, function)
+        throw a UniqueViolationError.""")
 
 
 class TestCategory(unittest.TestCase):

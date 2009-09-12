@@ -7,6 +7,7 @@ from firmant.datasource.comments import Comment
 from firmant.datasource import Storage
 
 from test.datasource import create_testSave1
+from test.datasource import create_testSave2
 
 
 comments = {}
@@ -254,13 +255,7 @@ class TestCommentProvider(unittest.TestCase):
         [comments['rescriva2'], comments['rescriva'], comments['DNE']],
         'for_entry', 'published', 'comments-enabled', 2009, 7, 18)
 
-    def testSave2(self):
+    testSave2 = create_testSave2(comments['rescriva'],
         '''firmant.datasource.comments.CommentProvider.save
         Save a comment object identical to an already saved object.  Should
-        throw a UniqueViolationError.'''
-        provider = self.provider
-
-        raised   = Storage.UniqueViolationError
-        function = lambda: provider.save(comments['rescriva'])
-
-        self.assertRaises(raised, function)
+        throw a UniqueViolationError.''')

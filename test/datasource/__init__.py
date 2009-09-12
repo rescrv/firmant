@@ -1,5 +1,7 @@
 import unittest
 
+from firmant.datasource import Storage
+
 
 def create_testSave1(tosave, docstring, expt, check_func, *args, **kwargs):
     def testSave1(self):
@@ -18,6 +20,18 @@ def create_testSave1(tosave, docstring, expt, check_func, *args, **kwargs):
         self.assertEqual(expected, returned)
     testSave1.__doc__ = docstring
     return testSave1
+
+
+def create_testSave2(tosave, docstring):
+    def testSave2(self):
+        provider = self.provider
+
+        raised   = Storage.UniqueViolationError
+        function = lambda: provider.save(tosave)
+
+        self.assertRaises(raised, function)
+    testSave2.__doc__ = docstring
+    return testSave2
 
 
 suite = unittest.TestSuite()
