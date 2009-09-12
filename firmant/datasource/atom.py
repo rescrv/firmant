@@ -65,17 +65,23 @@ class Category(AtomBase):
     fields    = ['term', 'label']
     __slots__ = fields
 
+    # TODO:
+    #def permalink(self):
+    #    not_implemented()
 
-class AtomCategoryProvider(SingleProviderPlugin):
+
+class AtomCategoryProvider(SingleProviderPlugin, Storage):
 
     provider_setting = 'ATOM_CATEGORY_PROVIDER'
 
     def by_term(self, term):
         return self._provider.by_term(term)
 
-    # TODO:
-    #def permalink(self):
-    #    not_implemented()
+    def _save(self, obj):
+        return self._provider._save(obj)
+
+    def _delete(self, obj):
+        return self._provider._delete(obj)
 
 
 class Entry(AtomBase):

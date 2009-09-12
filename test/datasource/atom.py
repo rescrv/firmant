@@ -46,6 +46,9 @@ categories['General'].label = u'All topics'
 categories['Generated']       = Category()
 categories['Generated'].term  = u'Generated'
 categories['Generated'].label = u"You can't tell a computer wrote it."
+categories['DNE']       = Category()
+categories['DNE'].term  = u'DNE'
+categories['DNE'].label = u"DNE"
 
 
 A_NY = pytz.timezone('America/New_York')
@@ -374,6 +377,26 @@ class TestCategory(unittest.TestCase):
         returned = provider.by_term('NOEXIST')
 
         self.assertEqual(expected, returned)
+
+    testDelete1 = create_testDelete1(categories['DNE'],
+        '''firmant.datasource.atom.Category.delete
+        Use a non-existent category object.  When delete is called, it should
+        raise a DoesNotExistError.''')
+
+    testDelete2 = create_testDelete2(categories['General'],
+        '''firmant.datasource.atom.Category.delete
+        Delete a category known to be in the system.  Should throw no errors.'''
+        , None, 'by_term', 'General')
+
+    testSave1 = create_testSave1(categories['DNE'],
+        """firmant.datasource.atom.Category.save
+        Save a category successfully.""",
+        categories['DNE'], 'by_term', 'DNE')
+
+    testSave2 = create_testSave2(categories['General'],
+        """firmant.datasource.atom.Category.save
+        Save a category object identical to an already saved object.  Should
+        throw a UniqueViolationError.""")
 
 
 class TestEntry(unittest.TestCase):
