@@ -1,5 +1,6 @@
 import unittest
 import weakref
+import shutil
 
 from firmant.datasource.atom import AtomCategoryProvider
 from firmant.datasource.atom import AtomAuthorProvider
@@ -12,6 +13,7 @@ from test.datasource.atom import TestCategory as BaseTestCategory
 from test.datasource.atom import TestFeed as BaseTestFeed
 from test.datasource.atom import DummyEntryPermalinkProvider
 from test.datasource.atom import DummyFeedPermalinkProvider
+from test.utils import clone_dir_to_tmp
 
 prefix = 'firmant.plugins.datasource.flatfile.atom'
 
@@ -32,8 +34,19 @@ settings = {
 class TestAuthor(BaseTestAuthor):
 
     def setUp(self):
-        self.rc       = RequestContext(settings)
+        s = settings.copy()
+        method = self.id().split('.')[-1]
+        if method in ('testSave1', 'testSave2', 'testDelete1', 'testDelete2'):
+            self.tmpdir = tmp = clone_dir_to_tmp('checkout/')
+            s['FLATFILE_BASE'] = tmp
+        else:
+            self.tmpdir = None
+        self.rc       = RequestContext(s)
         self.provider = self.rc.get(AtomAuthorProvider)
+
+    def tearDown(self):
+        if self.tmpdir is not None:
+            shutil.rmtree(self.tmpdir)
 
 
 class TestCategory(BaseTestCategory):

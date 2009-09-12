@@ -15,6 +15,7 @@ from firmant.datasource.atom import AtomEntryProvider
 from firmant.datasource.atom import AtomAuthorProvider
 from firmant.datasource.atom import AtomCategoryProvider
 from firmant.datasource.atom import slug_re
+from firmant.datasource import Storage
 from firmant.utils import strptime
 from firmant.utils import uniq_presorted
 from firmant.utils import json
@@ -61,6 +62,19 @@ class AtomFlatfileAuthorProvider(object):
         author.uri   = jdata['uri']
         author.email = jdata['email']
         return author
+
+    def _save(self, obj):
+        path = os.path.join(self.settings['FLATFILE_BASE'], 'people', obj.name)
+        if os.access(path, os.F_OK):
+            raise Storage.UniqueViolationError('Author already exists')
+        f = open(path, 'w')
+        data = {}
+        data['uri'] = obj.uri
+        data['email'] = obj.email
+        f.write(json.dumps(data))
+        f.flush()
+        f.close()
+
 
 
 class AtomFlatfileEntryProvider(object):
