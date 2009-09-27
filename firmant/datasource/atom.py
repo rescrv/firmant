@@ -153,6 +153,9 @@ class AtomFeedProvider(SingleProviderPlugin):
     def by_slug(self, slug):
         return self._provider.by_slug(slug)
 
+    def exists(self, slug):
+        return self._provider.exists(slug)
+
     def default(self):
         return self._provider.default()
 

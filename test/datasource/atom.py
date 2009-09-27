@@ -1188,6 +1188,36 @@ class TestFeed(unittest.TestCase):
 
         self.assertEqual(expected, returned)
 
+    def testExists1(self):
+        """firmant.datasource.atom.Feed.exists
+        Check if a feed object exists."""
+        provider = self.provider
+
+        expected = True
+        returned = provider.exists('general')
+
+        self.assertEqual(expected, returned)
+
+    def testExists2(self):
+        """firmant.datasource.atom.Feed.exists
+        Check for a feed that doesn't exist."""
+        provider = self.provider
+
+        expected = False
+        returned = provider.exists('noexist')
+
+        self.assertEqual(expected, returned)
+
+    def testExists3(self):
+        """firmant.datasource.atom.Feed.exists
+        A ValueError should be raised for an invalid slug."""
+        provider = self.provider
+
+        raises   = ValueError
+        function = lambda: provider.exists('!@#$')
+
+        self.assertRaises(raises, function)
+
     def testDefault(self):
         """firmant.datasource.atom.Feed.default
         The default feed object should be returned."""
