@@ -620,6 +620,66 @@ class TestEntry(unittest.TestCase):
 
         self.assertRaises(raises, function)
 
+    def testExists3(self):
+        """firmant.datasource.atom.Entry.exists
+        An entry does exist on the given date."""
+        provider = self.provider
+
+        expected = True
+        returned = provider.exists('sample', 2009, 2, 13)
+
+        self.assertEqual(expected, returned)
+
+    def testExists4(self):
+        """firmant.datasource.atom.Entry.exists
+        An entry does exist on the given date."""
+        provider = self.provider
+
+        expected = True
+        returned = provider.exists('loren-ipsum', '2009', '2', '17')
+
+        self.assertEqual(expected, returned)
+
+    def testExists5(self):
+        """firmant.datasource.atom.Entry.exists
+        False should be returned for a non-existent entry."""
+        provider = self.provider
+
+        expected = False
+        returned = provider.exists('IDONOTEXIST', 2009, 2, 13)
+
+        self.assertEqual(expected, returned)
+
+    def testExists6(self):
+        """firmant.datasource.atom.Entry.exists
+        A ValueError should be raised for invalid slug."""
+        provider = self.provider
+
+        raises   = ValueError
+        function = lambda: provider.exists('s@mpl3', 2009, 2, 13)
+
+        self.assertRaises(raises, function)
+
+    def testExists7(self):
+        """firmant.datasource.atom.Entry.exists
+        A ValueError should be raised for invalid datetime."""
+        provider = self.provider
+
+        raises   = ValueError
+        function = lambda: provider.exists('sample', 2009, 'a', 15)
+
+        self.assertRaises(raises, function)
+
+    def testExists8(self):
+        """firmant.datasource.atom.Entry.exists
+        A ValueError should be raised for invalid datetime."""
+        provider = self.provider
+
+        raises   = ValueError
+        function = lambda: provider.exists('sample', 2009, 13, 15)
+
+        self.assertRaises(raises, function)
+
     def testDay1(self):
         """firmant.datasource.atom.Entry.day
         A valid list of entries for a given day should be returned."""

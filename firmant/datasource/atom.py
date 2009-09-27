@@ -109,6 +109,9 @@ class AtomEntryProvider(SingleProviderPlugin):
     def single(self, slug, year, month, day):
         return self._provider.single(slug, year, month, day)
 
+    def exists(self, slug, year, month, day):
+        return self._provider.exists(slug, year, month, day)
+
     def day(self, year, month, day, limit=None, offset=None):
         return self._provider.day(year, month, day, limit, offset)
 
