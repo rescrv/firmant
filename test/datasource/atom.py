@@ -329,6 +329,26 @@ class TestAuthor(unittest.TestCase):
 
         self.assertEqual(expected, returned)
 
+    def testExists1(self):
+        """firmant.datasource.atom.Author.exists
+        Check the existence of an author object."""
+        provider = self.provider
+
+        expected = True
+        returned = provider.exists('Robert Escriva')
+
+        self.assertEqual(expected, returned)
+
+    def testExists2(self):
+        """firmant.datasource.atom.Author.exists
+        No such Author object using the exists function"""
+        provider = self.provider
+
+        expected = False
+        returned = provider.exists('Jane Doe')
+
+        self.assertEqual(expected, returned)
+
     testDelete1 = create_testDelete1(authors['DNE'],
          """firmant.datasource.atom.Author.delete
          Use a non-existent author object.  When delete is called, it should

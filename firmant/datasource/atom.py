@@ -53,6 +53,9 @@ class AtomAuthorProvider(SingleProviderPlugin, Storage):
     def by_name(self, name):
         return self._provider.by_name(name)
 
+    def exists(self, name):
+        return self._provider.exists(name)
+
     def _save(self, obj):
         return self._provider._save(obj)
 
