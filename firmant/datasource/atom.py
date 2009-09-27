@@ -124,9 +124,6 @@ class AtomEntryProvider(SingleProviderPlugin):
     def recent(self, limit=None, offset=None):
         return self._provider.recent(limit, offset)
 
-    def exists(self, slug, year, month, day):
-        return self._provider.exists(slug, year, month, day)
-
     def list(self):
         return self._provider.list()
 
