@@ -43,6 +43,14 @@ class AtomFlatfileCategoryProvider(object):
         category.label = data
         return category
 
+    def exists(self, term):
+        path = os.path.join(self.settings['FLATFILE_BASE'],
+                            'categories',
+                            term)
+        if not os.access(path, os.R_OK):
+            return False
+        return True
+
     def _save(self, obj):
         path = os.path.join(self.settings['FLATFILE_BASE'], 'categories',
                 obj.term)
@@ -79,6 +87,12 @@ class AtomFlatfileAuthorProvider(object):
         author.uri   = jdata['uri']
         author.email = jdata['email']
         return author
+
+    def exists(self, name):
+        path = os.path.join(self.settings['FLATFILE_BASE'], 'people', name)
+        if not os.access(path, os.R_OK):
+            return False
+        return True
 
     def _save(self, obj):
         path = os.path.join(self.settings['FLATFILE_BASE'], 'people', obj.name)
@@ -210,14 +224,14 @@ class AtomFlatfileEntryProvider(object):
 
     def exists(self, slug, year, month, day):
         if slug_re.match(slug) == None:
-            return False
+            raise ValueError("Invalid Slug")
         try:
             year  = int(year)
             month = int(month)
             day   = int(day)
             dt    = datetime.date(year, month, day)
         except ValueError:
-            return False
+            raise
         valid_paths = self._validate(slug, dt)
         return valid_paths is not None
 
@@ -350,6 +364,23 @@ class AtomFlatfileFeedProvider(object):
         if slug_re.match(slug) == None:
             raise ValueError("Invalid slug")
         return self._common(slug)
+
+    def exists(self, slug):
+        # TODO:  duplicates _common prefix and by_slug.  Fix it?
+        if slug_re.match(slug) == None:
+            raise ValueError("Invalid slug")
+        feed_path = os.path.join(self.settings['FLATFILE_BASE'],
+                                'feeds',
+                                slug)
+
+        rights_path = os.path.join(feed_path, 'rights')
+        meta_path   = os.path.join(feed_path, 'meta')
+
+        if not os.access(feed_path,   os.R_OK) or \
+           not os.access(rights_path, os.R_OK) or \
+           not os.access(meta_path,   os.R_OK):
+            return False
+        return True
 
     def _common(self, slug):
         feed_path = os.path.join(self.settings['FLATFILE_BASE'],
