@@ -80,6 +80,9 @@ class AtomCategoryProvider(SingleProviderPlugin, Storage):
     def by_term(self, term):
         return self._provider.by_term(term)
 
+    def exists(self, term):
+        return self._provider.exists(term)
+
     def _save(self, obj):
         return self._provider._save(obj)
 

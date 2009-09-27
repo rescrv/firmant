@@ -398,6 +398,26 @@ class TestCategory(unittest.TestCase):
 
         self.assertEqual(expected, returned)
 
+    def testExists1(self):
+        """firmant.datasource.atom.Category.exists
+        Check the existence of a valid atom Category object."""
+        provider = self.provider
+
+        expected = True
+        returned = provider.exists('General')
+
+        self.assertEqual(expected, returned)
+
+    def testExists2(self):
+        """firmant.datasource.atom.Category.exists
+        No such Category object exists"""
+        provider = self.provider
+
+        expected = False
+        returned = provider.exists('NOEXIST')
+
+        self.assertEqual(expected, returned)
+
     testDelete1 = create_testDelete1(categories['DNE'],
         '''firmant.datasource.atom.Category.delete
         Use a non-existent category object.  When delete is called, it should
