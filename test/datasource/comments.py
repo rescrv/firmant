@@ -246,3 +246,56 @@ class TestCommentProvider(unittest.TestCase):
         '''firmant.datasource.comments.CommentProvider.save
         Save a comment object identical to an already saved object.  Should
         throw a UniqueViolationError.''')
+
+
+class TestComment(unittest.TestCase):
+
+    def testEqual1(self):
+        '''firmant.datasource.comments.Comment.equal
+        Test two equal comments.'''
+
+        a = comments['rescriva']
+        b = comments['rescriva']
+
+        self.assertTrue(a == b)
+        self.assertTrue(not (a != b))
+
+    def testEqual2(self):
+        '''firmant.datasource.comments.Comment.equal
+        Test two comments with all attrs, but the are unequal.'''
+        a             = Comment()
+        a.name        = 'Escriva, Robert'
+        a.email       = 'rob@example.org'
+        a.url         = 'http://robescriva.com/'
+        a.ip          = '128.113.151.53'
+        a.useragent   = "Mozilla/5.0 (X11; U; Linux i686; " + \
+            "en-US; rv:1.9.0.11) Gecko/2009060308 Ubuntu/9.04 (jaunty) " + \
+            "Firefox/3.0.11"
+        a.created     = \
+            datetime.datetime(2009, 7, 19, 11, 25, 6, tzinfo=pytz.utc)
+        a.content     = "Sample comment # 1"
+        a.status      = "published"
+        a.entry_pkey  = \
+            (datetime.date(2009, 7, 18), "comments-enabled")
+
+        b = comments['rescriva']
+
+        self.assertTrue(a != b)
+        self.assertTrue(not (a == b))
+
+    def testEqual3(self):
+        '''firmant.datasource.comments.Comment.equal
+        Test two comments with all attrs, but the are unequal.'''
+        a             = Comment()
+        b = comments['rescriva']
+
+        self.assertTrue(a != b)
+        self.assertTrue(not (a == b))
+
+        self.assertTrue(b != a)
+        self.assertTrue(not (b == a))
+
+
+from test import add_test
+suite = unittest.TestSuite()
+add_test(suite, TestComment)

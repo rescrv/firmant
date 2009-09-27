@@ -69,3 +69,6 @@ suite = unittest.TestSuite()
 
 from test.datasource.atom import suite as atom_tests
 suite.addTests(atom_tests)
+
+from test.datasource.comments import suite as comment_tests
+suite.addTests(comment_tests)
