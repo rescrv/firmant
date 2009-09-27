@@ -3,7 +3,8 @@ import datetime
 import pytz
 import shutil
 
-from firmant.plugins.datasource.flatfile.comments import FlatfileCommentProvider
+from firmant.datasource.comments import CommentProvider
+from firmant.wsgi import RequestContext
 
 from test.datasource.comments import TestCommentProvider as BaseTestCommentProvider
 from test.datasource.comments import comments
@@ -14,7 +15,11 @@ class TestCommentProvider(BaseTestCommentProvider):
 
     def setUp(self):
         self.tmpdir = tmp = clone_dir_to_tmp('checkout/')
-        self.provider = FlatfileCommentProvider(None, {'FLATFILE_BASE': tmp})
+        settings = {'FLATFILE_BASE': tmp,
+                    'COMMENT_PROVIDER':
+        'firmant.plugins.datasource.flatfile.comments.FlatfileCommentProvider'}
+        rc            = RequestContext(settings)
+        self.provider = rc.get(CommentProvider)
 
     def tearDown(self):
         shutil.rmtree(self.tmpdir)
@@ -25,9 +30,10 @@ class TestCommentProvider(BaseTestCommentProvider):
         entry_pkey = (datetime.date(2009, 7, 18), 'comments-enabled')
         created    = 1248002706
         id         = 'ad9d83756efde485089bdf27119fe37c3cc9da6d'
+        flatfile   = self.provider._provider
 
         expected = comments['rescriva']
-        returned = self.provider._load_one(status, entry_pkey, created, id)
+        returned = flatfile._load_one(status, entry_pkey, created, id)
 
         self.assertEqual(expected, returned)
 
@@ -37,9 +43,10 @@ class TestCommentProvider(BaseTestCommentProvider):
         entry_pkey = (datetime.date(2009, 7, 18), 'comments-enabled')
         created    = 1248003150
         id         = '0279dd3ca037767782fed2e788ab68da40b2a445'
+        flatfile   = self.provider._provider
 
         expected = comments['jsmith']
-        returned = self.provider._load_one(status, entry_pkey, created, id)
+        returned = flatfile._load_one(status, entry_pkey, created, id)
 
         self.assertEqual(expected, returned)
 
@@ -49,9 +56,10 @@ class TestCommentProvider(BaseTestCommentProvider):
         entry_pkey = (datetime.date(2009, 7, 18), 'comments-enabled')
         created    = 1248003454
         id         = 'e6f4aadf75637bb4649a9a12eee7f32ee9b81a1c'
+        flatfile   = self.provider._provider
 
         expected = comments['spammer']
-        returned = self.provider._load_one(status, entry_pkey, created, id)
+        returned = flatfile._load_one(status, entry_pkey, created, id)
 
         self.assertEqual(expected, returned)
 
@@ -61,9 +69,10 @@ class TestCommentProvider(BaseTestCommentProvider):
         entry_pkey = (datetime.date(2009, 7, 18), 'comments-enabled')
         created    = 1247916306
         id         = 'ad9d83756efde485089bdf27119fe37c3cc9da6d'
+        flatfile   = self.provider._provider
 
         expected = comments['rescriva2']
-        returned = self.provider._load_one(status, entry_pkey, created, id)
+        returned = flatfile._load_one(status, entry_pkey, created, id)
 
         self.assertEqual(expected, returned)
 
@@ -81,7 +90,7 @@ class TestCommentProvider(BaseTestCommentProvider):
                     ('spam',
                      (datetime.date(2009, 7, 18), 'comments-enabled'),
                      1248003454, 'e6f4aadf75637bb4649a9a12eee7f32ee9b81a1c')]
-        returned = self.provider._list()
+        returned   = self.provider._provider._list()
 
         self.assertEqual(expected, returned)
 
