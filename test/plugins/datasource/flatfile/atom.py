@@ -2,10 +2,7 @@ import unittest
 import weakref
 import shutil
 
-from firmant.datasource.atom import AtomCategoryProvider
-from firmant.datasource.atom import AtomAuthorProvider
-from firmant.datasource.atom import AtomEntryProvider
-from firmant.datasource.atom import AtomFeedProvider
+from firmant.datasource.atom import AtomProvider
 from firmant.wsgi import RequestContext
 from test.datasource.atom import TestEntry as BaseTestEntry
 from test.datasource.atom import TestAuthor as BaseTestAuthor
@@ -42,7 +39,8 @@ class TestAuthor(BaseTestAuthor):
         else:
             self.tmpdir = None
         self.rc       = RequestContext(s)
-        self.provider = self.rc.get(AtomAuthorProvider)
+        provider      = self.rc.get(AtomProvider)
+        self.provider = provider.author
 
     def tearDown(self):
         if self.tmpdir is not None:
@@ -60,7 +58,8 @@ class TestCategory(BaseTestCategory):
         else:
             self.tmpdir = None
         self.rc       = RequestContext(s)
-        self.provider = self.rc.get(AtomCategoryProvider)
+        provider      = self.rc.get(AtomProvider)
+        self.provider = provider.category
 
     def tearDown(self):
         if self.tmpdir is not None:
@@ -71,14 +70,16 @@ class TestEntry(BaseTestEntry):
 
     def setUp(self):
         self.rc       = RequestContext(settings)
-        self.provider = self.rc.get(AtomEntryProvider)
+        provider      = self.rc.get(AtomProvider)
+        self.provider = provider.entry
 
 
 class TestFeed(BaseTestFeed):
 
     def setUp(self):
         self.rc       = RequestContext(settings)
-        self.provider = self.rc.get(AtomFeedProvider)
+        provider      = self.rc.get(AtomProvider)
+        self.provider = provider.feed
 
     def testBadPerms(self):
         '''firmant.plugins.datasource.flatfile.FlatfileAtomProvider.feed.by_slug
