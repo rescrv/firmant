@@ -14,7 +14,14 @@ class Storage(object):
             self._save(obj)
         except Storage.UniqueViolationError:
             raise
-        except Exception, e:
+        except Storage.StorageError:
+            raise
+        # This is just a safeguard to ensure the errors raised are limited to
+        # just the subset of errors defined in storage.  As such, there should
+        # never be a case it is executed (if there is, the underlying plugin
+        # should be raising the StorageError itself).  Thus, there is no need to
+        # cover it.
+        except Exception, e: # pragma: no cover
             raise Storage.StorageError('%s %s' % (type(e), str(e)))
 
     def delete(self, obj):
@@ -22,5 +29,8 @@ class Storage(object):
             self._delete(obj)
         except Storage.DoesNotExistError:
             raise
-        except Exception, e:
+        except Storage.StorageError:
+            raise
+        # See above.
+        except Exception, e: # pragma: no cover
             raise Storage.StorageError('%s %s' % (type(e), str(e)))
