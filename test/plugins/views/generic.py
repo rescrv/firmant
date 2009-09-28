@@ -9,13 +9,13 @@ class DummyUrls(object):
         return (endpoint, args)
 
 
-rc    = {}
-rc['args'] = {'args': True}
-rc['endpoint'] = 'endpoint'
-rc['urls'] = DummyUrls()
-
-
 class TestPaginate(unittest.TestCase):
+
+    def setUp(self):
+        self.rc    = {}
+        self.rc['args'] = {'args': True}
+        self.rc['endpoint'] = 'endpoint'
+        self.rc['urls'] = DummyUrls()
 
     def testNoPaginationNecessary(self):
         '''firmant.plugins.views.generic.paginate
@@ -26,7 +26,7 @@ class TestPaginate(unittest.TestCase):
         page  = 0
         limit = 10
 
-        new_list, page = paginate(lambda: rc.copy(), limit, func, page)
+        new_list, page = paginate(lambda: self.rc.copy(), limit, func, page)
 
         self.assertEqual(range(1, 11), new_list)
         self.assertEqual(page.has_newer, False)
@@ -43,7 +43,7 @@ class TestPaginate(unittest.TestCase):
         page = 0
         limit = 5
 
-        new_list, page = paginate(lambda: rc.copy(), limit, func, page)
+        new_list, page = paginate(lambda: self.rc.copy(), limit, func, page)
 
         self.assertEqual(range(1, 6), new_list)
         self.assertEqual(page.has_newer, False)
@@ -60,7 +60,7 @@ class TestPaginate(unittest.TestCase):
         page = 1
         limit = 5
 
-        new_list, page = paginate(lambda: rc.copy(), limit, func, page)
+        new_list, page = paginate(lambda: self.rc.copy(), limit, func, page)
 
         self.assertEqual(range(6, 11), new_list)
         self.assertEqual(page.has_newer, True)
@@ -77,7 +77,7 @@ class TestPaginate(unittest.TestCase):
         page = 2
         limit = 5
 
-        new_list, page = paginate(lambda: rc.copy(), limit, func, page)
+        new_list, page = paginate(lambda: self.rc.copy(), limit, func, page)
 
         self.assertEqual(range(11, 16), new_list)
         self.assertEqual(page.has_newer, True)
@@ -94,7 +94,7 @@ class TestPaginate(unittest.TestCase):
         page = 2
         limit = 5
 
-        new_list, page = paginate(lambda: rc.copy(), limit, func, page)
+        new_list, page = paginate(lambda: self.rc.copy(), limit, func, page)
 
         self.assertEqual(range(11, 16), new_list)
         self.assertEqual(page.has_newer, True)
