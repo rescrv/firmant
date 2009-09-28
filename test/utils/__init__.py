@@ -9,6 +9,7 @@ from firmant.utils import not_implemented
 from firmant.utils import get_module
 from firmant.utils import mod_to_dict
 from firmant.utils import RFC3339
+from firmant.utils import valid_date
 from firmant.utils import uniq
 from firmant.utils import sha1
 from firmant.utils import uniq_presorted
@@ -83,6 +84,44 @@ class TestRFC3339(unittest.TestCase):
         self.assertEqual(expected, returned)
 
 
+class TestValidDate(unittest.TestCase):
+
+    def testValidDateInts(self):
+        '''firmant.utils.valid_date
+        Provide integers that constitute a valid date.'''
+        expected = (2009, 2, 14)
+        returned = valid_date(2009, 2, 14)
+        self.assertEqual(expected, returned)
+
+    def testValidDateStrs(self):
+        '''firmant.utils.valid_date
+        Provide strings that constitute a valid date.'''
+        expected = (2009, 2, 14)
+        returned = valid_date('2009', '2', '14')
+        self.assertEqual(expected, returned)
+
+    def testInvalidYear(self):
+        '''firmant.utils.valid_date
+        Provide an invalid year.'''
+        raised   = ValueError
+        function = lambda: valid_date('2o09', 2, 14)
+        self.assertRaises(raised, function)
+
+    def testInvalidMonth(self):
+        '''firmant.utils.valid_date
+        Provide an invalid month.'''
+        raised   = ValueError
+        function = lambda: valid_date(2009, 'z', 14)
+        self.assertRaises(raised, function)
+
+    def testInvalidDay(self):
+        '''firmant.utils.valid_date
+        Provide an invalid day.'''
+        raised   = ValueError
+        function = lambda: valid_date(2009, 2, '!4')
+        self.assertRaises(raised, function)
+
+
 class TestUniq(unittest.TestCase):
 
     def testUnsorted(self):
@@ -139,3 +178,4 @@ add_test(suite, TestModToDict)
 add_test(suite, TestRFC3339)
 add_test(suite, TestUniq)
 add_test(suite, TestSha1)
+add_test(suite, TestValidDate)

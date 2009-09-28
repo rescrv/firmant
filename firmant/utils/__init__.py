@@ -40,6 +40,27 @@ def RFC3339(dt):
     else:
         return timestamp + 'Z'
 
+
+def valid_date(year, month, day):
+    try:
+        year = int(year)
+    except ValueError:
+        raise ValueError('invalid value for year; cannot cast to int')
+    try:
+        month = int(month)
+    except ValueError:
+        raise ValueError('invalid value for month; cannot cast to int')
+    try:
+        day = int(day)
+    except ValueError:
+        raise ValueError('invalid value for day; cannot cast to int')
+    try:
+        dt = datetime.date(year, month, day)
+    except ValueError:
+        raise
+    return (dt.year, dt.month, dt.day)
+
+
 if hasattr(datetime.datetime, 'strptime'):
     strptime = datetime.datetime.strptime
 else:
