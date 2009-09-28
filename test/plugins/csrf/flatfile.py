@@ -2,7 +2,7 @@ import unittest
 import tempfile
 import shutil
 
-from firmant.plugins.csrf.flatfile import FlatfileCSRFTokenProvider
+from firmant.csrf import CSRFTokenProvider
 from test.csrf import TestCSRFTokenProvider as BaseTestCSRFTokenProvider
 
 
@@ -15,11 +15,13 @@ class TestCSRFTokenProvider(BaseTestCSRFTokenProvider):
         # example.
         settings['CSRF_SERVER_SECRET'] = 'abc123'
         settings['CSRF_TOKENS_DIR']    = self._dir = tempfile.mkdtemp()
+        settings['CSRF_TOKEN_PROVIDER'] = \
+        'firmant.plugins.csrf.flatfile.FlatfileCSRFTokenProvider'
         if self.id().rsplit('.', 1)[1] == 'testConsumeToken4':
             settings['CSRF_TOKEN_TTL'] = 0
         else:
             settings['CSRF_TOKEN_TTL'] = 60
-        self._provider = FlatfileCSRFTokenProvider(None, settings)
+        self._provider = CSRFTokenProvider(None, settings)
 
     def tearDown(self):
         del self._provider
