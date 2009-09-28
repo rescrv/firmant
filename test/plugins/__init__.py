@@ -112,3 +112,6 @@ suite.addTests(filters_tests)
 
 from test.plugins.csrf import suite as csrf_tests
 suite.addTests(csrf_tests)
+
+from test.plugins.views import suite as view_tests
+suite.addTests(view_tests)
