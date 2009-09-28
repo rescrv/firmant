@@ -10,6 +10,7 @@ from firmant.utils import get_module
 from firmant.utils import mod_to_dict
 from firmant.utils import RFC3339
 from firmant.utils import valid_date
+from firmant.utils import force_to_int
 from firmant.utils import uniq
 from firmant.utils import sha1
 from firmant.utils import uniq_presorted
@@ -122,6 +123,30 @@ class TestValidDate(unittest.TestCase):
         self.assertRaises(raised, function)
 
 
+class TestForceToInt(unittest.TestCase):
+
+    def testValid(self):
+        '''firmant.utils.force_to_int
+        Provide a valid int.'''
+        expected = 1337
+        returned = force_to_int(1337, 7331)
+        self.assertEqual(expected, returned)
+
+    def testInvalid(self):
+        '''firmant.utils.force_to_int
+        Provide an invalid int.'''
+        expected = 1337
+        returned = force_to_int('1z37', 1337)
+        self.assertEqual(expected, returned)
+
+    def testString(self):
+        '''firmant.utils.force_to_int
+        Provide a string.'''
+        expected = 1337
+        returned = force_to_int('1337', 7331)
+        self.assertEqual(expected, returned)
+
+
 class TestUniq(unittest.TestCase):
 
     def testUnsorted(self):
@@ -179,3 +204,4 @@ add_test(suite, TestRFC3339)
 add_test(suite, TestUniq)
 add_test(suite, TestSha1)
 add_test(suite, TestValidDate)
+add_test(suite, TestForceToInt)

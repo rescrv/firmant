@@ -61,6 +61,16 @@ def valid_date(year, month, day):
     return (dt.year, dt.month, dt.day)
 
 
+def force_to_int(value, default):
+    '''Force `value' to be an integer.  If an exception is raised in casting,
+    use default instead.'''
+    try:
+        new_value = int(value)
+        return new_value
+    except:
+        return default
+
+
 if hasattr(datetime.datetime, 'strptime'):
     strptime = datetime.datetime.strptime
 else:
