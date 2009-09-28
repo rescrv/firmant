@@ -12,7 +12,7 @@ def create_testSave1(tosave, docstring, expt, check_func, *args, **kwargs):
         self.assertEqual(expected, returned)
 
         if not hasattr(provider, check_func):
-            self.fail()
+            self.fail() # pragma: no cover
         check = getattr(provider, check_func)
 
         expected = expt
@@ -55,7 +55,7 @@ def create_testDelete2(todelete, docstring, expt, check_func, *args, **kwargs):
         self.assertEqual(expected, returned)
 
         if not hasattr(provider, check_func):
-            self.fail()
+            self.fail() # pragma: no cover
         check = getattr(provider, check_func)
 
         expected = expt

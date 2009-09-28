@@ -125,7 +125,7 @@ def clone_dir_to_tmp(dirpath):
     for file in tomove:
         full_path = os.path.join(dirpath, file)
         if os.path.isfile(full_path):
-            shutil.copy2(full_path, os.path.join(tmpdir, file))
+            shutil.copy2(full_path, os.path.join(tmpdir, file)) # pragma: no cover
         elif os.path.isdir(full_path):
             shutil.copytree(full_path, os.path.join(tmpdir, file))
     return tmpdir
