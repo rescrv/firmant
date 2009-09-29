@@ -124,6 +124,9 @@ class TestableGenericEntryViewProvider(GenericEntryViewProvider):
     def _day(self, request, entries, page, year, month, day):
         return (year, month, day, entries, page.has_newer, page.has_older)
 
+    def invalid_date(self, request):
+        raise ValueError('Date requested is invalid')
+
 
 class TestGenericEntryViewProvider(unittest.TestCase):
 
@@ -181,42 +184,98 @@ class TestGenericEntryViewProvider(unittest.TestCase):
     def testYearEmpty(self):
         '''firmant.plugins.views.generic.GenericEntryViewProvider.year
         Test the case that there are no entries for the given year.'''
-        self.fail()
+        request = DummyRequest()
+        request.args = {}
+
+        expected = ('2008', None, False, False)
+        returned = self.view.year(request, '2008')
+        self.assertEqual(expected, returned)
 
     def testYearNotValid(self):
         '''firmant.plugins.views.generic.GenericEntryViewProvider.year
         Test the case that the year requested is invalid.'''
-        self.fail()
+        request      = DummyRequest()
+        request.args = {}
+        raised       = ValueError
+        function     = lambda: self.view.year(request, '20o9')
+        self.assertRaises(raised, function)
 
     def testMonthPresent(self):
         '''firmant.plugins.views.generic.GenericEntryViewProvider.month
         Test the case that there are entries for the given month.'''
-        self.fail()
+        request = DummyRequest()
+        request.args = {}
+
+        # page undefined
+        expected = ('2009', '03', [entries['2009-03-29-markdown']], False, True)
+        returned = self.view.month(request, '2009', '03')
+        self.assertEqual(expected, returned)
+
+        # page = 0
+        self.rc.get('args')['page'] = request.args['page'] = 0
+        expected = ('2009', '03', [entries['2009-03-29-markdown']], False, True)
+        returned = self.view.month(request, '2009', '03')
+        self.assertEqual(expected, returned)
+
+        # page = 1
+        self.rc.get('args')['page'] = request.args['page'] = 1
+        expected = ('2009', '03', [entries['2009-03-17-sample']], True, False)
+        returned = self.view.month(request, '2009', '03')
+        self.assertEqual(expected, returned)
 
     def testMonthEmpty(self):
         '''firmant.plugins.views.generic.GenericEntryViewProvider.month
         Test the case that there are no entries for the given month.'''
-        self.fail()
+        request = DummyRequest()
+        request.args = {}
+
+        expected = ('2009', '04', None, False, False)
+        returned = self.view.month(request, '2009', '04')
+        self.assertEqual(expected, returned)
 
     def testMonthNotValid(self):
         '''firmant.plugins.views.generic.GenericEntryViewProvider.month
         Test the case that the month requested is invalid.'''
-        self.fail()
+        request      = DummyRequest()
+        request.args = {}
+        raised       = ValueError
+        function     = lambda: self.view.month(request, '2009', '0E')
+        self.assertRaises(raised, function)
 
     def testDayPresent(self):
         '''firmant.plugins.views.generic.GenericEntryViewProvider.day
         Test the case that there are entries for the given day.'''
-        self.fail()
+        request = DummyRequest()
+        request.args = {}
+
+        # page undefined
+        expected = ('2009', '03', '29', [entries['2009-03-29-markdown']], False, False)
+        returned = self.view.day(request, '2009', '03', '29')
+        self.assertEqual(expected, returned)
+
+        # page = 0
+        self.rc.get('args')['page'] = request.args['page'] = 0
+        expected = ('2009', '03', '29', [entries['2009-03-29-markdown']], False, False)
+        returned = self.view.day(request, '2009', '03', '29')
+        self.assertEqual(expected, returned)
 
     def testDayEmpty(self):
         '''firmant.plugins.views.generic.GenericEntryViewProvider.day
         Test the case that there are no entries for the given day.'''
-        self.fail()
+        request = DummyRequest()
+        request.args = {}
+
+        expected = ('2009', '03', '28', None, False, False)
+        returned = self.view.day(request, '2009', '03', '28')
 
     def testDayNotValid(self):
         '''firmant.plugins.views.generic.GenericEntryViewProvider.day
         Test the case that the day requested is invalid.'''
-        self.fail()
+        request      = DummyRequest()
+        request.args = {}
+        raised       = ValueError
+        function     = lambda: self.view.day(request, '2009', '09', 'Z8')
+        self.assertRaises(raised, function)
 
 
 from test import add_test
