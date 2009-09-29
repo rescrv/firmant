@@ -115,6 +115,9 @@ class TestableGenericEntryViewProvider(GenericEntryViewProvider):
 
     limit = 1
 
+    def _recent(self, request, entries, page):
+        return (entries, page.has_newer, page.has_older)
+
     def _year(self, request, entries, page, year):
         return (year, entries, page.has_newer, page.has_older)
 
@@ -276,6 +279,40 @@ class TestGenericEntryViewProvider(unittest.TestCase):
         raised       = ValueError
         function     = lambda: self.view.day(request, '2009', '09', 'Z8')
         self.assertRaises(raised, function)
+
+    def testRecentPresent(self):
+        '''firmant.plugins.views.generic.GenericEntryViewProvider.recent'''
+        request = DummyRequest()
+        request.args = {}
+
+        # page undefined
+        expected = ([entries['2009-03-29-markdown']], False, True)
+        returned = self.view.recent(request)
+        self.assertEqual(expected, returned)
+
+        # page = 0
+        self.rc.get('args')['page'] = request.args['page'] = 0
+        expected = ([entries['2009-03-29-markdown']], False, True)
+        returned = self.view.recent(request)
+        self.assertEqual(expected, returned)
+
+        # page = 1
+        self.rc.get('args')['page'] = request.args['page'] = 1
+        expected = ([entries['2009-03-17-sample']], True, True)
+        returned = self.view.recent(request)
+        self.assertEqual(expected, returned)
+
+        # page = 2
+        self.rc.get('args')['page'] = request.args['page'] = 2
+        expected = ([entries['2009-02-17-loren-ipsum']], True, True)
+        returned = self.view.recent(request)
+        self.assertEqual(expected, returned)
+
+        # page = 3
+        self.rc.get('args')['page'] = request.args['page'] = 3
+        expected = ([entries['2009-02-13-sample']], True, False)
+        returned = self.view.recent(request)
+        self.assertEqual(expected, returned)
 
 
 from test import add_test
