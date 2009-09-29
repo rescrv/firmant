@@ -127,6 +127,9 @@ class TestableGenericEntryViewProvider(GenericEntryViewProvider):
     def _day(self, request, entries, page, year, month, day):
         return (year, month, day, entries, page.has_newer, page.has_older)
 
+    def _single(self, request, entry):
+        return entry
+
     def invalid_date(self, request):
         raise ValueError('Date requested is invalid')
 
@@ -313,6 +316,14 @@ class TestGenericEntryViewProvider(unittest.TestCase):
         expected = ([entries['2009-02-13-sample']], True, False)
         returned = self.view.recent(request)
         self.assertEqual(expected, returned)
+
+    def testSingle(self):
+        '''firmant.plugins.views.generic.GenericEntryViewProvider.single'''
+        request = DummyRequest()
+        request.args = {}
+
+        expected = entries['2009-03-29-markdown']
+        returned = self.view.single(request, 'markdown', 2009, 03, 29)
 
 
 from test import add_test
