@@ -130,7 +130,7 @@ class TestableGenericEntryViewProvider(GenericEntryViewProvider):
     def _single(self, request, entry):
         return entry
 
-    def invalid_date(self, request):
+    def invalid_args(self, request):
         raise ValueError('Date requested is invalid')
 
 
