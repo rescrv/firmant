@@ -1,4 +1,6 @@
 import datetime
+from werkzeug.routing import Rule, \
+                             Submount
 
 from firmant.datasource.atom import AtomProvider
 from firmant.datasource.atom import slug_re
@@ -56,16 +58,16 @@ class GenericEntryViewProvider(object):
 
     @property
     def rules(self):
-        name = __name__ + '.GenericEntryViewProvider.'
+        name = str(self.__class__)[8:-2]
         url_rules = [
-            Rule('/', endpoint=name + 'recent'),
-            Rule('/<int(fixed_digits=4):year>/', endpoint=name + 'year'),
+            Rule('/', endpoint=name + '.recent'),
+            Rule('/<int(fixed_digits=4):year>/', endpoint=name + '.year'),
             Rule('/<int(fixed_digits=4):year>/<int(fixed_digits=2):month>/',
-                 endpoint=name + 'month'),
+                 endpoint=name + '.month'),
             Rule('/<int(fixed_digits=4):year>/<int(fixed_digits=2):month>' + \
-                 '/<int(fixed_digits=2):day>/', endpoint=name + 'day'),
+                 '/<int(fixed_digits=2):day>/', endpoint=name + '.day'),
             Rule('/<int(fixed_digits=4):year>/<int(fixed_digits=2):month>' + \
-                 '/<int(fixed_digits=2):day>/<slug>', endpoint=name + 'single')
+                 '/<int(fixed_digits=2):day>/<slug>', endpoint=name + '.single')
         ]
         if self.prefix != '':
             return [Submount('/' + self.prefix, url_rules)]
