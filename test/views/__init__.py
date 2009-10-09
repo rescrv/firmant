@@ -119,3 +119,6 @@ from test import add_test
 suite = unittest.TestSuite()
 add_test(suite, TestViewProvider)
 add_test(suite, TestCatchallProvider)
+
+from test.views.generic import suite as generic_tests
+suite.addTests(generic_tests)

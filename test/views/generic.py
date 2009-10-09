@@ -1,8 +1,8 @@
 import unittest
 from werkzeug.exceptions import NotFound
 
-from firmant.plugins.views.generic import paginate
-from firmant.plugins.views.generic import GenericEntryViewProvider
+from firmant.views.generic import paginate
+from firmant.views.generic import GenericEntryViewProvider
 from firmant.wsgi import RequestContext
 from test.datasource.atom import entries
 
@@ -22,7 +22,7 @@ class TestPaginate(unittest.TestCase):
         self.rc['urls'] = DummyUrls()
 
     def testNoPaginationNecessary(self):
-        '''firmant.plugins.views.generic.paginate
+        '''firmant.views.generic.paginate
         Tests the case where there are not enough entries in a list to trigger
         pagination.'''
 
@@ -39,7 +39,7 @@ class TestPaginate(unittest.TestCase):
         self.assertEqual(page.older, None)
 
     def testPaginationBeginning(self):
-        '''firmant.plugins.views.generic.paginate
+        '''firmant.views.generic.paginate
         Tests the case where there is a first and (at least) a second page
         because there are enough entries to require pagination.'''
 
@@ -56,7 +56,7 @@ class TestPaginate(unittest.TestCase):
         self.assertEqual(page.older, ('endpoint', {'args': True, 'page': 1}))
 
     def testPaginationMiddle1(self):
-        '''firmant.plugins.views.generic.paginate
+        '''firmant.views.generic.paginate
         Tests the case where there is at least one middle page with one or more
         pages on each side.  This case has only 1 newer page.'''
 
@@ -73,7 +73,7 @@ class TestPaginate(unittest.TestCase):
         self.assertEqual(page.older, ('endpoint', {'args': True, 'page': 2}))
 
     def testPaginationMiddle2(self):
-        '''firmant.plugins.views.generic.paginate
+        '''firmant.views.generic.paginate
         Tests the case where there is at least one middle page with one or more
         pages on each side.  This case has more than one newer page.'''
 
@@ -90,7 +90,7 @@ class TestPaginate(unittest.TestCase):
         self.assertEqual(page.older, ('endpoint', {'args': True, 'page': 3}))
 
     def testPaginationLast(self):
-        '''firmant.plugins.views.generic.paginate
+        '''firmant.views.generic.paginate
         Tests the case where there is at least one middle page with one or more
         pages on each side.  This case has only 1 newer page.'''
 
@@ -154,7 +154,7 @@ class TestGenericEntryViewProvider(unittest.TestCase):
         self.view = TestableGenericEntryViewProvider(lambda: self.rc, settings)
 
     def testYearPresent(self):
-        '''firmant.plugins.views.generic.GenericEntryViewProvider.year
+        '''firmant.views.generic.GenericEntryViewProvider.year
         Test the case that there are entries for the given year.'''
         request = DummyRequest()
         request.args = {}
@@ -189,7 +189,7 @@ class TestGenericEntryViewProvider(unittest.TestCase):
         self.assertEqual(expected, returned)
 
     def testYearEmpty(self):
-        '''firmant.plugins.views.generic.GenericEntryViewProvider.year
+        '''firmant.views.generic.GenericEntryViewProvider.year
         Test the case that there are no entries for the given year.'''
         request = DummyRequest()
         request.args = {}
@@ -199,7 +199,7 @@ class TestGenericEntryViewProvider(unittest.TestCase):
         self.assertRaises(raised, function)
 
     def testYearNotValid(self):
-        '''firmant.plugins.views.generic.GenericEntryViewProvider.year
+        '''firmant.views.generic.GenericEntryViewProvider.year
         Test the case that the year requested is invalid.'''
         request      = DummyRequest()
         request.args = {}
@@ -208,7 +208,7 @@ class TestGenericEntryViewProvider(unittest.TestCase):
         self.assertRaises(raised, function)
 
     def testMonthPresent(self):
-        '''firmant.plugins.views.generic.GenericEntryViewProvider.month
+        '''firmant.views.generic.GenericEntryViewProvider.month
         Test the case that there are entries for the given month.'''
         request = DummyRequest()
         request.args = {}
@@ -231,7 +231,7 @@ class TestGenericEntryViewProvider(unittest.TestCase):
         self.assertEqual(expected, returned)
 
     def testMonthEmpty(self):
-        '''firmant.plugins.views.generic.GenericEntryViewProvider.month
+        '''firmant.views.generic.GenericEntryViewProvider.month
         Test the case that there are no entries for the given month.'''
         request = DummyRequest()
         request.args = {}
@@ -241,7 +241,7 @@ class TestGenericEntryViewProvider(unittest.TestCase):
         self.assertRaises(raised, function)
 
     def testMonthNotValid(self):
-        '''firmant.plugins.views.generic.GenericEntryViewProvider.month
+        '''firmant.views.generic.GenericEntryViewProvider.month
         Test the case that the month requested is invalid.'''
         request      = DummyRequest()
         request.args = {}
@@ -250,7 +250,7 @@ class TestGenericEntryViewProvider(unittest.TestCase):
         self.assertRaises(raised, function)
 
     def testDayPresent(self):
-        '''firmant.plugins.views.generic.GenericEntryViewProvider.day
+        '''firmant.views.generic.GenericEntryViewProvider.day
         Test the case that there are entries for the given day.'''
         request = DummyRequest()
         request.args = {}
@@ -267,7 +267,7 @@ class TestGenericEntryViewProvider(unittest.TestCase):
         self.assertEqual(expected, returned)
 
     def testDayEmpty(self):
-        '''firmant.plugins.views.generic.GenericEntryViewProvider.day
+        '''firmant.views.generic.GenericEntryViewProvider.day
         Test the case that there are no entries for the given day.'''
         request = DummyRequest()
         request.args = {}
@@ -277,7 +277,7 @@ class TestGenericEntryViewProvider(unittest.TestCase):
         self.assertRaises(raised, function)
 
     def testDayNotValid(self):
-        '''firmant.plugins.views.generic.GenericEntryViewProvider.day
+        '''firmant.views.generic.GenericEntryViewProvider.day
         Test the case that the day requested is invalid.'''
         request      = DummyRequest()
         request.args = {}
@@ -286,7 +286,7 @@ class TestGenericEntryViewProvider(unittest.TestCase):
         self.assertRaises(raised, function)
 
     def testRecentPresent(self):
-        '''firmant.plugins.views.generic.GenericEntryViewProvider.recent'''
+        '''firmant.views.generic.GenericEntryViewProvider.recent'''
         request = DummyRequest()
         request.args = {}
 
@@ -320,7 +320,7 @@ class TestGenericEntryViewProvider(unittest.TestCase):
         self.assertEqual(expected, returned)
 
     def testSingle(self):
-        '''firmant.plugins.views.generic.GenericEntryViewProvider.single'''
+        '''firmant.views.generic.GenericEntryViewProvider.single'''
         request = DummyRequest()
         request.args = {}
 
