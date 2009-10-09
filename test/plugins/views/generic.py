@@ -1,4 +1,5 @@
 import unittest
+from werkzeug.exceptions import NotFound
 
 from firmant.plugins.views.generic import paginate
 from firmant.plugins.views.generic import GenericEntryViewProvider
@@ -193,9 +194,9 @@ class TestGenericEntryViewProvider(unittest.TestCase):
         request = DummyRequest()
         request.args = {}
 
-        expected = ('2008', None, False, False)
-        returned = self.view.year(request, '2008')
-        self.assertEqual(expected, returned)
+        raised       = NotFound
+        function     = lambda: self.view.year(request, '2008')
+        self.assertRaises(raised, function)
 
     def testYearNotValid(self):
         '''firmant.plugins.views.generic.GenericEntryViewProvider.year
@@ -235,9 +236,9 @@ class TestGenericEntryViewProvider(unittest.TestCase):
         request = DummyRequest()
         request.args = {}
 
-        expected = ('2009', '04', None, False, False)
-        returned = self.view.month(request, '2009', '04')
-        self.assertEqual(expected, returned)
+        raised       = NotFound
+        function     = lambda: self.view.month(request, '2009', '04')
+        self.assertRaises(raised, function)
 
     def testMonthNotValid(self):
         '''firmant.plugins.views.generic.GenericEntryViewProvider.month
@@ -271,8 +272,9 @@ class TestGenericEntryViewProvider(unittest.TestCase):
         request = DummyRequest()
         request.args = {}
 
-        expected = ('2009', '03', '28', None, False, False)
-        returned = self.view.day(request, '2009', '03', '28')
+        raised       = NotFound
+        function     = lambda: self.view.day(request, '2009', '03', '28')
+        self.assertRaises(raised, function)
 
     def testDayNotValid(self):
         '''firmant.plugins.views.generic.GenericEntryViewProvider.day
