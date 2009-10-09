@@ -5,6 +5,7 @@ import pytz
 from firmant.utils import not_implemented
 from firmant.datasource.comments import Comment
 from firmant.datasource.comments import CommentEmailValidator
+from firmant.datasource.comments import CommentURLValidator
 from firmant.datasource import Storage
 
 from test.datasource import create_testSave1
@@ -317,7 +318,35 @@ class TestCommentEmailValidator(unittest.TestCase):
         self.assertEqual(True, self.validator.is_valid(c))
 
 
+class TestCommentURLValidator(unittest.TestCase):
+
+    def setUp(self):
+        self.validator = CommentURLValidator(None, None)
+
+    def testValidURL1(self):
+        '''firmant.datasource.comments.CommentURLValidator
+        Check valid url'''
+        c = Comment()
+        c.url = 'http://example.org'
+        self.assertEqual(True, self.validator.is_valid(c))
+
+    def testValidURL2(self):
+        '''firmant.datasource.comments.CommentURLValidator
+        Check valid url'''
+        c = Comment()
+        c.url = 'http://exampledotorg'
+        self.assertEqual(True, self.validator.is_valid(c))
+
+    def testInvalidURL(self):
+        '''firmant.datasource.comments.CommentURLValidator
+        Check ivalid url'''
+        c = Comment()
+        c.url = 'example.org/foo/bar'
+        self.assertEqual(False, self.validator.is_valid(c))
+
+
 from test import add_test
 suite = unittest.TestSuite()
 add_test(suite, TestComment)
 add_test(suite, TestCommentEmailValidator)
+add_test(suite, TestCommentURLValidator)
