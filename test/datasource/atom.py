@@ -341,6 +341,14 @@ class TestPrimaryKeys(unittest.TestCase):
         returned = entries['2009-03-29-markdown'].pk
         self.assertEqual(expected, returned)
 
+    def testEntries3(self):
+        """firmant.datasource.atom.Entry.pk"""
+        e = Entry()
+        e.slug = 'markdown'
+        expected = (None, 'markdown')
+        returned = e.pk
+        self.assertEqual(expected, returned)
+
     def testFeeds1(self):
         """firmant.datasource.atom.Feed.pk"""
         expected = ('general',)
