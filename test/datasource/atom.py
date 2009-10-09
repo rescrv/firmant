@@ -303,6 +303,57 @@ class TestAtomBase(unittest.TestCase):
         self.assertTrue(a != b)
 
 
+class TestPrimaryKeys(unittest.TestCase):
+
+    def testAuthor1(self):
+        """firmant.datasource.atom.Author.pk"""
+        expected = ('Robert Escriva',)
+        returned = authors['Robert Escriva'].pk
+        self.assertEqual(expected, returned)
+
+    def testAuthor2(self):
+        """firmant.datasource.atom.Author.pk"""
+        expected = ('Loren Ipsum Generator',)
+        returned = authors['Loren Ipsum Generator'].pk
+        self.assertEqual(expected, returned)
+
+    def testCategories1(self):
+        """firmant.datasource.atom.Category.pk"""
+        expected = ('General',)
+        returned = categories['General'].pk
+        self.assertEqual(expected, returned)
+
+    def testCategories2(self):
+        """firmant.datasource.atom.Category.pk"""
+        expected = ('Generated',)
+        returned = categories['Generated'].pk
+        self.assertEqual(expected, returned)
+
+    def testEntries1(self):
+        """firmant.datasource.atom.Entry.pk"""
+        expected = (datetime.date(2009, 2, 13), 'sample')
+        returned = entries['2009-02-13-sample'].pk
+        self.assertEqual(expected, returned)
+
+    def testEntries2(self):
+        """firmant.datasource.atom.Entry.pk"""
+        expected = (datetime.date(2009, 3, 29), 'markdown')
+        returned = entries['2009-03-29-markdown'].pk
+        self.assertEqual(expected, returned)
+
+    def testFeeds1(self):
+        """firmant.datasource.atom.Feed.pk"""
+        expected = ('general',)
+        returned = feeds['general'].pk
+        self.assertEqual(expected, returned)
+
+    def testFeeds2(self):
+        """firmant.datasource.atom.Feed.pk"""
+        expected = ('',)
+        returned = feeds['default'].pk
+        self.assertEqual(expected, returned)
+
+
 class TestAuthor(unittest.TestCase):
 
     def setUp(self):
@@ -1252,3 +1303,4 @@ class DummyFeedPermalinkProvider(FeedPermalinkProvider):
 from test import add_test
 suite = unittest.TestSuite()
 add_test(suite, TestAtomBase)
+add_test(suite, TestPrimaryKeys)

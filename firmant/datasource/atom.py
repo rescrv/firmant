@@ -35,10 +35,15 @@ class AtomBase(object):
     def __ne__(self, other):
         return not (self == other)
 
+    @property
+    def pk(self):
+        return tuple(map(lambda a: getattr(self, a, None), self.key_attrs))
+
 
 class Author(AtomBase):
 
     fields    = ['name', 'uri', 'email']
+    key_attrs = ['name']
     __slots__ = fields
 
     # TODO:
@@ -66,6 +71,7 @@ class AtomAuthorProvider(SingleProviderPlugin, Storage):
 class Category(AtomBase):
 
     fields    = ['term', 'label']
+    key_attrs = ['term']
     __slots__ = fields
 
     # TODO:
@@ -97,6 +103,16 @@ class Entry(AtomBase):
     fields    = ['slug', 'published', 'author', 'category', 'rights', 'updated',
                  'title', 'content', 'summary', 'tz']
     __slots__ = fields
+
+    @property
+    def pk(self):
+        published = getattr(self, 'published', None)
+        slug      = getattr(self, 'slug', None)
+        if published is not None:
+            date = published.date()
+        else:
+            date = None
+        return (date, slug)
 
 
 class AtomEntryProvider(SingleProviderPlugin):
@@ -140,6 +156,7 @@ class AtomEntryProvider(SingleProviderPlugin):
 class Feed(AtomBase):
 
     fields    = ['slug', 'title', 'rights', 'subtitle', 'updated', 'entries']
+    key_attrs = ['slug']
     __slots__ = fields
 
 
