@@ -94,24 +94,32 @@ class GenericEntryViewProvider(object):
         def func(ap, y, m, d):
             return lambda l, o: ap.entry.recent(l, o)
         entries, page = self.common(request, func)
+        if entries is None:
+            raise NotFound('Entries not found.')
         return self._recent(request, entries, page)
 
     def year(self, request, year):
         def func(ap, y, m, d):
             return lambda l, o: ap.entry.year(y, l, o)
         entries, page = self.common(request, func, year)
+        if entries is None:
+            raise NotFound('Entries not found.')
         return self._year(request, entries, page, year)
 
     def month(self, request, year, month):
         def func(ap, y, m, d):
             return lambda l, o: ap.entry.month(y, m, l, o)
         entries, page = self.common(request, func, year, month)
+        if entries is None:
+            raise NotFound('Entries not found.')
         return self._month(request, entries, page, year, month)
 
     def day(self, request, year, month, day):
         def func(ap, y, m, d):
             return lambda l, o: ap.entry.day(y, m, d, l, o)
         entries, page = self.common(request, func, year, month, day)
+        if entries is None:
+            raise NotFound('Entries not found.')
         return self._day(request, entries, page, year, month, day)
 
     def single(self, request, slug, year, month, day):
