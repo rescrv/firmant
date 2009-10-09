@@ -4,6 +4,7 @@ import pytz
 
 from firmant.utils import not_implemented
 from firmant.datasource.comments import Comment
+from firmant.datasource.comments import CommentEmailValidator
 from firmant.datasource import Storage
 
 from test.datasource import create_testSave1
@@ -296,6 +297,27 @@ class TestComment(unittest.TestCase):
         self.assertTrue(not (b == a))
 
 
+class TestCommentEmailValidator(unittest.TestCase):
+
+    def setUp(self):
+        self.validator = CommentEmailValidator(None, None)
+
+    def testValidEmail(self):
+        '''firmant.datasource.comments.CommentEmailValidator
+        Check comment with valid email.'''
+        c = Comment()
+        c.email = 'rob@example.org'
+        self.assertEqual(True, self.validator.is_valid(c))
+
+    def testInvalidEmail(self):
+        '''firmant.datasource.comments.CommentEmailValidator
+        Check comment with invalid email.'''
+        c = Comment()
+        c.email = 'rob@localhost'
+        self.assertEqual(True, self.validator.is_valid(c))
+
+
 from test import add_test
 suite = unittest.TestSuite()
 add_test(suite, TestComment)
+add_test(suite, TestCommentEmailValidator)
