@@ -6,6 +6,8 @@ from firmant.utils import not_implemented
 from firmant.datasource.comments import Comment
 from firmant.datasource.comments import CommentEmailValidator
 from firmant.datasource.comments import CommentURLValidator
+from firmant.datasource.comments import CommentNameValidator
+from firmant.datasource.comments import CommentContentValidator
 from firmant.datasource import Storage
 
 from test.datasource import create_testSave1
@@ -345,8 +347,50 @@ class TestCommentURLValidator(unittest.TestCase):
         self.assertEqual(False, self.validator.is_valid(c))
 
 
+class TestCommentNameValidator(unittest.TestCase):
+
+    def setUp(self):
+        self.validator = CommentNameValidator(None, None)
+
+    def testValidName(self):
+        '''firmant.datasource.comments.CommentNameValidator
+        Check valid name'''
+        c = Comment()
+        c.name = 'Foobar'
+        self.assertEqual(True, self.validator.is_valid(c))
+
+    def testInvalidName(self):
+        '''firmant.datasource.comments.CommentNameValidator
+        Check invalid name'''
+        c = Comment()
+        c.name = ''
+        self.assertEqual(False, self.validator.is_valid(c))
+
+
+class TestCommentContentValidator(unittest.TestCase):
+
+    def setUp(self):
+        self.validator = CommentContentValidator(None, None)
+
+    def testValidName(self):
+        '''firmant.datasource.comments.CommentContentValidator
+        Check valid content'''
+        c = Comment()
+        c.content = 'Foobar'
+        self.assertEqual(True, self.validator.is_valid(c))
+
+    def testInvalidName(self):
+        '''firmant.datasource.comments.CommentContentValidator
+        Check invalid content'''
+        c = Comment()
+        c.content = ''
+        self.assertEqual(False, self.validator.is_valid(c))
+
+
 from test import add_test
 suite = unittest.TestSuite()
 add_test(suite, TestComment)
 add_test(suite, TestCommentEmailValidator)
 add_test(suite, TestCommentURLValidator)
+add_test(suite, TestCommentNameValidator)
+add_test(suite, TestCommentContentValidator)
