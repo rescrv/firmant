@@ -10,7 +10,7 @@ class MarkdownFilter(object):
         args = dict()
         args['text'] = content
 
-        if self.settings['MARKDOWN_XHTML_SAFE_MODE'] != None
+        if self.settings['MARKDOWN_XHTML_SAFE_MODE'] != None:
             args['safe_mode'] = self.settings['MARKDOWN_XHTML_SAFE_MODE']
 
         if isinstance(self.settings.get('MARKDOWN_EXTENSIONS', None), list):
