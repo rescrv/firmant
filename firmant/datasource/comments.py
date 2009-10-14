@@ -72,7 +72,9 @@ class CommentURLValidator(object):
         # Designed to make sure people don't enter random junk for url;
         # not designed to be a serious filter.
         url = urlparse.urlparse(comment.url)
-        return '' not in (url.scheme, url.netloc)
+        scheme = url[0]
+        netloc = url[1]
+        return '' not in (scheme, netloc)
 
 
 class CommentNameValidator(object):

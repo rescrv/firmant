@@ -1,6 +1,7 @@
 import datetime
 from werkzeug.routing import Rule, \
                              Submount
+from werkzeug.exceptions import NotFound
 
 from firmant.datasource.atom import AtomProvider
 from firmant.datasource.atom import slug_re
@@ -83,31 +84,42 @@ class GenericEntryViewProvider(object):
         rc = self.rc()
         ap = rc.get(AtomProvider)
         paginate_func = func(ap, year, month, day)
-        entries, page = paginate(lambda: rc, self.limit, paginate_func, page)
+        try:
+            entries, page = paginate(lambda: rc, self.limit, paginate_func, page)
+        except ValueError:
+            raise NotFound("The page you requested does not exist")
         return entries, page
 
     def recent(self, request):
         def func(ap, y, m, d):
             return lambda l, o: ap.entry.recent(l, o)
         entries, page = self.common(request, func)
+        if entries is None:
+            raise NotFound('Entries not found.')
         return self._recent(request, entries, page)
 
     def year(self, request, year):
         def func(ap, y, m, d):
             return lambda l, o: ap.entry.year(y, l, o)
         entries, page = self.common(request, func, year)
+        if entries is None:
+            raise NotFound('Entries not found.')
         return self._year(request, entries, page, year)
 
     def month(self, request, year, month):
         def func(ap, y, m, d):
             return lambda l, o: ap.entry.month(y, m, l, o)
         entries, page = self.common(request, func, year, month)
+        if entries is None:
+            raise NotFound('Entries not found.')
         return self._month(request, entries, page, year, month)
 
     def day(self, request, year, month, day):
         def func(ap, y, m, d):
             return lambda l, o: ap.entry.day(y, m, d, l, o)
         entries, page = self.common(request, func, year, month, day)
+        if entries is None:
+            raise NotFound('Entries not found.')
         return self._day(request, entries, page, year, month, day)
 
     def single(self, request, slug, year, month, day):
@@ -120,7 +132,10 @@ class GenericEntryViewProvider(object):
 
         rc = self.rc()
         ap = rc.get(AtomProvider)
-        entry = ap.entry.single(slug, year, month, day)
+        try:
+            entry = ap.entry.single(slug, year, month, day)
+        except ValueError:
+            entry = None
         if entry is None:
             raise NotFound('Entry not found.')
         return self._single(request, entry)

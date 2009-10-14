@@ -5,7 +5,7 @@ from jinja2 import Environment, \
                    FileSystemLoader
 
 from firmant.plugins import MultiProviderPlugin
-from firmant.plugins.views.generic import GenericEntryViewProvider
+from firmant.views.generic import GenericEntryViewProvider
 from firmant.filters import FilterProvider
 
 
