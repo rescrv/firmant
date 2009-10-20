@@ -136,3 +136,38 @@ class GenericEntryViewProvider(object):
         if entry is None:
             raise NotFound('Entry not found.')
         return self._single(request, entry)
+
+
+class GenericFeedViewProvider(object):
+    '''Subclass this and override the ``render'' method.
+    The render method gets a single feed object to render to an HTTP response.
+    '''
+
+    def __init__(self, rc, settings):
+        self.rc       = rc
+        self.settings = settings
+        self.ap       = rc().get(AtomProvider)
+
+    @property
+    def rules(self):
+        name = str(self.__class__)[8:-2]
+        url_rules = [
+            Rule('/', endpoint=name + '.default'),
+            Rule('/<slug>/', endpoint=name + '.named'),
+        ]
+        if self.prefix != '':
+            return [Submount('/' + self.prefix, url_rules)]
+        else:
+            return url_rules
+
+    def default(self, request):
+        return self.render(request, self.ap.feed.default())
+
+    def named(self, request, slug):
+        try:
+            feed = self.ap.feed.by_slug(slug)
+        except ValueError:
+            feed = None
+        if feed is None:
+            raise NotFound('No feed with that name.')
+        return self.render(request, feed)

@@ -3,8 +3,10 @@ from werkzeug.exceptions import NotFound
 
 from firmant.views.generic import paginate
 from firmant.views.generic import GenericEntryViewProvider
+from firmant.views.generic import GenericFeedViewProvider
 from firmant.wsgi import RequestContext
 from test.datasource.atom import entries
+from test.datasource.atom import feeds
 
 
 class DummyUrls(object):
@@ -347,7 +349,68 @@ class TestGenericEntryViewProvider(unittest.TestCase):
         self.assertRaises(raised, function)
 
 
+class TestableGenericFeedViewProvider(GenericFeedViewProvider):
+
+    limit = 1
+
+    def render(self, request, feed):
+        return feed
+
+
+class TestGenericFeedViewProvider(unittest.TestCase):
+
+    def setUp(self):
+        prefix = 'firmant.plugins.datasource.flatfile.atom'
+        settings = {}
+        settings['ENTRY_PERMALINK'] = 'test.datasource.atom.DummyEntryPermalinkProvider'
+        settings['FEED_PERMALINK'] = 'test.datasource.atom.DummyFeedPermalinkProvider'
+        settings['ATOM_FEED_PROVIDER']     = prefix + '.AtomFlatfileFeedProvider'
+        settings['ATOM_AUTHOR_PROVIDER']   = prefix + '.AtomFlatfileAuthorProvider'
+        settings['ATOM_CATEGORY_PROVIDER'] = prefix + '.AtomFlatfileCategoryProvider'
+        settings['ATOM_ENTRY_PROVIDER']    = prefix + '.AtomFlatfileEntryProvider'
+        settings['FLATFILE_BASE']          = 'checkout/'
+        self.rc = RequestContext(settings)
+        self.rc.set('urls', DummyUrls())
+        self.rc.set('endpoint', 'endpoint')
+        self.rc.set('args', {})
+        self.view = TestableGenericFeedViewProvider(lambda: self.rc, settings)
+
+    def testDefault(self):
+        '''firmant.views.generic.GenericFeedViewProvider.default
+        Test fetching the default feed.'''
+        request = DummyRequest()
+        request.args = {}
+
+        expected = feeds['default']
+        returned = self.view.default(request)
+
+        self.assertEqual(expected, returned)
+
+    def testNamedPresent(self):
+        '''firmant.views.generic.GenericFeedViewProvider.named
+        Test fetching a named feed.'''
+        request = DummyRequest()
+        request.args = {}
+
+        expected = feeds['general']
+        returned = self.view.named(request, 'general')
+
+        self.assertEqual(expected, returned)
+
+    def testNamedAbsent(self):
+        '''firmant.views.generic.GenericFeedViewProvider.named
+        Test fetching a non-existent named feed.'''
+        request = DummyRequest()
+        request.args = {}
+
+        raised   = NotFound
+        function = lambda: self.view.named(request, 'noexist')
+
+        self.assertRaises(raised, function)
+
+
 from test import add_test
 suite = unittest.TestSuite()
 add_test(suite, TestPaginate)
 add_test(suite, TestGenericEntryViewProvider)
+add_test(suite, TestGenericFeedViewProvider)
