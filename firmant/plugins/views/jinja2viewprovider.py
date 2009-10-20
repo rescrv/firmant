@@ -62,28 +62,16 @@ class Jinja2FrontendViewProvider(GenericEntryViewProvider):
         return self.render_response('frontend/single.html', context)
 
     def _year(self, request, entries, page, year):
-        entries = map(self.XHTML_filter, entries)
-        context = {}
-        context['entries'] = entries
-        context['page']    = page
-        context['dt']      = datetime.date(year, 1, 1)
-        return self.render_response('frontend/year.html', context)
+        return self.common('frontend/year.html', entries, page,
+                datetime.date(year, 1, 1))
 
     def _month(self, request, entries, page, year, month):
-        entries = map(self.XHTML_filter, entries)
-        context = {}
-        context['entries'] = entries
-        context['page']    = page
-        context['dt']      = datetime.date(year, month, 1)
-        return self.render_response('frontend/month.html', context)
+        return self.common('frontend/year.html', entries, page,
+                datetime.date(year, month, 1))
 
     def _day(self, request, entries, page, year, month, day):
-        entries = map(self.XHTML_filter, entries)
-        context = {}
-        context['entries'] = entries
-        context['page']    = page
-        context['dt']      = datetime.date(year, month, day)
-        return self.render_response('frontend/day.html', context)
+        return self.common('frontend/year.html', entries, page,
+                datetime.date(year, month, day))
 
     def XHTML_filter(self, entry):
         rc = self.rc()
@@ -91,6 +79,14 @@ class Jinja2FrontendViewProvider(GenericEntryViewProvider):
         entry.summary = fp.filter('XHTML', entry.summary)
         entry.content = fp.filter('XHTML', entry.content)
         return entry
+
+    def common(self, template, entries, page, d):
+        entries = map(self.XHTML_filter, entries)
+        context = {}
+        context['entries'] = entries
+        context['page']    = page
+        context['dt']      = d
+        return self.render_response(template, context)
 
     def render_response(self, template, context):
         loader = FileSystemLoader(self.settings['JINJA2_TEMPLATE_DIR'])
