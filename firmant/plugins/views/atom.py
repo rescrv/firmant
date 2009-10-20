@@ -1,9 +1,6 @@
-from werkzeug.routing import Rule, \
-                             Submount
 from werkzeug import Response
-from werkzeug.exceptions import NotFound
 
-from firmant.datasource.atom import AtomProvider
+from firmant.views.generic import GenericFeedViewProvider
 from firmant.filters import FilterProvider
 from firmant.utils import xml
 from firmant.utils import RFC3339
@@ -28,43 +25,13 @@ class AtomFeedPermalinkProvider(object):
         return urls.build(endpoint, values, force_external=True)
 
 
-class AtomFeedViewProvider(object):
-
-    def __init__(self, rc, settings):
-        self.rc       = rc
-        self.settings = settings
+class AtomFeedViewProvider(GenericFeedViewProvider):
 
     @property
-    def rules(self):
-        name = __name__ + '.AtomFeedViewProvider.'
-        url_rules = [
-            Rule('/', endpoint=name + 'default'),
-            Rule('/<slug>/', endpoint=name + 'named'),
-        ]
-        prefix = self.settings.get('VIEW_ATOM_FEED_PREFIX', '')
-        if prefix != '':
-            return [Submount('/' + prefix, url_rules)]
-        else:
-            return url_rules
+    def prefix(self):
+        return self.settings.get('VIEW_ATOM_FEED_PREFIX', '')
 
-    def default(self, request):
-        rc = self.rc()
-        ap = rc.get(AtomProvider)
-        return self.common(request, ap.feed.default())
-
-    def named(self, request, slug):
-        rc = self.rc()
-        ap = rc.get(AtomProvider)
-        try:
-            feed = ap.feed.by_slug(slug)
-        except ValueError:
-            feed = None
-        if feed is None:
-            return Response('No feed with that name.', status=404,
-                    mimetype='text/plain')
-        return self.common(request, feed)
-
-    def common(self, request, feed):
+    def render(self, request, feed):
         rc = self.rc()
         fp = rc.get(FilterProvider)
         def filter(content):
