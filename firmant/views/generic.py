@@ -84,10 +84,7 @@ class GenericEntryViewProvider(object):
         rc = self.rc()
         ap = rc.get(AtomProvider)
         paginate_func = func(ap, year, month, day)
-        try:
-            entries, page = paginate(lambda: rc, self.limit, paginate_func, page)
-        except ValueError:
-            raise NotFound("The page you requested does not exist")
+        entries, page = paginate(lambda: rc, self.limit, paginate_func, page)
         return entries, page
 
     def recent(self, request):
