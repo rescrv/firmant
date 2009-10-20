@@ -319,13 +319,32 @@ class TestGenericEntryViewProvider(unittest.TestCase):
         returned = self.view.recent(request)
         self.assertEqual(expected, returned)
 
-    def testSingle(self):
+    def testSingle1(self):
         '''firmant.views.generic.GenericEntryViewProvider.single'''
         request = DummyRequest()
         request.args = {}
 
         expected = entries['2009-03-29-markdown']
         returned = self.view.single(request, 'markdown', 2009, 03, 29)
+        self.assertEqual(expected, returned)
+
+    def testSingle2(self):
+        '''firmant.views.generic.GenericEntryViewProvider.single'''
+        request = DummyRequest()
+        request.args = {}
+
+        raised       = ValueError
+        function     = lambda: self.view.single(request, 'markdown', 2009, 2, 45)
+        self.assertRaises(raised, function)
+
+    def testSingle3(self):
+        '''firmant.views.generic.GenericEntryViewProvider.single'''
+        request = DummyRequest()
+        request.args = {}
+
+        raised       = ValueError
+        function     = lambda: self.view.single(request, 'm@rkdown', 2009, 2, 15)
+        self.assertRaises(raised, function)
 
 
 from test import add_test
