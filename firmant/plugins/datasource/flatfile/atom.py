@@ -415,7 +415,7 @@ class AtomFlatfileFeedProvider(object):
         if len(feed.entries) > 0:
             feed.updated  = feed.entries[0].updated
         else:
-            feed.updated  = datetime.datetime.min
+            feed.updated  = datetime.datetime(1900, 1, 1)
         return feed
 
     def default(self):

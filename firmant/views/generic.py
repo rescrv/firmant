@@ -75,7 +75,7 @@ class GenericEntryViewProvider(object):
         else:
             return url_rules
 
-    def common(self, request, func, year=1, month=1, day=1):
+    def common(self, request, func, year=1900, month=1, day=1):
         try:
             year, month, day = valid_date(year, month, day)
         except ValueError:
