@@ -179,7 +179,7 @@ feeds['empty'].slug       = u"empty"
 feeds['empty'].title      = u"An Empty Feed"
 feeds['empty'].rights     = u"Same as source.\n"
 feeds['empty'].subtitle   = u"This feed has no entries."
-feeds['empty'].updated    = datetime.datetime.min
+feeds['empty'].updated    = datetime.datetime(1900, 1, 1)
 feeds['empty'].entries    = []
 
 feeds['default'] = Feed()
