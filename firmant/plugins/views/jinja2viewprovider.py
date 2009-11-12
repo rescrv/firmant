@@ -62,15 +62,15 @@ class Jinja2FrontendViewProvider(GenericEntryViewProvider):
         return self.render_response('frontend/single.html', context)
 
     def _year(self, request, entries, page, year):
-        return self.common('frontend/year.html', entries, page,
+        return self.render('frontend/year.html', entries, page,
                 datetime.date(year, 1, 1))
 
     def _month(self, request, entries, page, year, month):
-        return self.common('frontend/year.html', entries, page,
+        return self.render('frontend/year.html', entries, page,
                 datetime.date(year, month, 1))
 
     def _day(self, request, entries, page, year, month, day):
-        return self.common('frontend/year.html', entries, page,
+        return self.render('frontend/year.html', entries, page,
                 datetime.date(year, month, day))
 
     def XHTML_filter(self, entry):
@@ -80,7 +80,7 @@ class Jinja2FrontendViewProvider(GenericEntryViewProvider):
         entry.content = fp.filter('XHTML', entry.content)
         return entry
 
-    def common(self, template, entries, page, d):
+    def render(self, template, entries, page, d):
         entries = map(self.XHTML_filter, entries)
         context = {}
         context['entries'] = entries
