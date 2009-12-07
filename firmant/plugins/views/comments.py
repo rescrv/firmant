@@ -12,6 +12,7 @@ from werkzeug.routing import Rule, \
 from werkzeug.utils import redirect
 
 from firmant.csrf import CSRFTokenProvider
+from firmant.datasource import Storage
 from firmant.datasource.atom import AtomProvider
 from firmant.datasource.atom import EntryPermalinkProvider
 from firmant.datasource.comments import Comment
@@ -116,9 +117,9 @@ class CommentSubmissionHandler(object):
         comment_provider = rc.get(CommentProvider)
         try:
             comment_provider.save(c)
-        except CommentProvider.UniqueViolationError:
+        except Storage.UniqueViolationError:
             return self.unique_error(c)
-        except CommentProvider.StorageError:
+        except Storage.StorageError:
             return self.storage_error()
 
         return self.success(c)
