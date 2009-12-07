@@ -5,8 +5,7 @@ import re
 from firmant.datasource import Storage
 from firmant.plugins import SingleProviderPlugin
 from firmant.constants import isoformat
-from firmant.utils import xml, \
-                          strptime
+from firmant.utils import strptime
 from firmant.utils import json
 
 

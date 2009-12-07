@@ -13,7 +13,6 @@ from firmant.datasource.atom import AtomProvider, \
                                     FeedPermalinkProvider
 from firmant.datasource import Storage
 from firmant.utils import not_implemented, \
-                          xml, \
                           RFC3339
 
 from test.datasource import create_testSave1
