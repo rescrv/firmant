@@ -317,6 +317,14 @@ class AtomFlatfileEntryProvider(object):
         parsed_entries = map(parse, cleaned_entries)
         return self._paginate(parsed_entries, limit, offset)
 
+    def for_category(self, categoryslug, limit=None, offset=None):
+        entry_pkeys = self.list()
+        entries     = self._load_many(entry_pkeys)
+        def is_in_category(entry):
+            return entry.category.term == categoryslug
+        filtered_entries = filter(is_in_category, entries)
+        return self._paginate(filtered_entries, limit, offset)
+
     def list(self):
         entry_path = os.path.join(self.settings['FLATFILE_BASE'], 'entries')
         entry_path = os.path.abspath(entry_path)
