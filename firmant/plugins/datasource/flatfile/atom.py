@@ -200,8 +200,11 @@ class AtomFlatfileEntryProvider(object):
         return entry
 
     def _load_many(self, entries):
-        return filter(lambda e: e is not None,
-                      map(lambda e: self._load_one(*e), entries))
+        def to_entry(e):
+            if isinstance(e, Entry):
+                return e
+            return self._load_one(*e)
+        return filter(lambda e: e is not None, map(to_entry, entries))
 
     def _paginate(self, entry_list, limit, offset):
         if limit is not None or offset is not None:
