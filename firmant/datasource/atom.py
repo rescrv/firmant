@@ -121,6 +121,9 @@ class AtomEntryProvider(SingleProviderPlugin):
     def for_feed(self, feedslug, limit=None, offset=None):
         return self._provider.for_feed(feedslug, limit, offset)
 
+    def for_category(self, categoryslug, limit=None, offset=None):
+        return self._provider.for_category(categoryslug, limit, offset)
+
     def single(self, slug, year, month, day):
         return self._provider.single(slug, year, month, day)
 
