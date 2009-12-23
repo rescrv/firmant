@@ -1207,6 +1207,102 @@ class TestEntry(unittest.TestCase):
 
         self.assertEqual(expected, returned)
 
+    def testForCategory1(self):
+        """firmant.datasource.atom.Entry.for_category
+        A valid list of entries for a given category should be returned."""
+        provider = self.provider
+
+        expected = [entries['2009-03-29-markdown'],
+                    entries['2009-02-13-sample']]
+        returned = provider.for_category('General')
+        self.assertEqual(expected, returned)
+
+        expected = [entries['2009-03-17-sample'],
+                    entries['2009-02-17-loren-ipsum']]
+        returned = provider.for_category('Generated')
+        self.assertEqual(expected, returned)
+
+    def testForCategory2(self):
+        """firmant.datasource.atom.Entry.for_category
+        An empty list for a day for which there are no entries."""
+        provider = self.provider
+
+        expected = []
+        returned = provider.for_category('DNE')
+
+        self.assertEqual(expected, returned)
+
+    def testForCategory4(self):
+        """firmant.datasource.atom.Entry.for_category
+        Test valid pagination."""
+        provider = self.provider
+
+        expected = ([entries['2009-03-29-markdown']], 1)
+        returned = provider.for_category('General', limit=1, offset=0)
+
+        self.assertEqual(expected, returned)
+
+    def testForCategory5(self):
+        """firmant.datasource.atom.Entry.for_category
+        Test valid pagination."""
+        provider = self.provider
+
+        expected = ([], 2)
+        returned = provider.for_category('General', limit=0, offset=0)
+
+        self.assertEqual(expected, returned)
+
+    def testForCategory6(self):
+        """firmant.datasource.atom.Entry.for_category
+        Test valid termination of pagination."""
+        provider = self.provider
+
+        expected = ([entries['2009-02-13-sample']], 0)
+        returned = provider.for_category('General', limit=1, offset=1)
+
+        self.assertEqual(expected, returned)
+
+    def testForCategory7(self):
+        """firmant.datasource.atom.Entry.for_category
+        Test that checks exist for sane values of limit/offset."""
+        provider = self.provider
+
+        raises   = ValueError
+        function = lambda: provider.for_category('General', limit=0, offset=-1)
+
+        self.assertRaises(raises, function)
+
+    def testForCategory8(self):
+        """firmant.datasource.atom.Entry.for_category
+        Test that checks exist for sane values of limit/offset."""
+        provider = self.provider
+
+        raises   = ValueError
+        function = lambda: provider.for_category('General', limit=-1, offset=0)
+
+        self.assertRaises(raises, function)
+
+    def testForCategory9(self):
+        """firmant.datasource.atom.Entry.for_category
+        An unspecified offset is equivalent to 0."""
+        provider = self.provider
+
+        expected = ([entries['2009-03-29-markdown']], 1)
+        returned = provider.for_category('General', limit=1)
+
+        self.assertEqual(expected, returned)
+
+    def testForCategory10(self):
+        """firmant.datasource.atom.Entry.for_category
+        An unspecified limit is equivalent to the default."""
+        provider = self.provider
+
+        expected = ([entries['2009-03-29-markdown'],
+                    entries['2009-02-13-sample']], 0)
+        returned = provider.for_category('General', offset=0)
+
+        self.assertEqual(expected, returned)
+
 
 class TestFeed(unittest.TestCase):
 
