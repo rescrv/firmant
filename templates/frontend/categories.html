@@ -1,0 +1,18 @@
+{% extends 'frontend/base.html' %}
+
+{% block title %}Categories{% endblock %}
+
+{% block content %}
+<h1 class="title">Categories</h1>
+
+{% if categories %}
+    {% for category in categories %}
+    <div class="category">
+        <h2><a href="{{ category.term }}">{{ category.term | escape }}</a></h2>
+    </div>
+    {% endfor %}
+{% else %}
+<p>There are no categories in the system.</p>
+{% endif %}
+
+{% endblock %}

@@ -196,6 +196,12 @@ class GenericCategoryViewProvider(object):
         else:
             return url_rules
 
+    def categories(self, request):
+        rc = self.rc()
+        ap = rc.get(AtomProvider)
+        categories = ap.category.all()
+        return self._categories(request, categories)
+
     def single(self, request, slug):
         rc = self.rc()
         ap = rc.get(AtomProvider)

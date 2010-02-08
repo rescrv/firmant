@@ -108,6 +108,11 @@ class Jinja2CategoryViewProvider(GenericCategoryViewProvider):
     def limit(self):
         return self.settings.get('JINJA2_ENTRIES_PER_PAGE')
 
+    def _categories(self, request, categories):
+        context = {}
+        context['categories'] = categories
+        return self.render_response('frontend/categories.html', context)
+
     def _single(self, request, slug, entries, page):
         context = {}
         context['slug']    = slug
