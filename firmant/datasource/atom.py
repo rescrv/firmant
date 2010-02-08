@@ -82,6 +82,9 @@ class AtomCategoryProvider(SingleProviderPlugin, Storage):
 
     provider_setting = 'ATOM_CATEGORY_PROVIDER'
 
+    def all(self):
+        return self._provider.all()
+
     def by_term(self, term):
         return self._provider.by_term(term)
 

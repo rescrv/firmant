@@ -29,6 +29,12 @@ class AtomFlatfileCategoryProvider(object):
     def __init__(self, rc, settings):
         self.settings = settings
 
+    def all(self):
+        path = os.path.join(self.settings['FLATFILE_BASE'],
+                            'categories')
+        categories = sorted(os.listdir(path))
+        return map(self.by_term, categories)
+
     def by_term(self, term):
         path = os.path.join(self.settings['FLATFILE_BASE'],
                             'categories',

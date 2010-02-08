@@ -436,6 +436,16 @@ class TestCategory(unittest.TestCase):
         setup whatever data is necessary for the test cases to run."""
         not_implemented() # pragma: no cover
 
+    def testAll(self):
+        """firmant.datasource.atom.Category.all
+        """
+        provider = self.provider
+
+        expected = [categories['General'], categories['Generated']]
+        returned = provider.all()
+
+        self.assertEqual(expected, returned)
+
     def testByTerm1(self):
         """firmant.datasource.atom.Category.by_term
         Load a valid atom Category object using the by_term function"""
