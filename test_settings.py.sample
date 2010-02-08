@@ -7,6 +7,7 @@ VIEWS = [
 'firmant.plugins.views.jinja2viewprovider.Jinja2FrontendViewProvider',
                  'firmant.plugins.views.atom.AtomFeedViewProvider',
                  'firmant.plugins.views.comments.CommentSubmissionHandler',
+'firmant.plugins.views.jinja2viewprovider.Jinja2CategoryViewProvider',
                  'firmant.views.CatchallProvider',
                  'firmant.plugins.views.forwarder.UrlAliasViewProvider']
 ENTRY_PERMALINK = 'firmant.plugins.views.jinja2viewprovider.Jinja2EntryPermalinkProvider'
@@ -37,6 +38,7 @@ ATOM_FEED_PROVIDER = ATOM_PROVIDER + '.AtomFlatfileFeedProvider'
 FLATFILE_BASE = 'checkout/'
 
 VIEW_JINJA2_FRONTEND_PREFIX = 'jinja2'
+VIEW_JINJA2_CATEGORY_PREFIX = 'categories'
 VIEW_ATOM_FEED_PREFIX = 'atom'
 
 JINJA2_TEMPLATE_DIR = 'templates/'

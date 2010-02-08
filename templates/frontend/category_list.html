@@ -1,0 +1,10 @@
+{% extends 'frontend/base.html' %}
+
+{% block title %}Entries for category {{ slug|escape }}{% endblock %}
+
+{% block content %}
+<h1 class="title">Entries for category {{ slug|escape }}</h1>
+
+{% include 'frontend/_entry_list.html' %}
+
+{% endblock %}

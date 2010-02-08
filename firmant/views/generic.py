@@ -171,3 +171,41 @@ class GenericFeedViewProvider(object):
         if feed is None:
             raise NotFound('No feed with that name.')
         return self.render(request, feed)
+
+
+class GenericCategoryViewProvider(object):
+    '''Subclass this and override the render methods.
+
+    For _categories, the input is a list of category objects.
+    For _single, the input is a list of entry objects.
+    '''
+
+    def __init__(self, rc, settings):
+        self.rc       = rc
+        self.settings = settings
+
+    @property
+    def rules(self):
+        name = str(self.__class__)[8:-2]
+        url_rules = [
+            Rule('/', endpoint=name + '.categories'),
+            Rule('/<string:slug>/',endpoint=name + '.single')
+        ]
+        if self.prefix != '':
+            return [Submount('/' + self.prefix, url_rules)]
+        else:
+            return url_rules
+
+    def single(self, request, slug):
+        rc = self.rc()
+        ap = rc.get(AtomProvider)
+        if slug_re.match(slug) is None or not ap.category.exists(slug):
+            raise NotFound('Category not found.')
+        page = force_to_int(request.args.get('page', 0), 0)
+        def func(limit, offset):
+            return ap.entry.for_category(slug, limit, offset)
+        try:
+            entries, page = paginate(lambda: rc, self.limit, func, page)
+        except ValueError:
+            raise NotFound('Category not found.')
+        return self._single(request, slug, entries, page)

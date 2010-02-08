@@ -6,6 +6,7 @@ from jinja2 import Environment, \
 
 from firmant.plugins import MultiProviderPlugin
 from firmant.views.generic import GenericEntryViewProvider
+from firmant.views.generic import GenericCategoryViewProvider
 from firmant.filters import FilterProvider
 
 
@@ -87,6 +88,32 @@ class Jinja2FrontendViewProvider(GenericEntryViewProvider):
         context['page']    = page
         context['dt']      = d
         return self.render_response(template, context)
+
+    def render_response(self, template, context):
+        loader = FileSystemLoader(self.settings['JINJA2_TEMPLATE_DIR'])
+        env = Environment(loader=loader)
+        env.globals['MEDIA_PATH'] = self.settings['MEDIA_URL_PATH']
+        env.globals.update(self.rc().get(Jinja2GlobalProvider).globals_dict())
+        tmpl = env.get_template(template)
+        return Response(tmpl.render(context), mimetype='text/html')
+
+
+class Jinja2CategoryViewProvider(GenericCategoryViewProvider):
+
+    @property
+    def prefix(self):
+        return self.settings.get('VIEW_JINJA2_CATEGORY_PREFIX', '')
+
+    @property
+    def limit(self):
+        return self.settings.get('JINJA2_ENTRIES_PER_PAGE')
+
+    def _single(self, request, slug, entries, page):
+        context = {}
+        context['slug']    = slug
+        context['entries'] = entries
+        context['page']    = page
+        return self.render_response('frontend/category_list.html', context)
 
     def render_response(self, template, context):
         loader = FileSystemLoader(self.settings['JINJA2_TEMPLATE_DIR'])
