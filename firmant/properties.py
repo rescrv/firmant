@@ -83,3 +83,20 @@ def property_datetime(attr, name,
                 val = dt
             setattr(self, attr, val)
     return property(getter, setter, doc=doc)
+
+
+def property_iterable(attr, name, default=list, doc=None):
+    def getter(self):
+        if not hasattr(self, attr):
+            setattr(self, attr, default())
+        return getattr(self, attr)
+    def setter(self, val):
+        if val is None:
+            setattr(self, attr, default())
+        else:
+            try:
+                iter(val)
+            except TypeError:
+                raise
+            setattr(self, attr, val)
+    return property(getter, setter, doc=doc)

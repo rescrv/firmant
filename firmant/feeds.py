@@ -213,41 +213,30 @@ class Feed(object):
 
     ''')
 
-    def get_entries(self):
-        '''Return the entries of the feed.
-
-            >>> f = Feed()
-            >>> f.get_entries()
-            []
-
-            >>> f = Feed(entries=list())
-            >>> f.get_entries()
-            []
-
-        '''
-        return getattr(self, '_updated', list())
-
-    def set_entries(self, val):
-        '''Set the entries of the feed.
-
-            >>> f = Feed()
-            >>> f.set_entries(list())
-            >>> f.get_entries()
-            []
-
-        '''
-        self._entries = list(val)
-
-    entries = property(get_entries, set_entries,
+    entries = properties.property_iterable('_entries', 'entries',
     doc='''The entries property.
 
     Access to the entries is mediated to validate that the entries always
-    contains a valid list object.
+    contains a valid iterable object.
 
-    .. seealso::
+        >>> f = Feed()
+        >>> f.entries
+        []
 
-       - Get function: :func:`Feed.get_entries`.
-       - Set function: :func:`Feed.set_entries`.
+        >>> # Assigning None simply empties the list.
+        >>> f = Feed()
+        >>> f.entries = None
+        >>> f.entries
+        []
+
+        >>> f.entries = ['foo', 'bar', 'baz']
+        >>> f.entries
+        ['foo', 'bar', 'baz']
+
+        >>> # Raise a TypeError when assigned a non-iterable.
+        >>> f.entries = 1
+        Traceback (most recent call last):
+        TypeError: 'int' object is not iterable
 
     ''')
 
@@ -272,7 +261,6 @@ class Feed(object):
         u'The body of the feed displayed on html pages.'
 
     ''')
-
 
 
 def list_feeds(content_root, feed_subdir='feeds', suffix='.rst'):
