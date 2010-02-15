@@ -52,7 +52,7 @@ class Feed(object):
     '''
 
     __slots__ = ['_slug', '_title', '_subtitle', '_copyright', '_updated'
-                ,'_entries']
+                ,'_entries', '_body']
 
     def __init__(self, **kwargs):
         '''Construct a new Feed.  Optional kwargs are used to populate the data
@@ -334,6 +334,44 @@ class Feed(object):
 
     ''')
 
+    def get_body(self):
+        '''Return the body of the feed.
+
+            >>> f = Feed()
+            >>> f.get_body()
+
+            >>> f = Feed(body='The body of the feed displayed on html pages.')
+            >>> f.get_body()
+            u'The body of the feed displayed on html pages.'
+
+        '''
+        return getattr(self, '_body', None)
+
+    def set_body(self, val):
+        '''Set the body of the feed.
+
+            >>> f = Feed()
+            >>> f.set_body('The body of the feed displayed on html pages.')
+            >>> f.get_body()
+            u'The body of the feed displayed on html pages.'
+
+        '''
+        self._body = unicode(val)
+
+    body = property(get_body, set_body,
+    doc='''The body property.
+
+    Access to the body is mediated to validate that the body always contains a
+    valid unicode object (or ``None``).
+
+    .. seealso::
+
+       - Get function: :func:`Feed.get_body`.
+       - Set function: :func:`Feed.set_body`.
+
+    ''')
+
+
 
 def list_feeds(content_root, feed_subdir='feeds', suffix='.rst'):
     '''Generate the absolute path for each feed object.
@@ -375,6 +413,8 @@ def parse_feed(feed_path):
         >>> f.updated
         >>> f.entries
         []
+        >>> f.body
+        u'<p>The body of the feed displayed on html pages.</p>\\n'
 
     '''
     file = open(feed_path)
@@ -387,6 +427,7 @@ def parse_feed(feed_path):
     f.title = parts['title']
     f.subtitle = parts['subtitle']
     f.copyright = doc.copyright
+    f.body = parts['fragment']
     return f
 
 
