@@ -177,50 +177,39 @@ class Feed(object):
 
     ''')
 
-    def get_updated(self):
-        '''Return the update time of the feed.
-
-            >>> f = Feed()
-            >>> f.get_updated()
-
-            >>> now = datetime.datetime.now()
-            >>> f = Feed(updated=now)
-            >>> f.get_updated() == now
-            True
-
-        '''
-        return getattr(self, '_updated', None)
-
-    def set_updated(self, val):
-        '''Set the update time of the feed.
-
-            >>> f = Feed()
-            >>> now = datetime.datetime.now()
-            >>> f.set_updated(now)
-            >>> f.get_updated() == now
-            True
-
-            >>> # Passing something other than a datetime object throws a
-            >>> # TypeError
-            >>> f.set_updated('not a date')
-            Traceback (most recent call last):
-            TypeError: Val is not of the correct type.
-
-        '''
-        if val is not None and not isinstance(val, datetime.datetime):
-            raise TypeError('Val is not of the correct type.')
-        self._updated = val
-
-    updated = property(get_updated, set_updated,
+    updated = properties.property_datetime('_updated', 'updated',
     doc='''The updated property.
 
     Access to the update time is mediated to validate that the update time
-    always contains is valid unicode object (or ``None``).
+    always contains is valid :class:`datetime.datetime` object.
 
-    .. seealso::
+        >>> f = Feed()
+        >>> f.updated
+        >>> f.updated = None
+        >>> f.updated
 
-       - Get function: :func:`Feed.get_updated`.
-       - Set function: :func:`Feed.set_updated`.
+        >>> f = Feed()
+        >>> f.updated
+        >>> f.updated = datetime.datetime(2010, 2, 15, 18, 7)
+        >>> f.updated
+        datetime.datetime(2010, 2, 15, 18, 7)
+
+        >>> f = Feed()
+        >>> f.updated = '2010-02-15 18:07:04'
+        >>> f.updated
+        datetime.datetime(2010, 2, 15, 18, 7, 4)
+
+        >>> # Also works if seconds are ommitted.
+        >>> f = Feed()
+        >>> f.updated = '2010-02-15 18:07'
+        >>> f.updated
+        datetime.datetime(2010, 2, 15, 18, 7)
+
+        >>> # Passing something other than a datetime object or string, raise a
+        >>> # TypeError
+        >>> f.updated = 'not a date'
+        Traceback (most recent call last):
+        ValueError: time data 'not a date' does not match format '%Y-%m-%d %H:%M:%S'
 
     ''')
 

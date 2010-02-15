@@ -25,6 +25,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+import datetime
+
+
 def property_regex(attr, name, regex, default=None, doc=None):
     '''Create a property where assigned values much match a regular expression.
     '''
@@ -53,4 +56,30 @@ def property_unicode(attr, name, default=None, doc=None):
             setattr(self, attr, default)
         else:
             setattr(self, attr, unicode(val))
+    return property(getter, setter, doc=doc)
+
+
+def property_datetime(attr, name,
+        patterns=['%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M'],
+        default=None, doc=None):
+    '''Create a property where assigned values are interpreted as a datetime.
+    '''
+    def getter(self):
+        return getattr(self, attr, default)
+    def setter(self, val):
+        if val is None:
+            setattr(self, attr, default)
+        else:
+            if not isinstance(val, datetime.datetime):
+                error = None
+                dt = None
+                for pattern in patterns:
+                    try:
+                        dt = datetime.datetime.strptime(val, pattern)
+                    except ValueError, e:
+                        if error is None: error = e
+                if dt is None:
+                    raise error
+                val = dt
+            setattr(self, attr, val)
     return property(getter, setter, doc=doc)
