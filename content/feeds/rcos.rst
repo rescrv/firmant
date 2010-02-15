@@ -1,6 +1,11 @@
-.. title:: The feed should be titled ``RCOS``
-.. subtitle:: Information pertaining to RCOS
+==============================
+The feed should be titled RCOS
+==============================
 
-.. rights::
+------------------------------
+Information pertaining to RCOS
+------------------------------
 
-    Feeds can have explicit rights too.
+.. copyright::
+
+    Feeds can have explicit copyright too.
