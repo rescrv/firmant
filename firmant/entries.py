@@ -30,10 +30,11 @@
 
 
 import datetime
+import os
 import re
 
 
-__all__ = ['Entry']
+__all__ = ['Entry', 'list_entries']
 
 
 slug_re = re.compile('^[a-zA-Z0-9][-\\_a-zA-Z0-9.]{1,30}[a-zA-Z0-9]$')
@@ -532,3 +533,29 @@ class Entry(object):
        - Set function: :func:`Entry.set_tz`.
 
     ''')
+
+
+def list_entries(content_root, subdir='posts', suffix='.rst'):
+    '''Generate the absolute path for each entry object.
+
+    Consider all the contents of the entries directory (by default this is
+    ``content_root/entries``).  Only files ending in ``suffix`` are considered.
+
+    Entries that are not files are ignored.
+
+        >>> from pprint import pprint
+        >>> pprint(list_entries('content'))
+        ['content/posts/1775-03-23-give-me-liberty.rst',
+         'content/posts/2009-02-17-loren-ipsum.rst',
+         'content/posts/2010-02-13-sample-code.rst']
+
+
+    '''
+
+    path  = os.path.join(content_root, subdir)
+    files = os.listdir(path)
+    files = map(lambda p: os.path.join(path, p), files)
+    files = filter(lambda f: f.endswith(suffix), files)
+    files = filter(lambda f: os.path.isfile(f), files)
+    files.sort()
+    return files
