@@ -46,7 +46,7 @@ class Feed(object):
     It is the core of the feed manipulation functions.
     '''
 
-    __slots__ = ['_slug', '_title', '_subtitle', '_rights', '_updated'
+    __slots__ = ['_slug', '_title', '_subtitle', '_copyright', '_updated'
                 ,'_entries']
 
     def __init__(self, **kwargs):
@@ -57,7 +57,7 @@ class Feed(object):
             >>> d = {'slug': 'rcos'
             ...     ,'title': 'RCOS'
             ...     ,'subtitle': 'The Rensselaer Center for Open Source'
-            ...     ,'rights': 'Creative Commons Attribution 3.0 Unported'
+            ...     ,'copyright': 'Creative Commons Attribution 3.0 Unported'
             ...     ,'updated': datetime.datetime.now()
             ...     ,'entries': list()
             ...     }
@@ -73,7 +73,7 @@ class Feed(object):
         defaults = {'slug': None
                    ,'title': None
                    ,'subtitle': None
-                   ,'rights': None
+                   ,'copyright': None
                    ,'updated': None
                    ,'entries': list()
                    }
@@ -207,31 +207,31 @@ class Feed(object):
 
     ''')
 
-    def get_rights(self):
+    def get_copyright(self):
         '''Return the copyright information of the feed.
 
             >>> f = Feed()
-            >>> f.get_rights()
+            >>> f.get_copyright()
 
-            >>> f = Feed(rights=u'CC-BY-3.0')
-            >>> f.get_rights()
+            >>> f = Feed(copyright=u'CC-BY-3.0')
+            >>> f.get_copyright()
             u'CC-BY-3.0'
 
         '''
-        return getattr(self, '_rights', None)
+        return getattr(self, '_copyright', None)
 
-    def set_rights(self, val):
+    def set_copyright(self, val):
         '''Set the copyright information of the feed.
 
             >>> f = Feed()
-            >>> f.set_rights(u'CC-BY-3.0')
-            >>> f.get_rights()
+            >>> f.set_copyright(u'CC-BY-3.0')
+            >>> f.get_copyright()
             u'CC-BY-3.0'
 
         '''
-        self._rights = unicode(val)
+        self._copyright = unicode(val)
 
-    rights = property(get_rights, set_rights,
+    copyright = property(get_copyright, set_copyright,
     doc='''The copyright information property.
 
     Access to the copyright information is mediated to validate that the
@@ -239,8 +239,8 @@ class Feed(object):
 
     .. seealso::
 
-       - Get function: :func:`Feed.get_rights`.
-       - Set function: :func:`Feed.set_rights`.
+       - Get function: :func:`Feed.get_copyright`.
+       - Set function: :func:`Feed.set_copyright`.
 
     ''')
 
