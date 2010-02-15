@@ -34,6 +34,7 @@ import os
 import re
 
 from firmant import du
+from firmant import properties
 
 
 __all__ = ['Entry', 'list_entries']
@@ -95,52 +96,27 @@ class Entry(object):
             else:
                 setattr(self, key, value)
 
-    def get_slug(self):
-        '''Return the slug of the entry as a unicode object.
-
-            >>> e = Entry()
-            >>> e.get_slug()
-
-            >>> e = Entry(slug='rcos')
-            >>> e.get_slug()
-            u'rcos'
-
-        '''
-        return getattr(self, '_slug', None)
-
-    def set_slug(self, val):
-        '''Set the slug of the entry.
-
-        Slugs must be composed of alphanumerics, numbers, hyphens, underscores,
-        and periods.  The slug must start and end with an alphanumeric.
-
-            >>> e = Entry()
-            >>> e.set_slug('rcos')
-            >>> e.get_slug()
-            u'rcos'
-
-            >>> # An invalid slug will raise a ValueError.
-            >>> e = Entry()
-            >>> e.set_slug('_rcos')
-            Traceback (most recent call last):
-            ValueError: Invalid slug.
-
-        '''
-        val = unicode(val)
-        if slug_re.match(val) is None:
-            raise ValueError('Invalid slug.')
-        self._slug = val
-
-    slug = property(get_slug, set_slug,
+    slug = properties.property_regex('_slug', 'slug', slug_re,
     doc='''The slug property.
 
     Access to the slug is mediated to validate that the slug always contains a
     valid unicode object (or ``None``).
 
-    .. seealso::
+        >>> e = Entry()
+        >>> e.slug
+        >>> e.slug = u'rcos'
+        >>> e.slug
+        u'rcos'
 
-       - Get function: :func:`Entry.get_slug`.
-       - Set function: :func:`Entry.set_slug`.
+        >>> # Assigning None will set the slug to None
+        >>> e.slug = None
+        >>> e.slug
+
+        >>> # An invalid slug will raise a ValueError.
+        >>> e = Entry()
+        >>> e.slug = '_rcos'
+        Traceback (most recent call last):
+        ValueError: Invalid value for 'slug'.  Failed to match regex.
 
     ''')
 
