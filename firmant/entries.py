@@ -178,78 +178,56 @@ class Entry(object):
 
     ''')
 
-    def get_tags(self):
-        '''Return the tags of the entry.
-
-            >>> e = Entry()
-            >>> e.get_tags()
-
-            >>> e = Entry(tags=['firmant', 'rcos'])
-            >>> e.get_tags()
-            ['firmant', 'rcos']
-
-        '''
-        return getattr(self, '_tags', None)
-
-    def set_tags(self, val):
-        '''Set the tags of the entry.
-
-            >>> e = Entry()
-            >>> e.set_tags(['firmant', 'rcos'])
-            >>> e.get_tags()
-            ['firmant', 'rcos']
-
-        '''
-        self._tags = list(val)
-
-    tags = property(get_tags, set_tags,
+    tags = properties.property_iterable('_tags', 'tags',
     doc='''The tags property.
 
-    Access to the tags is mediated to validate that the tags are always stored
-    in a list.
+    Access to the tags is mediated to validate that the tags always are a valid
+    iterable object.
 
-    .. seealso::
+        >>> e = Entry()
+        >>> e.tags
+        []
 
-       - Get function: :func:`Entry.get_tags`.
-       - Set function: :func:`Entry.set_tags`.
+        >>> # Assigning None simply empties the list.
+        >>> e = Entry()
+        >>> e.tags = None
+        >>> e.tags
+        []
 
+        >>> e.tags = ['foo', 'bar', 'baz']
+        >>> e.tags
+        ['foo', 'bar', 'baz']
+
+        >>> # Raise a TypeError when assigned a non-iterable.
+        >>> e.tags = 1
+        Traceback (most recent call last):
+        TypeError: 'int' object is not iterable
     ''')
 
-    def get_feeds(self):
-        '''Return the feeds of the entry.
-
-            >>> e = Entry()
-            >>> e.get_feeds()
-
-            >>> e = Entry(feeds=['firmant', 'rcos'])
-            >>> e.get_feeds()
-            ['firmant', 'rcos']
-
-        '''
-        return getattr(self, '_feeds', None)
-
-    def set_feeds(self, val):
-        '''Set the feeds of the entry.
-
-            >>> e = Entry()
-            >>> e.set_feeds(['firmant', 'rcos'])
-            >>> e.get_feeds()
-            ['firmant', 'rcos']
-
-        '''
-        self._feeds = list(val)
-
-    feeds = property(get_feeds, set_feeds,
+    feeds = properties.property_iterable('_feeds', 'feeds',
     doc='''The feeds property.
 
-    Access to the feeds is mediated to validate that the feeds are always stored
-    in a list.
+    Access to the feeds is mediated to validate that the feeds always are a
+    valid iterable object.
 
-    .. seealso::
+        >>> e = Entry()
+        >>> e.feeds
+        []
 
-       - Get function: :func:`Entry.get_feeds`.
-       - Set function: :func:`Entry.set_feeds`.
+        >>> # Assigning None simply empties the list.
+        >>> e = Entry()
+        >>> e.feeds = None
+        >>> e.feeds
+        []
 
+        >>> e.feeds = ['foo', 'bar', 'baz']
+        >>> e.feeds
+        ['foo', 'bar', 'baz']
+
+        >>> # Raise a TypeError when assigned a non-iterable.
+        >>> e.feeds = 1
+        Traceback (most recent call last):
+        TypeError: 'int' object is not iterable
     ''')
 
     def get_copyright(self):
