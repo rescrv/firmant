@@ -111,114 +111,69 @@ class Feed(object):
 
     ''')
 
-    def get_title(self):
-        '''Return the title of the feed.
-
-            >>> f = Feed()
-            >>> f.get_title()
-
-            >>> f = Feed(title='RCOS')
-            >>> f.get_title()
-            u'RCOS'
-
-        '''
-        return getattr(self, '_title', None)
-
-    def set_title(self, val):
-        '''Set the title of the feed.
-
-            >>> f = Feed()
-            >>> f.set_title('RCOS')
-            >>> f.get_title()
-            u'RCOS'
-
-        '''
-        self._title = unicode(val)
-
-    title = property(get_title, set_title,
+    title = properties.property_unicode('_title', 'title',
     doc='''The title property.
 
     Access to the title is mediated to validate that the title always contains a
     valid unicode object (or ``None``).
 
-    .. seealso::
+        >>> f = Feed()
+        >>> f.title
+        >>> f.title = None
+        >>> f.title
 
-       - Get function: :func:`Feed.get_title`.
-       - Set function: :func:`Feed.set_title`.
+        >>> f = Feed(title='RCOS')
+        >>> f.title
+        u'RCOS'
+
+        >>> f = Feed()
+        >>> f.title = 'RCOS'
+        >>> f.title
+        u'RCOS'
 
     ''')
 
-    def get_subtitle(self):
-        '''Return the subtitle of the feed.
-
-            >>> f = Feed()
-            >>> f.get_subtitle()
-
-            >>> f = Feed(subtitle='RCOS')
-            >>> f.get_subtitle()
-            u'RCOS'
-
-        '''
-        return getattr(self, '_subtitle', None)
-
-    def set_subtitle(self, val):
-        '''Set the subtitle of the feed.
-
-            >>> f = Feed()
-            >>> f.set_subtitle('RCOS')
-            >>> f.get_subtitle()
-            u'RCOS'
-
-        '''
-        self._subtitle = unicode(val)
-
-    subtitle = property(get_subtitle, set_subtitle,
+    subtitle = properties.property_unicode('_subtitle', 'subtitle',
     doc='''The subtitle property.
 
     Access to the subtitle is mediated to validate that the subtitle always
     contains a valid unicode object (or ``None``).
 
-    .. seealso::
+        >>> f = Feed()
+        >>> f.subtitle
+        >>> f.subtitle = None
+        >>> f.subtitle
 
-       - Get function: :func:`Feed.get_subtitle`.
-       - Set function: :func:`Feed.set_subtitle`.
+        >>> f = Feed(subtitle='Rensselaer Center For Open Source')
+        >>> f.subtitle
+        u'Rensselaer Center For Open Source'
+
+        >>> f = Feed()
+        >>> f.subtitle = 'Rensselaer Center For Open Source'
+        >>> f.subtitle
+        u'Rensselaer Center For Open Source'
 
     ''')
 
-    def get_copyright(self):
-        '''Return the copyright information of the feed.
-
-            >>> f = Feed()
-            >>> f.get_copyright()
-
-            >>> f = Feed(copyright=u'CC-BY-3.0')
-            >>> f.get_copyright()
-            u'CC-BY-3.0'
-
-        '''
-        return getattr(self, '_copyright', None)
-
-    def set_copyright(self, val):
-        '''Set the copyright information of the feed.
-
-            >>> f = Feed()
-            >>> f.set_copyright(u'CC-BY-3.0')
-            >>> f.get_copyright()
-            u'CC-BY-3.0'
-
-        '''
-        self._copyright = unicode(val)
-
-    copyright = property(get_copyright, set_copyright,
+    copyright = properties.property_unicode('_copyright', 'copyright',
     doc='''The copyright information property.
 
     Access to the copyright information is mediated to validate that the
     copyright information always is a valid unicode object (or ``None``).
 
-    .. seealso::
+        >>> f = Feed()
+        >>> f.copyright
+        >>> f.copyright = None
+        >>> f.copyright
 
-       - Get function: :func:`Feed.get_copyright`.
-       - Set function: :func:`Feed.set_copyright`.
+        >>> f = Feed(copyright='CC-BY-3.0')
+        >>> f.copyright
+        u'CC-BY-3.0'
+
+        >>> f = Feed()
+        >>> f.copyright = 'CC-BY-3.0'
+        >>> f.copyright
+        u'CC-BY-3.0'
 
     ''')
 
@@ -307,40 +262,25 @@ class Feed(object):
 
     ''')
 
-    def get_body(self):
-        '''Return the body of the feed.
-
-            >>> f = Feed()
-            >>> f.get_body()
-
-            >>> f = Feed(body='The body of the feed displayed on html pages.')
-            >>> f.get_body()
-            u'The body of the feed displayed on html pages.'
-
-        '''
-        return getattr(self, '_body', None)
-
-    def set_body(self, val):
-        '''Set the body of the feed.
-
-            >>> f = Feed()
-            >>> f.set_body('The body of the feed displayed on html pages.')
-            >>> f.get_body()
-            u'The body of the feed displayed on html pages.'
-
-        '''
-        self._body = unicode(val)
-
-    body = property(get_body, set_body,
+    body = properties.property_unicode('_body', 'body',
     doc='''The body property.
 
     Access to the body is mediated to validate that the body always contains a
     valid unicode object (or ``None``).
 
-    .. seealso::
+        >>> f = Feed()
+        >>> f.body
+        >>> f.body = None
+        >>> f.body
 
-       - Get function: :func:`Feed.get_body`.
-       - Set function: :func:`Feed.set_body`.
+        >>> f = Feed(body='The body of the feed displayed on html pages.')
+        >>> f.body
+        u'The body of the feed displayed on html pages.'
+
+        >>> f = Feed()
+        >>> f.body = 'The body of the feed displayed on html pages.'
+        >>> f.body
+        u'The body of the feed displayed on html pages.'
 
     ''')
 

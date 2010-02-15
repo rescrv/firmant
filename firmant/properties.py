@@ -41,3 +41,16 @@ def property_regex(attr, name, regex, default=None, doc=None):
         else:
             setattr(self, attr, val)
     return property(getter, setter, doc=doc)
+
+
+def property_unicode(attr, name, default=None, doc=None):
+    '''Create a property where assigned values are cast to unicode
+    '''
+    def getter(self):
+        return getattr(self, attr, default)
+    def setter(self, val):
+        if val is None:
+            setattr(self, attr, default)
+        else:
+            setattr(self, attr, unicode(val))
+    return property(getter, setter, doc=doc)
