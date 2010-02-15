@@ -120,50 +120,39 @@ class Entry(object):
 
     ''')
 
-    def get_published(self):
-        '''Return the publication time of the entry.
-
-            >>> e = Entry()
-            >>> e.get_published()
-
-            >>> now = datetime.datetime.now()
-            >>> e = Entry(published=now)
-            >>> e.get_published() == now
-            True
-
-        '''
-        return getattr(self, '_published', None)
-
-    def set_published(self, val):
-        '''Set the publication time of the entry.
-
-            >>> e = Entry()
-            >>> now = datetime.datetime.now()
-            >>> e.set_published(now)
-            >>> e.get_published() == now
-            True
-
-            >>> # Passing something other than a datetime object throws a
-            >>> # TypeError
-            >>> e.set_published('not a date')
-            Traceback (most recent call last):
-            TypeError: Val is not of the correct type.
-
-        '''
-        if val is not None and not isinstance(val, datetime.datetime):
-            raise TypeError('Val is not of the correct type.')
-        self._published = val
-
-    published = property(get_published, set_published,
+    published = properties.property_datetime('_published', 'published',
     doc='''The published property.
 
-    Access to the publication time is mediated to validate that the update time
-    always contains is valid unicode object (or ``None``).
+    Access to the update time is mediated to validate that the publication time
+    always contains is valid :class:`datetime.datetime` object.
 
-    .. seealso::
+        >>> e = Entry()
+        >>> e.published
+        >>> e.published = None
+        >>> e.published
 
-       - Get function: :func:`Entry.get_published`.
-       - Set function: :func:`Entry.set_published`.
+        >>> e = Entry()
+        >>> e.published
+        >>> e.published = datetime.datetime(2010, 2, 15, 18, 7)
+        >>> e.published
+        datetime.datetime(2010, 2, 15, 18, 7)
+
+        >>> e = Entry()
+        >>> e.published = '2010-02-15 18:07:04'
+        >>> e.published
+        datetime.datetime(2010, 2, 15, 18, 7, 4)
+
+        >>> # Also works if seconds are ommitted.
+        >>> e = Entry()
+        >>> e.published = '2010-02-15 18:07'
+        >>> e.published
+        datetime.datetime(2010, 2, 15, 18, 7)
+
+        >>> # Passing something other than a datetime object or string, raise a
+        >>> # TypeError
+        >>> e.published = 'not a date'
+        Traceback (most recent call last):
+        ValueError: time data 'not a date' does not match format '%Y-%m-%d %H:%M:%S'
 
     ''')
 
