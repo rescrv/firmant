@@ -30,10 +30,11 @@
 
 
 import datetime
+import os
 import re
 
 
-__all__ = ['Feed']
+__all__ = ['Feed', 'list_feeds']
 
 
 slug_re = re.compile('^[a-zA-Z0-9][-\\_a-zA-Z0-9]{1,30}[a-zA-Z0-9]$')
@@ -327,3 +328,25 @@ class Feed(object):
        - Set function: :func:`Feed.set_entries`.
 
     ''')
+
+
+def list_feeds(content_root, feed_subdir='feeds', suffix='.rst'):
+    '''Generate the absolute path for each feed object.
+
+    Consider all the contents of the feeds directory (by default this is
+    ``content_root/feeds``).  Only files ending in ``suffix`` are considered.
+
+    Entries that are not files are ignored.
+
+        >>> list_feeds('content')
+        ['content/feeds/rcos.rst']
+
+    '''
+
+    path  = os.path.join(content_root, feed_subdir)
+    files = os.listdir(path)
+    files = map(lambda p: os.path.join(path, p), files)
+    files = filter(lambda f: f.endswith(suffix), files)
+    files = filter(lambda f: os.path.isfile(f), files)
+    files.sort()
+    return files
