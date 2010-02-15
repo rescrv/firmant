@@ -34,6 +34,7 @@ import os
 import re
 
 from firmant import du
+from firmant import properties
 
 
 __all__ = ['Feed', 'list_feeds', 'parse_feed']
@@ -86,52 +87,27 @@ class Feed(object):
             else:
                 setattr(self, key, value)
 
-    def get_slug(self):
-        '''Return the slug of the feed as a unicode object.
-
-            >>> f = Feed()
-            >>> f.get_slug()
-
-            >>> f = Feed(slug='rcos')
-            >>> f.get_slug()
-            u'rcos'
-
-        '''
-        return getattr(self, '_slug', None)
-
-    def set_slug(self, val):
-        '''Set the slug of the feed.
-
-        Slugs must be composed of alphanumerics, numbers, hyphens and
-        underscores.  The slug must start with an alphanumeric.
-
-            >>> f = Feed()
-            >>> f.set_slug('rcos')
-            >>> f.get_slug()
-            u'rcos'
-
-            >>> # An invalid slug will raise a ValueError.
-            >>> f = Feed()
-            >>> f.set_slug('_rcos')
-            Traceback (most recent call last):
-            ValueError: Invalid slug.
-
-        '''
-        val = unicode(val)
-        if slug_re.match(val) is None:
-            raise ValueError('Invalid slug.')
-        self._slug = val
-
-    slug = property(get_slug, set_slug,
+    slug = properties.property_regex('_slug', 'slug', slug_re,
     doc='''The slug property.
 
     Access to the slug is mediated to validate that the slug always contains a
     valid unicode object (or ``None``).
 
-    .. seealso::
+        >>> f = Feed()
+        >>> f.slug
+        >>> f.slug = u'rcos'
+        >>> f.slug
+        u'rcos'
 
-       - Get function: :func:`Feed.get_slug`.
-       - Set function: :func:`Feed.set_slug`.
+        >>> # Assigning None will set the slug to None
+        >>> f.slug = None
+        >>> f.slug
+
+        >>> # An invalid slug will raise a ValueError.
+        >>> f = Feed()
+        >>> f.slug = '_rcos'
+        Traceback (most recent call last):
+        ValueError: Invalid value for 'slug'.  Failed to match regex.
 
     ''')
 
