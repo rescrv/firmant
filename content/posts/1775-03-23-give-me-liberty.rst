@@ -1,16 +1,14 @@
-.. time:: 130105
+.. time:: 13:01
 .. timezone:: US/Eastern
 .. tag:: speech
 .. tag:: patriotism
-.. updated:: 2009-02-17 113130
+.. updated:: 2009-02-17 11:31
 .. author:: Patrick Henry
+.. feed:: patriotic-things
 
-.. rights::
+.. copyright::
 
     This document is part of the public domain.
-
-.. comment::
-    Don't actually interpret this.
 
 Give Me Liberty or Give Me Death
 ================================

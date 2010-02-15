@@ -33,6 +33,8 @@ import datetime
 import os
 import re
 
+from firmant import du
+
 
 __all__ = ['Entry', 'list_entries']
 
@@ -47,7 +49,7 @@ class Entry(object):
     '''
 
     __slots__ = ['_slug', '_published', '_author', '_tags', '_feeds'
-                ,'_copyright', '_updated', '_title', '_content', '_summary'
+                ,'_copyright', '_updated', '_title', '_content'
                 ,'_tz']
 
     def __init__(self, **kwargs):
@@ -64,7 +66,6 @@ class Entry(object):
             ...     ,'updated': datetime.datetime(2010, 2, 15, 13, 12)
             ...     ,'title': 'Firmant nears a 0.1 release'
             ...     ,'content': 'As development progresses, ...'
-            ...     ,'summary': "Details of Firmant's pending 0.1 release."
             ...     ,'tz': 'America/New_York'
             ...     }
             >>> Entry(**d) #doctest: +ELLIPSIS
@@ -85,7 +86,6 @@ class Entry(object):
                    ,'updated': None
                    ,'title': None
                    ,'content': None
-                   ,'summary': None
                    ,'tz': None
                    }
         defaults.update(kwargs)
@@ -460,43 +460,6 @@ class Entry(object):
 
     ''')
 
-    def get_summary(self):
-        '''Return the summary of the entry.
-
-            >>> e = Entry()
-            >>> e.get_summary()
-
-            >>> e = Entry(summary='A rework of Firmant for RCOS.')
-            >>> e.get_summary()
-            u'A rework of Firmant for RCOS.'
-
-        '''
-        return getattr(self, '_summary', None)
-
-    def set_summary(self, val):
-        '''Set the summary of the entry.
-
-            >>> f = Entry()
-            >>> f.set_summary('A rework of Firmant for RCOS.')
-            >>> f.get_summary()
-            u'A rework of Firmant for RCOS.'
-
-        '''
-        self._summary = unicode(val)
-
-    summary = property(get_summary, set_summary,
-    doc='''The summary property.
-
-    Access to the summary is mediated to validate that the summary always
-    contains a valid unicode object (or ``None``).
-
-    .. seealso::
-
-       - Get function: :func:`Entry.get_summary`.
-       - Set function: :func:`Entry.set_summary`.
-
-    ''')
-
     def get_tz(self):
         '''Return the timezone of the entry.
 
@@ -559,3 +522,57 @@ def list_entries(content_root, subdir='posts', suffix='.rst'):
     files = filter(lambda f: os.path.isfile(f), files)
     files.sort()
     return files
+
+
+def parse_entry(entry_path):
+    '''Construct an entry object from the entry on the file system.
+
+    This does not load any information other than that which is stored in the
+    ``/entries/`` directory.
+
+        >>> e = parse_entry('content/posts/1775-03-23-give-me-liberty.rst')
+        >>> e.slug
+        u'give-me-liberty'
+        >>> e.published
+        datetime.datetime(1775, 3, 23, 13, 1)
+        >>> e.author
+        u'Patrick Henry'
+        >>> e.tags
+        [u'speech', u'patriotism']
+        >>> e.feeds
+        ['default']
+        >>> e.copyright
+        u'This document is part of the public domain.'
+        >>> e.updated
+        datetime.datetime(2009, 2, 17, 11, 31)
+        >>> e.title
+        u'Give Me Liberty or Give Me Death'
+        >>> e.content #doctest: +ELLIPSIS
+        u'<p>No man thinks more highly ... or give me death.</p>\\n'
+        >>> e.tz
+        u'US/Eastern'
+
+    '''
+    file = open(entry_path)
+    data = file.read()
+    file.close()
+    parts, doc = du.publish_parts_doc(data)
+
+    e = Entry()
+    e.slug, null = os.path.basename(entry_path)[11:].rsplit('.', 1)
+    dt = datetime.datetime.strptime(os.path.basename(entry_path)[:10],
+    '%Y-%m-%d')
+    e.published = datetime.datetime.combine(dt.date(), doc.time)
+    e.author = doc.author
+    e.tags = doc.tags
+    if hasattr(doc, 'nodefaultfeed'):
+        e.feeds = list()
+    else:
+        e.feeds = list(['default'])
+    e.title = parts['title']
+    e.title = parts['title']
+    e.content = parts['fragment']
+    e.copyright = doc.copyright
+    e.updated = doc.updated
+    e.tz = doc.timezone
+    return e

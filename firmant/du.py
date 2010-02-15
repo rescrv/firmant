@@ -32,6 +32,8 @@
 __all__ = ['Copyright', 'publish_parts_doc']
 
 
+import datetime
+
 from docutils.parsers.rst import Directive
 from docutils.parsers.rst import directives
 from docutils.core import publish_programmatically
@@ -56,7 +58,135 @@ class Copyright(Directive):
         return []
 
 
+class Time(Directive):
+    '''A restructured text directive for time information.
+    '''
+
+    required_arguments = 0
+    optional_arguments = 0
+    final_argument_whitespace = False
+    option_spec = {}
+    has_content = True
+
+    def run(self):
+        # Raise an error if the directive does not have contents.
+        self.assert_has_content()
+        try:
+            dt = datetime.datetime.strptime(''.join(self.content), '%H:%M')
+        except ValueError:
+            error = self.state_machine.reporter.error(
+                    'Invalid time format:  the %H:%M format should be used.')
+            return [error]
+        self.state.document.time = dt.time()
+        return []
+
+
+class Timezone(Directive):
+    '''A restructured text directive for timezone information.
+    '''
+
+    required_arguments = 0
+    optional_arguments = 0
+    final_argument_whitespace = False
+    option_spec = {}
+    has_content = True
+
+    def run(self):
+        # Raise an error if the directive does not have contents.
+        self.assert_has_content()
+        text = ''.join(self.content)
+        self.state.document.timezone = text
+        return []
+
+
+class Author(Directive):
+    '''A restructured text directive for author information.
+    '''
+
+    required_arguments = 0
+    optional_arguments = 0
+    final_argument_whitespace = False
+    option_spec = {}
+    has_content = True
+
+    def run(self):
+        # Raise an error if the directive does not have contents.
+        self.assert_has_content()
+        text = ''.join(self.content)
+        self.state.document.author = text
+        return []
+
+
+class Updated(Directive):
+    '''A restructured text directive for updated timestamps
+    '''
+
+    required_arguments = 0
+    optional_arguments = 0
+    final_argument_whitespace = True
+    option_spec = {}
+    has_content = True
+
+    def run(self):
+        # Raise an error if the directive does not have contents.
+        self.assert_has_content()
+        try:
+            dt = datetime.datetime.strptime(''.join(self.content), '%Y-%m-%d %H:%M')
+        except ValueError:
+            error = self.state_machine.reporter.error(
+                    'Invalid time format:  the %Y-%m-%d %H:%M format should be used.')
+            return [error]
+        self.state.document.updated = dt
+        return []
+
+
+class Tag(Directive):
+    '''A restructured text directive for tag information.
+    '''
+
+    required_arguments = 0
+    optional_arguments = 0
+    final_argument_whitespace = False
+    option_spec = {}
+    has_content = True
+
+    def run(self):
+        # Raise an error if the directive does not have contents.
+        self.assert_has_content()
+        text = ''.join(self.content)
+        if not hasattr(self.state.document, 'tags'):
+            self.state.document.tags = list()
+        self.state.document.tags.append(text)
+        return []
+
+
+class Feed(Directive):
+    '''A restructured text directive for tag information.
+    '''
+
+    required_arguments = 0
+    optional_arguments = 0
+    final_argument_whitespace = False
+    option_spec = {}
+    has_content = True
+
+    def run(self):
+        # Raise an error if the directive does not have contents.
+        self.assert_has_content()
+        text = ''.join(self.content)
+        if not hasattr(self.state.document, 'feeds'):
+            self.state.document.feeds = list()
+        self.state.document.feeds.append(text)
+        return []
+
+
 directives.register_directive('copyright', Copyright)
+directives.register_directive('time', Time)
+directives.register_directive('timezone', Timezone)
+directives.register_directive('author', Author)
+directives.register_directive('updated', Updated)
+directives.register_directive('tag', Tag)
+directives.register_directive('feed', Feed)
 
 
 def publish_parts_doc(source):
