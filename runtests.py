@@ -12,6 +12,8 @@ if __name__ == '__main__':
 
     from firmant import du
     suite.addTest(doctest.DocTestSuite(du))
+    from firmant import entries
+    suite.addTest(doctest.DocTestSuite(entries))
     from firmant import feeds
     suite.addTest(doctest.DocTestSuite(feeds))
 
