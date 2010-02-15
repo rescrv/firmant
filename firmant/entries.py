@@ -156,40 +156,25 @@ class Entry(object):
 
     ''')
 
-    def get_author(self):
-        '''Return the author of the entry.
-
-            >>> e = Entry()
-            >>> e.get_author()
-
-            >>> e = Entry(author='The author of the entry.')
-            >>> e.get_author()
-            u'The author of the entry.'
-
-        '''
-        return getattr(self, '_author', None)
-
-    def set_author(self, val):
-        '''Set the author of the entry.
-
-            >>> e = Entry()
-            >>> e.set_author('The author of the entry.')
-            >>> e.get_author()
-            u'The author of the entry.'
-
-        '''
-        self._author = unicode(val)
-
-    author = property(get_author, set_author,
+    author = properties.property_unicode('_author', 'author',
     doc='''The author property.
 
-    Access to the author is mediated to validate that the author always contains a
-    valid unicode object (or ``None``).
+    Access to the author is mediated to validate that the author always is
+    a valid unicode object (or ``None``).
 
-    .. seealso::
+        >>> e = Entry()
+        >>> e.author
+        >>> e.author = None
+        >>> e.author
 
-       - Get function: :func:`Entry.get_author`.
-       - Set function: :func:`Entry.set_author`.
+        >>> e = Entry(author='Robert')
+        >>> e.author
+        u'Robert'
+
+        >>> e = Entry()
+        >>> e.author = 'Robert'
+        >>> e.author
+        u'Robert'
 
     ''')
 
