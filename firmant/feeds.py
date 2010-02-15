@@ -33,10 +33,7 @@ import datetime
 import os
 import re
 
-from docutils.parsers.rst import Directive
-from docutils.parsers.rst import directives
-from docutils.core import publish_programmatically
-from docutils import io
+from firmant import du
 
 
 __all__ = ['Feed', 'list_feeds', 'parse_feed']
@@ -420,7 +417,7 @@ def parse_feed(feed_path):
     file = open(feed_path)
     data = file.read()
     file.close()
-    parts, doc = publish_parts_doc(data)
+    parts, doc = du.publish_parts_doc(data)
 
     f = Feed()
     f.slug = os.path.basename(feed_path).rsplit('.', 1)[0]
@@ -429,40 +426,3 @@ def parse_feed(feed_path):
     f.copyright = doc.copyright
     f.body = parts['fragment']
     return f
-
-
-class Copyright(Directive):
-
-    required_arguments = 0
-    optional_arguments = 0
-    final_argument_whitespace = True
-    option_spec = {}
-    has_content = True
-
-    def run(self):
-        # Raise an error if the directive does not have contents.
-        self.assert_has_content()
-        text = '\n'.join(self.content)
-        self.state.document.copyright = text
-        return []
-
-
-directives.register_directive('copyright', Copyright)
-
-
-def publish_parts_doc(source):
-    args = {'source': source
-           ,'source_path': None
-           ,'source_class': io.StringInput
-           ,'destination_class': io.StringOutput
-           ,'destination': None
-           ,'destination_path': None
-           ,'reader': None, 'reader_name': 'standalone'
-           ,'parser': None, 'parser_name': 'restructuredtext'
-           ,'writer': None, 'writer_name': 'html'
-           ,'settings': None, 'settings_spec': None, 'settings_overrides': None
-           ,'config_section': None
-           ,'enable_exit_status': None
-           }
-    output, pub = publish_programmatically(**args)
-    return pub.writer.parts, pub.document

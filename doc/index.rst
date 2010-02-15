@@ -11,6 +11,7 @@ Contents:
 .. autosummary::
    :toctree: generated
 
+   firmant.du
    firmant.feeds
 
 Indices and tables
