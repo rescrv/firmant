@@ -272,7 +272,7 @@ def list_feeds(content_root, feed_subdir='feeds', suffix='.rst'):
     Entries that are not files are ignored.
 
         >>> list_feeds('content')
-        ['content/feeds/rcos.rst']
+        ['content/feeds/empty.rst', 'content/feeds/rcos.rst']
 
     '''
 
@@ -306,6 +306,21 @@ def parse_feed(feed_path):
         >>> f.body
         u'<p>The body of the feed displayed on html pages.</p>\\n'
 
+        >>> # Test the empty-file case.
+        >>> f = parse_feed('content/feeds/empty.rst')
+        >>> f.slug
+        u'empty'
+        >>> f.title
+        u''
+        >>> f.subtitle
+        u''
+        >>> f.copyright
+        >>> f.updated
+        >>> f.entries
+        []
+        >>> f.body
+        u''
+
     '''
     file = open(feed_path)
     data = file.read()
@@ -314,8 +329,9 @@ def parse_feed(feed_path):
 
     f = Feed()
     f.slug = os.path.basename(feed_path).rsplit('.', 1)[0]
-    f.title = parts['title']
-    f.subtitle = parts['subtitle']
-    f.copyright = doc.copyright
+    f.title = parts.get('title')
+    f.subtitle = parts.get('subtitle')
+    if hasattr(doc, 'copyright'):
+        f.copyright = doc.copyright
     f.body = parts['fragment']
     return f
