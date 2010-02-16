@@ -332,40 +332,25 @@ class Entry(object):
 
     ''')
 
-    def get_tz(self):
-        '''Return the timezone of the entry.
+    tz = properties.property_unicode('_tz', 'tz',
+    doc='''The tz property.
 
-            >>> e = Entry()
-            >>> e.get_tz()
+    Access to the tz is mediated to validate that the tz always contains a valid
+    unicode object (or ``None``).
 
-            >>> e = Entry(tz='A rework of Firmant for RCOS.')
-            >>> e.get_tz()
-            u'A rework of Firmant for RCOS.'
+        >>> e = Entry()
+        >>> e.tz
+        >>> e.tz = None
+        >>> e.tz
 
-        '''
-        return getattr(self, '_tz', None)
+        >>> e = Entry(tz='Firmant was developed for RCOS')
+        >>> e.tz
+        u'Firmant was developed for RCOS'
 
-    def set_tz(self, val):
-        '''Set the timezone of the entry.
-
-            >>> f = Entry()
-            >>> f.set_tz('A rework of Firmant for RCOS.')
-            >>> f.get_tz()
-            u'A rework of Firmant for RCOS.'
-
-        '''
-        self._tz = unicode(val)
-
-    tz = property(get_tz, set_tz,
-    doc='''The timezone property.
-
-    Access to the timezone is mediated to validate that the timezone always
-    contains a valid unicode object (or ``None``).
-
-    .. seealso::
-
-       - Get function: :func:`Entry.get_tz`.
-       - Set function: :func:`Entry.set_tz`.
+        >>> e = Entry()
+        >>> e.tz = 'Firmant was developed for RCOS'
+        >>> e.tz
+        u'Firmant was developed for RCOS'
 
     ''')
 
