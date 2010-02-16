@@ -1,14 +1,12 @@
-.. time:: 113130
+.. time:: 11:31
 .. timezone:: America/New_York
 .. tag:: generated
-.. updated:: 2009-02-17 113130
+.. updated:: 2009-02-17 11:31
 .. author:: Loren Ipsum Generator
 
-.. rights::
+.. copyright::
 
     This document is licensed under a 3-clause BSD license.
-
-.. nodefaultfeed::
 
 Loren Ipsum ...
 ===============

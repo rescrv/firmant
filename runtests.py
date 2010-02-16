@@ -10,6 +10,8 @@ import pytz
 if __name__ == '__main__':
     suite = unittest.TestSuite()
 
+    import firmant
+    suite.addTest(doctest.DocTestSuite(firmant))
     from firmant import du
     suite.addTest(doctest.DocTestSuite(du))
     from firmant import entries

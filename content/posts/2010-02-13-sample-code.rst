@@ -1,17 +1,16 @@
-.. time:: 180424
+.. time:: 18:04
 .. timezone:: America/New_York
 .. tag:: code
 .. tag:: python
 .. tag:: rcos
 .. tag:: firmant
-.. updated:: 2009-02-17 113130
+.. updated:: 2009-02-17 11:31
 .. author:: Robert Escriva
 
-.. rights::
+.. copyright::
 
     This document is licensed under a 3-clause BSD license.
 
-.. nodefaultfeed::
 .. feed:: RCOS
 
 A rework of Firmant for RCOS
