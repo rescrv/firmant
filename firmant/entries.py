@@ -310,40 +310,25 @@ class Entry(object):
 
     ''')
 
-    def get_content(self):
-        '''Return the content of the entry.
-
-            >>> e = Entry()
-            >>> e.get_content()
-
-            >>> e = Entry(content='A rework of Firmant for RCOS.')
-            >>> e.get_content()
-            u'A rework of Firmant for RCOS.'
-
-        '''
-        return getattr(self, '_content', None)
-
-    def set_content(self, val):
-        '''Set the content of the entry.
-
-            >>> f = Entry()
-            >>> f.set_content('A rework of Firmant for RCOS.')
-            >>> f.get_content()
-            u'A rework of Firmant for RCOS.'
-
-        '''
-        self._content = unicode(val)
-
-    content = property(get_content, set_content,
+    content = properties.property_unicode('_content', 'content',
     doc='''The content property.
 
     Access to the content is mediated to validate that the content always
     contains a valid unicode object (or ``None``).
 
-    .. seealso::
+        >>> e = Entry()
+        >>> e.content
+        >>> e.content = None
+        >>> e.content
 
-       - Get function: :func:`Entry.get_content`.
-       - Set function: :func:`Entry.set_content`.
+        >>> e = Entry(content='Firmant was developed for RCOS')
+        >>> e.content
+        u'Firmant was developed for RCOS'
+
+        >>> e = Entry()
+        >>> e.content = 'Firmant was developed for RCOS'
+        >>> e.content
+        u'Firmant was developed for RCOS'
 
     ''')
 
