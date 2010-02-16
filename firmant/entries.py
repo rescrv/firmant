@@ -230,40 +230,25 @@ class Entry(object):
         TypeError: 'int' object is not iterable
     ''')
 
-    def get_copyright(self):
-        '''Return the copyright information of the entry.
-
-            >>> e = Entry()
-            >>> e.get_copyright()
-
-            >>> e = Entry(copyright=u'CC-BY-3.0')
-            >>> e.get_copyright()
-            u'CC-BY-3.0'
-
-        '''
-        return getattr(self, '_copyright', None)
-
-    def set_copyright(self, val):
-        '''Set the copyright information of the entry.
-
-            >>> f = Entry()
-            >>> f.set_copyright(u'CC-BY-3.0')
-            >>> f.get_copyright()
-            u'CC-BY-3.0'
-
-        '''
-        self._copyright = unicode(val)
-
-    copyright = property(get_copyright, set_copyright,
+    copyright = properties.property_unicode('_copyright', 'copyright',
     doc='''The copyright information property.
 
     Access to the copyright information is mediated to validate that the
     copyright information always is a valid unicode object (or ``None``).
 
-    .. seealso::
+        >>> e = Entry()
+        >>> e.copyright
+        >>> e.copyright = None
+        >>> e.copyright
 
-       - Get function: :func:`Entry.get_copyright`.
-       - Set function: :func:`Entry.set_copyright`.
+        >>> e = Entry(copyright='CC-BY-3.0')
+        >>> e.copyright
+        u'CC-BY-3.0'
+
+        >>> e = Entry()
+        >>> e.copyright = 'CC-BY-3.0'
+        >>> e.copyright
+        u'CC-BY-3.0'
 
     ''')
 
