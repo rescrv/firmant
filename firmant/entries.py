@@ -398,7 +398,7 @@ def parse_entry(entry_path):
         >>> e.tags
         [u'speech', u'patriotism']
         >>> e.feeds
-        ['default']
+        [u'default', u'patriotic-things']
         >>> e.copyright
         u'This document is part of the public domain.'
         >>> e.updated
@@ -419,7 +419,7 @@ def parse_entry(entry_path):
         >>> e.tags
         []
         >>> e.feeds
-        ['default']
+        [u'default']
         >>> e.copyright
         >>> e.updated
         datetime.datetime(2010, 2, 15, 0, 0)
@@ -448,10 +448,10 @@ def parse_entry(entry_path):
         e.author = doc.author
     if hasattr(doc, 'tags'):
         e.tags = doc.tags
-    if hasattr(doc, 'nodefaultfeed'):
-        e.feeds = list()
-    else:
-        e.feeds = list(['default'])
+    if not hasattr(doc, 'nodefaultfeed'):
+        e.feeds = list([u'default'])
+    if hasattr(doc, 'feeds'):
+        e.feeds += doc.feeds
     e.title = parts['title']
     e.title = parts['title']
     e.content = parts['fragment']
