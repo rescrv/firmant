@@ -367,7 +367,8 @@ def list_entries(content_root, subdir='posts', suffix='.rst'):
         >>> pprint(list_entries('content'))
         ['content/posts/1775-03-23-give-me-liberty.rst',
          'content/posts/2009-02-17-loren-ipsum.rst',
-         'content/posts/2010-02-13-sample-code.rst']
+         'content/posts/2010-02-13-sample-code.rst',
+         'content/posts/2010-02-15-empty.rst']
 
 
     '''
@@ -409,6 +410,25 @@ def parse_entry(entry_path):
         >>> e.tz
         u'US/Eastern'
 
+        >>> e = parse_entry('content/posts/2010-02-15-empty.rst')
+        >>> e.slug
+        u'empty'
+        >>> e.published
+        datetime.datetime(2010, 2, 15, 0, 0)
+        >>> e.author
+        >>> e.tags
+        []
+        >>> e.feeds
+        ['default']
+        >>> e.copyright
+        >>> e.updated
+        datetime.datetime(2010, 2, 15, 0, 0)
+        >>> e.title
+        u''
+        >>> e.content #doctest: +ELLIPSIS
+        u''
+        >>> e.tz
+
     '''
     file = open(entry_path)
     data = file.read()
@@ -419,9 +439,15 @@ def parse_entry(entry_path):
     e.slug, null = os.path.basename(entry_path)[11:].rsplit('.', 1)
     dt = datetime.datetime.strptime(os.path.basename(entry_path)[:10],
     '%Y-%m-%d')
-    e.published = datetime.datetime.combine(dt.date(), doc.time)
-    e.author = doc.author
-    e.tags = doc.tags
+    if hasattr(doc, 'time'):
+        t = doc.time
+    else:
+        t = datetime.time(0, 0, 0)
+    e.published = datetime.datetime.combine(dt.date(), t)
+    if hasattr(doc, 'author'):
+        e.author = doc.author
+    if hasattr(doc, 'tags'):
+        e.tags = doc.tags
     if hasattr(doc, 'nodefaultfeed'):
         e.feeds = list()
     else:
@@ -429,7 +455,12 @@ def parse_entry(entry_path):
     e.title = parts['title']
     e.title = parts['title']
     e.content = parts['fragment']
-    e.copyright = doc.copyright
-    e.updated = doc.updated
-    e.tz = doc.timezone
+    if hasattr(doc, 'copyright'):
+        e.copyright = doc.copyright
+    if hasattr(doc, 'updated'):
+        e.updated = doc.updated
+    else:
+        e.updated = e.published
+    if hasattr(doc, 'timezone'):
+        e.tz = doc.timezone
     return e
