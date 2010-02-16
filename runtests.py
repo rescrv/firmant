@@ -16,6 +16,8 @@ if __name__ == '__main__':
     suite.addTest(doctest.DocTestSuite(entries))
     from firmant import feeds
     suite.addTest(doctest.DocTestSuite(feeds))
+    from firmant import tags
+    suite.addTest(doctest.DocTestSuite(tags))
 
     results = unittest.TextTestRunner(verbosity=2).run(suite)
 
