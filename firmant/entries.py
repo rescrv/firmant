@@ -252,87 +252,61 @@ class Entry(object):
 
     ''')
 
-    def get_updated(self):
-        '''Return the update time of the entry.
-
-            >>> e = Entry()
-            >>> e.get_updated()
-
-            >>> now = datetime.datetime.now()
-            >>> e = Entry(updated=now)
-            >>> e.get_updated() == now
-            True
-
-        '''
-        return getattr(self, '_updated', None)
-
-    def set_updated(self, val):
-        '''Set the update time of the entry.
-
-            >>> e = Entry()
-            >>> now = datetime.datetime.now()
-            >>> e.set_updated(now)
-            >>> e.get_updated() == now
-            True
-
-            >>> # Passing something other than a datetime object throws a
-            >>> # TypeError
-            >>> e.set_updated('not a date')
-            Traceback (most recent call last):
-            TypeError: Val is not of the correct type.
-
-        '''
-        if val is not None and not isinstance(val, datetime.datetime):
-            raise TypeError('Val is not of the correct type.')
-        self._updated = val
-
-    updated = property(get_updated, set_updated,
+    updated = properties.property_datetime('_updated', 'updated',
     doc='''The updated property.
 
     Access to the update time is mediated to validate that the update time
-    always contains is valid datetime object (or ``None``).
+    always contains is valid :class:`datetime.datetime` object.
 
-    .. seealso::
+        >>> e = Entry()
+        >>> e.updated
+        >>> e.updated = None
+        >>> e.updated
 
-       - Get function: :func:`Entry.get_updated`.
-       - Set function: :func:`Entry.set_updated`.
+        >>> e = Entry()
+        >>> e.updated
+        >>> e.updated = datetime.datetime(2010, 2, 15, 18, 7)
+        >>> e.updated
+        datetime.datetime(2010, 2, 15, 18, 7)
+
+        >>> e = Entry()
+        >>> e.updated = '2010-02-15 18:07:04'
+        >>> e.updated
+        datetime.datetime(2010, 2, 15, 18, 7, 4)
+
+        >>> # Also works if seconds are ommitted.
+        >>> e = Entry()
+        >>> e.updated = '2010-02-15 18:07'
+        >>> e.updated
+        datetime.datetime(2010, 2, 15, 18, 7)
+
+        >>> # Passing something other than a datetime object or string, raise a
+        >>> # TypeError
+        >>> e.updated = 'not a date'
+        Traceback (most recent call last):
+        ValueError: time data 'not a date' does not match format '%Y-%m-%d %H:%M:%S'
 
     ''')
 
-    def get_title(self):
-        '''Return the title of the entry.
-
-            >>> e = Entry()
-            >>> e.get_title()
-
-            >>> e = Entry(title='A rework of Firmant for RCOS.')
-            >>> e.get_title()
-            u'A rework of Firmant for RCOS.'
-
-        '''
-        return getattr(self, '_title', None)
-
-    def set_title(self, val):
-        '''Set the title of the entry.
-
-            >>> f = Entry()
-            >>> f.set_title('A rework of Firmant for RCOS.')
-            >>> f.get_title()
-            u'A rework of Firmant for RCOS.'
-
-        '''
-        self._title = unicode(val)
-
-    title = property(get_title, set_title,
+    title = properties.property_unicode('_title', 'title',
     doc='''The title property.
 
     Access to the title is mediated to validate that the title always contains a
     valid unicode object (or ``None``).
 
-    .. seealso::
+        >>> e = Entry()
+        >>> e.title
+        >>> e.title = None
+        >>> e.title
 
-       - Get function: :func:`Entry.get_title`.
-       - Set function: :func:`Entry.set_title`.
+        >>> e = Entry(title='RCOS')
+        >>> e.title
+        u'RCOS'
+
+        >>> e = Entry()
+        >>> e.title = 'RCOS'
+        >>> e.title
+        u'RCOS'
 
     ''')
 
