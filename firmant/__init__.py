@@ -33,20 +33,36 @@ from firmant import feeds
 from firmant import tags
 
 
+def stderr_warn(message):
+    print >>sys.stderr, '[warning]: %s' % str(message)
+
+
+def stderr_error(message):
+    print >>sys.stderr, '[error]: %s' % str(message)
+
+
+def stdout_warn(message):
+    print '[warning]: %s' % str(message)
+
+
+def stdout_error(message):
+    print '[error]: %s' % str(message)
+
+
 class Blog(object):
     '''A complete representation of a blog.
 
     This class loads all content from the filesystem and validates
     cross-references issuing warnings where appropriate.
 
-        >>> Blog('content') #doctest: +ELLIPSIS
+        >>> Blog('content', stdout_warn, stdout_error) #doctest: +ELLIPSIS
         <firmant.Blog object at 0x...>
 
     '''
 
     __slots__ = ['_feeds', '_tags', '_entries']
 
-    def __init__(self, content_root):
+    def __init__(self, content_root, warn=stderr_warn, error=stderr_error):
         _feeds   = dict()
         _tags    = dict()
         _entries = list()
@@ -56,7 +72,7 @@ class Blog(object):
         for feed in feeds.list_feeds(content_root):
             feed = feeds.parse_feed(feed)
             if feed.slug in _feeds:
-                print >>sys.stderr, '[error]: Duplicate feed %s' % feed.slug
+                error('Duplicate feed %s' % feed.slug)
             else:
                 _feeds[feed.slug] = feed
 
@@ -64,7 +80,8 @@ class Blog(object):
         for entry in entries.list_entries(content_root):
             entry = entries.parse_entry(entry)
             if entry.slug in inserted_entries[entry.published.date()]:
-                print >>sys.stderr, '[error]: Duplicate entry %s' % entry.slug
+                error('Duplicate entry %s %s' % \
+                        (str(entry.published.date()), entry.slug))
             else:
                 _entries.append(entry)
                 inserted_entries[entry.published.date()].append(entry.slug)
@@ -72,6 +89,6 @@ class Blog(object):
         for tag in tags.list_tags(content_root):
             tag = tags.parse_tag(tag)
             if tag.slug in _tags:
-                print >>sys.stderr, '[error]: Duplicate tag %s' % tag.slug
+                error('Duplicate tag %s' % tag.slug)
             else:
                 _tags[tag.slug] = tag
