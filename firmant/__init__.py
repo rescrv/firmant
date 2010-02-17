@@ -56,6 +56,14 @@ class Blog(object):
     cross-references issuing warnings where appropriate.
 
         >>> Blog('content', stdout_warn, stdout_error) #doctest: +ELLIPSIS
+        [warning]: implicit tag speech
+        [warning]: implicit tag patriotism
+        [error]: Undefined feed patriotic-things
+        [warning]: implicit tag generated
+        [warning]: implicit tag code
+        [warning]: implicit tag python
+        [warning]: implicit tag firmant
+        [error]: Undefined feed RCOS
         <firmant.Blog object at 0x...>
 
     '''
@@ -92,3 +100,17 @@ class Blog(object):
                 error('Duplicate tag %s' % tag.slug)
             else:
                 _tags[tag.slug] = tag
+
+        for entry in _entries:
+            for tag in entry.tags:
+                if tag not in _tags:
+                    t = tags.Tag()
+                    t.slug = t.title = tag
+                    _tags[t.slug] = t
+                    warn('implicit tag %s' % tag)
+                _tags[tag].entries.append(entry)
+            for feed in entry.feeds:
+                if feed not in _feeds:
+                    error('Undefined feed %s' % feed)
+                else:
+                    _feeds[feed].entries.append(entry)
