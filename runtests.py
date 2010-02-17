@@ -10,14 +10,14 @@ import pytz
 if __name__ == '__main__':
     suite = unittest.TestSuite()
 
-    import firmant
-    suite.addTest(doctest.DocTestSuite(firmant))
     from firmant import du
     suite.addTest(doctest.DocTestSuite(du))
     from firmant import entries
     suite.addTest(doctest.DocTestSuite(entries))
     from firmant import feeds
     suite.addTest(doctest.DocTestSuite(feeds))
+    from firmant import parser
+    suite.addTest(doctest.DocTestSuite(parser))
     from firmant import tags
     suite.addTest(doctest.DocTestSuite(tags))
     from firmant import utils
