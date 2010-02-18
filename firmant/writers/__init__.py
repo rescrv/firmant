@@ -51,6 +51,14 @@ class Writer(object):
         self.log = logging.getLogger(class_name(self.__class__))
 
     def write(self):
+        '''Transform a parsed blog into objects on the file system.
+
+            >>> from firmant.parser import Blog
+            >>> b = Blog('content', lambda w: None, lambda e: None)
+            >>> w = Writer({'settings': True}, b)
+            >>> w.write() # This does nothing on the base classes.
+
+        '''
         pass
 
     def write_preconditions(self):
