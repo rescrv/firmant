@@ -88,6 +88,11 @@ class Jinja2TemplateMapper(object):
         '''
         return 'entries/single.html'
 
+    def entry_all(self):
+        '''Call this to get the template that corresponds to all entries.
+        '''
+        return 'entries/index.html'
+
     def entry_year(self, year):
         '''Call this to get the template that corresponds to ``year``.
 
@@ -193,6 +198,40 @@ class Jinja2EntryArchive(EntryWriter, Jinja2Base):
             self.log.info(self.info % path)
             path = os.path.join(self.settings['OUTPUT_DIR'], path, 'index.html')
             self.save_to_disk(path, data)
+
+
+class Jinja2EntryArchiveAll(Jinja2EntryArchive):
+    r'''Write the entries to the filesystem in lists grouped by year.
+
+    Example:
+
+        >>> j2eaa = Jinja2EntryArchiveAll(settings, blog)
+        >>> j2eaa.log = Mock('log')
+        >>> j2eaa.write()
+        Called log.info('processing archive')
+        >>> cat(os.path.join(settings['OUTPUT_DIR'], 'index.html'))
+        Called stdout.write('2009-12-31-party\n')
+        Called stdout.write('2010-01-01-newyear\n')
+        Called stdout.write('2010-02-01-newmonth\n')
+        Called stdout.write('2010-02-02-newday\n')
+        Called stdout.write('2010-02-02-newday2\n')
+
+    '''
+
+    def group_entries(self):
+        return [('', self.entries)]
+
+    def path(self, key):
+        return ''
+
+    def get_template(self, key, entries):
+        mapr = self.template_mapper
+        return self.environment.get_template(mapr.entry_all())
+
+    def get_context(self, key, entries):
+        return {'entries': entries}
+
+    info = _('processing archive%s')
 
 
 class Jinja2EntryArchiveYearly(Jinja2EntryArchive):
