@@ -26,6 +26,7 @@
 
 
 import os
+import sys
 
 
 def get_module(plugin):
@@ -134,3 +135,21 @@ def safe_mkdir(path):
             os.mkdir(p)
         paths.pop()
     os.mkdir(path)
+
+
+def cat(path, out=sys.stdout):
+    r'''Write the contents of file ``path`` to ``out``.
+
+        >>> from minimock import Mock
+        >>> m = Mock('output')
+        >>> cat('testdata/settings/empty.py', m) #doctest: +ELLIPSIS
+        Called output.write('# Copyright (c) 2010, Robert Escriva\n')
+        ...
+        Called output.write(
+            '# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n')
+
+    '''
+    f = open(path)
+    for line in f:
+        print >>out, line,
+    f.close()
