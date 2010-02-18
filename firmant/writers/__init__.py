@@ -63,6 +63,17 @@ class Writer(object):
 
     def write_preconditions(self):
         '''Returns true if and only if it is acceptable to proceed with writing.
+
+            >>> # If the output dir is not set, log a critical error:
+            >>> from firmant.parser import Blog
+            >>> from minimock import Mock
+            >>> b = Blog('content', lambda w: None, lambda e: None)
+            >>> w = Writer({'settings': True}, b)
+            >>> w.log = Mock('log')
+            >>> w.write_preconditions()
+            Called log.critical('``OUTPUT_DIR`` not defined in settings.')
+            False
+
         '''
         # Fail if we do not have an output directory.
         if self.settings.get('OUTPUT_DIR', None) is None:
