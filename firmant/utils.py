@@ -30,13 +30,12 @@ def get_module(plugin):
 
         >>> # Returns a module object on success.
         >>> get_module('testdata.settings.full') #doctest: +ELLIPSIS
-        <module 'testdata.settings.full' from '...testdata/settings/full.pyc'>
+        <module 'testdata.settings.full' from '...testdata/settings/full.py...'>
 
         >>> # An ImportError is raised on non-existant settings.
         >>> get_module('testdata.settings.noexist')
         Traceback (most recent call last):
         ImportError: No module named noexist
-
 
     '''
     try:
