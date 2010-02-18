@@ -51,6 +51,27 @@ class Jinja2Base(Writer):
         default = Jinja2TemplateMapper(self.settings)
         return self.settings.get('TEMPLATE_MAPPER', default)
 
+    def save_to_disk(self, path, data):
+        '''Save the data to ``path`` on disk.
+
+        :func:`firmant.utils.safe_mkdir` will be called on the
+        :func:`os.path.dirname` of ``path``.
+        '''
+        try:
+            utils.safe_mkdir(os.path.dirname(path))
+        except OSError:
+            raise
+            self.log.error(_('cannot create dir: %s') % path)
+            return False
+        try:
+            f = open(path, 'w+')
+        except IOError:
+            self.log.error(_('cannot open file: %s') % path)
+            return False
+        f.write(data.encode('utf-8'))
+        f.close()
+        return True
+
 
 class Jinja2TemplateMapper(object):
     '''Class to map entries to templates.
@@ -85,24 +106,11 @@ class Jinja2SingleEntry(EntryWriter, Jinja2Base):
         for entry in self.entries:
             self.log_processing(entry)
             path = os.path.join(self.settings['OUTPUT_DIR'], self.path(entry))
+            path = os.path.join(path, 'index.html')
             mapr = self.template_mapper
             tmpl = env.get_template(mapr.single_entry(entry))
             data = tmpl.render({'entry': entry})
-
-            try:
-                utils.safe_mkdir(path)
-            except OSError:
-                raise
-                self.log.error(_('cannot create dir: %s') % path)
-                continue
-
-            try:
-                f = open(os.path.join(path, 'index.html'), 'w+')
-            except IOError:
-                self.log.error(_('cannot open file: %s') % path)
-                continue
-            f.write(data.encode('utf-8'))
-            f.close()
+            self.save_to_disk(path, data)
 
 
 class Jinja2ArchiveYearsEntry(EntryWriter, Jinja2Base):
@@ -118,18 +126,6 @@ class Jinja2ArchiveYearsEntry(EntryWriter, Jinja2Base):
             year = str(year)
             tmpl = env.get_template(mapr.entry_year(year))
             data = tmpl.render({'entries': entries, 'year': year})
-            path = os.path.join(self.settings['OUTPUT_DIR'], year)
+            path = os.path.join(self.settings['OUTPUT_DIR'], year, 'index.html')
             self.log.info(_('processing year archive: %s') % path)
-            try:
-                utils.safe_mkdir(path)
-            except OSError:
-                raise
-                self.log.error(_('cannot create dir: %s') % path)
-                continue
-            try:
-                f = open(os.path.join(path, 'index.html'), 'w+')
-            except IOError:
-                self.log.error(_('cannot open file: %s') % path)
-                continue
-            f.write(data.encode('utf-8'))
-            f.close()
+            self.save_to_disk(path, data)
