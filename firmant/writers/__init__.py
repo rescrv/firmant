@@ -50,3 +50,12 @@ class Writer(object):
 
     def write(self):
         pass
+
+    def write_preconditions(self):
+        '''Returns true if and only if it is acceptable to proceed with writing.
+        '''
+        # Fail if we do not have an output directory.
+        if self.settings.get('OUTPUT_DIR', None) is None:
+            self.log.critical(_('``OUTPUT_DIR`` not defined in settings.'))
+            return False
+        return True

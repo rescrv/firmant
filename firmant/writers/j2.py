@@ -65,10 +65,7 @@ class Jinja2SingleEntry(Jinja2Base):
     def write(self):
         env = self.environment
 
-        # Fail if we do not have an output directory.
-        if self.settings.get('OUTPUT_DIR', None) is None:
-            self.log.critical(_('``OUTPUT_DIR`` not defined in settings.'))
-            return
+        if not self.write_preconditions(): return
 
         for entry in self.entries:
             # Hackish, but works around the python strftime bug.
