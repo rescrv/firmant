@@ -127,5 +127,5 @@ class Jinja2ArchiveYearsEntry(EntryWriter, Jinja2Base):
             tmpl = env.get_template(mapr.entry_year(year))
             data = tmpl.render({'entries': entries, 'year': year})
             path = os.path.join(self.settings['OUTPUT_DIR'], year, 'index.html')
-            self.log.info(_('processing year archive: %s') % path)
+            self.log.info(_('processing yearly archive: %s') % path)
             self.save_to_disk(path, data)
