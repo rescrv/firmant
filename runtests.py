@@ -19,7 +19,9 @@ if __name__ == '__main__':
                'firmant.parser',
                'firmant.tags',
                'firmant.utils',
-               'firmant.writers']
+               'firmant.writers',
+               'firmant.writers.j2'
+              ]
 
     for module in modules:
         mod = get_module(module)

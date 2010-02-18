@@ -171,8 +171,27 @@ class Jinja2ArchiveMonthsEntry(EntryWriter, Jinja2Base):
 
 
 class Jinja2ArchiveDaysEntry(EntryWriter, Jinja2Base):
+    '''Create lists of entries for given days.
+    '''
 
     def write(self):
+        r'''Write the entries to the filesystem in lists grouped by day.
+
+        Example:
+
+            >>> j2ade = Jinja2ArchiveDaysEntry(settings, blog)
+            >>> j2ade.log = Mock('log')
+            >>> j2ade.write()
+            Called log.info('processing daily archive: 2009/12/31')
+            Called log.info('processing daily archive: 2010/01/01')
+            Called log.info('processing daily archive: 2010/02/01')
+            Called log.info('processing daily archive: 2010/02/02')
+            >>> cat(os.path.join(settings['OUTPUT_DIR'], '2010/02/02/index.html'))
+            Called stdout.write('2010-2-2\n')
+            Called stdout.write('2010-02-02-newday\n')
+            Called stdout.write('2010-02-02-newday2\n')
+
+        '''
         env = self.environment
 
         if not self.write_preconditions(): return
@@ -180,13 +199,39 @@ class Jinja2ArchiveDaysEntry(EntryWriter, Jinja2Base):
         days = EntryWriter.split_days(self.entries)
         mapr = self.template_mapper
         for (year, month, day), entries in days:
+            path = '%04i/%02i/%02i' % (year, month, day)
             year = str(year)
             month = str(month)
             day = str(day)
             tmpl = env.get_template(mapr.entry_day(year, month, day))
             data = tmpl.render({'entries': entries, 'year': year,
                 'month': month, 'day': day})
-            path = os.path.join(self.settings['OUTPUT_DIR'], year, month, day)
-            path = os.path.join(path, 'index.html')
             self.log.info(_('processing daily archive: %s') % path)
+            path = os.path.join(self.settings['OUTPUT_DIR'], path, 'index.html')
             self.save_to_disk(path, data)
+
+
+def _setUp(test):
+    '''Setup the Jinja2 test cases.
+    '''
+    import tempfile
+
+    from minimock import Mock
+
+    from firmant.parser import Blog
+    from firmant.utils import cat
+
+    settings = {}
+    settings['OUTPUT_DIR'] = tempfile.mkdtemp()
+    settings['TEMPLATE_DIR'] = 'testdata/pristine/templates'
+    test.globs['settings'] = settings
+    test.globs['blog']     = Blog('testdata/pristine/')
+    test.globs['Mock']     = Mock
+    test.globs['cat']      = lambda out: cat(out, Mock('stdout'))
+
+
+def _tearDown(test):
+    '''Cleanup the Jinja2 test cases.
+    '''
+    import shutil
+    shutil.rmtree(test.globs['settings']['OUTPUT_DIR'])
