@@ -10,19 +10,12 @@
                     {{ entry.author.name | escape }}<a/>.</span>
             <span>Published on {{ entry.published.strftime("%Y-%m-%d") }} at
                 {{ entry.published.strftime("%H:%M") }}.</span>
-            <span>Filed under {{ entry.category.term | escape }}.</span>
+            <span>Filed under {% for tag in entry.tags %}{{ tag.title |
+                escape}} {% endfor %}.</span>
         </div>
     </div>
     {% endfor %}
-    {% if page.has_older or page.has_newer %}
-    <div class="navigation">
-        {% if page.has_older %}<div class="alignright">
-            <a href="{{ page.older }}">Older Entries &raquo;</div></a>{% endif %}
-        {% if page.has_newer %}<div class="alignleft">
-            <a href="{{ page.newer }}">&laquo; Newer Entries</div></a>{% endif
-        %}
-    </div>
-    {% endif %}
 {% else %}
-<p>There are no entries in the system.</p>
+<p>The archive in question does not contain any entries (perhaps this is the
+last page?</p>
 {% endif %}

@@ -67,6 +67,13 @@ class Jinja2TemplateMapper(object):
         '''
         return 'entries/single.html'
 
+    def entry_year(self, year):
+        '''Call this to get the template that corresponds to ``year``.
+
+        ``year`` should be a string representing the year.
+        '''
+        return 'entries/year.html'
+
 
 class Jinja2SingleEntry(EntryWriter, Jinja2Base):
 
@@ -89,6 +96,36 @@ class Jinja2SingleEntry(EntryWriter, Jinja2Base):
                 self.log.error(_('cannot create dir: %s') % path)
                 continue
 
+            try:
+                f = open(os.path.join(path, 'index.html'), 'w+')
+            except IOError:
+                self.log.error(_('cannot open file: %s') % path)
+                continue
+            f.write(data.encode('utf-8'))
+            f.close()
+
+
+class Jinja2ArchiveYearsEntry(EntryWriter, Jinja2Base):
+
+    def write(self):
+        env = self.environment
+
+        if not self.write_preconditions(): return
+
+        years = EntryWriter.split_years(self.entries)
+        mapr = self.template_mapper
+        for year, entries in years:
+            year = str(year)
+            tmpl = env.get_template(mapr.entry_year(year))
+            data = tmpl.render({'entries': entries, 'year': year})
+            path = os.path.join(self.settings['OUTPUT_DIR'], year)
+            self.log.info(_('processing year archive: %s') % path)
+            try:
+                utils.safe_mkdir(path)
+            except OSError:
+                raise
+                self.log.error(_('cannot create dir: %s') % path)
+                continue
             try:
                 f = open(os.path.join(path, 'index.html'), 'w+')
             except IOError:

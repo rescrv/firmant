@@ -25,6 +25,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+import collections
 import logging
 
 from firmant.i18n import _
@@ -80,3 +81,32 @@ class EntryWriter(Writer):
         '''Log to the info logger that we are processing entries.
         '''
         self.log.info(_('processing post: %s') % self.path(entry))
+
+    @classmethod
+    def split_years(cls, entries):
+        '''Return a list of tuples.  They will be of the form:
+        [(YYYY, [<entries>, ...]), ...]
+
+            >>> import datetime
+            >>> from pprint import pprint
+            >>> from firmant.entries import Entry
+            >>> a = Entry(published=datetime.datetime(2008, 1, 1), slug='aaa')
+            >>> b = Entry(published=datetime.datetime(2009, 1, 1), slug='baa')
+            >>> c = Entry(published=datetime.datetime(2009, 1, 1), slug='caa')
+            >>> d = Entry(published=datetime.datetime(2010, 1, 1), slug='daa')
+            >>> e = Entry(published=datetime.datetime(2010, 1, 1), slug='eaa')
+            >>> f = Entry(published=datetime.datetime(2010, 1, 1), slug='faa')
+            >>> pprint(EntryWriter.split_years([a, b, c, d, e])) #doctest: +ELLIPSIS
+            [(2008, [<firmant.entries.Entry object at 0x...>]),
+             (2009,
+              [<firmant.entries.Entry object at 0x...>,
+               <firmant.entries.Entry object at 0x...>]),
+             (2010,
+              [<firmant.entries.Entry object at 0x...>,
+               <firmant.entries.Entry object at 0x...>])]
+
+        '''
+        d = collections.defaultdict(list)
+        for entry in entries:
+            d[entry.published.year].append(entry)
+        return list([(x, sorted(y)) for x, y in d.items()])
