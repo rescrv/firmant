@@ -25,6 +25,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+import os
+
+
 def get_module(plugin):
     '''Retrieve a module by named path.
 
@@ -86,3 +89,25 @@ def class_name(cls):
 
     '''
     return str(cls)[8:-2]
+
+
+def safe_mkdir(path):
+    '''Make sure a directory exists.
+
+    This will only throw errors if creation is impossible.
+
+    Very similar in behavior to ``mkdir -p``.
+    '''
+    if os.path.exists(path):
+        return
+    paths = list()
+    paths.append(os.path.split(path))
+    while paths[-1][0] not in ('/', ''):
+        paths.append(os.path.split(paths[-1][0]))
+    paths.pop()
+    while len(paths):
+        p = paths[-1][0]
+        if not os.path.exists(p):
+            os.mkdir(p)
+        paths.pop()
+    os.mkdir(path)
