@@ -71,9 +71,9 @@ class Blog(object):
     __slots__ = ['_feeds', '_tags', '_entries']
 
     def __init__(self, content_root, warn=stderr_warn, error=stderr_error):
-        _feeds   = dict()
-        _tags    = dict()
-        _entries = list()
+        self._feeds   = _feeds   = dict()
+        self._tags    = _tags    = dict()
+        self._entries = _entries = list()
 
         _feeds['default'] = feeds.Feed(slug='default', title='Default Feed')
 
