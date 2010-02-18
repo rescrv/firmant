@@ -104,6 +104,15 @@ class Jinja2TemplateMapper(object):
         '''
         return 'entries/month.html'
 
+    def entry_day(self, year, month, day):
+        '''Call this to get the template that corresponds to ``year``,
+        ``month``, and ``day``.
+
+        ``year``, ``month``, ``day`` should all be strings representing a
+        particular day.
+        '''
+        return 'entries/day.html'
+
 
 class Jinja2SingleEntry(EntryWriter, Jinja2Base):
 
@@ -158,4 +167,26 @@ class Jinja2ArchiveMonthsEntry(EntryWriter, Jinja2Base):
             path = os.path.join(self.settings['OUTPUT_DIR'], year, month)
             path = os.path.join(path, 'index.html')
             self.log.info(_('processing monthly archive: %s') % path)
+            self.save_to_disk(path, data)
+
+
+class Jinja2ArchiveDaysEntry(EntryWriter, Jinja2Base):
+
+    def write(self):
+        env = self.environment
+
+        if not self.write_preconditions(): return
+
+        days = EntryWriter.split_days(self.entries)
+        mapr = self.template_mapper
+        for (year, month, day), entries in days:
+            year = str(year)
+            month = str(month)
+            day = str(day)
+            tmpl = env.get_template(mapr.entry_day(year, month, day))
+            data = tmpl.render({'entries': entries, 'year': year,
+                'month': month, 'day': day})
+            path = os.path.join(self.settings['OUTPUT_DIR'], year, month, day)
+            path = os.path.join(path, 'index.html')
+            self.log.info(_('processing daily archive: %s') % path)
             self.save_to_disk(path, data)
