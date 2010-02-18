@@ -25,6 +25,11 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+import logging
+
+from firmant.utils import class_name
+
+
 class Writer(object):
     '''Transform a parsed blog into objects on the file system.
 
@@ -41,6 +46,7 @@ class Writer(object):
         self.entries = blog._entries
         self.feeds = blog._feeds
         self.tags = blog._tags
+        self.log = logging.getLogger(class_name(self.__class__))
 
     def write(self):
         pass
