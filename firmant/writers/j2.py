@@ -202,7 +202,7 @@ class Jinja2ArchiveYearsEntry(EntryWriter, Jinja2Base):
         for year, entries in years:
             entries.sort(key=lambda e: (e.published.date(), e.slug))
             path = '%04i' % year
-            year = str(year)
+            year = '%04i' % year
             tmpl = env.get_template(mapr.entry_year(year))
             data = tmpl.render({'entries': entries, 'year': year})
             self.log.info(_('processing yearly archive: %s') % path)
@@ -226,7 +226,7 @@ class Jinja2ArchiveMonthsEntry(EntryWriter, Jinja2Base):
             Called log.info('processing monthly archive: 2010/01')
             Called log.info('processing monthly archive: 2010/02')
             >>> cat(os.path.join(settings['OUTPUT_DIR'], '2010/02/index.html'))
-            Called stdout.write('2010-2\n')
+            Called stdout.write('2010-02\n')
             Called stdout.write('2010-02-01-newmonth\n')
             Called stdout.write('2010-02-02-newday\n')
             Called stdout.write('2010-02-02-newday2\n')
@@ -241,8 +241,8 @@ class Jinja2ArchiveMonthsEntry(EntryWriter, Jinja2Base):
         for (year, month), entries in months:
             entries.sort(key=lambda e: (e.published.date(), e.slug))
             path = '%04i/%02i' % (year, month)
-            year = str(year)
-            month = str(month)
+            year = '%04i' % year
+            month = '%02i' % month
             tmpl = env.get_template(mapr.entry_month(year, month))
             data = tmpl.render({'entries': entries, 'year': year,
                 'month': month})
@@ -268,7 +268,7 @@ class Jinja2ArchiveDaysEntry(EntryWriter, Jinja2Base):
             Called log.info('processing daily archive: 2010/02/01')
             Called log.info('processing daily archive: 2010/02/02')
             >>> cat(os.path.join(settings['OUTPUT_DIR'], '2010/02/02/index.html'))
-            Called stdout.write('2010-2-2\n')
+            Called stdout.write('2010-02-02\n')
             Called stdout.write('2010-02-02-newday\n')
             Called stdout.write('2010-02-02-newday2\n')
 
@@ -282,9 +282,9 @@ class Jinja2ArchiveDaysEntry(EntryWriter, Jinja2Base):
         for (year, month, day), entries in days:
             entries.sort(key=lambda e: (e.published.date(), e.slug))
             path = '%04i/%02i/%02i' % (year, month, day)
-            year = str(year)
-            month = str(month)
-            day = str(day)
+            year = '%04i' % year
+            month = '%02i' % month
+            day = '%02i' % day
             tmpl = env.get_template(mapr.entry_day(year, month, day))
             data = tmpl.render({'entries': entries, 'year': year,
                 'month': month, 'day': day})
