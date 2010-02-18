@@ -30,7 +30,9 @@ import os
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 
+from firmant.i18n import _
 from firmant.writers import Writer
+from firmant import utils
 
 
 class Jinja2Base(Writer):
@@ -46,16 +48,33 @@ class Jinja2SingleEntry(Jinja2Base):
 
     def write(self):
         env = self.environment
+
+        # Fail if we do not have an output directory.
+        if self.settings.get('OUTPUT_DIR', None) is None:
+            self.log.critical(_('``OUTPUT_DIR`` not defined in settings.'))
+            return
+
         for entry in self.entries:
+            # Hackish, but works around the python strftime bug.
+            dt = entry.published.date()
+            path = '%04i/%02i/%02i/%s' % \
+                    (dt.year, dt.month, dt.day, entry.slug)
+            self.log.info(_('processing post: %s') % path)
+
             tmp  = env.get_template('entries/single.html')
             data = tmp.render({'entry': entry})
-            dt = entry.published.date()
-            path = '%04i/%02i/%02i/%s/' % \
-                    (dt.year, dt.month, dt.day, entry.slug)
+
             try:
-                os.makedirs(path)
-            except:
-                pass
-            f = open(os.path.join(path, 'index.html'), 'w+')
+                utils.safe_mkdir(path)
+            except OSError:
+                raise
+                self.log.error(_('cannot create dir: %s') % path)
+                continue
+
+            try:
+                f = open(os.path.join(path, 'index.html'), 'w+')
+            except IOError:
+                self.log.error(_('cannot open file: %s') % path)
+                continue
             f.write(data.encode('utf-8'))
             f.close()
