@@ -27,6 +27,7 @@
 
 import logging
 
+from firmant.i18n import _
 from firmant.utils import class_name
 
 
@@ -59,3 +60,19 @@ class Writer(object):
             self.log.critical(_('``OUTPUT_DIR`` not defined in settings.'))
             return False
         return True
+
+
+class EntryWriter(Writer):
+    '''Parse the entries pertaining to a blog.
+
+    This class is simply a subclass of :class:`Writer` used for abstracting some
+    common functions.
+    '''
+
+    def log_processing(self, entry):
+        '''Log to the info logger that we are processing entries.
+        '''
+        # Hackish, but works around the python strftime bug.
+        dt = entry.published.date()
+        path = '%04i/%02i/%02i/%s' % (dt.year, dt.month, dt.day, entry.slug)
+        self.log.info(_('processing post: %s') % path)

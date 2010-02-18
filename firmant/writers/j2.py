@@ -31,6 +31,7 @@ from jinja2 import Environment
 from jinja2 import FileSystemLoader
 
 from firmant.i18n import _
+from firmant.writers import EntryWriter
 from firmant.writers import Writer
 from firmant import utils
 
@@ -60,7 +61,7 @@ class Jinja2TemplateMapper(object):
         return 'entries/single.html'
 
 
-class Jinja2SingleEntry(Jinja2Base):
+class Jinja2SingleEntry(EntryWriter, Jinja2Base):
 
     def write(self):
         env = self.environment
@@ -68,12 +69,10 @@ class Jinja2SingleEntry(Jinja2Base):
         if not self.write_preconditions(): return
 
         for entry in self.entries:
-            # Hackish, but works around the python strftime bug.
-            dt = entry.published.date()
-            path = '%04i/%02i/%02i/%s' % \
-                    (dt.year, dt.month, dt.day, entry.slug)
-            self.log.info(_('processing post: %s') % path)
+            self.log_processing(entry)
 
+            dt = entry.published.date()
+            path = '%04i/%02i/%02i/%s' % (dt.year, dt.month, dt.day, entry.slug)
             default = Jinja2TemplateMapper(self.settings)
             template_mapper = self.settings.get('TEMPLATE_MAPPER', default)
 
