@@ -74,3 +74,15 @@ def mod_to_dict(module):
             value = getattr(module, attr)
             dictionary[attr] = value
     return dictionary
+
+
+def class_name(cls):
+    '''Return a string representation of a class's name.
+
+        >>> class Foo(object): pass
+        ...
+        >>> class_name(Foo)
+        'firmant.utils.Foo'
+
+    '''
+    return str(cls)[8:-2]
