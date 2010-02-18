@@ -4,28 +4,31 @@ import doctest
 import sys
 from optparse import OptionParser
 
+from firmant.utils import get_module
+
 # Import this now to avoid it throwing errors.
 import pytz
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
 
-    from firmant import du
-    suite.addTest(doctest.DocTestSuite(du))
-    from firmant import entries
-    suite.addTest(doctest.DocTestSuite(entries))
-    from firmant import feeds
-    suite.addTest(doctest.DocTestSuite(feeds))
-    from firmant import i18n
-    suite.addTest(doctest.DocTestSuite(i18n))
-    from firmant import parser
-    suite.addTest(doctest.DocTestSuite(parser))
-    from firmant import tags
-    suite.addTest(doctest.DocTestSuite(tags))
-    from firmant import utils
-    suite.addTest(doctest.DocTestSuite(utils))
-    from firmant import writers
-    suite.addTest(doctest.DocTestSuite(writers))
+    modules = ['firmant.du',
+               'firmant.entries',
+               'firmant.feeds',
+               'firmant.i18n',
+               'firmant.parser',
+               'firmant.tags',
+               'firmant.utils',
+               'firmant.writers']
+
+    for module in modules:
+        mod = get_module(module)
+        args = {}
+        for attr in ['module_relative', 'package', 'setUp', 'tearDown', 'globs',
+                'optionflags', 'parser', 'encoding']:
+            if hasattr(mod, '_' + attr):
+                args[attr] = getattr(mod, '_' + attr)
+        suite.addTest(doctest.DocTestSuite(mod, **args))
 
     results = unittest.TextTestRunner(verbosity=2).run(suite)
 
