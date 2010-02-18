@@ -365,7 +365,7 @@ def list_entries(content_root, subdir='posts', suffix='.rst'):
 
         >>> from pprint import pprint
         >>> pprint(list_entries('content'))
-        ['content/posts/1775-03-23-give-me-liberty.rst',
+        ['content/posts/1975-03-23-give-me-liberty.rst',
          'content/posts/2009-02-17-loren-ipsum.rst',
          'content/posts/2010-02-13-sample-code.rst',
          'content/posts/2010-02-15-empty.rst']
@@ -388,11 +388,11 @@ def parse_entry(entry_path):
     This does not load any information other than that which is stored in the
     ``/entries/`` directory.
 
-        >>> e = parse_entry('content/posts/1775-03-23-give-me-liberty.rst')
+        >>> e = parse_entry('content/posts/1975-03-23-give-me-liberty.rst')
         >>> e.slug
         u'give-me-liberty'
         >>> e.published
-        datetime.datetime(1775, 3, 23, 13, 1)
+        datetime.datetime(1975, 3, 23, 13, 1)
         >>> e.author
         u'Patrick Henry'
         >>> e.tags
@@ -406,7 +406,7 @@ def parse_entry(entry_path):
         >>> e.title
         u'Give Me Liberty or Give Me Death'
         >>> e.content #doctest: +ELLIPSIS
-        u'<p>No man thinks more highly ... or give me death.</p>\\n'
+        u"<p>Two hundred years ago people ... or give me death.</p>\\n"
         >>> e.tz
         u'US/Eastern'
 

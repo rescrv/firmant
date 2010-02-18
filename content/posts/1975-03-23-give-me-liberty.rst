@@ -13,6 +13,9 @@
 Give Me Liberty or Give Me Death
 ================================
 
+Two hundred years ago people didn't have to worry about ValueErrors from
+Python's strftime.  Also, Patrick henry gave the following speech:
+
 No man thinks more highly than I do of the patriotism, as well as abilities, of
 the very worthy gentlemen who have just addressed the House. But different men
 often see the same subject in different lights and therefore, I hope it will not
