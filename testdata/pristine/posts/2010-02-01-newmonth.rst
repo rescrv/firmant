@@ -1,0 +1,15 @@
+.. time:: 00:10
+.. timezone:: US/Eastern
+.. tag:: quux
+.. author:: John Doe
+.. feed:: baz
+.. feed:: quux
+
+.. copyright::
+
+   Same as source.
+
+Here Is a New Month!
+====================
+
+This is the content of the new month.
