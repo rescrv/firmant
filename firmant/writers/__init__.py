@@ -90,19 +90,20 @@ class EntryWriter(Writer):
             >>> import datetime
             >>> from pprint import pprint
             >>> from firmant.entries import Entry
-            >>> a = Entry(published=datetime.datetime(2008, 1, 1), slug='aaa')
-            >>> b = Entry(published=datetime.datetime(2009, 1, 1), slug='baa')
-            >>> c = Entry(published=datetime.datetime(2009, 1, 1), slug='caa')
-            >>> d = Entry(published=datetime.datetime(2010, 1, 1), slug='daa')
-            >>> e = Entry(published=datetime.datetime(2010, 1, 1), slug='eaa')
-            >>> f = Entry(published=datetime.datetime(2010, 1, 1), slug='faa')
-            >>> pprint(EntryWriter.split_years([a, b, c, d, e])) #doctest: +ELLIPSIS
+            >>> a = Entry(published=datetime.datetime(2008, 1, 7), slug='aaa')
+            >>> b = Entry(published=datetime.datetime(2009, 2, 8), slug='baa')
+            >>> c = Entry(published=datetime.datetime(2009, 3, 9), slug='caa')
+            >>> d = Entry(published=datetime.datetime(2010, 4, 1), slug='daa')
+            >>> e = Entry(published=datetime.datetime(2010, 5, 2), slug='eaa')
+            >>> f = Entry(published=datetime.datetime(2010, 6, 3), slug='faa')
+            >>> pprint(EntryWriter.split_years([a, b, c, d, e, f])) #doctest: +ELLIPSIS
             [(2008, [<firmant.entries.Entry object at 0x...>]),
              (2009,
               [<firmant.entries.Entry object at 0x...>,
                <firmant.entries.Entry object at 0x...>]),
              (2010,
               [<firmant.entries.Entry object at 0x...>,
+               <firmant.entries.Entry object at 0x...>,
                <firmant.entries.Entry object at 0x...>])]
 
         '''
@@ -119,19 +120,20 @@ class EntryWriter(Writer):
             >>> import datetime
             >>> from pprint import pprint
             >>> from firmant.entries import Entry
-            >>> a = Entry(published=datetime.datetime(2009, 1, 1), slug='aaa')
-            >>> b = Entry(published=datetime.datetime(2009, 2, 1), slug='baa')
-            >>> c = Entry(published=datetime.datetime(2009, 2, 1), slug='caa')
-            >>> d = Entry(published=datetime.datetime(2010, 1, 1), slug='daa')
-            >>> e = Entry(published=datetime.datetime(2010, 1, 1), slug='eaa')
-            >>> f = Entry(published=datetime.datetime(2010, 1, 1), slug='faa')
-            >>> pprint(EntryWriter.split_months([a, b, c, d, e])) #doctest: +ELLIPSIS
-            [((2009, 1), [<firmant.entries.Entry object at 0x...>]),
-             ((2009, 2),
+            >>> a = Entry(published=datetime.datetime(2010, 1, 1), slug='aaa')
+            >>> b = Entry(published=datetime.datetime(2010, 2, 2), slug='baa')
+            >>> c = Entry(published=datetime.datetime(2010, 2, 3), slug='caa')
+            >>> d = Entry(published=datetime.datetime(2010, 3, 4), slug='daa')
+            >>> e = Entry(published=datetime.datetime(2010, 3, 5), slug='eaa')
+            >>> f = Entry(published=datetime.datetime(2010, 3, 6), slug='faa')
+            >>> pprint(EntryWriter.split_months([a, b, c, d, e, f])) #doctest: +ELLIPSIS
+            [((2010, 1), [<firmant.entries.Entry object at 0x...>]),
+             ((2010, 2),
               [<firmant.entries.Entry object at 0x...>,
                <firmant.entries.Entry object at 0x...>]),
-             ((2010, 1),
+             ((2010, 3),
               [<firmant.entries.Entry object at 0x...>,
+               <firmant.entries.Entry object at 0x...>,
                <firmant.entries.Entry object at 0x...>])]
 
         '''
@@ -149,19 +151,20 @@ class EntryWriter(Writer):
             >>> import datetime
             >>> from pprint import pprint
             >>> from firmant.entries import Entry
-            >>> a = Entry(published=datetime.datetime(2009, 1, 1), slug='aaa')
-            >>> b = Entry(published=datetime.datetime(2009, 2, 1), slug='baa')
-            >>> c = Entry(published=datetime.datetime(2009, 2, 1), slug='caa')
-            >>> d = Entry(published=datetime.datetime(2010, 1, 1), slug='daa')
-            >>> e = Entry(published=datetime.datetime(2010, 1, 1), slug='eaa')
-            >>> f = Entry(published=datetime.datetime(2010, 1, 1), slug='faa')
-            >>> pprint(EntryWriter.split_days([a, b, c, d, e])) #doctest: +ELLIPSIS
-            [((2009, 1, 1), [<firmant.entries.Entry object at 0x...>]),
-             ((2009, 2, 1),
+            >>> a = Entry(published=datetime.datetime(2010, 1, 1), slug='aaa')
+            >>> b = Entry(published=datetime.datetime(2010, 1, 2), slug='baa')
+            >>> c = Entry(published=datetime.datetime(2010, 1, 2), slug='caa')
+            >>> d = Entry(published=datetime.datetime(2010, 1, 3), slug='daa')
+            >>> e = Entry(published=datetime.datetime(2010, 1, 3), slug='eaa')
+            >>> f = Entry(published=datetime.datetime(2010, 1, 3), slug='faa')
+            >>> pprint(EntryWriter.split_days([a, b, c, d, e, f])) #doctest: +ELLIPSIS
+            [((2010, 1, 1), [<firmant.entries.Entry object at 0x...>]),
+             ((2010, 1, 2),
               [<firmant.entries.Entry object at 0x...>,
                <firmant.entries.Entry object at 0x...>]),
-             ((2010, 1, 1),
+             ((2010, 1, 3),
               [<firmant.entries.Entry object at 0x...>,
+               <firmant.entries.Entry object at 0x...>,
                <firmant.entries.Entry object at 0x...>])]
 
         '''
