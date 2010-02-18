@@ -115,8 +115,36 @@ class Jinja2TemplateMapper(object):
 
 
 class Jinja2SingleEntry(EntryWriter, Jinja2Base):
+    '''Write full entries out to their appropriate files.
+    '''
 
     def write(self):
+        r'''Write the entries to the filesystem individually.
+
+        Example:
+
+            >>> j2se = Jinja2SingleEntry(settings, blog)
+            >>> j2se.log = Mock('log')
+            >>> j2se.write()
+            Called log.info(u'processing post: 2009/12/31/party')
+            Called log.info(u'processing post: 2010/01/01/newyear')
+            Called log.info(u'processing post: 2010/02/01/newmonth')
+            Called log.info(u'processing post: 2010/02/02/newday')
+            Called log.info(u'processing post: 2010/02/02/newday2')
+            >>> cat(os.path.join(settings['OUTPUT_DIR'],
+            ... '2010/02/02/newday/index.html'))
+            Called stdout.write('newday\n')
+            Called stdout.write('2010-02-02 00:10:00\n')
+            Called stdout.write('John Doe\n')
+            Called stdout.write('baz foo \n')
+            Called stdout.write('default baz foo \n')
+            Called stdout.write('Same as source.\n')
+            Called stdout.write('2010-02-02 00:10:00\n')
+            Called stdout.write('Here Is a New Day!\n')
+            Called stdout.write('<p>This is the content of the new day.</p>\n')
+            Called stdout.write('US/Eastern')
+
+        '''
         env = self.environment
 
         if not self.write_preconditions(): return

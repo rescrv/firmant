@@ -1,0 +1,10 @@
+{{ entry.slug }}
+{{ entry.published }}
+{{ entry.author }}
+{% for tag in entry.tags %}{{ tag.slug }} {% endfor %}
+{% for feed in entry.feeds %}{{ feed.slug }} {% endfor %}
+{{ entry.copyright }}
+{{ entry.updated }}
+{{ entry.title }}
+{{ entry.content -}}
+{{ entry.tz }}
