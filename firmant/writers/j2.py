@@ -230,87 +230,76 @@ class Jinja2EntryArchiveYearly(Jinja2EntryArchive):
     info = _('processing yearly archive: %s')
 
 
-class Jinja2ArchiveMonthsEntry(EntryWriter, Jinja2Base):
-    '''Create lists of entries grouped by month.
+class Jinja2EntryArchiveMonthly(Jinja2EntryArchive):
+    r'''Write the entries to the filesystem in lists grouped by month.
+
+    Example:
+
+        >>> j2eam = Jinja2EntryArchiveMonthly(settings, blog)
+        >>> j2eam.log = Mock('log')
+        >>> j2eam.write()
+        Called log.info('processing monthly archive: 2009/12')
+        Called log.info('processing monthly archive: 2010/01')
+        Called log.info('processing monthly archive: 2010/02')
+        >>> cat(os.path.join(settings['OUTPUT_DIR'], '2010/02/index.html'))
+        Called stdout.write('2010-02\n')
+        Called stdout.write('2010-02-01-newmonth\n')
+        Called stdout.write('2010-02-02-newday\n')
+        Called stdout.write('2010-02-02-newday2\n')
+
     '''
 
-    def write(self):
-        r'''Write the entries to the filesystem in lists grouped by month.
+    def group_entries(self):
+        return self.split_months(self.entries)
 
-        Example:
+    def path(self, key):
+        return '%04i/%02i' % key
 
-            >>> j2ame = Jinja2ArchiveMonthsEntry(settings, blog)
-            >>> j2ame.log = Mock('log')
-            >>> j2ame.write()
-            Called log.info('processing monthly archive: 2009/12')
-            Called log.info('processing monthly archive: 2010/01')
-            Called log.info('processing monthly archive: 2010/02')
-            >>> cat(os.path.join(settings['OUTPUT_DIR'], '2010/02/index.html'))
-            Called stdout.write('2010-02\n')
-            Called stdout.write('2010-02-01-newmonth\n')
-            Called stdout.write('2010-02-02-newday\n')
-            Called stdout.write('2010-02-02-newday2\n')
-
-        '''
-        env = self.environment
-
-        if not self.write_preconditions(): return
-
-        months = EntryWriter.split_months(self.entries)
+    def get_template(self, key, entries):
         mapr = self.template_mapper
-        for (year, month), entries in months:
-            entries.sort(key=lambda e: (e.published.date(), e.slug))
-            path = '%04i/%02i' % (year, month)
-            year = '%04i' % year
-            month = '%02i' % month
-            tmpl = env.get_template(mapr.entry_month(year, month))
-            data = tmpl.render({'entries': entries, 'year': year,
-                'month': month})
-            self.log.info(_('processing monthly archive: %s') % path)
-            path = os.path.join(self.settings['OUTPUT_DIR'], path, 'index.html')
-            self.save_to_disk(path, data)
+        return self.environment.get_template(mapr.entry_month(*key))
+
+    def get_context(self, key, entries):
+        return {'entries': entries, 'year': '%04i' % key[0],
+                'month': '%02i' % key[1]}
+
+    info = _('processing monthly archive: %s')
 
 
-class Jinja2ArchiveDaysEntry(EntryWriter, Jinja2Base):
-    '''Create lists of entries for given days.
+class Jinja2EntryArchiveDaily(Jinja2EntryArchive):
+    r'''Write the entries to the filesystem in lists grouped by day.
+
+    Example:
+
+        >>> j2ead = Jinja2EntryArchiveDaily(settings, blog)
+        >>> j2ead.log = Mock('log')
+        >>> j2ead.write()
+        Called log.info('processing daily archive: 2009/12/31')
+        Called log.info('processing daily archive: 2010/01/01')
+        Called log.info('processing daily archive: 2010/02/01')
+        Called log.info('processing daily archive: 2010/02/02')
+        >>> cat(os.path.join(settings['OUTPUT_DIR'], '2010/02/02/index.html'))
+        Called stdout.write('2010-02-02\n')
+        Called stdout.write('2010-02-02-newday\n')
+        Called stdout.write('2010-02-02-newday2\n')
+
     '''
 
-    def write(self):
-        r'''Write the entries to the filesystem in lists grouped by day.
+    def group_entries(self):
+        return self.split_days(self.entries)
 
-        Example:
+    def path(self, key):
+        return '%04i/%02i/%02i' % key
 
-            >>> j2ade = Jinja2ArchiveDaysEntry(settings, blog)
-            >>> j2ade.log = Mock('log')
-            >>> j2ade.write()
-            Called log.info('processing daily archive: 2009/12/31')
-            Called log.info('processing daily archive: 2010/01/01')
-            Called log.info('processing daily archive: 2010/02/01')
-            Called log.info('processing daily archive: 2010/02/02')
-            >>> cat(os.path.join(settings['OUTPUT_DIR'], '2010/02/02/index.html'))
-            Called stdout.write('2010-02-02\n')
-            Called stdout.write('2010-02-02-newday\n')
-            Called stdout.write('2010-02-02-newday2\n')
-
-        '''
-        env = self.environment
-
-        if not self.write_preconditions(): return
-
-        days = EntryWriter.split_days(self.entries)
+    def get_template(self, key, entries):
         mapr = self.template_mapper
-        for (year, month, day), entries in days:
-            entries.sort(key=lambda e: (e.published.date(), e.slug))
-            path = '%04i/%02i/%02i' % (year, month, day)
-            year = '%04i' % year
-            month = '%02i' % month
-            day = '%02i' % day
-            tmpl = env.get_template(mapr.entry_day(year, month, day))
-            data = tmpl.render({'entries': entries, 'year': year,
-                'month': month, 'day': day})
-            self.log.info(_('processing daily archive: %s') % path)
-            path = os.path.join(self.settings['OUTPUT_DIR'], path, 'index.html')
-            self.save_to_disk(path, data)
+        return self.environment.get_template(mapr.entry_day(*key))
+
+    def get_context(self, key, entries):
+        return {'entries': entries, 'year': '%04i' % key[0],
+                'month': '%02i' % key[1], 'day': '%02i' % key[2]}
+
+    info = _('processing daily archive: %s')
 
 
 def _setUp(test):
