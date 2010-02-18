@@ -140,3 +140,33 @@ class EntryWriter(Writer):
             for entry in entries:
                 d[(year, entry.published.month)].append(entry)
         return [(x, sorted(y)) for x, y in sorted(d.items())]
+
+    @classmethod
+    def split_days(cls, entries):
+        '''Return a list of tuples.  They will be of the form:
+        [((YYYY, MM), [<entries>, ...]), ...]
+
+            >>> import datetime
+            >>> from pprint import pprint
+            >>> from firmant.entries import Entry
+            >>> a = Entry(published=datetime.datetime(2009, 1, 1), slug='aaa')
+            >>> b = Entry(published=datetime.datetime(2009, 2, 1), slug='baa')
+            >>> c = Entry(published=datetime.datetime(2009, 2, 1), slug='caa')
+            >>> d = Entry(published=datetime.datetime(2010, 1, 1), slug='daa')
+            >>> e = Entry(published=datetime.datetime(2010, 1, 1), slug='eaa')
+            >>> f = Entry(published=datetime.datetime(2010, 1, 1), slug='faa')
+            >>> pprint(EntryWriter.split_days([a, b, c, d, e])) #doctest: +ELLIPSIS
+            [((2009, 1, 1), [<firmant.entries.Entry object at 0x...>]),
+             ((2009, 2, 1),
+              [<firmant.entries.Entry object at 0x...>,
+               <firmant.entries.Entry object at 0x...>]),
+             ((2010, 1, 1),
+              [<firmant.entries.Entry object at 0x...>,
+               <firmant.entries.Entry object at 0x...>])]
+
+        '''
+        d = collections.defaultdict(list)
+        for (year, month), entries in cls.split_months(entries):
+            for entry in entries:
+                d[(year, month, entry.published.day)].append(entry)
+        return [(x, sorted(y)) for x, y in sorted(d.items())]
