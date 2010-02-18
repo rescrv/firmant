@@ -109,4 +109,4 @@ class EntryWriter(Writer):
         d = collections.defaultdict(list)
         for entry in entries:
             d[entry.published.year].append(entry)
-        return list([(x, sorted(y)) for x, y in d.items()])
+        return [(x, sorted(y)) for x, y in sorted(d.items())]
