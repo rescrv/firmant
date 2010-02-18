@@ -171,43 +171,63 @@ class Jinja2SingleEntry(EntryWriter, Jinja2Base):
             self.save_to_disk(path, data)
 
 
-class Jinja2ArchiveYearsEntry(EntryWriter, Jinja2Base):
-    '''Create lists of entries grouped by year.
+class Jinja2EntryArchive(EntryWriter, Jinja2Base):
+    '''Group entries in a generic fashion.
+
+    Yearly, monthly, and daily views should all derive from this class.
     '''
 
     def write(self):
-        r'''Write the entries to the filesystem in lists grouped by year.
-
-        Example:
-
-            >>> j2aye = Jinja2ArchiveYearsEntry(settings, blog)
-            >>> j2aye.log = Mock('log')
-            >>> j2aye.write()
-            Called log.info('processing yearly archive: 2009')
-            Called log.info('processing yearly archive: 2010')
-            >>> cat(os.path.join(settings['OUTPUT_DIR'], '2010/index.html'))
-            Called stdout.write('2010\n')
-            Called stdout.write('2010-01-01-newyear\n')
-            Called stdout.write('2010-02-01-newmonth\n')
-            Called stdout.write('2010-02-02-newday\n')
-            Called stdout.write('2010-02-02-newday2\n')
-
-        '''
         env = self.environment
 
         if not self.write_preconditions(): return
 
-        years = EntryWriter.split_years(self.entries)
+        keyed_entries = self.group_entries()
         mapr = self.template_mapper
-        for year, entries in years:
+        for key, entries in keyed_entries:
             entries.sort(key=lambda e: (e.published.date(), e.slug))
-            path = '%04i' % year
-            year = '%04i' % year
-            tmpl = env.get_template(mapr.entry_year(year))
-            data = tmpl.render({'entries': entries, 'year': year})
-            self.log.info(_('processing yearly archive: %s') % path)
+            path = self.path(key)
+            template = self.get_template(key, entries)
+            context  = self.get_context(key, entries)
+            data = template.render(context)
+            self.log.info(self.info % path)
             path = os.path.join(self.settings['OUTPUT_DIR'], path, 'index.html')
             self.save_to_disk(path, data)
+
+
+class Jinja2EntryArchiveYearly(Jinja2EntryArchive):
+    r'''Write the entries to the filesystem in lists grouped by year.
+
+    Example:
+
+        >>> j2eay = Jinja2EntryArchiveYearly(settings, blog)
+        >>> j2eay.log = Mock('log')
+        >>> j2eay.write()
+        Called log.info('processing yearly archive: 2009')
+        Called log.info('processing yearly archive: 2010')
+        >>> cat(os.path.join(settings['OUTPUT_DIR'], '2010/index.html'))
+        Called stdout.write('2010\n')
+        Called stdout.write('2010-01-01-newyear\n')
+        Called stdout.write('2010-02-01-newmonth\n')
+        Called stdout.write('2010-02-02-newday\n')
+        Called stdout.write('2010-02-02-newday2\n')
+
+    '''
+
+    def group_entries(self):
+        return self.split_years(self.entries)
+
+    def path(self, key):
+        return '%04i' % key
+
+    def get_template(self, key, entries):
+        mapr = self.template_mapper
+        return self.environment.get_template(mapr.entry_year(key))
+
+    def get_context(self, key, entries):
+        return {'entries': entries, 'year': '%04i' % key}
+
+    info = _('processing yearly archive: %s')
 
 
 class Jinja2ArchiveMonthsEntry(EntryWriter, Jinja2Base):
