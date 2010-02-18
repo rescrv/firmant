@@ -95,6 +95,15 @@ class Jinja2TemplateMapper(object):
         '''
         return 'entries/year.html'
 
+    def entry_month(self, year, month):
+        '''Call this to get the template that corresponds to ``year`` and
+        ``month``.
+
+        ``year`` and ``month`` should both be a string representing a particular
+        month.
+        '''
+        return 'entries/month.html'
+
 
 class Jinja2SingleEntry(EntryWriter, Jinja2Base):
 
@@ -128,4 +137,25 @@ class Jinja2ArchiveYearsEntry(EntryWriter, Jinja2Base):
             data = tmpl.render({'entries': entries, 'year': year})
             path = os.path.join(self.settings['OUTPUT_DIR'], year, 'index.html')
             self.log.info(_('processing yearly archive: %s') % path)
+            self.save_to_disk(path, data)
+
+
+class Jinja2ArchiveMonthsEntry(EntryWriter, Jinja2Base):
+
+    def write(self):
+        env = self.environment
+
+        if not self.write_preconditions(): return
+
+        months = EntryWriter.split_months(self.entries)
+        mapr = self.template_mapper
+        for (year, month), entries in months:
+            year = str(year)
+            month = str(month)
+            tmpl = env.get_template(mapr.entry_month(year, month))
+            data = tmpl.render({'entries': entries, 'year': year,
+                'month': month})
+            path = os.path.join(self.settings['OUTPUT_DIR'], year, month)
+            path = os.path.join(path, 'index.html')
+            self.log.info(_('processing monthly archive: %s') % path)
             self.save_to_disk(path, data)
