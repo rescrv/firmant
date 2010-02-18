@@ -27,5 +27,12 @@
 
 def _(s):
     '''A placeholder for gettext later.
+
+    This will translate words between languages.  As ``foo`` is pretty
+    universal, it should be safe to say that it translates ``foo`` correctly.
+
+        >>> _('foo')
+        'foo'
+
     '''
     return s

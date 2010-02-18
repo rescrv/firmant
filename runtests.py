@@ -16,6 +16,8 @@ if __name__ == '__main__':
     suite.addTest(doctest.DocTestSuite(entries))
     from firmant import feeds
     suite.addTest(doctest.DocTestSuite(feeds))
+    from firmant import i18n
+    suite.addTest(doctest.DocTestSuite(i18n))
     from firmant import parser
     suite.addTest(doctest.DocTestSuite(parser))
     from firmant import tags
