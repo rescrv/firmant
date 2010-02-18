@@ -102,15 +102,17 @@ class Blog(object):
                 _tags[tag.slug] = tag
 
         for entry in _entries:
-            for tag in entry.tags:
+            for i, tag in enumerate(entry.tags):
                 if tag not in _tags:
                     t = tags.Tag()
                     t.slug = t.title = tag
                     _tags[t.slug] = t
                     warn('implicit tag %s' % tag)
+                entry.tags[i] = _tags[tag]
                 _tags[tag].entries.append(entry)
-            for feed in entry.feeds:
+            for i, feed in enumerate(entry.feeds):
                 if feed not in _feeds:
                     error('Undefined feed %s' % feed)
                 else:
                     _feeds[feed].entries.append(entry)
+                    entry.feeds[i] = _feeds[feed]
