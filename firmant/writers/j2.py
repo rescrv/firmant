@@ -44,6 +44,22 @@ class Jinja2Base(Writer):
         return env
 
 
+class Jinja2TemplateMapper(object):
+    '''Class to map entries to templates.
+
+    Eventually it will be possible to have per-entry templates override the
+    defaults.
+    '''
+
+    def __init__(self, settings):
+        self.settings = settings
+
+    def single_entry(self, entry):
+        '''Call this to get the template that corresponds to ``entry``.
+        '''
+        return 'entries/single.html'
+
+
 class Jinja2SingleEntry(Jinja2Base):
 
     def write(self):
@@ -61,7 +77,10 @@ class Jinja2SingleEntry(Jinja2Base):
                     (dt.year, dt.month, dt.day, entry.slug)
             self.log.info(_('processing post: %s') % path)
 
-            tmp  = env.get_template('entries/single.html')
+            default = Jinja2TemplateMapper(self.settings)
+            template_mapper = self.settings.get('TEMPLATE_MAPPER', default)
+
+            tmp  = env.get_template(template_mapper.single_entry(entry))
             data = tmp.render({'entry': entry})
 
             try:
