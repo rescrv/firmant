@@ -44,6 +44,13 @@ class Jinja2Base(Writer):
         env = Environment(loader=loader)
         return env
 
+    @property
+    def template_mapper(self):
+        '''Return the a class for mapping entries/feeds/tags to templates.
+        '''
+        default = Jinja2TemplateMapper(self.settings)
+        return self.settings.get('TEMPLATE_MAPPER', default)
+
 
 class Jinja2TemplateMapper(object):
     '''Class to map entries to templates.
@@ -71,11 +78,9 @@ class Jinja2SingleEntry(EntryWriter, Jinja2Base):
         for entry in self.entries:
             self.log_processing(entry)
             path = self.path(entry)
-            default = Jinja2TemplateMapper(self.settings)
-            template_mapper = self.settings.get('TEMPLATE_MAPPER', default)
-
-            tmp  = env.get_template(template_mapper.single_entry(entry))
-            data = tmp.render({'entry': entry})
+            mapr = self.template_mapper()
+            tmpl = env.get_template(mapr.single_entry(entry))
+            data = tmpl.render({'entry': entry})
 
             try:
                 utils.safe_mkdir(path)
