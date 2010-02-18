@@ -40,7 +40,7 @@ class Jinja2Base(Writer):
 
     @property
     def environment(self):
-        loader = FileSystemLoader(self.settings['JINJA2_TEMPLATE_DIR'])
+        loader = FileSystemLoader(self.settings['TEMPLATE_DIR'])
         env = Environment(loader=loader)
         return env
 
