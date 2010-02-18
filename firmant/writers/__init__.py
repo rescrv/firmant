@@ -69,10 +69,14 @@ class EntryWriter(Writer):
     common functions.
     '''
 
-    def log_processing(self, entry):
-        '''Log to the info logger that we are processing entries.
+    def path(self, entry):
+        '''Return the path for the entry.
         '''
         # Hackish, but works around the python strftime bug.
         dt = entry.published.date()
-        path = '%04i/%02i/%02i/%s' % (dt.year, dt.month, dt.day, entry.slug)
-        self.log.info(_('processing post: %s') % path)
+        return '%04i/%02i/%02i/%s' % (dt.year, dt.month, dt.day, entry.slug)
+
+    def log_processing(self, entry):
+        '''Log to the info logger that we are processing entries.
+        '''
+        self.log.info(_('processing post: %s') % self.path(entry))

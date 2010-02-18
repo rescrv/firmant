@@ -70,9 +70,7 @@ class Jinja2SingleEntry(EntryWriter, Jinja2Base):
 
         for entry in self.entries:
             self.log_processing(entry)
-
-            dt = entry.published.date()
-            path = '%04i/%02i/%02i/%s' % (dt.year, dt.month, dt.day, entry.slug)
+            path = self.path(entry)
             default = Jinja2TemplateMapper(self.settings)
             template_mapper = self.settings.get('TEMPLATE_MAPPER', default)
 
