@@ -77,8 +77,8 @@ class Jinja2SingleEntry(EntryWriter, Jinja2Base):
 
         for entry in self.entries:
             self.log_processing(entry)
-            path = self.path(entry)
-            mapr = self.template_mapper()
+            path = os.path.join(self.settings['OUTPUT_DIR'], self.path(entry))
+            mapr = self.template_mapper
             tmpl = env.get_template(mapr.single_entry(entry))
             data = tmpl.render({'entry': entry})
 
