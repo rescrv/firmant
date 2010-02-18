@@ -199,6 +199,7 @@ class Jinja2ArchiveDaysEntry(EntryWriter, Jinja2Base):
         days = EntryWriter.split_days(self.entries)
         mapr = self.template_mapper
         for (year, month, day), entries in days:
+            entries.sort(key=lambda e: (e.published.date(), e.slug))
             path = '%04i/%02i/%02i' % (year, month, day)
             year = str(year)
             month = str(month)
