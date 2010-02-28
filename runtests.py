@@ -18,6 +18,7 @@ if __name__ == '__main__':
                'firmant.feeds',
                'firmant.i18n',
                'firmant.parser',
+               'firmant.parsers',
                'firmant.tags',
                'firmant.utils',
                'firmant.writers',
