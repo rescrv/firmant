@@ -14,6 +14,7 @@ if __name__ == '__main__':
 
     modules = ['firmant.du',
                'firmant.entries',
+               'firmant.extensions',
                'firmant.feeds',
                'firmant.i18n',
                'firmant.parser',
