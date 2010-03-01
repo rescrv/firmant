@@ -240,30 +240,40 @@ _Feed = meta_data_directive(lambda d, c: list_element(d, c, 'feeds'))
 directives.register_directive('feed', _Feed)
 
 
-class MetaDataTransform(Transform):
-    '''Remove MetaDataNode nodes and set attributes on document.
-    '''
-    default_priority = 700
+def meta_data_transform(data):
 
-    def apply(self):
-        for node in self.document.traverse(MetaDataNode):
-            for key, val in node.details.items():
-                try:
-                    iter(val)
-                    if hasattr(self.document, key):
-                        val = getattr(self.document, key) + val
-                except TypeError:
-                    pass
-                setattr(self.document, key, val)
-            node.parent.remove(node)
+    class MetaDataTransform(Transform):
+        '''Remove MetaDataNode nodes and set attributes on document.
+        '''
+        default_priority = 700
+
+        def apply(self):
+            for node in self.document.traverse(MetaDataNode):
+                for key, val in node.details.items():
+                    try:
+                        iter(val)
+                        if key in data:
+                            val = data[key] + val
+                    except TypeError:
+                        pass
+                    data[key] = val
+                node.parent.remove(node)
+    return MetaDataTransform
 
 
 class MetaDataStandaloneReader(standalone.Reader):
     '''Add transformations to read MetaData from doctree.
     '''
 
+    def __init__(self, parser=None, parser_name=None, data=None):
+        standalone.Reader.__init__(self, parser, parser_name)
+        if data is None:
+            data = dict()
+        self.data = data
+
     def get_transforms(self):
-        return standalone.Reader.get_transforms(self) + [MetaDataTransform]
+        return standalone.Reader.get_transforms(self) + \
+            [meta_data_transform(self.data)]
 
 
 def publish_parts_doc(source):

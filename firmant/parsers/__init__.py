@@ -118,7 +118,7 @@ class RstParser(Parser):
                ,'destination_class': io.StringOutput
                ,'destination': None
                ,'destination_path': None
-               ,'reader': MetaDataStandaloneReader(), 'reader_name': None
+               ,'reader': MetaDataStandaloneReader(data=d), 'reader_name': None
                ,'parser': None, 'parser_name': 'restructuredtext'
                ,'writer': None, 'writer_name': 'html'
                ,'settings': None, 'settings_spec': None
