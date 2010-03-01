@@ -153,40 +153,25 @@ def time(d, content):
         raise e
 
 
-class Timezone(Directive):
-    '''A restructured text directive for timezone information.
+def single_line(d, content, attr='line'):
+    '''Interpret the content as a single line.
+
+    Default behavior::
+
+        >>> d = dict()
+        >>> single_line(d, [u'foobar'])
+        >>> d['line']
+        u'foobar'
+
+    Specifying the attribute to save to::
+
+        >>> d = dict()
+        >>> single_line(d, [u'foobar'], 'attr')
+        >>> d['attr']
+        u'foobar'
+
     '''
-
-    required_arguments = 0
-    optional_arguments = 0
-    final_argument_whitespace = False
-    option_spec = {}
-    has_content = True
-
-    def run(self):
-        # Raise an error if the directive does not have contents.
-        self.assert_has_content()
-        text = ''.join(self.content)
-        self.state.document.timezone = text
-        return []
-
-
-class Author(Directive):
-    '''A restructured text directive for author information.
-    '''
-
-    required_arguments = 0
-    optional_arguments = 0
-    final_argument_whitespace = False
-    option_spec = {}
-    has_content = True
-
-    def run(self):
-        # Raise an error if the directive does not have contents.
-        self.assert_has_content()
-        text = ''.join(self.content)
-        self.state.document.author = text
-        return []
+    d[attr] = ''.join(content)
 
 
 class Updated(Directive):
@@ -258,8 +243,12 @@ directives.register_directive('copyright', _Copyright)
 _Time = meta_data_directive(time)
 directives.register_directive('time', _Time)
 
-directives.register_directive('timezone', Timezone)
-directives.register_directive('author', Author)
+_Timezone = meta_data_directive(lambda d, c: single_line(d, c, 'timezone'))
+directives.register_directive('timezone', _Timezone)
+
+_Author = meta_data_directive(lambda d, c: single_line(d, c, 'author'))
+directives.register_directive('author', _Author)
+
 directives.register_directive('updated', Updated)
 directives.register_directive('tag', Tag)
 directives.register_directive('feed', Feed)
