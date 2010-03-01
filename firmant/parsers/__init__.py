@@ -61,6 +61,11 @@ class Parser(object):
         return path
 
 
+class RstObject(object):
+    '''An object representing a parsed restructured text document.
+    '''
+
+
 class RstParser(Parser):
     '''Interpret *.rst for a given directory.
 
@@ -86,6 +91,7 @@ class RstParser(Parser):
     def new_object(self, path, d, pub):
         '''Return an instance of the object to which rst documents are parsed.
         '''
+        return RstObject()
 
     def default(self, attr):
         '''Return the default value of an attribute.
