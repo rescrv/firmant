@@ -34,10 +34,66 @@ __all__ = ['Copyright', 'publish_parts_doc']
 
 import datetime
 
+from docutils.transforms.components import Filter
 from docutils.parsers.rst import Directive
 from docutils.parsers.rst import directives
 from docutils.core import publish_programmatically
 from docutils import io
+from docutils import nodes
+
+
+def meta_data_directive(func, transform=Filter, whitespace=False):
+    '''Create a Directive class to store data to a pending node.
+
+    The function ``func`` is passed the contents of the node and a dictionary
+    into which it should place all relevant metadata it extracts from the
+    contents.
+    '''
+
+    class MetaDataDirective(Directive):
+        '''A generic directive for capturing metadata.
+        '''
+
+        required_arguments = 0
+        optional_arguments = 0
+        final_argument_whitespace = whitespace
+        option_spec = dict()
+        has_content = True
+
+        def run(self):
+            # Raise an error if the directive does not have contents.
+            self.assert_has_content()
+
+            # Parse the contents into metadata.
+            d = dict()
+            try:
+                func(d, self.content)
+            except ValueError, e:
+                error = self.state_machine.reporter.error(str(e))
+                return []
+
+            # Insert a pending node with the metadata.
+            pending = nodes.pending(transform, details=d)
+            pending.details.update({'component': 'reader', 'format': 'html'})
+            self.state.document.note_pending(pending)
+
+            # TODO: Remove this block
+            # This block is here to facilitate moving the old directive classes
+            # to use MetaDataDirective without requiring changes to the parsing
+            # process.
+            doc = self.state.document
+            for key, val in d.items():
+                try:
+                    iter(val)
+                    if hasattr(doc, key):
+                        val = getattr(doc, key) + val
+                except TypeError:
+                    pass
+                setattr(doc, key, val)
+
+            return [pending]
+
+    return MetaDataDirective
 
 
 class Copyright(Directive):
