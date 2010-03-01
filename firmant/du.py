@@ -37,6 +37,7 @@ import datetime
 from docutils.transforms.components import Filter
 from docutils.parsers.rst import Directive
 from docutils.parsers.rst import directives
+from docutils.transforms import Transform
 from docutils.readers import standalone
 from docutils.core import publish_programmatically
 from docutils import io
@@ -87,25 +88,7 @@ def meta_data_directive(func, whitespace=False):
 
             # Insert a MetaDataNode with the metadata.
             node = MetaDataNode(d)
-            node.details.update({'component': 'reader', 'format': 'html'})
-
-            # TODO: Remove this block
-            # This block is here to facilitate moving the old directive classes
-            # to use MetaDataDirective without requiring changes to the parsing
-            # process.
-            doc = self.state.document
-            for key, val in d.items():
-                try:
-                    iter(val)
-                    if hasattr(doc, key):
-                        val = getattr(doc, key) + val
-                except TypeError:
-                    pass
-                setattr(doc, key, val)
-
-            # TODO: Return the created node.  This requires the metadata
-            # transforms to be implemented.
-            return []
+            return [node]
 
     return MetaDataDirective
 
@@ -257,14 +240,30 @@ _Feed = meta_data_directive(lambda d, c: list_element(d, c, 'feeds'))
 directives.register_directive('feed', _Feed)
 
 
+class MetaDataTransform(Transform):
+    '''Remove MetaDataNode nodes and set attributes on document.
+    '''
+    default_priority = 700
+
+    def apply(self):
+        for node in self.document.traverse(MetaDataNode):
+            for key, val in node.details.items():
+                try:
+                    iter(val)
+                    if hasattr(self.document, key):
+                        val = getattr(self.document, key) + val
+                except TypeError:
+                    pass
+                setattr(self.document, key, val)
+            node.parent.remove(node)
+
+
 class MetaDataStandaloneReader(standalone.Reader):
     '''Add transformations to read MetaData from doctree.
     '''
 
-    # TODO:  Add transformations.  They are not present as the goal is just to
-    # replace the standalone reader for now.
     def get_transforms(self):
-        return standalone.Reader.get_transforms(self) + []
+        return standalone.Reader.get_transforms(self) + [MetaDataTransform]
 
 
 def publish_parts_doc(source):
