@@ -45,6 +45,11 @@ class Parser(object):
     Example parsers include those that read posts, and those that find images.
     '''
 
+    def __init__(self, settings=None):
+        '''Instantiate a Parser, bound to the settings.
+        '''
+        self.settings = settings
+
     def parse(self):
         '''Create a list of parsed objects.
         '''
