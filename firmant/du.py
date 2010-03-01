@@ -199,18 +199,28 @@ def updated(d, content):
     d['updated'] = strptime(''.join(content), formats)
 
 
-def tag(d, content):
-    '''Interpret content as a tag's slug.
+def list_element(d, content, attr='element_plural'):
+    '''Interpret content as an element in a list.
+
+    MetaData of this type may have several directives, each of which appends a
+    value to list.
 
     It returns a list so that the metadata transforms may simply append tags::
 
         >>> d = dict()
-        >>> tag(d, [u'foo'])
-        >>> d['tags']
+        >>> list_element(d, [u'foo'])
+        >>> d['element_plural']
+        [u'foo']
+
+    An attribute for storing values may be provided::
+
+        >>> d = dict()
+        >>> list_element(d, [u'foo'], 'attr')
+        >>> d['attr']
         [u'foo']
 
     '''
-    d['tags'] = list([''.join(content)])
+    d[attr] = list([''.join(content)])
 
 
 class Feed(Directive):
@@ -248,7 +258,7 @@ directives.register_directive('author', _Author)
 _Updated = meta_data_directive(updated)
 directives.register_directive('updated', _Updated)
 
-_Tag = meta_data_directive(tag)
+_Tag = meta_data_directive(lambda d, c: list_element(d, c, 'tags'))
 directives.register_directive('tag', _Tag)
 
 directives.register_directive('feed', Feed)
