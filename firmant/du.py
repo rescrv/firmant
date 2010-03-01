@@ -199,24 +199,18 @@ def updated(d, content):
     d['updated'] = strptime(''.join(content), formats)
 
 
-class Tag(Directive):
-    '''A restructured text directive for tag information.
+def tag(d, content):
+    '''Interpret content as a tag's slug.
+
+    It returns a list so that the metadata transforms may simply append tags::
+
+        >>> d = dict()
+        >>> tag(d, [u'foo'])
+        >>> d['tags']
+        [u'foo']
+
     '''
-
-    required_arguments = 0
-    optional_arguments = 0
-    final_argument_whitespace = False
-    option_spec = {}
-    has_content = True
-
-    def run(self):
-        # Raise an error if the directive does not have contents.
-        self.assert_has_content()
-        text = ''.join(self.content)
-        if not hasattr(self.state.document, 'tags'):
-            self.state.document.tags = list()
-        self.state.document.tags.append(text)
-        return []
+    d['tags'] = list([''.join(content)])
 
 
 class Feed(Directive):
@@ -254,7 +248,9 @@ directives.register_directive('author', _Author)
 _Updated = meta_data_directive(updated)
 directives.register_directive('updated', _Updated)
 
-directives.register_directive('tag', Tag)
+_Tag = meta_data_directive(tag)
+directives.register_directive('tag', _Tag)
+
 directives.register_directive('feed', Feed)
 
 
