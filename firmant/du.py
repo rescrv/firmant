@@ -44,8 +44,18 @@ from docutils import nodes
 from firmant.utils import strptime
 
 
-def meta_data_directive(func, transform=Filter, whitespace=False):
-    '''Create a Directive class to store data to a pending node.
+class MetaDataNode(nodes.Special, nodes.Invisible, nodes.Element):
+    '''The MetaDataNode is a node that holds metadata for later Transforms.
+    '''
+
+    def __init__(self, details=None, rawsource='', *children, **attributes):
+        nodes.Element.__init__(self, rawsource, *children, **attributes)
+
+        self.details = details or dict()
+
+
+def meta_data_directive(func, whitespace=False):
+    '''Create a Directive class to store data to a MetaDataNode.
 
     The function ``func`` is passed the contents of the node and a dictionary
     into which it should place all relevant metadata it extracts from the
@@ -74,10 +84,9 @@ def meta_data_directive(func, transform=Filter, whitespace=False):
                 error = self.state_machine.reporter.error(str(e))
                 return []
 
-            # Insert a pending node with the metadata.
-            pending = nodes.pending(transform, details=d)
-            pending.details.update({'component': 'reader', 'format': 'html'})
-            self.state.document.note_pending(pending)
+            # Insert a MetaDataNode with the metadata.
+            node = MetaDataNode(d)
+            node.details.update({'component': 'reader', 'format': 'html'})
 
             # TODO: Remove this block
             # This block is here to facilitate moving the old directive classes
@@ -93,7 +102,9 @@ def meta_data_directive(func, transform=Filter, whitespace=False):
                     pass
                 setattr(doc, key, val)
 
-            return [pending]
+            # TODO: Return the created node.  This requires the metadata
+            # transforms to be implemented.
+            return []
 
     return MetaDataDirective
 
