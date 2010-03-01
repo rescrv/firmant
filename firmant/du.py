@@ -96,22 +96,16 @@ def meta_data_directive(func, transform=Filter, whitespace=False):
     return MetaDataDirective
 
 
-class Copyright(Directive):
-    '''A restructured text directive for copyright information.
+def copyright(d, content):
+    r'''Interpret the content as a copyright declaration.
+
+        >>> d = dict()
+        >>> copyright(d, [u'foo', u'bar'])
+        >>> d['copyright']
+        u'foo\nbar'
+
     '''
-
-    required_arguments = 0
-    optional_arguments = 0
-    final_argument_whitespace = True
-    option_spec = {}
-    has_content = True
-
-    def run(self):
-        # Raise an error if the directive does not have contents.
-        self.assert_has_content()
-        text = '\n'.join(self.content)
-        self.state.document.copyright = text
-        return []
+    d['copyright'] = '\n'.join(content)
 
 
 class Time(Directive):
@@ -236,7 +230,9 @@ class Feed(Directive):
         return []
 
 
-directives.register_directive('copyright', Copyright)
+_Copyright = meta_data_directive(copyright, whitespace=True)
+directives.register_directive('copyright', _Copyright)
+
 directives.register_directive('time', Time)
 directives.register_directive('timezone', Timezone)
 directives.register_directive('author', Author)
