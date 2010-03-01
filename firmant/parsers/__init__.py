@@ -108,6 +108,10 @@ class RstParser(Parser):
         '''
         return None
 
+    def post_process(self, doc):
+        '''Post-process the document.
+        '''
+
     def parse_one(self, path):
         '''Transform one path on the filesystem into a parsed object.
         '''
@@ -146,6 +150,9 @@ class RstParser(Parser):
 
         # Save the doctree for future use.
         o.document = pub.document
+
+        # Post process the document.
+        self.post_process(o)
 
         return o
 
