@@ -16,13 +16,13 @@ if __name__ == '__main__':
                'firmant.extensions',
                'firmant.feeds',
                'firmant.i18n',
-               'firmant.parser',
+               #'firmant.parser',
                'firmant.parsers',
                'firmant.parsers.posts',
                'firmant.tags',
                'firmant.utils',
-               'firmant.writers',
-               'firmant.writers.j2'
+               #'firmant.writers',
+               #'firmant.writers.j2'
               ]
 
     for module in modules:
