@@ -19,7 +19,7 @@ if __name__ == '__main__':
                'firmant.parsers',
                'firmant.parsers.feeds',
                'firmant.parsers.posts',
-               'firmant.tags',
+               'firmant.parsers.tags',
                'firmant.utils',
                #'firmant.writers',
                #'firmant.writers.j2'
