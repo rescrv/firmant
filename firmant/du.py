@@ -160,7 +160,7 @@ def single_line(d, content, attr='line'):
         u'foobar'
 
     '''
-    d[attr] = ''.join(content)
+    d[attr] = unicode(''.join(content))
 
 
 def updated(d, content):
