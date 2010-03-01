@@ -174,27 +174,44 @@ def single_line(d, content, attr='line'):
     d[attr] = ''.join(content)
 
 
-class Updated(Directive):
-    '''A restructured text directive for updated timestamps
+def updated(d, content):
+    '''Interpret content as a full datetime.
+
+    YYYY-MM-DD HH:MM:SS (time may be omitted)::
+
+        >>> d = dict()
+        >>> updated(d, ['2009-02-01 14:15:51'])
+        >>> d['updated']
+        datetime.datetime(2009, 2, 1, 14, 15, 51)
+
+    MM-DD-YYYY HH:MM:SS (time may be omitted)::
+
+        >>> d = dict()
+        >>> updated(d, ['02-01-2009 14:15:51'])
+        >>> d['updated']
+        datetime.datetime(2009, 2, 1, 14, 15, 51)
+
+    ValueError is raised on invalid datetime::
+
+        >>> d = dict()
+        >>> updated(d, ['154342'])
+        Traceback (most recent call last):
+        ValueError: time data '154342' does not match format '%m-%d-%Y %H:%M:%S'
+
     '''
-
-    required_arguments = 0
-    optional_arguments = 0
-    final_argument_whitespace = True
-    option_spec = {}
-    has_content = True
-
-    def run(self):
-        # Raise an error if the directive does not have contents.
-        self.assert_has_content()
+    error = None
+    t     = None
+    s     = ''.join(content)
+    for format in ['%Y-%m-%d', '%Y-%m-%d %H', '%Y-%m-%d %H:%M',
+            '%Y-%m-%d %H:%M:%S', '%m-%d-%Y', '%m-%d-%Y %H', '%m-%d-%Y %H:%M',
+            '%m-%d-%Y %H:%M:%S']:
         try:
-            dt = datetime.datetime.strptime(''.join(self.content), '%Y-%m-%d %H:%M')
-        except ValueError:
-            error = self.state_machine.reporter.error(
-                    'Invalid time format:  the %Y-%m-%d %H:%M format should be used.')
-            return [error]
-        self.state.document.updated = dt
-        return []
+            t = datetime.datetime.strptime(s, format)
+            d['updated'] = t
+        except ValueError, e:
+            error = e
+    if t is None:
+        raise e
 
 
 class Tag(Directive):
@@ -249,7 +266,9 @@ directives.register_directive('timezone', _Timezone)
 _Author = meta_data_directive(lambda d, c: single_line(d, c, 'author'))
 directives.register_directive('author', _Author)
 
-directives.register_directive('updated', Updated)
+_Updated = meta_data_directive(updated)
+directives.register_directive('updated', _Updated)
+
 directives.register_directive('tag', Tag)
 directives.register_directive('feed', Feed)
 
