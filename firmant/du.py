@@ -37,6 +37,7 @@ import datetime
 from docutils.transforms.components import Filter
 from docutils.parsers.rst import Directive
 from docutils.parsers.rst import directives
+from docutils.readers import standalone
 from docutils.core import publish_programmatically
 from docutils import io
 from docutils import nodes
@@ -256,6 +257,16 @@ _Feed = meta_data_directive(lambda d, c: list_element(d, c, 'feeds'))
 directives.register_directive('feed', _Feed)
 
 
+class MetaDataStandaloneReader(standalone.Reader):
+    '''Add transformations to read MetaData from doctree.
+    '''
+
+    # TODO:  Add transformations.  They are not present as the goal is just to
+    # replace the standalone reader for now.
+    def get_transforms(self):
+        return standalone.Reader.get_transforms(self) + []
+
+
 def publish_parts_doc(source):
     '''A utility function to parse a string into a document and its metadata.
     '''
@@ -265,7 +276,7 @@ def publish_parts_doc(source):
            ,'destination_class': io.StringOutput
            ,'destination': None
            ,'destination_path': None
-           ,'reader': None, 'reader_name': 'standalone'
+           ,'reader': MetaDataStandaloneReader(), 'reader_name': None
            ,'parser': None, 'parser_name': 'restructuredtext'
            ,'writer': None, 'writer_name': 'html'
            ,'settings': None, 'settings_spec': None, 'settings_overrides': None
