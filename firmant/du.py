@@ -223,26 +223,6 @@ def list_element(d, content, attr='element_plural'):
     d[attr] = list([''.join(content)])
 
 
-class Feed(Directive):
-    '''A restructured text directive for tag information.
-    '''
-
-    required_arguments = 0
-    optional_arguments = 0
-    final_argument_whitespace = False
-    option_spec = {}
-    has_content = True
-
-    def run(self):
-        # Raise an error if the directive does not have contents.
-        self.assert_has_content()
-        text = ''.join(self.content)
-        if not hasattr(self.state.document, 'feeds'):
-            self.state.document.feeds = list()
-        self.state.document.feeds.append(text)
-        return []
-
-
 _Copyright = meta_data_directive(copyright, whitespace=True)
 directives.register_directive('copyright', _Copyright)
 
@@ -261,7 +241,8 @@ directives.register_directive('updated', _Updated)
 _Tag = meta_data_directive(lambda d, c: list_element(d, c, 'tags'))
 directives.register_directive('tag', _Tag)
 
-directives.register_directive('feed', Feed)
+_Feed = meta_data_directive(lambda d, c: list_element(d, c, 'feeds'))
+directives.register_directive('feed', _Feed)
 
 
 def publish_parts_doc(source):
