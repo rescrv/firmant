@@ -108,27 +108,49 @@ def copyright(d, content):
     d['copyright'] = '\n'.join(content)
 
 
-class Time(Directive):
-    '''A restructured text directive for time information.
+def time(d, content):
+    '''Interpret the content as a time.
+
+    Using just hours::
+
+        >>> d = dict()
+        >>> time(d, ['15'])
+        >>> d['time']
+        datetime.time(15, 0)
+
+    Using hours and minutes::
+
+        >>> d = dict()
+        >>> time(d, ['15:43'])
+        >>> d['time']
+        datetime.time(15, 43)
+
+    Using hours, minutes, and seconds::
+
+        >>> d = dict()
+        >>> time(d, ['15:43:42'])
+        >>> d['time']
+        datetime.time(15, 43, 42)
+
+    ValueError is raised on invalid time::
+
+        >>> d = dict()
+        >>> time(d, ['154342'])
+        Traceback (most recent call last):
+        ValueError: time data '154342' does not match format '%H:%M:%S'
+
     '''
-
-    required_arguments = 0
-    optional_arguments = 0
-    final_argument_whitespace = False
-    option_spec = {}
-    has_content = True
-
-    def run(self):
-        # Raise an error if the directive does not have contents.
-        self.assert_has_content()
+    error = None
+    t     = None
+    s     = ''.join(content)
+    for format in ['%H', '%H:%M', '%H:%M:%S']:
         try:
-            dt = datetime.datetime.strptime(''.join(self.content), '%H:%M')
-        except ValueError:
-            error = self.state_machine.reporter.error(
-                    'Invalid time format:  the %H:%M format should be used.')
-            return [error]
-        self.state.document.time = dt.time()
-        return []
+            t = datetime.datetime.strptime(s, format).time()
+            d['time'] = t
+        except ValueError, e:
+            error = e
+    if t is None:
+        raise e
 
 
 class Timezone(Directive):
@@ -233,7 +255,9 @@ class Feed(Directive):
 _Copyright = meta_data_directive(copyright, whitespace=True)
 directives.register_directive('copyright', _Copyright)
 
-directives.register_directive('time', Time)
+_Time = meta_data_directive(time)
+directives.register_directive('time', _Time)
+
 directives.register_directive('timezone', Timezone)
 directives.register_directive('author', Author)
 directives.register_directive('updated', Updated)
