@@ -107,6 +107,40 @@ class PostParser(RstParser):
                     ,('content', 'fragment')
                     ]
 
+    def paths(self):
+        '''Return a list of paths to objects on the file system.
+
+        Consider all the contents of the entries directory (by default this is
+        ``content_root/posts``).  Only files ending in ``suffix`` are
+        considered.
+
+        Directory entries that are not files are ignored.
+
+            >>> from pprint import pprint
+            >>> from pysettings.settings import Settings
+            >>> s = {'CONTENT_ROOT': 'content'
+            ...     ,'POSTS_SUBDIR': 'posts'
+            ...     ,'REST_EXTENSION': 'rst'
+            ...     }
+            >>> s = Settings(s)
+            >>> p = PostParser(s)
+            >>> pprint(p.paths())
+            ['content/posts/1975-03-23-give-me-liberty.rst',
+             'content/posts/2009-02-17-loren-ipsum.rst',
+             'content/posts/2010-02-13-sample-code.rst',
+             'content/posts/2010-02-15-empty.rst']
+
+        '''
+        # TODO add above settings to global settings.
+        settings = self.settings
+        path  = os.path.join(settings.CONTENT_ROOT, settings.POSTS_SUBDIR)
+        files = os.listdir(path)
+        files = map(lambda p: os.path.join(path, p), files)
+        files = filter(lambda f: f.endswith(settings.REST_EXTENSION), files)
+        files = filter(lambda f: os.path.isfile(f), files)
+        files.sort()
+        return files
+
     def new_object(self, path, d, pub):
         '''Return an instance of the object to which rst documents are parsed.
         '''
