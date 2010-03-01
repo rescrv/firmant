@@ -41,6 +41,8 @@ from docutils.core import publish_programmatically
 from docutils import io
 from docutils import nodes
 
+from firmant.utils import strptime
+
 
 def meta_data_directive(func, transform=Filter, whitespace=False):
     '''Create a Directive class to store data to a pending node.
@@ -137,20 +139,12 @@ def time(d, content):
         >>> d = dict()
         >>> time(d, ['154342'])
         Traceback (most recent call last):
-        ValueError: time data '154342' does not match format '%H:%M:%S'
+        ValueError: time data '154342' does not match any format.
 
     '''
-    error = None
-    t     = None
-    s     = ''.join(content)
-    for format in ['%H', '%H:%M', '%H:%M:%S']:
-        try:
-            t = datetime.datetime.strptime(s, format).time()
-            d['time'] = t
-        except ValueError, e:
-            error = e
-    if t is None:
-        raise e
+    formats = ['%H', '%H:%M', '%H:%M:%S']
+    dt = strptime(''.join(content), formats)
+    d['time'] = dt.time()
 
 
 def single_line(d, content, attr='line'):
@@ -196,22 +190,13 @@ def updated(d, content):
         >>> d = dict()
         >>> updated(d, ['154342'])
         Traceback (most recent call last):
-        ValueError: time data '154342' does not match format '%m-%d-%Y %H:%M:%S'
+        ValueError: time data '154342' does not match any format.
 
     '''
-    error = None
-    t     = None
-    s     = ''.join(content)
-    for format in ['%Y-%m-%d', '%Y-%m-%d %H', '%Y-%m-%d %H:%M',
-            '%Y-%m-%d %H:%M:%S', '%m-%d-%Y', '%m-%d-%Y %H', '%m-%d-%Y %H:%M',
-            '%m-%d-%Y %H:%M:%S']:
-        try:
-            t = datetime.datetime.strptime(s, format)
-            d['updated'] = t
-        except ValueError, e:
-            error = e
-    if t is None:
-        raise e
+    formats = ['%Y-%m-%d', '%Y-%m-%d %H', '%Y-%m-%d %H:%M',
+               '%Y-%m-%d %H:%M:%S', '%m-%d-%Y', '%m-%d-%Y %H',
+               '%m-%d-%Y %H:%M', '%m-%d-%Y %H:%M:%S']
+    d['updated'] = strptime(''.join(content), formats)
 
 
 class Tag(Directive):

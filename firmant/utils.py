@@ -25,6 +25,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+import datetime
 import os
 import sys
 
@@ -153,3 +154,33 @@ def cat(path, out=sys.stdout):
     for line in f:
         print >>out, line,
     f.close()
+
+
+def strptime(date_string, formats):
+    '''Cast the date_string to the first format to match.
+
+    Examples::
+
+        >>> strptime('2009-02-01 11:51:15', ['%Y-%m-%d %H:%M:%S'])
+        datetime.datetime(2009, 2, 1, 11, 51, 15)
+        >>> strptime('11:51:15', ['%H:%M:%S'])
+        datetime.datetime(1900, 1, 1, 11, 51, 15)
+
+    If the time does not match, a value error will be raised::
+
+        >>> strptime('AB:CD:EF', ['%H:%M:%S'])
+        Traceback (most recent call last):
+        ValueError: time data 'AB:CD:EF' does not match any format.
+
+    '''
+    error = None
+    dt    = None
+    for format in formats:
+        try:
+            dt = dt or datetime.datetime.strptime(date_string, format)
+        except ValueError:
+            pass
+    if dt is None:
+        error = "time data '%s' does not match any format." % date_string
+        raise ValueError(error)
+    return dt
