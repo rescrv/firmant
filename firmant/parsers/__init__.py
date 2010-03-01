@@ -25,6 +25,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+from docutils import io
+from docutils.core import publish_programmatically
+
+from firmant.du import MetaDataStandaloneReader
 from firmant.extensions import ExtensionManager
 
 
@@ -55,6 +59,89 @@ class Parser(object):
         '''Transform one path on the filesystem into a parsed object.
         '''
         return path
+
+
+class RstParser(Parser):
+    '''Interpret *.rst for a given directory.
+
+    For each reSt document, parse it to a doctree and extract its metadata.
+    '''
+
+    auto_metadata = []
+    '''Attributes which should be automatically read from metadata.
+
+    This value should be a list of 2-tuples where the first value is the
+    attribute on the entry, and the second is the key to the metadata
+    dictionary.
+    '''
+
+    auto_pubparts = []
+    '''Attributes which should be automatically read from publisher parts.
+
+    This value should be a list of 2-tuples where the first value is the
+    attribute on the entry, and the second is the key to the publisher's parts
+    dictionary.
+    '''
+
+    def new_object(self, path, d, pub):
+        '''Return an instance of the object to which rst documents are parsed.
+        '''
+
+    def default(self, attr):
+        '''Return the default value of an attribute.
+
+        This base class version is limited::
+
+            >>> r = RstParser()
+            >>> r.default('foo') is None
+            True
+
+        It is intended that this function will be overridden (possibly to read
+        from settings).
+
+        '''
+        return None
+
+    def parse_one(self, path):
+        '''Transform one path on the filesystem into a parsed object.
+        '''
+        d = dict()
+        args = {'source': None
+               ,'source_path': path
+               ,'source_class': io.FileInput
+               ,'destination_class': io.StringOutput
+               ,'destination': None
+               ,'destination_path': None
+               ,'reader': MetaDataStandaloneReader(), 'reader_name': None
+               ,'parser': None, 'parser_name': 'restructuredtext'
+               ,'writer': None, 'writer_name': 'html'
+               ,'settings': None, 'settings_spec': None
+               ,'settings_overrides': None
+               ,'config_section': None
+               ,'enable_exit_status': None
+               }
+        null, pub = publish_programmatically(**args)
+
+        # Create a new object, using information from path and dictionary to
+        # fill in all values not filled by auto_metadata or the defaults.
+        o = self.new_object(path, d, pub)
+
+        # Automatically assign all auto_metadata to new object.
+        for attr, directive in self.auto_metadata:
+            default = self.default(attr)
+            val = d.get(directive, None) or default
+            setattr(o, attr, val)
+
+        # Automatically assign all auto_pubparts to new object.
+        for attr, directive in self.auto_pubparts:
+            default = self.default(attr)
+            val = pub.writer.parts.get(directive, None) or default
+            setattr(o, attr, val)
+
+        # Save the doctree for future use.
+        o.document = pub.document
+
+        return o
 
 
 parsers = ExtensionManager()
