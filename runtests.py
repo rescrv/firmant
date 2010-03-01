@@ -13,12 +13,12 @@ if __name__ == '__main__':
     suite = unittest.TestSuite()
 
     modules = ['firmant.du',
-               'firmant.entries',
                'firmant.extensions',
                'firmant.feeds',
                'firmant.i18n',
                'firmant.parser',
                'firmant.parsers',
+               'firmant.parsers.posts',
                'firmant.tags',
                'firmant.utils',
                'firmant.writers',
