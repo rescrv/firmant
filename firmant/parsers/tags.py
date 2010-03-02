@@ -82,6 +82,18 @@ class TagParser(RstParser):
         Traceback (most recent call last):
         AttributeError: 'RstObject' object has no attribute 'updated'
 
+    All tags may be retrieved with::
+
+        >>> from pysettings.settings import Settings
+        >>> s = {'CONTENT_ROOT': 'content'
+        ...     ,'TAGS_SUBDIR': 'tags'
+        ...     ,'REST_EXTENSION': 'rst'
+        ...     }
+        >>> s = Settings(s)
+        >>> t = TagParser(s)
+        >>> map(lambda t: t.slug, t.parse())
+        [u'empty', u'rcos']
+
     '''
 
     auto_metadata = [('copyright', 'copyright')

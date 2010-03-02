@@ -93,6 +93,22 @@ class PostParser(RstParser):
         >>> p.tz
         u''
 
+    All posts may be retrieved with::
+
+        >>> from pysettings.settings import Settings
+        >>> s = {'CONTENT_ROOT': 'content'
+        ...     ,'POSTS_SUBDIR': 'posts'
+        ...     ,'REST_EXTENSION': 'rst'
+        ...     }
+        >>> s = Settings(s)
+        >>> p = PostParser(s)
+        >>> from pprint import pprint
+        >>> pprint(map(lambda p: (p.published.date(), p.slug), p.parse()))
+        [(datetime.date(1975, 3, 23), u'give-me-liberty'),
+         (datetime.date(2009, 2, 17), u'loren-ipsum'),
+         (datetime.date(2010, 2, 13), u'sample-code'),
+         (datetime.date(2010, 2, 15), u'empty')]
+
     '''
 
     auto_metadata = [('author', 'author')

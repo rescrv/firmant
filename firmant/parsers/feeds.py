@@ -82,6 +82,18 @@ class FeedParser(RstParser):
         Traceback (most recent call last):
         AttributeError: 'RstObject' object has no attribute 'updated'
 
+    All feeds may be retrieved with::
+
+        >>> from pysettings.settings import Settings
+        >>> s = {'CONTENT_ROOT': 'content'
+        ...     ,'FEEDS_SUBDIR': 'feeds'
+        ...     ,'REST_EXTENSION': 'rst'
+        ...     }
+        >>> s = Settings(s)
+        >>> f = FeedParser(s)
+        >>> map(lambda f: f.slug, f.parse())
+        [u'empty', u'rcos']
+
     '''
 
     auto_metadata = [('copyright', 'copyright')
