@@ -101,3 +101,85 @@ class PostArchiveAll(Writer):
         for post in posts:
             s = post.published.strftime('  - %Y-%m-%d-%%s')
             print s % post.slug
+
+
+class PostArchiveYearly(Writer):
+    '''Parse the posts into a list, grouped by year, then by page.
+
+    The :func:``render`` function should be overrridden to actually render the
+    posts.
+
+    This depends upon the objs having a value for the key ``posts``.
+
+    When instantiating, if the setting for ``ENTRIES_PER_PAGE`` is not a
+    positive, non-zero integer, it will raise a value error::
+
+        >>> from pysettings.settings import Settings
+        >>> PostArchiveYearly(Settings(ENTRIES_PER_PAGE=0), [])
+        Traceback (most recent call last):
+        ValueError: ENTRIES_PER_PAGE must be a positive value.
+
+    '''
+
+    def __init__(self, settings, objs):
+        Writer.__init__(self, settings, objs)
+        if settings.ENTRIES_PER_PAGE < 1:
+            raise ValueError('ENTRIES_PER_PAGE must be a positive value.')
+
+    def write(self):
+        '''Write the parsed posts to the filesystem.
+
+        Example on testdata/pristine::
+
+        >>> from pysettings.settings import Settings
+        >>> from firmant.application import Firmant
+        >>> s = {'PARSERS': {'posts': 'firmant.parsers.posts.PostParser'}
+        ...     ,'CONTENT_ROOT': 'testdata/pristine'
+        ...     ,'POSTS_SUBDIR': 'posts'
+        ...     ,'REST_EXTENSION': 'rst'
+        ...     ,'ENTRIES_PER_PAGE': 2
+        ...     }
+        >>> s = Settings(s)
+        >>> f = Firmant(s)
+        >>> f.parse()
+        >>> eay = PostArchiveYearly(s, f.objs)
+        >>> eay.write()
+        Year 2010:
+            Page 1 1-2 of 2:
+              - 2010-02-02-newday2
+              - 2010-02-02-newday
+        Year 2010:
+            Page 2 3-4 of 2:
+              - 2010-02-01-newmonth
+              - 2010-01-01-newyear
+        Year 2009:
+            Page 1 1-1 of 1:
+              - 2009-12-31-party
+
+        '''
+        per_page = self.settings.ENTRIES_PER_PAGE
+
+        posts = copy(self.objs['posts'])
+        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
+
+        def key(x):
+            if x is None:
+                return None
+            return x.published.year
+
+        split_lists = paginate.split_boundary(key, posts)
+        for year, split_list in split_lists:
+            split_posts = paginate.paginate(per_page, split_list)
+            for page, num_pages, begin, end, posts in split_posts:
+                self.render(year, page, num_pages, begin, end, posts)
+
+    def render(self, year, page, num_pages, first, last, posts):
+        '''Render the function.
+
+        This should be overridden in base classes.
+        '''
+        print 'Year %04i:' % year
+        print '    Page %i %i-%i of %i:' % (page, first, last, num_pages)
+        for post in posts:
+            s = post.published.strftime('      - %Y-%m-%d-%%s')
+            print s % post.slug
