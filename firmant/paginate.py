@@ -55,3 +55,38 @@ def paginate(per_page, obj_list):
         begin += 1
         ret.append( (page + 1, num_pages, begin, end, objs) )
     return ret
+
+
+def split_boundary(key, obj_list):
+    '''Split a list across boundaries where key(a) != key(b)
+
+    Split the list at each point the numbers change from evens to odds::
+
+        >>> from pprint import pprint
+        >>> def key(x):
+        ...     if x is None:
+        ...         return None
+        ...     return x % 2
+        >>> pprint(split_boundary(key, [1, 3, 5, 2, 4, 7, 8, 9, 10]))
+        [(1, [1, 3, 5]), (0, [2, 4]), (1, [7]), (0, [8]), (1, [9]), (0, [10])]
+        >>> pprint(split_boundary(key, [1]))
+        [(1, [1])]
+        >>> pprint(split_boundary(key, []))
+        []
+
+    '''
+    if len(obj_list) == 0:
+        return []
+    if len(obj_list) == 1:
+        return [(key(obj_list[0]), obj_list)]
+
+    new_objs = zip(obj_list, obj_list[1:] + [None])
+
+    ret = list()
+    tmp = list()
+    for cur, next in new_objs:
+        tmp.append(cur)
+        if key(cur) != key(next):
+            ret.append((key(cur), tmp))
+            tmp = list()
+    return ret
