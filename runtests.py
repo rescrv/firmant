@@ -4,7 +4,7 @@ import doctest
 import sys
 from optparse import OptionParser
 
-from firmant.utils import get_module
+from pysettings.modules import get_module
 
 # Import this now to avoid it throwing errors.
 import pytz
