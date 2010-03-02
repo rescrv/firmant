@@ -33,30 +33,19 @@ from firmant.utils import class_name
 
 
 class Writer(object):
-    '''Transform a parsed blog into objects on the file system.
-
-        >>> from firmant.parser import Blog
-        >>> b = Blog('content', lambda w: None, lambda e: None)
-        >>> w = Writer({'settings': True}, b)
-        >>> w #doctest: +ELLIPSIS
-        <firmant.writers.Writer object at 0x...>
-
+    '''Handle writing parsed objects to the filesystem.
     '''
 
-    def __init__(self, settings, blog):
+    def __init__(self, settings, objs):
         self.settings = settings
-        self.entries = blog._entries
-        self.feeds = blog._feeds
-        self.tags = blog._tags
+        self.objs = objs
         self.log = logging.getLogger(class_name(self.__class__))
 
     def write(self):
-        '''Transform a parsed blog into objects on the file system.
+        '''Write the objects to the filesystem.
 
-            >>> from firmant.parser import Blog
-            >>> b = Blog('content', lambda w: None, lambda e: None)
-            >>> w = Writer({'settings': True}, b)
-            >>> w.write() # This does nothing on the base classes.
+            >>> w = Writer(None, None)
+            >>> w.write()
 
         '''
         pass
@@ -64,11 +53,22 @@ class Writer(object):
     def write_preconditions(self):
         '''Returns true if and only if it is acceptable to proceed with writing.
 
+        Normal conditions::
+
             >>> # If the output dir is not set, log a critical error:
-            >>> from firmant.parser import Blog
+            >>> from pysettings.settings import Settings
             >>> from minimock import Mock
-            >>> b = Blog('content', lambda w: None, lambda e: None)
-            >>> w = Writer({'settings': True}, b)
+            >>> w = Writer(Settings(OUTPUT_DIR='foo'), None)
+            >>> w.log = Mock('log')
+            >>> w.write_preconditions()
+            True
+
+        Error conditions::
+
+            >>> # If the output dir is not set, log a critical error:
+            >>> from pysettings.settings import Settings
+            >>> from minimock import Mock
+            >>> w = Writer(Settings(), None)
             >>> w.log = Mock('log')
             >>> w.write_preconditions()
             Called log.critical('``OUTPUT_DIR`` not defined in settings.')
@@ -76,7 +76,7 @@ class Writer(object):
 
         '''
         # Fail if we do not have an output directory.
-        if self.settings.get('OUTPUT_DIR', None) is None:
+        if getattr(self.settings, 'OUTPUT_DIR', None) is None:
             self.log.critical(_('``OUTPUT_DIR`` not defined in settings.'))
             return False
         return True

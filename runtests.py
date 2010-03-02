@@ -21,7 +21,7 @@ if __name__ == '__main__':
                'firmant.parsers.posts',
                'firmant.parsers.tags',
                'firmant.utils',
-               #'firmant.writers',
+               'firmant.writers',
                #'firmant.writers.j2'
               ]
 
