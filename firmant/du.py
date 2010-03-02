@@ -274,23 +274,3 @@ class MetaDataStandaloneReader(standalone.Reader):
     def get_transforms(self):
         return standalone.Reader.get_transforms(self) + \
             [meta_data_transform(self.data)]
-
-
-def publish_parts_doc(source):
-    '''A utility function to parse a string into a document and its metadata.
-    '''
-    args = {'source': source
-           ,'source_path': None
-           ,'source_class': io.StringInput
-           ,'destination_class': io.StringOutput
-           ,'destination': None
-           ,'destination_path': None
-           ,'reader': MetaDataStandaloneReader(), 'reader_name': None
-           ,'parser': None, 'parser_name': 'restructuredtext'
-           ,'writer': None, 'writer_name': 'html'
-           ,'settings': None, 'settings_spec': None, 'settings_overrides': None
-           ,'config_section': None
-           ,'enable_exit_status': None
-           }
-    output, pub = publish_programmatically(**args)
-    return pub.writer.parts, pub.document
