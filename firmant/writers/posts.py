@@ -27,7 +27,7 @@
 
 from copy import copy
 
-from firmant.paginate import paginate
+from firmant import paginate
 from firmant.writers import Writer
 
 
@@ -87,7 +87,9 @@ class PostArchiveAll(Writer):
         posts = copy(self.objs['posts'])
         posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
 
-        for page, num_pages, begin, end, posts in paginate(per_page, posts):
+        split_posts = paginate.paginate(per_page, posts)
+
+        for page, num_pages, begin, end, posts in split_posts:
             self.render(page, num_pages, begin, end, posts)
 
     def render(self, page, num_pages, first, last, posts):
