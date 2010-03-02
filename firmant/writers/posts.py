@@ -39,6 +39,14 @@ class PostArchiveAll(Writer):
 
     This depends upon the objs having a value for the key ``posts``.
 
+    When instantiating, if the setting for ``ENTRIES_PER_PAGE`` is not a
+    positive, non-zero integer, it will raise a value error::
+
+        >>> from pysettings.settings import Settings
+        >>> PostArchiveAll(Settings(ENTRIES_PER_PAGE=0), [])
+        Traceback (most recent call last):
+        ValueError: ENTRIES_PER_PAGE must be a positive value.
+
     '''
 
     def __init__(self, settings, objs):
