@@ -27,6 +27,7 @@
 
 from copy import copy
 
+from firmant.paginate import paginate
 from firmant.writers import Writer
 
 
@@ -63,13 +64,13 @@ class PostArchiveAll(Writer):
         >>> f.parse()
         >>> eaa = PostArchiveAll(s, f.objs)
         >>> eaa.write()
-        Page 0 1-2 of 3:
+        Page 1 1-2 of 3:
           - 2010-02-02-newday2
           - 2010-02-02-newday
-        Page 1 3-4 of 3:
+        Page 2 3-4 of 3:
           - 2010-02-01-newmonth
           - 2010-01-01-newyear
-        Page 2 5-5 of 3:
+        Page 3 5-5 of 3:
           - 2009-12-31-party
 
         '''
@@ -78,14 +79,8 @@ class PostArchiveAll(Writer):
         posts = copy(self.objs['posts'])
         posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
 
-        num_pages = (len(posts) + per_page - 1) / per_page
-        for page in range((len(posts) + per_page - 1) / per_page):
-            begin = page * per_page
-            end   = begin + per_page
-            page_posts = posts[begin:end]
-            begin += 1
-            end   = begin + len(page_posts) - 1
-            self.render(page, num_pages, begin, end, page_posts)
+        for page, num_pages, begin, end, posts in paginate(per_page, posts):
+            self.render(page, num_pages, begin, end, posts)
 
     def render(self, page, num_pages, first, last, posts):
         '''Render the function.
