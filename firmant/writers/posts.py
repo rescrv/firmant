@@ -39,20 +39,20 @@ class PostArchiveAll(Writer):
 
     This depends upon the objs having a value for the key ``posts``.
 
-    When instantiating, if the setting for ``ENTRIES_PER_PAGE`` is not a
+    When instantiating, if the setting for ``POSTS_PER_PAGE`` is not a
     positive, non-zero integer, it will raise a value error::
 
         >>> from pysettings.settings import Settings
-        >>> PostArchiveAll(Settings(ENTRIES_PER_PAGE=0), [])
+        >>> PostArchiveAll(Settings(POSTS_PER_PAGE=0), [])
         Traceback (most recent call last):
-        ValueError: ENTRIES_PER_PAGE must be a positive value.
+        ValueError: POSTS_PER_PAGE must be a positive value.
 
     '''
 
     def __init__(self, settings, objs):
         Writer.__init__(self, settings, objs)
-        if settings.ENTRIES_PER_PAGE < 1:
-            raise ValueError('ENTRIES_PER_PAGE must be a positive value.')
+        if settings.POSTS_PER_PAGE < 1:
+            raise ValueError('POSTS_PER_PAGE must be a positive value.')
 
     def write(self):
         '''Write the parsed posts to the filesystem.
@@ -65,13 +65,13 @@ class PostArchiveAll(Writer):
         ...     ,'CONTENT_ROOT': 'testdata/pristine'
         ...     ,'POSTS_SUBDIR': 'posts'
         ...     ,'REST_EXTENSION': 'rst'
-        ...     ,'ENTRIES_PER_PAGE': 2
+        ...     ,'POSTS_PER_PAGE': 2
         ...     }
         >>> s = Settings(s)
         >>> f = Firmant(s)
         >>> f.parse()
-        >>> eaa = PostArchiveAll(s, f.objs)
-        >>> eaa.write()
+        >>> paa = PostArchiveAll(s, f.objs)
+        >>> paa.write()
         Page 1 1-2 of 3:
           - 2010-02-02-newday2
           - 2010-02-02-newday
@@ -82,7 +82,7 @@ class PostArchiveAll(Writer):
           - 2009-12-31-party
 
         '''
-        per_page = self.settings.ENTRIES_PER_PAGE
+        per_page = self.settings.POSTS_PER_PAGE
 
         posts = copy(self.objs['posts'])
         posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
@@ -111,20 +111,20 @@ class PostArchiveYearly(Writer):
 
     This depends upon the objs having a value for the key ``posts``.
 
-    When instantiating, if the setting for ``ENTRIES_PER_PAGE`` is not a
+    When instantiating, if the setting for ``POSTS_PER_PAGE`` is not a
     positive, non-zero integer, it will raise a value error::
 
         >>> from pysettings.settings import Settings
-        >>> PostArchiveYearly(Settings(ENTRIES_PER_PAGE=0), [])
+        >>> PostArchiveYearly(Settings(POSTS_PER_PAGE=0), [])
         Traceback (most recent call last):
-        ValueError: ENTRIES_PER_PAGE must be a positive value.
+        ValueError: POSTS_PER_PAGE must be a positive value.
 
     '''
 
     def __init__(self, settings, objs):
         Writer.__init__(self, settings, objs)
-        if settings.ENTRIES_PER_PAGE < 1:
-            raise ValueError('ENTRIES_PER_PAGE must be a positive value.')
+        if settings.POSTS_PER_PAGE < 1:
+            raise ValueError('POSTS_PER_PAGE must be a positive value.')
 
     def write(self):
         '''Write the parsed posts to the filesystem.
@@ -137,13 +137,13 @@ class PostArchiveYearly(Writer):
         ...     ,'CONTENT_ROOT': 'testdata/pristine'
         ...     ,'POSTS_SUBDIR': 'posts'
         ...     ,'REST_EXTENSION': 'rst'
-        ...     ,'ENTRIES_PER_PAGE': 2
+        ...     ,'POSTS_PER_PAGE': 2
         ...     }
         >>> s = Settings(s)
         >>> f = Firmant(s)
         >>> f.parse()
-        >>> eay = PostArchiveYearly(s, f.objs)
-        >>> eay.write()
+        >>> pay = PostArchiveYearly(s, f.objs)
+        >>> pay.write()
         Year 2010:
             Page 1 1-2 of 2:
               - 2010-02-02-newday2
@@ -157,7 +157,7 @@ class PostArchiveYearly(Writer):
               - 2009-12-31-party
 
         '''
-        per_page = self.settings.ENTRIES_PER_PAGE
+        per_page = self.settings.POSTS_PER_PAGE
 
         posts = copy(self.objs['posts'])
         posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
@@ -193,20 +193,20 @@ class PostArchiveMonthly(Writer):
 
     This depends upon the objs having a value for the key ``posts``.
 
-    When instantiating, if the setting for ``ENTRIES_PER_PAGE`` is not a
+    When instantiating, if the setting for ``POSTS_PER_PAGE`` is not a
     positive, non-zero integer, it will raise a value error::
 
         >>> from pysettings.settings import Settings
-        >>> PostArchiveMonthly(Settings(ENTRIES_PER_PAGE=0), [])
+        >>> PostArchiveMonthly(Settings(POSTS_PER_PAGE=0), [])
         Traceback (most recent call last):
-        ValueError: ENTRIES_PER_PAGE must be a positive value.
+        ValueError: POSTS_PER_PAGE must be a positive value.
 
     '''
 
     def __init__(self, settings, objs):
         Writer.__init__(self, settings, objs)
-        if settings.ENTRIES_PER_PAGE < 1:
-            raise ValueError('ENTRIES_PER_PAGE must be a positive value.')
+        if settings.POSTS_PER_PAGE < 1:
+            raise ValueError('POSTS_PER_PAGE must be a positive value.')
 
     def write(self):
         '''Write the parsed posts to the filesystem.
@@ -219,13 +219,13 @@ class PostArchiveMonthly(Writer):
         ...     ,'CONTENT_ROOT': 'testdata/pristine'
         ...     ,'POSTS_SUBDIR': 'posts'
         ...     ,'REST_EXTENSION': 'rst'
-        ...     ,'ENTRIES_PER_PAGE': 2
+        ...     ,'POSTS_PER_PAGE': 2
         ...     }
         >>> s = Settings(s)
         >>> f = Firmant(s)
         >>> f.parse()
-        >>> eam = PostArchiveMonthly(s, f.objs)
-        >>> eam.write()
+        >>> pam = PostArchiveMonthly(s, f.objs)
+        >>> pam.write()
         Month 2010-02:
             Page 1 1-2 of 2:
               - 2010-02-02-newday2
@@ -241,7 +241,7 @@ class PostArchiveMonthly(Writer):
               - 2009-12-31-party
 
         '''
-        per_page = self.settings.ENTRIES_PER_PAGE
+        per_page = self.settings.POSTS_PER_PAGE
 
         posts = copy(self.objs['posts'])
         posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
@@ -277,20 +277,20 @@ class PostArchiveDaily(Writer):
 
     This depends upon the objs having a value for the key ``posts``.
 
-    When instantiating, if the setting for ``ENTRIES_PER_PAGE`` is not a
+    When instantiating, if the setting for ``POSTS_PER_PAGE`` is not a
     positive, non-zero integer, it will raise a value error::
 
         >>> from pysettings.settings import Settings
-        >>> PostArchiveDaily(Settings(ENTRIES_PER_PAGE=0), [])
+        >>> PostArchiveDaily(Settings(POSTS_PER_PAGE=0), [])
         Traceback (most recent call last):
-        ValueError: ENTRIES_PER_PAGE must be a positive value.
+        ValueError: POSTS_PER_PAGE must be a positive value.
 
     '''
 
     def __init__(self, settings, objs):
         Writer.__init__(self, settings, objs)
-        if settings.ENTRIES_PER_PAGE < 1:
-            raise ValueError('ENTRIES_PER_PAGE must be a positive value.')
+        if settings.POSTS_PER_PAGE < 1:
+            raise ValueError('POSTS_PER_PAGE must be a positive value.')
 
     def write(self):
         '''Write the parsed posts to the filesystem.
@@ -303,13 +303,13 @@ class PostArchiveDaily(Writer):
         ...     ,'CONTENT_ROOT': 'testdata/pristine'
         ...     ,'POSTS_SUBDIR': 'posts'
         ...     ,'REST_EXTENSION': 'rst'
-        ...     ,'ENTRIES_PER_PAGE': 1
+        ...     ,'POSTS_PER_PAGE': 1
         ...     }
         >>> s = Settings(s)
         >>> f = Firmant(s)
         >>> f.parse()
-        >>> ead = PostArchiveDaily(s, f.objs)
-        >>> ead.write()
+        >>> pad = PostArchiveDaily(s, f.objs)
+        >>> pad.write()
         Day 2010-02-02:
             Page 1 1-1 of 2:
               - 2010-02-02-newday2
@@ -327,7 +327,7 @@ class PostArchiveDaily(Writer):
               - 2009-12-31-party
 
         '''
-        per_page = self.settings.ENTRIES_PER_PAGE
+        per_page = self.settings.POSTS_PER_PAGE
 
         posts = copy(self.objs['posts'])
         posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
