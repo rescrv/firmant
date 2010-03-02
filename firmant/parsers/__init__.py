@@ -29,7 +29,6 @@ from docutils import io
 from docutils.core import publish_programmatically
 
 from firmant.du import MetaDataStandaloneReader
-from firmant.extensions import ExtensionManager
 
 
 __all__ = ['Parser']
@@ -160,6 +159,3 @@ class RstParser(Parser):
         self.post_process(o)
 
         return o
-
-
-parsers = ExtensionManager()
