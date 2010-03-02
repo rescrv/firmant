@@ -12,7 +12,8 @@ import pytz
 if __name__ == '__main__':
     suite = unittest.TestSuite()
 
-    modules = ['firmant.du',
+    modules = ['firmant.application',
+               'firmant.du',
                'firmant.extensions',
                'firmant.i18n',
                'firmant.parsers',
