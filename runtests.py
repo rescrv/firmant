@@ -16,6 +16,7 @@ if __name__ == '__main__':
                'firmant.du',
                'firmant.extensions',
                'firmant.i18n',
+               'firmant.paginate',
                'firmant.parsers',
                'firmant.parsers.feeds',
                'firmant.parsers.posts',
