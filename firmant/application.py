@@ -37,6 +37,11 @@ class Firmant(object):
         ...                 ,'posts': 'firmant.parsers.posts.PostParser'
         ...                 ,'tags': 'firmant.parsers.tags.TagParser'
         ...                 }
+        ...     ,'CONTENT_ROOT': 'content'
+        ...     ,'FEEDS_SUBDIR': 'feeds'
+        ...     ,'POSTS_SUBDIR': 'posts'
+        ...     ,'TAGS_SUBDIR': 'tags'
+        ...     ,'REST_EXTENSION': 'rst'
         ...     }
         >>> s = Settings(s)
         >>> f = Firmant(s)
@@ -44,6 +49,16 @@ class Firmant(object):
         {'feeds': <firmant.parsers.feeds.FeedParser object at 0x...>,
          'posts': <firmant.parsers.posts.PostParser object at 0x...>,
          'tags': <firmant.parsers.tags.TagParser object at 0x...>}
+        >>> f.parse()
+        >>> pprint(f.objs) #doctest: +ELLIPSIS
+        {'feeds': [<firmant.parsers.RstObject object at 0x...>,
+                   <firmant.parsers.RstObject object at 0x...>],
+         'posts': [<firmant.parsers.RstObject object at 0x...>,
+                   <firmant.parsers.RstObject object at 0x...>,
+                   <firmant.parsers.RstObject object at 0x...>,
+                   <firmant.parsers.RstObject object at 0x...>],
+         'tags': [<firmant.parsers.RstObject object at 0x...>,
+                  <firmant.parsers.RstObject object at 0x...>]}
 
     '''
 
@@ -57,3 +72,9 @@ class Firmant(object):
             mod = get_module(mod)
             parser = getattr(mod, attr)
             self.parsers[key] = parser(self.settings)
+
+    def parse(self):
+        # Parse documents
+        self.objs = dict()
+        for key, parser in self.parsers.items():
+            self.objs[key] = parser.parse()
