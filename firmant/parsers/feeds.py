@@ -72,12 +72,12 @@ class FeedParser(RstParser):
         >>> f.body
         u''
 
-    Note that entries are not cross-referenced at this point.  This also implies
+    Note that posts are not cross-referenced at this point.  This also implies
     that the update time is not set::
 
-        >>> f.entries
+        >>> f.posts
         Traceback (most recent call last):
-        AttributeError: 'RstObject' object has no attribute 'entries'
+        AttributeError: 'RstObject' object has no attribute 'posts'
         >>> f.updated
         Traceback (most recent call last):
         AttributeError: 'RstObject' object has no attribute 'updated'

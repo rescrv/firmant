@@ -110,7 +110,7 @@ class PostParser(RstParser):
     def paths(self):
         '''Return a list of paths to objects on the file system.
 
-        Consider all the contents of the entries directory (by default this is
+        Consider all the contents of the posts directory (by default this is
         ``content_root/posts``).  Only files ending in ``suffix`` are
         considered.
 

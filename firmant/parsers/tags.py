@@ -72,12 +72,12 @@ class TagParser(RstParser):
         >>> t.body
         u''
 
-    Note that entries are not cross-referenced at this point.  This also implies
+    Note that posts are not cross-referenced at this point.  This also implies
     that the update time is not set::
 
-        >>> t.entries
+        >>> t.posts
         Traceback (most recent call last):
-        AttributeError: 'RstObject' object has no attribute 'entries'
+        AttributeError: 'RstObject' object has no attribute 'posts'
         >>> t.updated
         Traceback (most recent call last):
         AttributeError: 'RstObject' object has no attribute 'updated'
