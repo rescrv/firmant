@@ -228,6 +228,24 @@ class PostArchiveMonthly(PostArchiveBase):
             return None
         return (post.published.year, post.published.month)
 
+    def url(self, month, page):
+        '''Return the URL for the month, page combination.
+
+            >>> pam = PostArchiveMonthly(settings, firmant.objs)
+            >>> pam.url((2009, 02), 100)
+            '/2009/02/page100.html'
+
+        Note that pages are 1-indexed::
+
+            >>> pam.url((2009, 02), 1)
+            '/2009/02/index.html'
+
+        '''
+        if page == 1:
+            return '/%04i/%02i/index.html' % month
+        else:
+            return '/%04i/%02i/page%i.html' % (month + (page,))
+
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
 
@@ -244,10 +262,7 @@ class PostArchiveMonthly(PostArchiveBase):
         '''
         ret = list()
         def action(month, page, num_pages, first, last, posts):
-            if page == 1:
-                ret.append('/%04i/%02i/index.html' % month)
-            else:
-                ret.append('/%04i/%02i/page%i.html' % (month + (page,)))
+            ret.append(self.url(month, page))
         self.for_split_posts(self.key, action)
         return ret
 
