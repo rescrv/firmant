@@ -317,6 +317,24 @@ class PostArchiveDaily(PostArchiveBase):
             return None
         return (post.published.year, post.published.month, post.published.day)
 
+    def url(self, day, page):
+        '''Return the URL for the day, page combination.
+
+            >>> pad = PostArchiveDaily(settings, firmant.objs)
+            >>> pad.url((2009, 2, 28), 100)
+            '/2009/02/28/page100.html'
+
+        Note that pages are 1-indexed::
+
+            >>> pad.url((2009, 2, 28), 1)
+            '/2009/02/28/index.html'
+
+        '''
+        if page == 1:
+            return '/%04i/%02i/%02i/index.html' % day
+        else:
+            return '/%04i/%02i/%02i/page%i.html' % (day + (page,))
+
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
 
@@ -335,10 +353,7 @@ class PostArchiveDaily(PostArchiveBase):
         '''
         ret = list()
         def action(day, page, num_pages, first, last, posts):
-            if page == 1:
-                ret.append('/%04i/%02i/%02i/index.html' % day)
-            else:
-                ret.append('/%04i/%02i/%02i/page%i.html' % (day + (page,)))
+            ret.append(self.url(day, page))
         self.for_split_posts(self.key, action)
         return ret
 
