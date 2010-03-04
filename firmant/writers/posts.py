@@ -323,6 +323,7 @@ class PostArchiveDaily(PostArchiveBase):
 
         Example on testdata/pristine::
 
+        >>> settings.POSTS_PER_PAGE = 1
         >>> pad = PostArchiveDaily(settings, firmant.objs)
         >>> from pprint import pprint
         >>> pprint(pad.urls())
