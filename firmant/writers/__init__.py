@@ -41,6 +41,21 @@ class Writer(object):
         self.objs = objs
         self.log = logging.getLogger(class_name(self.__class__))
 
+    def urls(self):
+        '''Return a list of rooted paths that this writer will write.
+
+        Each path is assumed to be rooted relative to the webroot of the blog.
+
+        It is assumed that all paths begin with '/' and those ending with a '/'
+        implicitly include the additional path component 'index.html'.
+
+            >>> w = Writer(None, None)
+            >>> w.urls()
+            []
+
+        '''
+        return []
+
     def write(self):
         '''Write the objects to the filesystem.
 
