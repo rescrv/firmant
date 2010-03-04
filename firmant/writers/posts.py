@@ -67,12 +67,23 @@ class PostArchiveAll(PostArchiveBase):
         >>> paa = PostArchiveAll(settings, firmant.objs)
         >>> from pprint import pprint
         >>> pprint(paa.urls())
-        ['/index.html',
-         '/page2.html',
-         '/page3.html']
+        ['/index.html', '/page2.html', '/page3.html']
 
         '''
-        pass
+        per_page = self.settings.POSTS_PER_PAGE
+
+        posts = copy(self.objs['posts'])
+        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
+
+        split_posts = paginate.paginate(per_page, posts)
+
+        ret = list()
+        for page, num_pages, begin, end, posts in split_posts:
+            if page == 1:
+                ret.append('/index.html')
+            else:
+                ret.append('/page%i.html' % page)
+        return ret
 
     def write(self):
         '''Write the parsed posts to the filesystem.
