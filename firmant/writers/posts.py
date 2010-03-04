@@ -83,19 +83,17 @@ class PostArchiveAll(PostArchiveBase):
         ['/index.html', '/page2.html', '/page3.html']
 
         '''
-        per_page = self.settings.POSTS_PER_PAGE
-
-        posts = copy(self.objs['posts'])
-        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
-
-        split_posts = paginate.paginate(per_page, posts)
-
         ret = list()
-        for page, num_pages, begin, end, posts in split_posts:
+        def key(x):
+            if x is None:
+                return None
+            return True
+        def action(key, page, num_pages, first, last, posts):
             if page == 1:
                 ret.append('/index.html')
             else:
                 ret.append('/page%i.html' % page)
+        self.for_split_posts(key, action)
         return ret
 
     def write(self):
@@ -115,15 +113,13 @@ class PostArchiveAll(PostArchiveBase):
           - 2009-12-31-party
 
         '''
-        per_page = self.settings.POSTS_PER_PAGE
-
-        posts = copy(self.objs['posts'])
-        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
-
-        split_posts = paginate.paginate(per_page, posts)
-
-        for page, num_pages, begin, end, posts in split_posts:
-            self.render(page, num_pages, begin, end, posts)
+        def key(x):
+            if x is None:
+                return None
+            return True
+        def render(key, *args, **kwargs):
+            self.render(*args, **kwargs)
+        self.for_split_posts(key, render)
 
     def render(self, page, num_pages, first, last, posts):
         '''Render the function.
