@@ -59,6 +59,21 @@ class PostArchiveAll(PostArchiveBase):
 
     '''
 
+    def urls(self):
+        '''A list of rooted paths that are the path component of URLs.
+
+        Example on testdata/pristine::
+
+        >>> paa = PostArchiveAll(settings, firmant.objs)
+        >>> from pprint import pprint
+        >>> pprint(paa.urls())
+        ['/index.html',
+         '/page2.html',
+         '/page3.html']
+
+        '''
+        pass
+
     def write(self):
         '''Write the parsed posts to the filesystem.
 
@@ -106,6 +121,21 @@ class PostArchiveYearly(PostArchiveBase):
     This depends upon the objs having a value for the key ``posts``.
 
     '''
+
+    def urls(self):
+        '''A list of rooted paths that are the path component of URLs.
+
+        Example on testdata/pristine::
+
+        >>> pay = PostArchiveYearly(settings, firmant.objs)
+        >>> from pprint import pprint
+        >>> pprint(pay.urls())
+        ['/2010/index.html',
+         '/2010/page2.html',
+         '/2009/index.html']
+
+        '''
+        pass
 
     def write(self):
         '''Write the parsed posts to the filesystem.
@@ -164,6 +194,22 @@ class PostArchiveMonthly(PostArchiveBase):
     This depends upon the objs having a value for the key ``posts``.
 
     '''
+
+    def urls(self):
+        '''A list of rooted paths that are the path component of URLs.
+
+        Example on testdata/pristine::
+
+        >>> pam = PostArchiveMonthly(settings, firmant.objs)
+        >>> from pprint import pprint
+        >>> pprint(pam.urls())
+        ['/2010/02/index.html',
+         '/2010/02/page2.html',
+         '/2010/01/index.html',
+         '/2009/12/index.html']
+
+        '''
+        pass
 
     def write(self):
         '''Write the parsed posts to the filesystem.
@@ -224,6 +270,23 @@ class PostArchiveDaily(PostArchiveBase):
     This depends upon the objs having a value for the key ``posts``.
 
     '''
+
+    def urls(self):
+        '''A list of rooted paths that are the path component of URLs.
+
+        Example on testdata/pristine::
+
+        >>> pad = PostArchiveDaily(settings, firmant.objs)
+        >>> from pprint import pprint
+        >>> pprint(pad.urls())
+        ['/2010/02/02/index.html',
+         '/2010/02/02/page2.html',
+         '/2010/02/01/index.html',
+         '/2010/01/01/index.html',
+         '/2009/12/31/index.html']
+
+        '''
+        pass
 
     def write(self):
         '''Write the parsed posts to the filesystem.
