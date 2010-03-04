@@ -157,25 +157,17 @@ class PostArchiveYearly(PostArchiveBase):
         ['/2010/index.html', '/2010/page2.html', '/2009/index.html']
 
         '''
-        per_page = self.settings.POSTS_PER_PAGE
-
-        posts = copy(self.objs['posts'])
-        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
-
+        ret = list()
         def key(x):
             if x is None:
                 return None
             return x.published.year
-
-        ret = list()
-        split_lists = paginate.split_boundary(key, posts)
-        for year, split_list in split_lists:
-            split_posts = paginate.paginate(per_page, split_list)
-            for page, num_pages, begin, end, posts in split_posts:
-                if page == 1:
-                    ret.append('/%04i/index.html' % year)
-                else:
-                    ret.append('/%04i/page%i.html' % (year, page))
+        def action(year, page, num_pages, first, last, posts):
+            if page == 1:
+                ret.append('/%04i/index.html' % year)
+            else:
+                ret.append('/%04i/page%i.html' % (year, page))
+        self.for_split_posts(key, action)
         return ret
 
     def write(self):
@@ -198,21 +190,11 @@ class PostArchiveYearly(PostArchiveBase):
               - 2009-12-31-party
 
         '''
-        per_page = self.settings.POSTS_PER_PAGE
-
-        posts = copy(self.objs['posts'])
-        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
-
         def key(x):
             if x is None:
                 return None
             return x.published.year
-
-        split_lists = paginate.split_boundary(key, posts)
-        for year, split_list in split_lists:
-            split_posts = paginate.paginate(per_page, split_list)
-            for page, num_pages, begin, end, posts in split_posts:
-                self.render(year, page, num_pages, begin, end, posts)
+        self.for_split_posts(key, self.render)
 
     def render(self, year, page, num_pages, first, last, posts):
         '''Render the function.
