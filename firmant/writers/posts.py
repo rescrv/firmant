@@ -31,13 +31,8 @@ from firmant import paginate
 from firmant.writers import Writer
 
 
-class PostArchiveAll(Writer):
-    '''Parse the posts into a list, grouped by page.
-
-    The :func:``render`` function should be overrridden to actually render the
-    posts.
-
-    This depends upon the objs having a value for the key ``posts``.
+class PostArchiveBase(Writer):
+    '''Parse the posts into lists of size POSTS_PER_PAGE.
 
     When instantiating, if the setting for ``POSTS_PER_PAGE`` is not a
     positive, non-zero integer, it will raise a value error::
@@ -53,6 +48,16 @@ class PostArchiveAll(Writer):
         Writer.__init__(self, settings, objs)
         if settings.POSTS_PER_PAGE < 1:
             raise ValueError('POSTS_PER_PAGE must be a positive value.')
+
+class PostArchiveAll(PostArchiveBase):
+    '''Parse the posts into a list, grouped by page.
+
+    The :func:``render`` function should be overrridden to actually render the
+    posts.
+
+    This depends upon the objs having a value for the key ``posts``.
+
+    '''
 
     def write(self):
         '''Write the parsed posts to the filesystem.
@@ -103,7 +108,7 @@ class PostArchiveAll(Writer):
             print s % post.slug
 
 
-class PostArchiveYearly(Writer):
+class PostArchiveYearly(PostArchiveBase):
     '''Parse the posts into a list, grouped by year, then by page.
 
     The :func:``render`` function should be overrridden to actually render the
@@ -111,20 +116,7 @@ class PostArchiveYearly(Writer):
 
     This depends upon the objs having a value for the key ``posts``.
 
-    When instantiating, if the setting for ``POSTS_PER_PAGE`` is not a
-    positive, non-zero integer, it will raise a value error::
-
-        >>> from pysettings.settings import Settings
-        >>> PostArchiveYearly(Settings(POSTS_PER_PAGE=0), [])
-        Traceback (most recent call last):
-        ValueError: POSTS_PER_PAGE must be a positive value.
-
     '''
-
-    def __init__(self, settings, objs):
-        Writer.__init__(self, settings, objs)
-        if settings.POSTS_PER_PAGE < 1:
-            raise ValueError('POSTS_PER_PAGE must be a positive value.')
 
     def write(self):
         '''Write the parsed posts to the filesystem.
@@ -185,7 +177,7 @@ class PostArchiveYearly(Writer):
             print s % post.slug
 
 
-class PostArchiveMonthly(Writer):
+class PostArchiveMonthly(PostArchiveBase):
     '''Parse the posts into a list, grouped by month, then by page.
 
     The :func:``render`` function should be overrridden to actually render the
@@ -193,20 +185,7 @@ class PostArchiveMonthly(Writer):
 
     This depends upon the objs having a value for the key ``posts``.
 
-    When instantiating, if the setting for ``POSTS_PER_PAGE`` is not a
-    positive, non-zero integer, it will raise a value error::
-
-        >>> from pysettings.settings import Settings
-        >>> PostArchiveMonthly(Settings(POSTS_PER_PAGE=0), [])
-        Traceback (most recent call last):
-        ValueError: POSTS_PER_PAGE must be a positive value.
-
     '''
-
-    def __init__(self, settings, objs):
-        Writer.__init__(self, settings, objs)
-        if settings.POSTS_PER_PAGE < 1:
-            raise ValueError('POSTS_PER_PAGE must be a positive value.')
 
     def write(self):
         '''Write the parsed posts to the filesystem.
@@ -269,7 +248,7 @@ class PostArchiveMonthly(Writer):
             print s % post.slug
 
 
-class PostArchiveDaily(Writer):
+class PostArchiveDaily(PostArchiveBase):
     '''Parse the posts into a list, grouped by day, then by page.
 
     The :func:``render`` function should be overrridden to actually render the
@@ -277,20 +256,7 @@ class PostArchiveDaily(Writer):
 
     This depends upon the objs having a value for the key ``posts``.
 
-    When instantiating, if the setting for ``POSTS_PER_PAGE`` is not a
-    positive, non-zero integer, it will raise a value error::
-
-        >>> from pysettings.settings import Settings
-        >>> PostArchiveDaily(Settings(POSTS_PER_PAGE=0), [])
-        Traceback (most recent call last):
-        ValueError: POSTS_PER_PAGE must be a positive value.
-
     '''
-
-    def __init__(self, settings, objs):
-        Writer.__init__(self, settings, objs)
-        if settings.POSTS_PER_PAGE < 1:
-            raise ValueError('POSTS_PER_PAGE must be a positive value.')
 
     def write(self):
         '''Write the parsed posts to the filesystem.
