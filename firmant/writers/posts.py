@@ -347,25 +347,17 @@ class PostArchiveDaily(PostArchiveBase):
          '/2009/12/31/index.html']
 
         '''
-        per_page = self.settings.POSTS_PER_PAGE
-
-        posts = copy(self.objs['posts'])
-        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
-
+        ret = list()
         def key(x):
             if x is None:
                 return None
             return (x.published.year, x.published.month, x.published.day)
-
-        ret = list()
-        split_lists = paginate.split_boundary(key, posts)
-        for day, split_list in split_lists:
-            split_posts = paginate.paginate(per_page, split_list)
-            for page, num_pages, begin, end, posts in split_posts:
-                if page == 1:
-                    ret.append('/%04i/%02i/%02i/index.html' % day)
-                else:
-                    ret.append('/%04i/%02i/%02i/page%i.html' % (day + (page,)))
+        def action(day, page, num_pages, first, last, posts):
+            if page == 1:
+                ret.append('/%04i/%02i/%02i/index.html' % day)
+            else:
+                ret.append('/%04i/%02i/%02i/page%i.html' % (day + (page,)))
+        self.for_split_posts(key, action)
         return ret
 
     def write(self):
@@ -393,21 +385,11 @@ class PostArchiveDaily(PostArchiveBase):
               - 2009-12-31-party
 
         '''
-        per_page = self.settings.POSTS_PER_PAGE
-
-        posts = copy(self.objs['posts'])
-        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
-
         def key(x):
             if x is None:
                 return None
             return (x.published.year, x.published.month, x.published.day)
-
-        split_lists = paginate.split_boundary(key, posts)
-        for day, split_list in split_lists:
-            split_posts = paginate.paginate(per_page, split_list)
-            for page, num_pages, begin, end, posts in split_posts:
-                self.render(day, page, num_pages, begin, end, posts)
+        self.for_split_posts(key, self.render)
 
     def render(self, day, page, num_pages, first, last, posts):
         '''Render the function.
