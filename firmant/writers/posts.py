@@ -144,6 +144,24 @@ class PostArchiveYearly(PostArchiveBase):
             return None
         return post.published.year
 
+    def url(self, year, page):
+        '''Return the URL for the year, page combination.
+
+            >>> pay = PostArchiveYearly(settings, firmant.objs)
+            >>> pay.url(2009, 100)
+            '/2009/page100.html'
+
+        Note that pages are 1-indexed::
+
+            >>> pay.url(2009, 1)
+            '/2009/index.html'
+
+        '''
+        if page == 1:
+            return '/%04i/index.html' % year
+        else:
+            return '/%04i/page%i.html' % (year, page)
+
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
 
@@ -157,10 +175,7 @@ class PostArchiveYearly(PostArchiveBase):
         '''
         ret = list()
         def action(year, page, num_pages, first, last, posts):
-            if page == 1:
-                ret.append('/%04i/index.html' % year)
-            else:
-                ret.append('/%04i/page%i.html' % (year, page))
+            ret.append(self.url(year, page))
         self.for_split_posts(self.key, action)
         return ret
 
