@@ -72,6 +72,11 @@ class PostArchiveAll(PostArchiveBase):
 
     '''
 
+    def key(self, post):
+        if post is None:
+            return None
+        return True
+
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
 
@@ -84,16 +89,12 @@ class PostArchiveAll(PostArchiveBase):
 
         '''
         ret = list()
-        def key(x):
-            if x is None:
-                return None
-            return True
         def action(key, page, num_pages, first, last, posts):
             if page == 1:
                 ret.append('/index.html')
             else:
                 ret.append('/page%i.html' % page)
-        self.for_split_posts(key, action)
+        self.for_split_posts(self.key, action)
         return ret
 
     def write(self):
@@ -113,13 +114,9 @@ class PostArchiveAll(PostArchiveBase):
           - 2009-12-31-party
 
         '''
-        def key(x):
-            if x is None:
-                return None
-            return True
         def render(key, *args, **kwargs):
             self.render(*args, **kwargs)
-        self.for_split_posts(key, render)
+        self.for_split_posts(self.key, render)
 
     def render(self, page, num_pages, first, last, posts):
         '''Render the function.
@@ -142,6 +139,11 @@ class PostArchiveYearly(PostArchiveBase):
 
     '''
 
+    def key(self, post):
+        if post is None:
+            return None
+        return post.published.year
+
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
 
@@ -154,16 +156,12 @@ class PostArchiveYearly(PostArchiveBase):
 
         '''
         ret = list()
-        def key(x):
-            if x is None:
-                return None
-            return x.published.year
         def action(year, page, num_pages, first, last, posts):
             if page == 1:
                 ret.append('/%04i/index.html' % year)
             else:
                 ret.append('/%04i/page%i.html' % (year, page))
-        self.for_split_posts(key, action)
+        self.for_split_posts(self.key, action)
         return ret
 
     def write(self):
@@ -186,11 +184,7 @@ class PostArchiveYearly(PostArchiveBase):
               - 2009-12-31-party
 
         '''
-        def key(x):
-            if x is None:
-                return None
-            return x.published.year
-        self.for_split_posts(key, self.render)
+        self.for_split_posts(self.key, self.render)
 
     def render(self, year, page, num_pages, first, last, posts):
         '''Render the function.
@@ -214,6 +208,11 @@ class PostArchiveMonthly(PostArchiveBase):
 
     '''
 
+    def key(self, post):
+        if post is None:
+            return None
+        return (post.published.year, post.published.month)
+
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
 
@@ -229,16 +228,12 @@ class PostArchiveMonthly(PostArchiveBase):
 
         '''
         ret = list()
-        def key(x):
-            if x is None:
-                return None
-            return (x.published.year, x.published.month)
         def action(month, page, num_pages, first, last, posts):
             if page == 1:
                 ret.append('/%04i/%02i/index.html' % month)
             else:
                 ret.append('/%04i/%02i/page%i.html' % (month + (page,)))
-        self.for_split_posts(key, action)
+        self.for_split_posts(self.key, action)
         return ret
 
     def write(self):
@@ -263,11 +258,7 @@ class PostArchiveMonthly(PostArchiveBase):
               - 2009-12-31-party
 
         '''
-        def key(x):
-            if x is None:
-                return None
-            return (x.published.year, x.published.month)
-        self.for_split_posts(key, self.render)
+        self.for_split_posts(self.key, self.render)
 
     def render(self, month, page, num_pages, first, last, posts):
         '''Render the function.
@@ -291,6 +282,11 @@ class PostArchiveDaily(PostArchiveBase):
 
     '''
 
+    def key(self, post):
+        if post is None:
+            return None
+        return (post.published.year, post.published.month, post.published.day)
+
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
 
@@ -308,16 +304,12 @@ class PostArchiveDaily(PostArchiveBase):
 
         '''
         ret = list()
-        def key(x):
-            if x is None:
-                return None
-            return (x.published.year, x.published.month, x.published.day)
         def action(day, page, num_pages, first, last, posts):
             if page == 1:
                 ret.append('/%04i/%02i/%02i/index.html' % day)
             else:
                 ret.append('/%04i/%02i/%02i/page%i.html' % (day + (page,)))
-        self.for_split_posts(key, action)
+        self.for_split_posts(self.key, action)
         return ret
 
     def write(self):
@@ -345,11 +337,7 @@ class PostArchiveDaily(PostArchiveBase):
               - 2009-12-31-party
 
         '''
-        def key(x):
-            if x is None:
-                return None
-            return (x.published.year, x.published.month, x.published.day)
-        self.for_split_posts(key, self.render)
+        self.for_split_posts(self.key, self.render)
 
     def render(self, day, page, num_pages, first, last, posts):
         '''Render the function.
