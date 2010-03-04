@@ -334,7 +334,26 @@ class PostArchiveDaily(PostArchiveBase):
          '/2009/12/31/index.html']
 
         '''
-        pass
+        per_page = self.settings.POSTS_PER_PAGE
+
+        posts = copy(self.objs['posts'])
+        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
+
+        def key(x):
+            if x is None:
+                return None
+            return (x.published.year, x.published.month, x.published.day)
+
+        ret = list()
+        split_lists = paginate.split_boundary(key, posts)
+        for day, split_list in split_lists:
+            split_posts = paginate.paginate(per_page, split_list)
+            for page, num_pages, begin, end, posts in split_posts:
+                if page == 1:
+                    ret.append('/%04i/%02i/%02i/index.html' % day)
+                else:
+                    ret.append('/%04i/%02i/%02i/page%i.html' % (day + (page,)))
+        return ret
 
     def write(self):
         '''Write the parsed posts to the filesystem.
