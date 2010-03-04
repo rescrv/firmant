@@ -250,25 +250,17 @@ class PostArchiveMonthly(PostArchiveBase):
          '/2009/12/index.html']
 
         '''
-        per_page = self.settings.POSTS_PER_PAGE
-
-        posts = copy(self.objs['posts'])
-        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
-
+        ret = list()
         def key(x):
             if x is None:
                 return None
             return (x.published.year, x.published.month)
-
-        ret = list()
-        split_lists = paginate.split_boundary(key, posts)
-        for month, split_list in split_lists:
-            split_posts = paginate.paginate(per_page, split_list)
-            for page, num_pages, begin, end, posts in split_posts:
-                if page == 1:
-                    ret.append('/%04i/%02i/index.html' % month)
-                else:
-                    ret.append('/%04i/%02i/page%i.html' % (month + (page,)))
+        def action(month, page, num_pages, first, last, posts):
+            if page == 1:
+                ret.append('/%04i/%02i/index.html' % month)
+            else:
+                ret.append('/%04i/%02i/page%i.html' % (month + (page,)))
+        self.for_split_posts(key, action)
         return ret
 
     def write(self):
@@ -293,21 +285,11 @@ class PostArchiveMonthly(PostArchiveBase):
               - 2009-12-31-party
 
         '''
-        per_page = self.settings.POSTS_PER_PAGE
-
-        posts = copy(self.objs['posts'])
-        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
-
         def key(x):
             if x is None:
                 return None
             return (x.published.year, x.published.month)
-
-        split_lists = paginate.split_boundary(key, posts)
-        for month, split_list in split_lists:
-            split_posts = paginate.paginate(per_page, split_list)
-            for page, num_pages, begin, end, posts in split_posts:
-                self.render(month, page, num_pages, begin, end, posts)
+        self.for_split_posts(key, self.render)
 
     def render(self, month, page, num_pages, first, last, posts):
         '''Render the function.
