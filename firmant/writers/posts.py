@@ -49,6 +49,19 @@ class PostArchiveBase(Writer):
         if settings.POSTS_PER_PAGE < 1:
             raise ValueError('POSTS_PER_PAGE must be a positive value.')
 
+    def for_split_posts(self, key, action):
+        per_page = self.settings.POSTS_PER_PAGE
+
+        posts = copy(self.objs['posts'])
+        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
+
+        split_lists = paginate.split_boundary(key, posts)
+        for key, split_list in split_lists:
+            split_posts = paginate.paginate(per_page, split_list)
+            for page, num_pages, begin, end, posts in split_posts:
+                action(key, page, num_pages, begin, end, posts)
+
+
 class PostArchiveAll(PostArchiveBase):
     '''Parse the posts into a list, grouped by page.
 
