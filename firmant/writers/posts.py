@@ -64,18 +64,7 @@ class PostArchiveAll(PostArchiveBase):
 
         Example on testdata/pristine::
 
-        >>> from pysettings.settings import Settings
-        >>> from firmant.application import Firmant
-        >>> s = {'PARSERS': {'posts': 'firmant.parsers.posts.PostParser'}
-        ...     ,'CONTENT_ROOT': 'testdata/pristine'
-        ...     ,'POSTS_SUBDIR': 'posts'
-        ...     ,'REST_EXTENSION': 'rst'
-        ...     ,'POSTS_PER_PAGE': 2
-        ...     }
-        >>> s = Settings(s)
-        >>> f = Firmant(s)
-        >>> f.parse()
-        >>> paa = PostArchiveAll(s, f.objs)
+        >>> paa = PostArchiveAll(settings, firmant.objs)
         >>> paa.write()
         Page 1 1-2 of 3:
           - 2010-02-02-newday2
@@ -123,18 +112,7 @@ class PostArchiveYearly(PostArchiveBase):
 
         Example on testdata/pristine::
 
-        >>> from pysettings.settings import Settings
-        >>> from firmant.application import Firmant
-        >>> s = {'PARSERS': {'posts': 'firmant.parsers.posts.PostParser'}
-        ...     ,'CONTENT_ROOT': 'testdata/pristine'
-        ...     ,'POSTS_SUBDIR': 'posts'
-        ...     ,'REST_EXTENSION': 'rst'
-        ...     ,'POSTS_PER_PAGE': 2
-        ...     }
-        >>> s = Settings(s)
-        >>> f = Firmant(s)
-        >>> f.parse()
-        >>> pay = PostArchiveYearly(s, f.objs)
+        >>> pay = PostArchiveYearly(settings, firmant.objs)
         >>> pay.write()
         Year 2010:
             Page 1 1-2 of 2:
@@ -192,18 +170,7 @@ class PostArchiveMonthly(PostArchiveBase):
 
         Example on testdata/pristine::
 
-        >>> from pysettings.settings import Settings
-        >>> from firmant.application import Firmant
-        >>> s = {'PARSERS': {'posts': 'firmant.parsers.posts.PostParser'}
-        ...     ,'CONTENT_ROOT': 'testdata/pristine'
-        ...     ,'POSTS_SUBDIR': 'posts'
-        ...     ,'REST_EXTENSION': 'rst'
-        ...     ,'POSTS_PER_PAGE': 2
-        ...     }
-        >>> s = Settings(s)
-        >>> f = Firmant(s)
-        >>> f.parse()
-        >>> pam = PostArchiveMonthly(s, f.objs)
+        >>> pam = PostArchiveMonthly(settings, firmant.objs)
         >>> pam.write()
         Month 2010-02:
             Page 1 1-2 of 2:
@@ -263,18 +230,8 @@ class PostArchiveDaily(PostArchiveBase):
 
         Example on testdata/pristine::
 
-        >>> from pysettings.settings import Settings
-        >>> from firmant.application import Firmant
-        >>> s = {'PARSERS': {'posts': 'firmant.parsers.posts.PostParser'}
-        ...     ,'CONTENT_ROOT': 'testdata/pristine'
-        ...     ,'POSTS_SUBDIR': 'posts'
-        ...     ,'REST_EXTENSION': 'rst'
-        ...     ,'POSTS_PER_PAGE': 1
-        ...     }
-        >>> s = Settings(s)
-        >>> f = Firmant(s)
-        >>> f.parse()
-        >>> pad = PostArchiveDaily(s, f.objs)
+        >>> settings.POSTS_PER_PAGE = 1
+        >>> pad = PostArchiveDaily(settings, firmant.objs)
         >>> pad.write()
         Day 2010-02-02:
             Page 1 1-1 of 2:
@@ -319,3 +276,19 @@ class PostArchiveDaily(PostArchiveBase):
         for post in posts:
             s = post.published.strftime('      - %Y-%m-%d-%%s')
             print s % post.slug
+
+
+def _setUp(self):
+    from pysettings.settings import Settings
+    from firmant.application import Firmant
+    s = {'PARSERS': {'posts': 'firmant.parsers.posts.PostParser'}
+        ,'CONTENT_ROOT': 'testdata/pristine'
+        ,'POSTS_SUBDIR': 'posts'
+        ,'REST_EXTENSION': 'rst'
+        ,'POSTS_PER_PAGE': 2
+        }
+    settings               = Settings(s)
+    firmant                = Firmant(settings)
+    firmant.parse()
+    self.globs['settings'] = settings
+    self.globs['firmant']  = firmant
