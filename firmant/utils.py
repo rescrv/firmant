@@ -133,3 +133,29 @@ def strptime(date_string, formats):
         error = "time data '%s' does not match any format." % date_string
         raise ValueError(error)
     return dt
+
+
+def merge_dicts(a, b):
+    '''Merge two dictionaries.  Return the merge.
+
+    Where identical keys correspond to conflicting values, a ValueError is
+    rasied.
+
+        >>> from pprint import pprint
+        >>> pprint(merge_dicts({'a': 1}, {'b': 2}))
+        {'a': 1, 'b': 2}
+        >>> pprint(merge_dicts({'a': 1, 'b': 2}, {'b': 2}))
+        {'a': 1, 'b': 2}
+        >>> pprint(merge_dicts({'a': 1, 'b': 2}, {'b': 3}))
+        Traceback (most recent call last):
+        ValueError: Conflicting values for 'b'
+
+    '''
+    conflicts = set(a.keys()) & set(b.keys())
+
+    ret = a.copy()
+    for key in conflicts:
+        if key in a and key in b and a[key] != b[key]:
+            raise ValueError("Conflicting values for '%s'" % key)
+    ret.update(b)
+    return ret
