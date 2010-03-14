@@ -69,14 +69,18 @@ class AbstractPath(object):
         return self.attributes - set(self.bound_attributes.keys())
 
     def match(self, *args, **kwargs):
+        # Provided values must exactly cover all attributes and not conflict
+        # with bound attributes.
         d = merge_dicts(kwargs, *args)
+
+        # Check for conflict with bound values
         try:
-            d = merge_dicts(d, self.bound_attributes)
+            merge_dicts(d, self.bound_attributes)
         except ValueError:
             return False
 
-        a = set(d.keys())
-        b = self.attributes
+        a = set(self.attributes)
+        b = set(d.keys())
         return a & b == a | b
 
     def construct(self, *args, **kwargs):
@@ -141,6 +145,50 @@ class SinglePathComponent(AbstractPath):
         return self._conv(d[self._attribute])
 
 
+class BoundNullPathComponent(AbstractPath):
+    '''A path component that does not impact the URL.
+
+    In this example, a path component is created that will match if the
+    attribute `month` is 3::
+
+        >>> bnpc = BoundNullPathComponent('month', 3)
+        >>> bnpc.attributes
+        set(['month'])
+        >>> bnpc.bound_attributes
+        {'month': 3}
+        >>> bnpc.free_attributes
+        set([])
+        >>> bnpc.match({'month': 3})
+        True
+        >>> bnpc.match(month=3)
+        True
+        >>> bnpc.construct({'month': 3}) is None
+        True
+        >>> bnpc.construct(month=3) is None
+        True
+
+    '''
+
+    def __init__(self, attribute, value):
+        self._attribute = attribute
+        self._value = value
+
+    @property
+    def attributes(self):
+        return set([self._attribute])
+
+    @property
+    def bound_attributes(self):
+        d = dict()
+        d[self._attribute] = self._value
+        return d
+
+    def construct(self, *args, **kwargs):
+        if not self.match(*args, **kwargs):
+            raise ValueError('Attributes do not match URL')
+        return None
+
+
 class CompoundComponent(AbstractPath):
     '''A compound path formed using zero or more AbstractPath objects.
 
@@ -158,6 +206,26 @@ class CompoundComponent(AbstractPath):
         False
         >>> ymd.construct(year=2010, month=3, day=14)
         '2010/03/14'
+
+    With a null path component::
+
+        >>> bnpc = BoundNullPathComponent('type', 'tag')
+        >>> slug = SinglePathComponent('slug', str)
+        >>> path = bnpc/slug
+        >>> path #doctest: +ELLIPSIS
+        <firmant.routing.CompoundComponent object at 0x...>
+        >>> path.attributes
+        set(['type', 'slug'])
+        >>> path.bound_attributes
+        {'type': 'tag'}
+        >>> path.free_attributes
+        set(['slug'])
+        >>> path.match(slug='foobar')
+        False
+        >>> path.match(type='tag', slug='foobar')
+        True
+        >>> path.construct(type='tag', slug='foobar')
+        'foobar'
 
     '''
 
