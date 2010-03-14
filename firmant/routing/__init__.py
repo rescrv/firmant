@@ -82,6 +82,9 @@ class AbstractPath(object):
     def construct(self, *args, **kwargs):
         raise RuntimeError("Not Implemented")
 
+    def __div__(self, rhs):
+        return CompoundComponent(self, rhs)
+
 
 class SinglePathComponent(AbstractPath):
     '''A single piece of a URL.
@@ -136,3 +139,54 @@ class SinglePathComponent(AbstractPath):
             raise ValueError('Attributes do not match URL')
         d = merge_dicts(kwargs, *args)
         return self._conv(d[self._attribute])
+
+
+class CompoundComponent(AbstractPath):
+    '''A compound path formed using zero or more AbstractPath objects.
+
+    Example usage::
+
+        >>> year = SinglePathComponent('year', lambda y: '%04i' % y)
+        >>> month = SinglePathComponent('month', lambda m: '%02i' % m)
+        >>> day = SinglePathComponent('day', lambda d: '%02i' % d)
+        >>> ymd = year/month/day
+        >>> ymd #doctest: +ELLIPSIS
+        <firmant.routing.CompoundComponent object at 0x...>
+        >>> ymd.match(year=2010, month=3, day=14)
+        True
+        >>> ymd.match(year=2010, month=3, day=14, slug='foobar')
+        False
+        >>> ymd.construct(year=2010, month=3, day=14)
+        '2010/03/14'
+
+    '''
+
+    def __init__(self, *args):
+        self._components = args
+
+    @property
+    def attributes(self):
+        list_of_sets = map(lambda x: x.attributes, self._components)
+        return reduce(set.__or__, list_of_sets)
+
+    @property
+    def bound_attributes(self):
+        list_of_sets = map(lambda x: x.bound_attributes, self._components)
+        return reduce(merge_dicts, list_of_sets)
+
+    def construct(self, *args, **kwargs):
+        if not self.match(*args, **kwargs):
+            raise ValueError('Attributes do not match URL')
+        d = merge_dicts(kwargs, *args)
+        list_of_paths = map(lambda x: self._call_construct(x, d),
+                self._components)
+        list_of_paths = filter(bool, list_of_paths)
+        return '/'.join(list_of_paths)
+
+    @classmethod
+    def _call_construct(cls, component, d):
+        e = d.copy()
+        for key in e.keys():
+            if key not in component.attributes:
+                e.pop(key, None)
+        return component.construct(e)
