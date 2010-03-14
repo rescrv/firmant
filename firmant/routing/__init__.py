@@ -189,6 +189,45 @@ class BoundNullPathComponent(AbstractPath):
         return None
 
 
+class StaticPathComponent(AbstractPath):
+    '''A path component that does not have any attributes.
+
+    In this example, a path component is created that will construct to the path
+    ``images``::
+
+        >>> spc = StaticPathComponent('images')
+        >>> spc.attributes
+        set([])
+        >>> spc.bound_attributes
+        {}
+        >>> spc.free_attributes
+        set([])
+        >>> spc.match({'month': 3})
+        False
+        >>> spc.match()
+        True
+        >>> spc.construct()
+        'images'
+
+    '''
+
+    def __init__(self, path):
+        self._path = str(path)
+
+    @property
+    def attributes(self):
+        return set([])
+
+    @property
+    def bound_attributes(self):
+        return {}
+
+    def construct(self, *args, **kwargs):
+        if not self.match(*args, **kwargs):
+            raise ValueError('Attributes do not match URL')
+        return self._path
+
+
 class CompoundComponent(AbstractPath):
     '''A compound path formed using zero or more AbstractPath objects.
 
@@ -226,6 +265,26 @@ class CompoundComponent(AbstractPath):
         True
         >>> path.construct(type='tag', slug='foobar')
         'foobar'
+
+    With a static path component::
+
+        >>> spc = StaticPathComponent('images')
+        >>> slug = SinglePathComponent('slug', str)
+        >>> path = spc/slug
+        >>> path #doctest: +ELLIPSIS
+        <firmant.routing.CompoundComponent object at 0x...>
+        >>> path.attributes
+        set(['slug'])
+        >>> path.bound_attributes
+        {}
+        >>> path.free_attributes
+        set(['slug'])
+        >>> path.match(slug='foobar')
+        True
+        >>> path.match(type='tag', slug='foobar')
+        False
+        >>> path.construct(slug='foobar')
+        'images/foobar'
 
     '''
 
