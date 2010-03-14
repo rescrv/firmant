@@ -135,27 +135,37 @@ def strptime(date_string, formats):
     return dt
 
 
-def merge_dicts(a, b):
+def merge_dicts(a, *args):
     '''Merge two dictionaries.  Return the merge.
 
     Where identical keys correspond to conflicting values, a ValueError is
     rasied.
 
         >>> from pprint import pprint
+        >>> pprint(merge_dicts({'a': 1}))
+        {'a': 1}
         >>> pprint(merge_dicts({'a': 1}, {'b': 2}))
         {'a': 1, 'b': 2}
         >>> pprint(merge_dicts({'a': 1, 'b': 2}, {'b': 2}))
         {'a': 1, 'b': 2}
+
+    More than two dictionaries may be merged as well::
+
+        >>> pprint(merge_dicts({'a': 1, 'b': 2}, {'b': 2}, {'c':3}))
+        {'a': 1, 'b': 2, 'c': 3}
+
+    Error conditions::
+
         >>> pprint(merge_dicts({'a': 1, 'b': 2}, {'b': 3}))
         Traceback (most recent call last):
         ValueError: Conflicting values for 'b'
 
     '''
-    conflicts = set(a.keys()) & set(b.keys())
-
     ret = a.copy()
-    for key in conflicts:
-        if key in a and key in b and a[key] != b[key]:
-            raise ValueError("Conflicting values for '%s'" % key)
-    ret.update(b)
+    for b in args:
+        conflicts = set(a.keys()) & set(b.keys())
+        for key in conflicts:
+            if key in a and key in b and a[key] != b[key]:
+                raise ValueError("Conflicting values for '%s'" % key)
+        ret.update(b)
     return ret
