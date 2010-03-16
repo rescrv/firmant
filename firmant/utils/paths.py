@@ -90,3 +90,35 @@ def cat(path, out=sys.stdout):
     for line in f:
         print >>out, line,
     f.close()
+
+
+def create_or_truncate(path):
+    r'''Return an ``path`` as an open file, creating dirs if necessary.
+
+    Example::
+
+        >>> import tempfile
+        >>> root = tempfile.mkdtemp()
+        >>> path = os.path.join(root, 'foo/bar/baz/quux')
+        >>> f = create_or_truncate(path)
+        >>> f.write('THIS IS THE FIRST TIME\n')
+        >>> f.flush() and f.close()
+
+        >>> from minimock import Mock
+        >>> m = Mock('output')
+        >>> cat(path, m)
+        Called output.write('THIS IS THE FIRST TIME\n')
+
+        >>> f2 = create_or_truncate(path)
+        >>> f2.write('THIS IS THE SECOND TIME\n')
+        >>> f2.flush() and f2.close()
+        >>> cat(path, m)
+        Called output.write('THIS IS THE SECOND TIME\n')
+
+        >>> # Cleanup after ourselves.
+        >>> import shutil
+        >>> shutil.rmtree(root)
+
+    '''
+    safe_mkdir(os.path.dirname(path))
+    return open(path, 'w+')
