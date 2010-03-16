@@ -143,38 +143,22 @@ class PostArchiveYearly(PostArchiveBase):
             return None
         return post.published.year
 
-    def url(self, year, page):
-        '''Return the URL for the year, page combination.
-
-            >>> pay = PostArchiveYearly(settings, firmant.objs)
-            >>> pay.url(2009, 100)
-            '/2009/page100.html'
-
-        Note that pages are 1-indexed::
-
-            >>> pay.url(2009, 1)
-            '/2009/index.html'
-
-        '''
-        if page == 1:
-            return '/%04i/index.html' % year
-        else:
-            return '/%04i/page%i.html' % (year, page)
-
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
 
         Example on testdata/pristine::
 
+        >>> settings.URLMapper.add(components.Type('post')/components.year/components.pageno)
         >>> pay = PostArchiveYearly(settings, firmant.objs)
         >>> from pprint import pprint
         >>> pprint(pay.urls())
-        ['/2010/index.html', '/2010/page2.html', '/2009/index.html']
+        ['2010/index.html', '2010/page2/index.html', '2009/index.html']
 
         '''
         ret = list()
         def action(year, page, num_pages, first, last, posts):
-            ret.append(self.url(year, page))
+            urlfor = self.settings.URLMapper.urlfor
+            ret.append(urlfor('html', type='post', year=year, page=page))
         self.for_split_posts(self.key, action)
         return ret
 
