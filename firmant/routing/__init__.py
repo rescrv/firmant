@@ -31,6 +31,8 @@ Writers are able to request a URL for a given set of attributes.
 '''
 
 
+import os.path
+
 from firmant.utils import class_name
 from firmant.utils import merge_dicts
 
@@ -344,6 +346,12 @@ class URLMapper(object):
         '2010'
         >>> um.lookup(type='post', unknown_attribute=True) is None
         True
+        >>> um.urlfor('html', type='post', slug='foobar', day=15, month=3, year=2010)
+        '2010/03/15/foobar/index.html'
+        >>> um.urlfor('html', type='post', year=2010)
+        '2010/index.html'
+        >>> um.urlfor('html', type='post', unknown_attribute=True) is None
+        True
 
     '''
 
@@ -355,7 +363,23 @@ class URLMapper(object):
         self._paths.append(path)
 
     def lookup(self, **kwargs):
+        '''Lookup the abstract representation of a page defined by attributes.
+
+        Unless you know to do otherwise, use :method:`urlfor` instead of this
+        method.
+        '''
         for path in self._paths:
             if path.match(kwargs):
                 return path.construct(kwargs)
         return None
+
+    def urlfor(self, format, **kwargs):
+        '''Return the path of a page relative to the content root.
+
+        Unless you know to do otherwise, use this method instead of
+        :method:`lookup`.
+
+        '''
+        path = self.lookup(**kwargs)
+        path = path or ''
+        return os.path.join(path, 'index.%s' % format)
