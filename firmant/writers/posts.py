@@ -285,43 +285,30 @@ class PostArchiveDaily(PostArchiveBase):
             return None
         return (post.published.year, post.published.month, post.published.day)
 
-    def url(self, day, page):
-        '''Return the URL for the day, page combination.
-
-            >>> pad = PostArchiveDaily(settings, firmant.objs)
-            >>> pad.url((2009, 2, 28), 100)
-            '/2009/02/28/page100.html'
-
-        Note that pages are 1-indexed::
-
-            >>> pad.url((2009, 2, 28), 1)
-            '/2009/02/28/index.html'
-
-        '''
-        if page == 1:
-            return '/%04i/%02i/%02i/index.html' % day
-        else:
-            return '/%04i/%02i/%02i/page%i.html' % (day + (page,))
-
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
 
         Example on testdata/pristine::
 
+        >>> c = components
         >>> settings.POSTS_PER_PAGE = 1
+        >>> settings.URLMapper.add(
+        ...     c.Type('post')/c.year/c.month/c.day/c.pageno)
         >>> pad = PostArchiveDaily(settings, firmant.objs)
         >>> from pprint import pprint
         >>> pprint(pad.urls())
-        ['/2010/02/02/index.html',
-         '/2010/02/02/page2.html',
-         '/2010/02/01/index.html',
-         '/2010/01/01/index.html',
-         '/2009/12/31/index.html']
+        ['2010/02/02/index.html',
+         '2010/02/02/page2/index.html',
+         '2010/02/01/index.html',
+         '2010/01/01/index.html',
+         '2009/12/31/index.html']
 
         '''
         ret = list()
         def action(day, page, num_pages, first, last, posts):
-            ret.append(self.url(day, page))
+            urlfor = self.settings.URLMapper.urlfor
+            ret.append(urlfor('html', type='post', page=page,
+                year=day[0], month=day[1], day=day[2]))
         self.for_split_posts(self.key, action)
         return ret
 
