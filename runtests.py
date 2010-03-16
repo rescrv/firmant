@@ -27,7 +27,7 @@ if __name__ == '__main__':
                'firmant.utils.paths',
                'firmant.writers',
                'firmant.writers.posts',
-               #'firmant.writers.j2'
+               'firmant.writers.j2'
               ]
 
     for module in modules:
