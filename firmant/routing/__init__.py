@@ -317,3 +317,45 @@ class CompoundComponent(AbstractPath):
             if key not in component.attributes:
                 e.pop(key, None)
         return component.construct(e)
+
+
+class URLMapper(object):
+    '''Convert between attributes and paths.
+
+    Example::
+
+        >>> # setup (this would be done by the Firmant object)
+        >>> post = BoundNullPathComponent('type', 'post')
+        >>> year = SinglePathComponent('year', lambda y: '%04i' % y)
+        >>> month = SinglePathComponent('month', lambda m: '%02i' % m)
+        >>> day = SinglePathComponent('day', lambda d: '%02i' % d)
+        >>> slug = SinglePathComponent('slug', str)
+        >>> from pysettings.settings import Settings
+        >>> um = URLMapper(settings=Settings())
+        >>> um.add( post/year/month/day/slug )
+        >>> um.add( post/year/month/day )
+        >>> um.add( post/year/month )
+        >>> um.add( post/year )
+
+        >>> # usage (this would be done within writers/transformers)
+        >>> um.lookup(type='post', slug='foobar', day=15, month=3, year=2010)
+        '2010/03/15/foobar'
+        >>> um.lookup(type='post', year=2010)
+        '2010'
+        >>> um.lookup(type='post', unknown_attribute=True) is None
+        True
+
+    '''
+
+    def __init__(self, settings):
+        settings.URLMapper = self
+        self._paths = list()
+
+    def add(self, path):
+        self._paths.append(path)
+
+    def lookup(self, **kwargs):
+        for path in self._paths:
+            if path.match(kwargs):
+                return path.construct(kwargs)
+        return None
