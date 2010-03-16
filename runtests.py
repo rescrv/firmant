@@ -24,6 +24,7 @@ if __name__ == '__main__':
                'firmant.routing',
                'firmant.routing.components',
                'firmant.utils',
+               'firmant.utils.paths',
                'firmant.writers',
                'firmant.writers.posts',
                #'firmant.writers.j2'

@@ -42,69 +42,6 @@ def class_name(cls):
     return str(cls)[8:-2]
 
 
-def safe_mkdir(path):
-    '''Make sure a directory exists.
-
-    This will only throw errors if creation is impossible.
-
-    Very similar in behavior to ``mkdir -p``.
-
-        >>> import tempfile
-        >>> root = tempfile.mkdtemp()
-
-        >>> # If the path exists, and is a dir, return immediately.
-        >>> safe_mkdir(root)
-
-        >>> # If the path exists, and is a file, raise an error.
-        >>> f = open(os.path.join(root, 'foo'), 'w+')
-        >>> safe_mkdir(os.path.join(root, 'foo'))
-        Traceback (most recent call last):
-        OSError
-
-        >>> # Else create the path.  If there is anything preventing the
-        >>> # directory from being created, raise an exception.
-        >>> safe_mkdir(os.path.join(root, 'bar/baz/quux'))
-
-        >>> # Cleanup after ourselves.
-        >>> import shutil
-        >>> shutil.rmtree(root)
-
-    '''
-    if os.path.exists(path) and os.path.isdir(path):
-        return
-    if os.path.exists(path):
-        raise OSError()
-    paths = list()
-    paths.append(os.path.split(path))
-    while paths[-1][0] not in ('/', ''):
-        paths.append(os.path.split(paths[-1][0]))
-    paths.pop()
-    while len(paths):
-        p = paths[-1][0]
-        if not os.path.exists(p):
-            os.mkdir(p)
-        paths.pop()
-    os.mkdir(path)
-
-
-def cat(path, out=sys.stdout):
-    r'''Write the contents of file ``path`` to ``out``.
-
-        >>> from minimock import Mock
-        >>> m = Mock('output')
-        >>> cat('testdata/settings/empty.py', m) #doctest: +ELLIPSIS
-        Called output.write('# Copyright (c) 2010, Robert Escriva\n')
-        ...
-        Called output.write(
-            '# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n')
-
-    '''
-    f = open(path)
-    for line in f:
-        print >>out, line,
-    f.close()
-
-
 def strptime(date_string, formats):
     '''Cast the date_string to the first format to match.
 
