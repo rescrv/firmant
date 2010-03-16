@@ -83,6 +83,59 @@ class Jinja2PostArchiveAll(posts.PostArchiveAll):
         f.close()
 
 
+class Jinja2PostArchiveYearly(posts.PostArchiveYearly):
+
+    fmt = 'html'
+
+    def render(self, year, page, num_pages, first, last, posts):
+        r'''Render the data in a Jinja2 template.
+
+            >>> c = components
+            >>> settings.URLMapper.add(c.Type('post')/c.year/c.pageno)
+            >>> j2pay = Jinja2PostArchiveYearly(settings, firmant.objs)
+            >>> j2pay.log = Mock('log')
+            >>> j2pay.write()
+            >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/index.html'))
+            Called stdout.write('Page 1/2\n')
+            Called stdout.write('Posts 1-2\n')
+            Called stdout.write('Year 2010\n')
+            Called stdout.write('2010-02-02-newday2\n')
+            Called stdout.write('2010-02-02-newday\n')
+            >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/page2/index.html'))
+            Called stdout.write('Page 2/2\n')
+            Called stdout.write('Posts 3-4\n')
+            Called stdout.write('Year 2010\n')
+            Called stdout.write('2010-02-01-newmonth\n')
+            Called stdout.write('2010-01-01-newyear\n')
+            >>> cat(os.path.join(settings.OUTPUT_DIR, '2009/index.html'))
+            Called stdout.write('Page 1/1\n')
+            Called stdout.write('Posts 1-1\n')
+            Called stdout.write('Year 2009\n')
+            Called stdout.write('2009-12-31-party\n')
+
+        '''
+        context = dict()
+        context['year']          = year
+        context['page_no']       = page
+        context['page_max']      = num_pages
+        context['first_post_no'] = first
+        context['last_post_no']  = last
+        context['posts']         = posts
+
+        loader = FileSystemLoader(self.settings.TEMPLATE_DIR)
+        env = Environment(loader=loader)
+
+        template = env.get_template('posts/archive_yearly.html')
+        data = template.render(context)
+
+        path = self.settings.OUTPUT_DIR
+        path = os.path.join(path, self.url(year, page) or '')
+        f    = utils.paths.create_or_truncate(path)
+        f.write(data.encode('utf-8'))
+        f.flush()
+        f.close()
+
+
 def _setUp(self):
     import tempfile
     from minimock import Mock
