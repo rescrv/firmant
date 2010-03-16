@@ -135,6 +135,59 @@ class Jinja2PostArchiveYearly(Jinja2Writer, posts.PostArchiveYearly):
         self.render_to_file(url, template, context)
 
 
+class Jinja2PostArchiveMonthly(Jinja2Writer, posts.PostArchiveMonthly):
+
+    fmt = 'html'
+
+    def render(self, month, page, num_pages, first, last, posts):
+        r'''Render the data in a Jinja2 template.
+
+            >>> c = components
+            >>> settings.URLMapper.add(
+            ...     c.Type('post')/c.year/c.month/c.pageno)
+            >>> j2pam = Jinja2PostArchiveMonthly(settings, firmant.objs)
+            >>> j2pam.log = Mock('log')
+            >>> j2pam.write()
+            >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/index.html'))
+            Called stdout.write('Page 1/2\n')
+            Called stdout.write('Posts 1-2\n')
+            Called stdout.write('Year 2010\n')
+            Called stdout.write('Month 2\n')
+            Called stdout.write('2010-02-02-newday2\n')
+            Called stdout.write('2010-02-02-newday\n')
+            >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/page2/index.html'))
+            Called stdout.write('Page 2/2\n')
+            Called stdout.write('Posts 3-3\n')
+            Called stdout.write('Year 2010\n')
+            Called stdout.write('Month 2\n')
+            Called stdout.write('2010-02-01-newmonth\n')
+            >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/01/index.html'))
+            Called stdout.write('Page 1/1\n')
+            Called stdout.write('Posts 1-1\n')
+            Called stdout.write('Year 2010\n')
+            Called stdout.write('Month 1\n')
+            Called stdout.write('2010-01-01-newyear\n')
+            >>> cat(os.path.join(settings.OUTPUT_DIR, '2009/12/index.html'))
+            Called stdout.write('Page 1/1\n')
+            Called stdout.write('Posts 1-1\n')
+            Called stdout.write('Year 2009\n')
+            Called stdout.write('Month 12\n')
+            Called stdout.write('2009-12-31-party\n')
+
+        '''
+        url = self.url(month[0], month[1], page)
+        template = 'posts/archive_monthly.html'
+        context = dict()
+        context['year']          = month[0]
+        context['month']         = month[1]
+        context['page_no']       = page
+        context['page_max']      = num_pages
+        context['first_post_no'] = first
+        context['last_post_no']  = last
+        context['posts']         = posts
+        self.render_to_file(url, template, context)
+
+
 def _setUp(self):
     import tempfile
     from minimock import Mock
