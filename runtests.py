@@ -22,6 +22,7 @@ if __name__ == '__main__':
                'firmant.parsers.posts',
                'firmant.parsers.tags',
                'firmant.routing',
+               'firmant.routing.components',
                'firmant.utils',
                'firmant.writers',
                'firmant.writers.posts',
