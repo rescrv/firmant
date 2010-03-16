@@ -211,41 +211,26 @@ class PostArchiveMonthly(PostArchiveBase):
             return None
         return (post.published.year, post.published.month)
 
-    def url(self, month, page):
-        '''Return the URL for the month, page combination.
-
-            >>> pam = PostArchiveMonthly(settings, firmant.objs)
-            >>> pam.url((2009, 02), 100)
-            '/2009/02/page100.html'
-
-        Note that pages are 1-indexed::
-
-            >>> pam.url((2009, 02), 1)
-            '/2009/02/index.html'
-
-        '''
-        if page == 1:
-            return '/%04i/%02i/index.html' % month
-        else:
-            return '/%04i/%02i/page%i.html' % (month + (page,))
-
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
 
         Example on testdata/pristine::
 
+        >>> settings.URLMapper.add(
+        ...     components.Type('post')/components.year/components.month/components.pageno)
         >>> pam = PostArchiveMonthly(settings, firmant.objs)
         >>> from pprint import pprint
         >>> pprint(pam.urls())
-        ['/2010/02/index.html',
-         '/2010/02/page2.html',
-         '/2010/01/index.html',
-         '/2009/12/index.html']
+        ['2010/02/index.html',
+         '2010/02/page2/index.html',
+         '2010/01/index.html',
+         '2009/12/index.html']
 
         '''
         ret = list()
         def action(month, page, num_pages, first, last, posts):
-            ret.append(self.url(month, page))
+            urlfor = self.settings.URLMapper.urlfor
+            ret.append(urlfor('html', type='post', year=month[0], month=month[1], page=page))
         self.for_split_posts(self.key, action)
         return ret
 
