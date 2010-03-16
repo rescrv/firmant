@@ -43,6 +43,15 @@ class Jinja2Writer(Writer):
         loader = FileSystemLoader(self.settings.TEMPLATE_DIR)
         self._env = Environment(loader=loader)
 
+    def render_to_file(self, path, template, context):
+        template = self._env.get_template(template)
+        data     = template.render(context)
+        path     = os.path.join(self.settings.OUTPUT_DIR, path or '')
+        f        = utils.paths.create_or_truncate(path)
+        f.write(data.encode('utf-8'))
+        f.flush()
+        f.close()
+
 
 class Jinja2PostArchiveAll(Jinja2Writer, posts.PostArchiveAll):
 
@@ -72,21 +81,15 @@ class Jinja2PostArchiveAll(Jinja2Writer, posts.PostArchiveAll):
             Called stdout.write('2009-12-31-party\n')
 
         '''
+        url = self.url(page)
+        template = 'posts/archive_all.html'
         context = dict()
         context['page_no']       = page
         context['page_max']      = num_pages
         context['first_post_no'] = first
         context['last_post_no']  = last
         context['posts']         = posts
-
-        template = self._env.get_template('posts/archive_all.html')
-        data = template.render(context)
-
-        path = os.path.join(self.settings.OUTPUT_DIR, self.url(page) or '')
-        f    = utils.paths.create_or_truncate(path)
-        f.write(data.encode('utf-8'))
-        f.flush()
-        f.close()
+        self.render_to_file(url, template, context)
 
 
 class Jinja2PostArchiveYearly(Jinja2Writer, posts.PostArchiveYearly):
@@ -120,6 +123,8 @@ class Jinja2PostArchiveYearly(Jinja2Writer, posts.PostArchiveYearly):
             Called stdout.write('2009-12-31-party\n')
 
         '''
+        url = self.url(year, page)
+        template = 'posts/archive_yearly.html'
         context = dict()
         context['year']          = year
         context['page_no']       = page
@@ -127,16 +132,7 @@ class Jinja2PostArchiveYearly(Jinja2Writer, posts.PostArchiveYearly):
         context['first_post_no'] = first
         context['last_post_no']  = last
         context['posts']         = posts
-
-        template = self._env.get_template('posts/archive_yearly.html')
-        data = template.render(context)
-
-        path = self.settings.OUTPUT_DIR
-        path = os.path.join(path, self.url(year, page) or '')
-        f    = utils.paths.create_or_truncate(path)
-        f.write(data.encode('utf-8'))
-        f.flush()
-        f.close()
+        self.render_to_file(url, template, context)
 
 
 def _setUp(self):
