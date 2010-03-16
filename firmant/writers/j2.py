@@ -196,6 +196,7 @@ class Jinja2PostArchiveDaily(Jinja2Writer, posts.PostArchiveDaily):
         r'''Render the data in a Jinja2 template.
 
             >>> c = components
+            >>> settings.POSTS_PER_PAGE = 1
             >>> settings.URLMapper.add(
             ...     c.Type('post')/c.year/c.month/c.day/c.pageno)
             >>> j2pad = Jinja2PostArchiveDaily(settings, firmant.objs)
