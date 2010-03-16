@@ -33,9 +33,18 @@ from jinja2 import FileSystemLoader
 
 from firmant import utils
 from firmant.writers import posts
+from firmant.writers import Writer
 
 
-class Jinja2PostArchiveAll(posts.PostArchiveAll):
+class Jinja2Writer(Writer):
+
+    def __init__(self, *args, **kwargs):
+        super(Jinja2Writer, self).__init__(*args, **kwargs)
+        loader = FileSystemLoader(self.settings.TEMPLATE_DIR)
+        self._env = Environment(loader=loader)
+
+
+class Jinja2PostArchiveAll(Jinja2Writer, posts.PostArchiveAll):
 
     fmt = 'html'
 
@@ -70,10 +79,7 @@ class Jinja2PostArchiveAll(posts.PostArchiveAll):
         context['last_post_no']  = last
         context['posts']         = posts
 
-        loader = FileSystemLoader(self.settings.TEMPLATE_DIR)
-        env = Environment(loader=loader)
-
-        template = env.get_template('posts/archive_all.html')
+        template = self._env.get_template('posts/archive_all.html')
         data = template.render(context)
 
         path = os.path.join(self.settings.OUTPUT_DIR, self.url(page) or '')
@@ -83,7 +89,7 @@ class Jinja2PostArchiveAll(posts.PostArchiveAll):
         f.close()
 
 
-class Jinja2PostArchiveYearly(posts.PostArchiveYearly):
+class Jinja2PostArchiveYearly(Jinja2Writer, posts.PostArchiveYearly):
 
     fmt = 'html'
 
@@ -122,10 +128,7 @@ class Jinja2PostArchiveYearly(posts.PostArchiveYearly):
         context['last_post_no']  = last
         context['posts']         = posts
 
-        loader = FileSystemLoader(self.settings.TEMPLATE_DIR)
-        env = Environment(loader=loader)
-
-        template = env.get_template('posts/archive_yearly.html')
+        template = self._env.get_template('posts/archive_yearly.html')
         data = template.render(context)
 
         path = self.settings.OUTPUT_DIR
