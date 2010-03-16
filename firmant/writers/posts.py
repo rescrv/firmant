@@ -82,18 +82,17 @@ class PostArchiveAll(PostArchiveBase):
 
         Example on testdata/pristine::
 
+        >>> settings.URLMapper.add(components.Type('post')/components.pageno)
         >>> paa = PostArchiveAll(settings, firmant.objs)
         >>> from pprint import pprint
         >>> pprint(paa.urls())
-        ['/index.html', '/page2.html', '/page3.html']
+        ['index.html', 'page2/index.html', 'page3/index.html']
 
         '''
         ret = list()
         def action(key, page, num_pages, first, last, posts):
-            if page == 1:
-                ret.append('/index.html')
-            else:
-                ret.append('/page%i.html' % page)
+            urlfor = self.settings.URLMapper.urlfor
+            ret.append(urlfor('html', type='post', page=page))
         self.for_split_posts(self.key, action)
         return ret
 
@@ -399,6 +398,8 @@ class PostArchiveDaily(PostArchiveBase):
 def _setUp(self):
     from pysettings.settings import Settings
     from firmant.application import Firmant
+    from firmant.routing import URLMapper
+    from firmant.routing import components
     s = {'PARSERS': {'posts': 'firmant.parsers.posts.PostParser'}
         ,'CONTENT_ROOT': 'testdata/pristine'
         ,'POSTS_SUBDIR': 'posts'
@@ -406,7 +407,10 @@ def _setUp(self):
         ,'POSTS_PER_PAGE': 2
         }
     settings               = Settings(s)
+    URLMapper(settings)
     firmant                = Firmant(settings)
     firmant.parse()
     self.globs['settings'] = settings
     self.globs['firmant']  = firmant
+    self.globs['URLMapper'] = URLMapper
+    self.globs['components'] = components
