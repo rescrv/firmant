@@ -188,6 +188,70 @@ class Jinja2PostArchiveMonthly(Jinja2Writer, posts.PostArchiveMonthly):
         self.render_to_file(url, template, context)
 
 
+class Jinja2PostArchiveDaily(Jinja2Writer, posts.PostArchiveDaily):
+
+    fmt = 'html'
+
+    def render(self, day, page, num_pages, first, last, posts):
+        r'''Render the data in a Jinja2 template.
+
+            >>> c = components
+            >>> settings.URLMapper.add(
+            ...     c.Type('post')/c.year/c.month/c.day/c.pageno)
+            >>> j2pad = Jinja2PostArchiveDaily(settings, firmant.objs)
+            >>> j2pad.log = Mock('log')
+            >>> j2pad.write()
+            >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/02/index.html'))
+            Called stdout.write('Page 1/2\n')
+            Called stdout.write('Posts 1-1\n')
+            Called stdout.write('Year 2010\n')
+            Called stdout.write('Month 2\n')
+            Called stdout.write('Day 2\n')
+            Called stdout.write('2010-02-02-newday2\n')
+            >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/02/page2/index.html'))
+            Called stdout.write('Page 2/2\n')
+            Called stdout.write('Posts 2-2\n')
+            Called stdout.write('Year 2010\n')
+            Called stdout.write('Month 2\n')
+            Called stdout.write('Day 2\n')
+            Called stdout.write('2010-02-02-newday\n')
+            >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/01/index.html'))
+            Called stdout.write('Page 1/1\n')
+            Called stdout.write('Posts 1-1\n')
+            Called stdout.write('Year 2010\n')
+            Called stdout.write('Month 2\n')
+            Called stdout.write('Day 1\n')
+            Called stdout.write('2010-02-01-newmonth\n')
+            >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/01/01/index.html'))
+            Called stdout.write('Page 1/1\n')
+            Called stdout.write('Posts 1-1\n')
+            Called stdout.write('Year 2010\n')
+            Called stdout.write('Month 1\n')
+            Called stdout.write('Day 1\n')
+            Called stdout.write('2010-01-01-newyear\n')
+            >>> cat(os.path.join(settings.OUTPUT_DIR, '2009/12/31/index.html'))
+            Called stdout.write('Page 1/1\n')
+            Called stdout.write('Posts 1-1\n')
+            Called stdout.write('Year 2009\n')
+            Called stdout.write('Month 12\n')
+            Called stdout.write('Day 31\n')
+            Called stdout.write('2009-12-31-party\n')
+
+        '''
+        url = self.url(day[0], day[1], day[2], page)
+        template = 'posts/archive_daily.html'
+        context = dict()
+        context['year']          = day[0]
+        context['month']         = day[1]
+        context['day']           = day[2]
+        context['page_no']       = page
+        context['page_max']      = num_pages
+        context['first_post_no'] = first
+        context['last_post_no']  = last
+        context['posts']         = posts
+        self.render_to_file(url, template, context)
+
+
 def _setUp(self):
     import tempfile
     from minimock import Mock
