@@ -72,10 +72,16 @@ class PostArchiveAll(PostArchiveBase):
 
     '''
 
+    fmt = 'html'
+
     def key(self, post):
         if post is None:
             return None
         return True
+
+    def url(self, page):
+        urlfor = self.settings.URLMapper.urlfor
+        return urlfor(self.fmt, type='post', page=page)
 
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
@@ -91,8 +97,7 @@ class PostArchiveAll(PostArchiveBase):
         '''
         ret = list()
         def action(key, page, num_pages, first, last, posts):
-            urlfor = self.settings.URLMapper.urlfor
-            ret.append(urlfor('html', type='post', page=page))
+            ret.append(self.url(page))
         self.for_split_posts(self.key, action)
         return ret
 
@@ -138,10 +143,16 @@ class PostArchiveYearly(PostArchiveBase):
 
     '''
 
+    fmt = 'html'
+
     def key(self, post):
         if post is None:
             return None
         return post.published.year
+
+    def url(self, year, page):
+        urlfor = self.settings.URLMapper.urlfor
+        return urlfor(self.fmt, type='post', year=year, page=page)
 
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
@@ -157,8 +168,7 @@ class PostArchiveYearly(PostArchiveBase):
         '''
         ret = list()
         def action(year, page, num_pages, first, last, posts):
-            urlfor = self.settings.URLMapper.urlfor
-            ret.append(urlfor('html', type='post', year=year, page=page))
+            ret.append(self.url(year, page))
         self.for_split_posts(self.key, action)
         return ret
 
@@ -206,10 +216,16 @@ class PostArchiveMonthly(PostArchiveBase):
 
     '''
 
+    fmt = 'html'
+
     def key(self, post):
         if post is None:
             return None
         return (post.published.year, post.published.month)
+
+    def url(self, year, month, page):
+        urlfor = self.settings.URLMapper.urlfor
+        return urlfor(self.fmt, type='post', year=year, month=month, page=page)
 
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
@@ -229,8 +245,7 @@ class PostArchiveMonthly(PostArchiveBase):
         '''
         ret = list()
         def action(month, page, num_pages, first, last, posts):
-            urlfor = self.settings.URLMapper.urlfor
-            ret.append(urlfor('html', type='post', year=month[0], month=month[1], page=page))
+            ret.append(self.url(month[0], month[1], page))
         self.for_split_posts(self.key, action)
         return ret
 
@@ -280,10 +295,17 @@ class PostArchiveDaily(PostArchiveBase):
 
     '''
 
+    fmt = 'html'
+
     def key(self, post):
         if post is None:
             return None
         return (post.published.year, post.published.month, post.published.day)
+
+    def url(self, year, month, day, page):
+        urlfor = self.settings.URLMapper.urlfor
+        return urlfor(self.fmt, type='post', year=year, month=month, day=day,
+                page=page)
 
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
@@ -306,9 +328,7 @@ class PostArchiveDaily(PostArchiveBase):
         '''
         ret = list()
         def action(day, page, num_pages, first, last, posts):
-            urlfor = self.settings.URLMapper.urlfor
-            ret.append(urlfor('html', type='post', page=page,
-                year=day[0], month=day[1], day=day[2]))
+            ret.append(self.url(day[0], day[1], day[2], page))
         self.for_split_posts(self.key, action)
         return ret
 
