@@ -344,8 +344,9 @@ class URLMapper(object):
         '2010/03/15/foobar'
         >>> um.lookup(type='post', year=2010)
         '2010'
-        >>> um.lookup(type='post', unknown_attribute=True) is None
-        True
+        >>> um.lookup(type='post', unknown_attribute=True)
+        Traceback (most recent call last):
+        AttributeError: Attributes do not correspond to any path
         >>> um.urlfor('html', type='post', slug='foobar', day=15, month=3, year=2010)
         '2010/03/15/foobar/index.html'
         >>> um.urlfor('html', type='post', year=2010)
@@ -371,7 +372,7 @@ class URLMapper(object):
         for path in self._paths:
             if path.match(kwargs):
                 return path.construct(kwargs)
-        return None
+        raise AttributeError('Attributes do not correspond to any path')
 
     def urlfor(self, format, **kwargs):
         '''Return the path of a page relative to the content root.
@@ -380,6 +381,9 @@ class URLMapper(object):
         :method:`lookup`.
 
         '''
-        path = self.lookup(**kwargs)
+        try:
+            path = self.lookup(**kwargs)
+        except AttributeError:
+            return None
         path = path or ''
         return os.path.join(path, 'index.%s' % format)
