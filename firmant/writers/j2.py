@@ -1,4 +1,3 @@
-
 # Copyright (c) 2010, Robert Escriva
 # All rights reserved.
 #
