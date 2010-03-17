@@ -59,7 +59,7 @@ class PostArchiveBase(Writer):
         for key, split_list in split_lists:
             split_posts = paginate.paginate(per_page, split_list)
             for page, num_pages, begin, end, posts in split_posts:
-                action(key, page, num_pages, begin, end, posts)
+                action(page, num_pages, begin, end, posts, *key)
 
     def url(self, **kwargs):
         urlfor = self.settings.URLMapper.urlfor
@@ -81,7 +81,7 @@ class PostArchiveAll(PostArchiveBase):
     def key(self, post):
         if post is None:
             return None
-        return True
+        return ()
 
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
@@ -96,7 +96,7 @@ class PostArchiveAll(PostArchiveBase):
 
         '''
         ret = list()
-        def action(key, page, num_pages, first, last, posts):
+        def action(page, num_pages, first, last, posts):
             ret.append(self.url(page=page))
         self.for_split_posts(self.key, action)
         return ret
@@ -118,9 +118,7 @@ class PostArchiveAll(PostArchiveBase):
           - 2009-12-31-party
 
         '''
-        def render(key, *args, **kwargs):
-            self.render(*args, **kwargs)
-        self.for_split_posts(self.key, render)
+        self.for_split_posts(self.key, self.render)
 
     def render(self, page, num_pages, first, last, posts):
         '''Render the function.
@@ -148,7 +146,7 @@ class PostArchiveYearly(PostArchiveBase):
     def key(self, post):
         if post is None:
             return None
-        return post.published.year
+        return (post.published.year,)
 
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
@@ -163,7 +161,7 @@ class PostArchiveYearly(PostArchiveBase):
 
         '''
         ret = list()
-        def action(year, page, num_pages, first, last, posts):
+        def action(page, num_pages, first, last, posts, year):
             ret.append(self.url(page=page, year=year))
         self.for_split_posts(self.key, action)
         return ret
@@ -190,7 +188,7 @@ class PostArchiveYearly(PostArchiveBase):
         '''
         self.for_split_posts(self.key, self.render)
 
-    def render(self, year, page, num_pages, first, last, posts):
+    def render(self, page, num_pages, first, last, posts, year):
         '''Render the function.
 
         This should be overridden in base classes.
@@ -236,8 +234,8 @@ class PostArchiveMonthly(PostArchiveBase):
 
         '''
         ret = list()
-        def action(month, page, num_pages, first, last, posts):
-            ret.append(self.url(page=page, year=month[0], month=month[1]))
+        def action(page, num_pages, first, last, posts, year, month):
+            ret.append(self.url(page=page, year=year, month=month))
         self.for_split_posts(self.key, action)
         return ret
 
@@ -265,12 +263,12 @@ class PostArchiveMonthly(PostArchiveBase):
         '''
         self.for_split_posts(self.key, self.render)
 
-    def render(self, month, page, num_pages, first, last, posts):
+    def render(self, page, num_pages, first, last, posts, year, month):
         '''Render the function.
 
         This should be overridden in base classes.
         '''
-        print 'Month %04i-%02i:' % month
+        print 'Month %04i-%02i:' % (year, month)
         print '    Page %i %i-%i of %i:' % (page, first, last, num_pages)
         for post in posts:
             s = post.published.strftime('      - %Y-%m-%d-%%s')
@@ -314,9 +312,8 @@ class PostArchiveDaily(PostArchiveBase):
 
         '''
         ret = list()
-        def action(day, page, num_pages, first, last, posts):
-            ret.append(self.url(page=page, year=day[0], month=day[1],
-                day=day[2]))
+        def action(page, num_pages, first, last, posts, year, month, day):
+            ret.append(self.url(page=page, year=year, month=month, day=day))
         self.for_split_posts(self.key, action)
         return ret
 
@@ -347,12 +344,12 @@ class PostArchiveDaily(PostArchiveBase):
         '''
         self.for_split_posts(self.key, self.render)
 
-    def render(self, day, page, num_pages, first, last, posts):
+    def render(self, page, num_pages, first, last, posts, year, month, day):
         '''Render the function.
 
         This should be overridden in base classes.
         '''
-        print 'Day %04i-%02i-%02i:' % day
+        print 'Day %04i-%02i-%02i:' % (year, month, day)
         print '    Page %i %i-%i of %i:' % (page, first, last, num_pages)
         for post in posts:
             s = post.published.strftime('      - %Y-%m-%d-%%s')

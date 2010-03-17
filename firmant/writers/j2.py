@@ -95,7 +95,7 @@ class Jinja2PostArchiveYearly(Jinja2Writer, posts.PostArchiveYearly):
 
     fmt = 'html'
 
-    def render(self, year, page, num_pages, first, last, posts):
+    def render(self, page, num_pages, first, last, posts, year):
         r'''Render the data in a Jinja2 template.
 
             >>> c = components
@@ -138,7 +138,7 @@ class Jinja2PostArchiveMonthly(Jinja2Writer, posts.PostArchiveMonthly):
 
     fmt = 'html'
 
-    def render(self, month, page, num_pages, first, last, posts):
+    def render(self, page, num_pages, first, last, posts, year, month):
         r'''Render the data in a Jinja2 template.
 
             >>> c = components
@@ -174,11 +174,11 @@ class Jinja2PostArchiveMonthly(Jinja2Writer, posts.PostArchiveMonthly):
             Called stdout.write('2009-12-31-party\n')
 
         '''
-        url = self.url(page=page, year=month[0], month=month[1])
+        url = self.url(page=page, year=year, month=month)
         template = 'posts/archive_monthly.html'
         context = dict()
-        context['year']          = month[0]
-        context['month']         = month[1]
+        context['year']          = year
+        context['month']         = month
         context['page_no']       = page
         context['page_max']      = num_pages
         context['first_post_no'] = first
@@ -191,7 +191,7 @@ class Jinja2PostArchiveDaily(Jinja2Writer, posts.PostArchiveDaily):
 
     fmt = 'html'
 
-    def render(self, day, page, num_pages, first, last, posts):
+    def render(self, page, num_pages, first, last, posts, year, month, day):
         r'''Render the data in a Jinja2 template.
 
             >>> c = components
@@ -238,12 +238,12 @@ class Jinja2PostArchiveDaily(Jinja2Writer, posts.PostArchiveDaily):
             Called stdout.write('2009-12-31-party\n')
 
         '''
-        url = self.url(page=page, year=day[0], month=day[1], day=day[2])
+        url = self.url(page=page, year=year, month=month, day=day)
         template = 'posts/archive_daily.html'
         context = dict()
-        context['year']          = day[0]
-        context['month']         = day[1]
-        context['day']           = day[2]
+        context['year']          = year
+        context['month']         = month
+        context['day']           = day
         context['page_no']       = page
         context['page_max']      = num_pages
         context['first_post_no'] = first
