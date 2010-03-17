@@ -81,7 +81,7 @@ class Jinja2PostArchiveAll(Jinja2Writer, posts.PostArchiveAll):
             Called stdout.write('2009-12-31-party\n')
 
         '''
-        url = self.url(page)
+        url = self.url(page=page)
         template = 'posts/archive_all.html'
         context = dict()
         context['page_no']       = page
@@ -123,7 +123,7 @@ class Jinja2PostArchiveYearly(Jinja2Writer, posts.PostArchiveYearly):
             Called stdout.write('2009-12-31-party\n')
 
         '''
-        url = self.url(year, page)
+        url = self.url(page=page, year=year)
         template = 'posts/archive_yearly.html'
         context = dict()
         context['year']          = year
@@ -175,7 +175,7 @@ class Jinja2PostArchiveMonthly(Jinja2Writer, posts.PostArchiveMonthly):
             Called stdout.write('2009-12-31-party\n')
 
         '''
-        url = self.url(month[0], month[1], page)
+        url = self.url(page=page, year=month[0], month=month[1])
         template = 'posts/archive_monthly.html'
         context = dict()
         context['year']          = month[0]
@@ -239,7 +239,7 @@ class Jinja2PostArchiveDaily(Jinja2Writer, posts.PostArchiveDaily):
             Called stdout.write('2009-12-31-party\n')
 
         '''
-        url = self.url(day[0], day[1], day[2], page)
+        url = self.url(page=page, year=day[0], month=day[1], day=day[2])
         template = 'posts/archive_daily.html'
         context = dict()
         context['year']          = day[0]
