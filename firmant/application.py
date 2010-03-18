@@ -27,6 +27,8 @@
 
 from pysettings.modules import get_module
 
+from firmant.utils import class_name
+
 
 class Firmant(object):
     '''Perform a complete run from parsing through writing.
@@ -42,6 +44,13 @@ class Firmant(object):
         ...     ,'POSTS_SUBDIR': 'posts'
         ...     ,'TAGS_SUBDIR': 'tags'
         ...     ,'REST_EXTENSION': 'rst'
+        ...     ,'WRITERS': ['firmant.writers.j2.Jinja2PostArchiveAll'
+        ...                 ,'firmant.writers.j2.Jinja2PostArchiveYearly'
+        ...                 ,'firmant.writers.j2.Jinja2PostArchiveMonthly'
+        ...                 ,'firmant.writers.j2.Jinja2PostArchiveDaily'
+        ...                 ]
+        ...     ,'POSTS_PER_PAGE': 10
+        ...     ,'TEMPLATE_DIR': 'testdata/pristine/templates'
         ...     }
         >>> s = Settings(s)
         >>> f = Firmant(s)
@@ -59,6 +68,7 @@ class Firmant(object):
                    <firmant.parsers.RstObject object at 0x...>],
          'tags': [<firmant.parsers.RstObject object at 0x...>,
                   <firmant.parsers.RstObject object at 0x...>]}
+        >>> f.setup_writers()
 
     '''
 
@@ -78,3 +88,18 @@ class Firmant(object):
         self.objs = dict()
         for key, parser in self.parsers.items():
             self.objs[key] = parser.parse()
+
+    def setup_writers(self):
+        '''Create instances of writer classes.
+        '''
+        self.writers = writers = dict()
+        for writer in self.settings.WRITERS:
+            mod, attr = writer.rsplit('.', 1)
+            mod = get_module(mod)
+            writer = getattr(mod, attr)
+            # We do not retain the class name from settings as it may be the
+            # case that:
+            # from foo import Quux
+            # really imports the class foo.bar.baz.Quux as Quux was imported
+            # into the foo namespace.
+            writers[class_name(writer)] = writer(self.settings, self.objs)
