@@ -4,10 +4,9 @@ import doctest
 import sys
 from optparse import OptionParser
 
+from minimock import Mock
+from pprint import pprint
 from pysettings.modules import get_module
-
-# Import this now to avoid it throwing errors.
-import pytz
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
@@ -33,10 +32,15 @@ if __name__ == '__main__':
     for module in modules:
         mod = get_module(module)
         args = {}
+        extraglobs = {'Mock': Mock
+                     ,'pprint': pprint
+                     }
         for attr in ['module_relative', 'package', 'setUp', 'tearDown', 'globs',
                 'optionflags', 'parser', 'encoding']:
             if hasattr(mod, '_' + attr):
                 args[attr] = getattr(mod, '_' + attr)
+        extraglobs.update(args.get('extraglobs', dict()))
+        args['extraglobs'] = extraglobs
         suite.addTest(doctest.DocTestSuite(mod, **args))
 
     results = unittest.TextTestRunner(verbosity=2).run(suite)

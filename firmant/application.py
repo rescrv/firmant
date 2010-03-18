@@ -34,7 +34,6 @@ class Firmant(object):
     '''Perform a complete run from parsing through writing.
 
         >>> from pysettings.settings import Settings
-        >>> from pprint import pprint
         >>> s = {'PARSERS': {'feeds': 'firmant.parsers.feeds.FeedParser'
         ...                 ,'posts': 'firmant.parsers.posts.PostParser'
         ...                 ,'tags': 'firmant.parsers.tags.TagParser'

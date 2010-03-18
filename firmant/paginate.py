@@ -28,7 +28,6 @@
 def paginate(per_page, obj_list):
     '''Return a list of objects, broken up into lists of size per_page.
 
-        >>> from pprint import pprint
         >>> pprint(paginate(1, [1, 2, 3, 4, 5, 6, 7]))
         [(1, 7, 1, 1, [1]),
          (2, 7, 2, 2, [2]),
@@ -62,7 +61,6 @@ def split_boundary(key, obj_list):
 
     Split the list at each point the numbers change from evens to odds::
 
-        >>> from pprint import pprint
         >>> def key(x):
         ...     if x is None:
         ...         return None

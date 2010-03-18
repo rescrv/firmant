@@ -90,7 +90,6 @@ class PostArchiveAll(PostArchiveBase):
 
         >>> settings.URLMapper.add(components.Type('post')/components.pageno)
         >>> paa = PostArchiveAll(settings, firmant.objs)
-        >>> from pprint import pprint
         >>> pprint(paa.urls())
         ['index.html', 'page2/index.html', 'page3/index.html']
 
@@ -155,7 +154,6 @@ class PostArchiveYearly(PostArchiveBase):
 
         >>> settings.URLMapper.add(components.Type('post')/components.year/components.pageno)
         >>> pay = PostArchiveYearly(settings, firmant.objs)
-        >>> from pprint import pprint
         >>> pprint(pay.urls())
         ['2010/index.html', '2010/page2/index.html', '2009/index.html']
 
@@ -225,7 +223,6 @@ class PostArchiveMonthly(PostArchiveBase):
         >>> settings.URLMapper.add(
         ...     components.Type('post')/components.year/components.month/components.pageno)
         >>> pam = PostArchiveMonthly(settings, firmant.objs)
-        >>> from pprint import pprint
         >>> pprint(pam.urls())
         ['2010/02/index.html',
          '2010/02/page2/index.html',
@@ -302,7 +299,6 @@ class PostArchiveDaily(PostArchiveBase):
         >>> settings.URLMapper.add(
         ...     c.Type('post')/c.year/c.month/c.day/c.pageno)
         >>> pad = PostArchiveDaily(settings, firmant.objs)
-        >>> from pprint import pprint
         >>> pprint(pad.urls())
         ['2010/02/02/index.html',
          '2010/02/02/page2/index.html',

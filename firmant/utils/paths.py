@@ -77,7 +77,6 @@ def safe_mkdir(path):
 def cat(path, out=sys.stdout):
     r'''Write the contents of file ``path`` to ``out``.
 
-        >>> from minimock import Mock
         >>> m = Mock('output')
         >>> cat('testdata/settings/empty.py', m) #doctest: +ELLIPSIS
         Called output.write('# Copyright (c) 2010, Robert Escriva\n')
@@ -104,7 +103,6 @@ def create_or_truncate(path):
         >>> f.write('THIS IS THE FIRST TIME\n')
         >>> f.flush() and f.close()
 
-        >>> from minimock import Mock
         >>> m = Mock('output')
         >>> cat(path, m)
         Called output.write('THIS IS THE FIRST TIME\n')

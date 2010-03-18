@@ -102,7 +102,6 @@ class PostParser(RstParser):
         ...     }
         >>> s = Settings(s)
         >>> p = PostParser(s)
-        >>> from pprint import pprint
         >>> pprint(map(lambda p: (p.published.date(), p.slug), p.parse()))
         [(datetime.date(1975, 3, 23), u'give-me-liberty'),
          (datetime.date(2009, 2, 17), u'loren-ipsum'),
@@ -132,7 +131,6 @@ class PostParser(RstParser):
 
         Directory entries that are not files are ignored.
 
-            >>> from pprint import pprint
             >>> from pysettings.settings import Settings
             >>> s = {'CONTENT_ROOT': 'content'
             ...     ,'POSTS_SUBDIR': 'posts'

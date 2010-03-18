@@ -78,7 +78,6 @@ def merge_dicts(a, *args):
     Where identical keys correspond to conflicting values, a ValueError is
     rasied.
 
-        >>> from pprint import pprint
         >>> pprint(merge_dicts({'a': 1}))
         {'a': 1}
         >>> pprint(merge_dicts({'a': 1}, {'b': 2}))

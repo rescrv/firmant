@@ -72,7 +72,6 @@ class Writer(object):
 
             >>> # If the output dir is not set, log a critical error:
             >>> from pysettings.settings import Settings
-            >>> from minimock import Mock
             >>> w = Writer(Settings(OUTPUT_DIR='foo'), None)
             >>> w.log = Mock('log')
             >>> w.write_preconditions()
@@ -82,7 +81,6 @@ class Writer(object):
 
             >>> # If the output dir is not set, log a critical error:
             >>> from pysettings.settings import Settings
-            >>> from minimock import Mock
             >>> w = Writer(Settings(), None)
             >>> w.log = Mock('log')
             >>> w.write_preconditions()
