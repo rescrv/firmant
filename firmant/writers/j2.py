@@ -1,4 +1,3 @@
-
 # Copyright (c) 2010, Robert Escriva
 # All rights reserved.
 #
@@ -81,7 +80,7 @@ class Jinja2PostArchiveAll(Jinja2Writer, posts.PostArchiveAll):
             Called stdout.write('2009-12-31-party\n')
 
         '''
-        url = self.url(page)
+        url = self.url(page=page)
         template = 'posts/archive_all.html'
         context = dict()
         context['page_no']       = page
@@ -96,7 +95,7 @@ class Jinja2PostArchiveYearly(Jinja2Writer, posts.PostArchiveYearly):
 
     fmt = 'html'
 
-    def render(self, year, page, num_pages, first, last, posts):
+    def render(self, page, num_pages, first, last, posts, year):
         r'''Render the data in a Jinja2 template.
 
             >>> c = components
@@ -123,7 +122,7 @@ class Jinja2PostArchiveYearly(Jinja2Writer, posts.PostArchiveYearly):
             Called stdout.write('2009-12-31-party\n')
 
         '''
-        url = self.url(year, page)
+        url = self.url(page=page, year=year)
         template = 'posts/archive_yearly.html'
         context = dict()
         context['year']          = year
@@ -139,7 +138,7 @@ class Jinja2PostArchiveMonthly(Jinja2Writer, posts.PostArchiveMonthly):
 
     fmt = 'html'
 
-    def render(self, month, page, num_pages, first, last, posts):
+    def render(self, page, num_pages, first, last, posts, year, month):
         r'''Render the data in a Jinja2 template.
 
             >>> c = components
@@ -175,11 +174,11 @@ class Jinja2PostArchiveMonthly(Jinja2Writer, posts.PostArchiveMonthly):
             Called stdout.write('2009-12-31-party\n')
 
         '''
-        url = self.url(month[0], month[1], page)
+        url = self.url(page=page, year=year, month=month)
         template = 'posts/archive_monthly.html'
         context = dict()
-        context['year']          = month[0]
-        context['month']         = month[1]
+        context['year']          = year
+        context['month']         = month
         context['page_no']       = page
         context['page_max']      = num_pages
         context['first_post_no'] = first
@@ -192,7 +191,7 @@ class Jinja2PostArchiveDaily(Jinja2Writer, posts.PostArchiveDaily):
 
     fmt = 'html'
 
-    def render(self, day, page, num_pages, first, last, posts):
+    def render(self, page, num_pages, first, last, posts, year, month, day):
         r'''Render the data in a Jinja2 template.
 
             >>> c = components
@@ -239,12 +238,12 @@ class Jinja2PostArchiveDaily(Jinja2Writer, posts.PostArchiveDaily):
             Called stdout.write('2009-12-31-party\n')
 
         '''
-        url = self.url(day[0], day[1], day[2], page)
+        url = self.url(page=page, year=year, month=month, day=day)
         template = 'posts/archive_daily.html'
         context = dict()
-        context['year']          = day[0]
-        context['month']         = day[1]
-        context['day']           = day[2]
+        context['year']          = year
+        context['month']         = month
+        context['day']           = day
         context['page_no']       = page
         context['page_max']      = num_pages
         context['first_post_no'] = first
