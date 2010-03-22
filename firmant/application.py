@@ -25,8 +25,11 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+import logging
+
 from pysettings.modules import get_module
 
+from firmant.i18n import _
 from firmant.routing import URLMapper
 from firmant.utils import class_name
 
@@ -35,6 +38,7 @@ class Firmant(object):
     '''Perform a complete run from parsing through writing.
 
         >>> from pysettings.settings import Settings
+        >>> from firmant.routing import components as c
         >>> s = {'PARSERS': {'feeds': 'firmant.parsers.feeds.FeedParser'
         ...                 ,'posts': 'firmant.parsers.posts.PostParser'
         ...                 ,'tags': 'firmant.parsers.tags.TagParser'
@@ -51,9 +55,15 @@ class Firmant(object):
         ...                 ]
         ...     ,'POSTS_PER_PAGE': 10
         ...     ,'TEMPLATE_DIR': 'testdata/pristine/templates'
+        ...     ,'URLS': [c.Type('post') /c.pageno
+        ...              ,c.Type('post') /c.year/c.pageno
+        ...              ,c.Type('post') /c.year/c.month/c.pageno
+        ...              ,c.Type('post') /c.year/c.month/c.day/c.pageno
+        ...              ]
         ...     }
         >>> s = Settings(s)
         >>> f = Firmant(s)
+        >>> f.log = Mock('log')
         >>> pprint(f.parsers) #doctest: +ELLIPSIS
         {'feeds': <firmant.parsers.feeds.FeedParser object at 0x...>,
          'posts': <firmant.parsers.posts.PostParser object at 0x...>,
@@ -69,12 +79,14 @@ class Firmant(object):
          'tags': [<firmant.parsers.RstObject object at 0x...>,
                   <firmant.parsers.RstObject object at 0x...>]}
         >>> f.setup_writers()
+        >>> f.check_url_conflicts()
 
     '''
 
     def __init__(self, settings):
         self.settings = settings
         self.urlmapper = URLMapper(getattr(settings, 'URLS', None))
+        self.log = logging.getLogger(class_name(self.__class__))
 
         # Setup parsers
         self.parsers = dict()
@@ -105,3 +117,20 @@ class Firmant(object):
             # into the foo namespace.
             writers[class_name(writer)] = writer(self.settings, self.objs,
                     self.urlmapper)
+
+    def check_url_conflicts(self):
+        '''Create instances of writer classes.
+        '''
+        urls = dict()
+        for key, inst in self.writers.items():
+            for url in inst.urls():
+                if url is None:
+                    warning  = _("Writer %s's URLs incompletely defined.")
+                    warning %= key
+                    self.log.warning(warning)
+                elif url in urls:
+                    warning  = _('Writers %s and %s conflict over %s.')
+                    warning %= urls[url], key, url
+                    self.log.warning(warning)
+                else:
+                    urls[url] = key
