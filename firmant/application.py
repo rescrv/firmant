@@ -60,6 +60,7 @@ class Firmant(object):
         ...              ,c.Type('post') /c.year/c.month/c.pageno
         ...              ,c.Type('post') /c.year/c.month/c.day/c.pageno
         ...              ]
+        ...     ,'OUTPUT_DIR': outdir
         ...     }
         >>> s = Settings(s)
         >>> f = Firmant(s)
@@ -80,6 +81,7 @@ class Firmant(object):
                   <firmant.parsers.RstObject object at 0x...>]}
         >>> f.setup_writers()
         >>> f.check_url_conflicts()
+        >>> f.write()
 
     '''
 
@@ -134,3 +136,21 @@ class Firmant(object):
                     self.log.warning(warning)
                 else:
                     urls[url] = key
+
+    def write(self):
+        '''Call ``write`` on each writer.
+        '''
+        for key, writer in self.writers.iteritems():
+            writer.write()
+
+
+def _setUp(self):
+    import tempfile
+    self.globs['outdir'] = tempfile.mkdtemp()
+
+
+def _tearDown(test):
+    '''Cleanup the Jinja2 test cases.
+    '''
+    import shutil
+    shutil.rmtree(test.globs['outdir'])
