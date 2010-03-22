@@ -36,9 +36,10 @@ class Writer(object):
     '''Handle writing parsed objects to the filesystem.
     '''
 
-    def __init__(self, settings, objs):
+    def __init__(self, settings, objs, urlmapper):
         self.settings = settings
         self.objs = objs
+        self.urlmapper = urlmapper
         self.log = logging.getLogger(class_name(self.__class__))
 
     def urls(self):
@@ -49,7 +50,7 @@ class Writer(object):
         It is assumed that all paths begin with '/' and those ending with a '/'
         implicitly include the additional path component 'index.html'.
 
-            >>> w = Writer(None, None)
+            >>> w = Writer(None, None, None)
             >>> w.urls()
             []
 
@@ -59,7 +60,7 @@ class Writer(object):
     def write(self):
         '''Write the objects to the filesystem.
 
-            >>> w = Writer(None, None)
+            >>> w = Writer(None, None, None)
             >>> w.write()
 
         '''
@@ -72,7 +73,7 @@ class Writer(object):
 
             >>> # If the output dir is not set, log a critical error:
             >>> from pysettings.settings import Settings
-            >>> w = Writer(Settings(OUTPUT_DIR='foo'), None)
+            >>> w = Writer(Settings(OUTPUT_DIR='foo'), None, None)
             >>> w.log = Mock('log')
             >>> w.write_preconditions()
             True
@@ -81,7 +82,7 @@ class Writer(object):
 
             >>> # If the output dir is not set, log a critical error:
             >>> from pysettings.settings import Settings
-            >>> w = Writer(Settings(), None)
+            >>> w = Writer(Settings(), None, None)
             >>> w.log = Mock('log')
             >>> w.write_preconditions()
             Called log.critical('``OUTPUT_DIR`` not defined in settings.')

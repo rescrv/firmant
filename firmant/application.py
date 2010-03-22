@@ -27,6 +27,7 @@
 
 from pysettings.modules import get_module
 
+from firmant.routing import URLMapper
 from firmant.utils import class_name
 
 
@@ -73,6 +74,7 @@ class Firmant(object):
 
     def __init__(self, settings):
         self.settings = settings
+        self.urlmapper = URLMapper(getattr(settings, 'URLS', None))
 
         # Setup parsers
         self.parsers = dict()
@@ -101,4 +103,5 @@ class Firmant(object):
             # from foo import Quux
             # really imports the class foo.bar.baz.Quux as Quux was imported
             # into the foo namespace.
-            writers[class_name(writer)] = writer(self.settings, self.objs)
+            writers[class_name(writer)] = writer(self.settings, self.objs,
+                    self.urlmapper)

@@ -60,8 +60,8 @@ class Jinja2PostArchiveAll(Jinja2Writer, posts.PostArchiveAll):
         r'''Render the data in a Jinja2 template.
 
             >>> c = components
-            >>> settings.URLMapper.add(c.Type('post')/c.pageno)
-            >>> j2paa = Jinja2PostArchiveAll(settings, firmant.objs)
+            >>> urlmapper.add(c.Type('post')/c.pageno)
+            >>> j2paa = Jinja2PostArchiveAll(settings, objs, urlmapper)
             >>> j2paa.log = Mock('log')
             >>> j2paa.write()
             >>> cat(os.path.join(settings.OUTPUT_DIR, 'index.html'))
@@ -99,8 +99,8 @@ class Jinja2PostArchiveYearly(Jinja2Writer, posts.PostArchiveYearly):
         r'''Render the data in a Jinja2 template.
 
             >>> c = components
-            >>> settings.URLMapper.add(c.Type('post')/c.year/c.pageno)
-            >>> j2pay = Jinja2PostArchiveYearly(settings, firmant.objs)
+            >>> urlmapper.add(c.Type('post')/c.year/c.pageno)
+            >>> j2pay = Jinja2PostArchiveYearly(settings, objs, urlmapper)
             >>> j2pay.log = Mock('log')
             >>> j2pay.write()
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/index.html'))
@@ -142,9 +142,9 @@ class Jinja2PostArchiveMonthly(Jinja2Writer, posts.PostArchiveMonthly):
         r'''Render the data in a Jinja2 template.
 
             >>> c = components
-            >>> settings.URLMapper.add(
+            >>> urlmapper.add(
             ...     c.Type('post')/c.year/c.month/c.pageno)
-            >>> j2pam = Jinja2PostArchiveMonthly(settings, firmant.objs)
+            >>> j2pam = Jinja2PostArchiveMonthly(settings, objs, urlmapper)
             >>> j2pam.log = Mock('log')
             >>> j2pam.write()
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/index.html'))
@@ -196,9 +196,9 @@ class Jinja2PostArchiveDaily(Jinja2Writer, posts.PostArchiveDaily):
 
             >>> c = components
             >>> settings.POSTS_PER_PAGE = 1
-            >>> settings.URLMapper.add(
+            >>> urlmapper.add(
             ...     c.Type('post')/c.year/c.month/c.day/c.pageno)
-            >>> j2pad = Jinja2PostArchiveDaily(settings, firmant.objs)
+            >>> j2pad = Jinja2PostArchiveDaily(settings, objs, urlmapper)
             >>> j2pad.log = Mock('log')
             >>> j2pad.write()
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/02/index.html'))
@@ -270,12 +270,11 @@ def _setUp(self):
         ,'TEMPLATE_DIR': 'testdata/pristine/templates'
         }
     settings               = Settings(s)
-    URLMapper(settings)
     firmant                = Firmant(settings)
     firmant.parse()
     self.globs['settings']   = settings
-    self.globs['firmant']    = firmant
-    self.globs['URLMapper']  = URLMapper
+    self.globs['objs']       = firmant.objs
+    self.globs['urlmapper']  = URLMapper()
     self.globs['Mock']       = Mock
     self.globs['components'] = components
     self.globs['cat']        = lambda out: cat(out, Mock('stdout'))

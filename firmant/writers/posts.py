@@ -38,15 +38,15 @@ class PostArchiveBase(Writer):
     positive, non-zero integer, it will raise a value error::
 
         >>> from pysettings.settings import Settings
-        >>> PostArchiveAll(Settings(POSTS_PER_PAGE=0), [])
+        >>> PostArchiveAll(Settings(POSTS_PER_PAGE=0), {}, None)
         Traceback (most recent call last):
         ValueError: POSTS_PER_PAGE must be a positive value.
 
     '''
 
-    def __init__(self, settings, objs):
-        Writer.__init__(self, settings, objs)
-        if settings.POSTS_PER_PAGE < 1:
+    def __init__(self, *args, **kwargs):
+        super(PostArchiveBase, self).__init__(*args, **kwargs)
+        if self.settings.POSTS_PER_PAGE < 1:
             raise ValueError('POSTS_PER_PAGE must be a positive value.')
 
     def for_split_posts(self, key, action):
@@ -62,7 +62,7 @@ class PostArchiveBase(Writer):
                 action(page, num_pages, begin, end, posts, *key)
 
     def url(self, **kwargs):
-        urlfor = self.settings.URLMapper.urlfor
+        urlfor = self.urlmapper.urlfor
         return urlfor(self.fmt, type='post', **kwargs)
 
 
@@ -88,8 +88,8 @@ class PostArchiveAll(PostArchiveBase):
 
         Example on testdata/pristine::
 
-        >>> settings.URLMapper.add(components.Type('post')/components.pageno)
-        >>> paa = PostArchiveAll(settings, firmant.objs)
+        >>> urlmapper.add(components.Type('post')/components.pageno)
+        >>> paa = PostArchiveAll(settings, objs, urlmapper)
         >>> pprint(paa.urls())
         ['index.html', 'page2/index.html', 'page3/index.html']
 
@@ -105,7 +105,7 @@ class PostArchiveAll(PostArchiveBase):
 
         Example on testdata/pristine::
 
-        >>> paa = PostArchiveAll(settings, firmant.objs)
+        >>> paa = PostArchiveAll(settings, objs, urlmapper)
         >>> paa.write()
         Page 1 1-2 of 3:
           - 2010-02-02-newday2
@@ -152,8 +152,8 @@ class PostArchiveYearly(PostArchiveBase):
 
         Example on testdata/pristine::
 
-        >>> settings.URLMapper.add(components.Type('post')/components.year/components.pageno)
-        >>> pay = PostArchiveYearly(settings, firmant.objs)
+        >>> urlmapper.add(components.Type('post')/components.year/components.pageno)
+        >>> pay = PostArchiveYearly(settings, objs, urlmapper)
         >>> pprint(pay.urls())
         ['2010/index.html', '2010/page2/index.html', '2009/index.html']
 
@@ -169,7 +169,7 @@ class PostArchiveYearly(PostArchiveBase):
 
         Example on testdata/pristine::
 
-        >>> pay = PostArchiveYearly(settings, firmant.objs)
+        >>> pay = PostArchiveYearly(settings, objs, urlmapper)
         >>> pay.write()
         Year 2010:
             Page 1 1-2 of 2:
@@ -220,9 +220,9 @@ class PostArchiveMonthly(PostArchiveBase):
 
         Example on testdata/pristine::
 
-        >>> settings.URLMapper.add(
+        >>> urlmapper.add(
         ...     components.Type('post')/components.year/components.month/components.pageno)
-        >>> pam = PostArchiveMonthly(settings, firmant.objs)
+        >>> pam = PostArchiveMonthly(settings, objs, urlmapper)
         >>> pprint(pam.urls())
         ['2010/02/index.html',
          '2010/02/page2/index.html',
@@ -241,7 +241,7 @@ class PostArchiveMonthly(PostArchiveBase):
 
         Example on testdata/pristine::
 
-        >>> pam = PostArchiveMonthly(settings, firmant.objs)
+        >>> pam = PostArchiveMonthly(settings, objs, urlmapper)
         >>> pam.write()
         Month 2010-02:
             Page 1 1-2 of 2:
@@ -296,9 +296,9 @@ class PostArchiveDaily(PostArchiveBase):
 
         >>> c = components
         >>> settings.POSTS_PER_PAGE = 1
-        >>> settings.URLMapper.add(
+        >>> urlmapper.add(
         ...     c.Type('post')/c.year/c.month/c.day/c.pageno)
-        >>> pad = PostArchiveDaily(settings, firmant.objs)
+        >>> pad = PostArchiveDaily(settings, objs, urlmapper)
         >>> pprint(pad.urls())
         ['2010/02/02/index.html',
          '2010/02/02/page2/index.html',
@@ -319,7 +319,7 @@ class PostArchiveDaily(PostArchiveBase):
         Example on testdata/pristine::
 
         >>> settings.POSTS_PER_PAGE = 1
-        >>> pad = PostArchiveDaily(settings, firmant.objs)
+        >>> pad = PostArchiveDaily(settings, objs, urlmapper)
         >>> pad.write()
         Day 2010-02-02:
             Page 1 1-1 of 2:
@@ -364,10 +364,9 @@ def _setUp(self):
         ,'POSTS_PER_PAGE': 2
         }
     settings               = Settings(s)
-    URLMapper(settings)
     firmant                = Firmant(settings)
     firmant.parse()
     self.globs['settings'] = settings
-    self.globs['firmant']  = firmant
-    self.globs['URLMapper'] = URLMapper
+    self.globs['objs']  = firmant.objs
+    self.globs['urlmapper'] = URLMapper()
     self.globs['components'] = components

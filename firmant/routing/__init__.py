@@ -333,7 +333,7 @@ class URLMapper(object):
         >>> day = SinglePathComponent('day', lambda d: '%02i' % d)
         >>> slug = SinglePathComponent('slug', str)
         >>> from pysettings.settings import Settings
-        >>> um = URLMapper(settings=Settings())
+        >>> um = URLMapper()
         >>> um.add( post/year/month/day/slug )
         >>> um.add( post/year/month/day )
         >>> um.add( post/year/month )
@@ -356,9 +356,10 @@ class URLMapper(object):
 
     '''
 
-    def __init__(self, settings):
-        settings.URLMapper = self
+    def __init__(self, urls=None):
         self._paths = list()
+        if urls is not None:
+            self._paths.extend(urls)
 
     def add(self, path):
         self._paths.append(path)
