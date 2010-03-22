@@ -31,6 +31,7 @@ from jinja2 import Environment
 from jinja2 import FileSystemLoader
 
 from firmant import utils
+from firmant.utils import paths
 from firmant.writers import posts
 from firmant.writers import Writer
 
@@ -46,7 +47,7 @@ class Jinja2Writer(Writer):
         template = self._env.get_template(template)
         data     = template.render(context)
         path     = os.path.join(self.settings.OUTPUT_DIR, path or '')
-        f        = utils.paths.create_or_truncate(path)
+        f        = paths.create_or_truncate(path)
         f.write(data.encode('utf-8'))
         f.flush()
         f.close()
