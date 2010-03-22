@@ -32,7 +32,8 @@
 from firmant import routing
 
 
-__all__ = ['Type', 'Year', 'Month', 'Day', 'year', 'month', 'day']
+__all__ = ['Type', 'Year', 'Month', 'Day', 'Slug', 'PageNo', 'year', 'month',
+        'day', 'slug', 'pageno']
 
 
 # Classes
