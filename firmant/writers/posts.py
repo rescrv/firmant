@@ -352,6 +352,64 @@ class PostArchiveDaily(PostArchiveBase):
             print s % post.slug
 
 
+class PostSingle(Writer):
+    '''Parse the posts into single pages.
+    '''
+
+    fmt = 'html'
+
+    def url(self, **kwargs):
+        urlfor = self.urlmapper.urlfor
+        return urlfor(self.fmt, type='post', **kwargs)
+
+    def urls(self):
+        '''A list of rooted paths that are the path component of URLs.
+
+        Example on testdata/pristine::
+
+            >>> c = components
+            >>> urlmapper.add(c.Type('post')/c.year/c.month/c.day/c.slug)
+            >>> ps = PostSingle(settings, objs, urlmapper)
+            >>> pprint(ps.urls())
+            ['2009/12/31/party/index.html',
+             '2010/01/01/newyear/index.html',
+             '2010/02/01/newmonth/index.html',
+             '2010/02/02/newday/index.html',
+             '2010/02/02/newday2/index.html']
+
+        '''
+        ret = list()
+        for post in self.objs['posts']:
+            ret.append(self.url(year=post.published.year,
+                month=post.published.month, day=post.published.day,
+                slug=post.slug))
+        return ret
+
+    def write(self):
+        '''Write the parsed posts to the filesystem.
+
+        Example on testdata/pristine::
+
+        >>> ps = PostSingle(settings, objs, urlmapper)
+        >>> ps.write()
+        Post 2009/12/31/party
+        Post 2010/01/01/newyear
+        Post 2010/02/01/newmonth
+        Post 2010/02/02/newday
+        Post 2010/02/02/newday2
+
+        '''
+        for post in self.objs['posts']:
+            self.render(post)
+
+    def render(self, post):
+        '''Render the posts.
+
+        This should be overridden in child classes.
+        '''
+        print 'Post %s/%s' % (post.published.strftime('%Y/%m/%d'), post.slug)
+
+
 def _setUp(self):
     from pysettings.settings import Settings
     from firmant.application import Firmant
