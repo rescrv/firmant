@@ -25,10 +25,17 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+import logging
+import stat
+import tempfile
+import os
+
 from docutils import io
 from docutils.core import publish_programmatically
 
 from firmant.du import MetaDataStandaloneReader
+from firmant.i18n import _
+from firmant.utils import class_name
 
 
 __all__ = ['Parser']
@@ -42,17 +49,75 @@ class Parser(object):
     functions and writers.
 
     Example parsers include those that read posts, and those that find images.
+
+    This class is meant to be used as a base, with the child implementing
+    ``paths``, and ``parse_one``.
+
+    The ``parse`` method is careful to trap tracebacks.  For example, if
+    parse_one throws an exception, and the setting ``SAVE_TRACEBACK`` is False::
+
+        >>> from pysettings.settings import Settings
+        >>> class BadParser(Parser):
+        ...     def parse_one(self, path): raise RuntimeError('bad')
+        ...     def paths(self): return [1]
+        >>> bp = BadParser(Settings(SAVE_TRACEBACK=False))
+        >>> bp.log = Mock('log')
+        >>> bp.parse()
+        Called log.error('error parsing 1')
+        Called log.info('traceback not saved')
+        []
+
+    With SAVE_TRACEBACK enabled, it will save to a file using tempfile.mkstemp.
+
+    If an exception is thrown while saving to the file, it will warn about
+    the potential for infinite recursion and stop::
+
+        >>> from minimock import restore
+        >>> import tempfile
+        >>> tempfile.mkstemp = Mock('mkstemp')
+        >>> tempfile.mkstemp.mock_raises = ValueError
+        >>> bp = BadParser(Settings(SAVE_TRACEBACK=True))
+        >>> bp.log = Mock('log')
+        >>> bp.parse()
+        Called log.error('error parsing 1')
+        Called mkstemp(prefix='firmant', text=True)
+        Called log.error("it's turtles all the way down")
+        []
+        >>> restore()
+
     '''
 
     def __init__(self, settings=None):
         '''Instantiate a Parser, bound to the settings.
         '''
         self.settings = settings
+        self.log = logging.getLogger(class_name(self.__class__))
 
     def parse(self):
         '''Create a list of parsed objects.
         '''
-        return [self.parse_one(p) for p in self.paths()]
+        ret = list()
+        for path in self.paths():
+            try:
+                obj = self.parse_one(path)
+                ret.append(obj)
+            except:
+                import traceback
+                self.log.error(_('error parsing %s') % path)
+                if getattr(self.settings, 'SAVE_TRACEBACK', False):
+                    try:
+                        t, path = tempfile.mkstemp(prefix='firmant', text=True)
+                        traceback.print_exc(file=t)
+                        t.flush()
+                        t.close()
+                        self.log.error(_('traceback saved to %s') % path)
+                    except:
+                        self.log.error(_("it's turtles all the way down"))
+                else:
+                    self.log.info(_('traceback not saved'))
+            else:
+                self.log.info(_('parsed %s') % path)
+        return ret
 
     def paths(self):
         '''Return a list of paths to objects on the file system.

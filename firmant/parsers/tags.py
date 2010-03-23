@@ -91,7 +91,10 @@ class TagParser(RstParser):
         ...     }
         >>> s = Settings(s)
         >>> t = TagParser(s)
+        >>> t.log = Mock('log')
         >>> map(lambda t: t.slug, t.parse())
+        Called log.info('parsed content/tags/empty.rst')
+        Called log.info('parsed content/tags/rcos.rst')
         [u'empty', u'rcos']
 
     '''

@@ -91,7 +91,10 @@ class FeedParser(RstParser):
         ...     }
         >>> s = Settings(s)
         >>> f = FeedParser(s)
+        >>> f.log = Mock('log')
         >>> map(lambda f: f.slug, f.parse())
+        Called log.info('parsed content/feeds/empty.rst')
+        Called log.info('parsed content/feeds/rcos.rst')
         [u'empty', u'rcos']
 
     '''

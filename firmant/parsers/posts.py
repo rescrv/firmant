@@ -102,7 +102,12 @@ class PostParser(RstParser):
         ...     }
         >>> s = Settings(s)
         >>> p = PostParser(s)
+        >>> p.log = Mock('log')
         >>> pprint(map(lambda p: (p.published.date(), p.slug), p.parse()))
+        Called log.info('parsed content/posts/1975-03-23-give-me-liberty.rst')
+        Called log.info('parsed content/posts/2009-02-17-loren-ipsum.rst')
+        Called log.info('parsed content/posts/2010-02-13-sample-code.rst')
+        Called log.info('parsed content/posts/2010-02-15-empty.rst')
         [(datetime.date(1975, 3, 23), u'give-me-liberty'),
          (datetime.date(2009, 2, 17), u'loren-ipsum'),
          (datetime.date(2010, 2, 13), u'sample-code'),
