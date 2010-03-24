@@ -25,6 +25,13 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+'''Default settings used within Firmant.
+
+It is not generally safe to omit any of these settings.  Change or update them
+if necessary.
+'''
+
+
 from firmant.routing import components as c
 
 
