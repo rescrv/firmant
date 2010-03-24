@@ -37,32 +37,9 @@ from firmant.utils import class_name
 class Firmant(object):
     '''Perform a complete run from parsing through writing.
 
-        >>> from pysettings.settings import Settings
-        >>> from firmant.routing import components as c
-        >>> s = {'PARSERS': {'feeds': 'firmant.parsers.feeds.FeedParser'
-        ...                 ,'posts': 'firmant.parsers.posts.PostParser'
-        ...                 ,'tags': 'firmant.parsers.tags.TagParser'
-        ...                 }
-        ...     ,'CONTENT_ROOT': 'content'
-        ...     ,'FEEDS_SUBDIR': 'feeds'
-        ...     ,'POSTS_SUBDIR': 'posts'
-        ...     ,'TAGS_SUBDIR': 'tags'
-        ...     ,'REST_EXTENSION': 'rst'
-        ...     ,'WRITERS': ['firmant.writers.j2.Jinja2PostArchiveAll'
-        ...                 ,'firmant.writers.j2.Jinja2PostArchiveYearly'
-        ...                 ,'firmant.writers.j2.Jinja2PostArchiveMonthly'
-        ...                 ,'firmant.writers.j2.Jinja2PostArchiveDaily'
-        ...                 ]
-        ...     ,'POSTS_PER_PAGE': 10
-        ...     ,'TEMPLATE_DIR': 'testdata/pristine/templates'
-        ...     ,'URLS': [c.Type('post') /c.pageno
-        ...              ,c.Type('post') /c.year/c.pageno
-        ...              ,c.Type('post') /c.year/c.month/c.pageno
-        ...              ,c.Type('post') /c.year/c.month/c.day/c.pageno
-        ...              ]
-        ...     ,'OUTPUT_DIR': outdir
-        ...     }
-        >>> s = Settings(s)
+        >>> from pysettings.loaders import mod_to_settings
+        >>> s = mod_to_settings('firmant.settings')
+        >>> s.OUTPUT_DIR = outdir
         >>> f = Firmant(s)
         >>> f.log = Mock('log')
         >>> pprint(f.parsers) #doctest: +ELLIPSIS
