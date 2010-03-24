@@ -50,6 +50,12 @@ class PostArchiveBase(Writer):
             raise ValueError('POSTS_PER_PAGE must be a positive value.')
 
     def for_split_posts(self, key, action):
+        '''For each group, for each page in the group, call action.
+
+        Action will be provided with the page, the total number of pages, the
+        beginning and ending indices (1-indexed) of the posts, and the posts
+        themselves.  It will also get the elements of the key.
+        '''
         per_page = self.settings.POSTS_PER_PAGE
 
         posts = copy(self.objs['posts'])
@@ -79,6 +85,8 @@ class PostArchiveAll(PostArchiveBase):
     fmt = 'html'
 
     def key(self, post):
+        '''The key for a post is a constant zero-tuple.
+        '''
         if post is None:
             return None
         return ()
@@ -143,6 +151,8 @@ class PostArchiveYearly(PostArchiveBase):
     fmt = 'html'
 
     def key(self, post):
+        '''Posts are keyed by year.
+        '''
         if post is None:
             return None
         return (post.published.year,)
@@ -211,6 +221,8 @@ class PostArchiveMonthly(PostArchiveBase):
     fmt = 'html'
 
     def key(self, post):
+        '''Posts are keyed by month.
+        '''
         if post is None:
             return None
         return (post.published.year, post.published.month)
@@ -285,6 +297,8 @@ class PostArchiveDaily(PostArchiveBase):
     fmt = 'html'
 
     def key(self, post):
+        '''Posts are keyed by day.
+        '''
         if post is None:
             return None
         return (post.published.year, post.published.month, post.published.day)
