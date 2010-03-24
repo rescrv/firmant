@@ -25,6 +25,13 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+'''Writers create the filesystem to be published.
+
+Each writer will handle a subset of the objs, and create a portion of the
+outputted directory hierarchy.
+'''
+
+
 import collections
 import logging
 
@@ -34,6 +41,12 @@ from firmant.utils import class_name
 
 class Writer(object):
     '''Handle writing parsed objects to the filesystem.
+
+    It is assumed that a writer will have the following methods::
+
+        - write:  Write all objects to the filesystem.
+        - write_preconditions:  Tests that the writer is able to write.  If this
+          returns False, it is likely that the writer would fail.
     '''
 
     def __init__(self, settings, objs, urlmapper):
@@ -43,22 +56,23 @@ class Writer(object):
         self.log = logging.getLogger(class_name(self.__class__))
 
     def urls(self):
-        '''Return a list of rooted paths that this writer will write.
+        '''A list of paths that the writer will write.
 
-        Each path is assumed to be rooted relative to the webroot of the blog.
-
-        It is assumed that all paths begin with '/' and those ending with a '/'
-        implicitly include the additional path component 'index.html'.
+        Each path is assumed to be relative to the webroot of the blog.  It is
+        implicit that paths begin with '/' (e.g. the path 'foo/bar' translates
+        to a request URI of '/foo/bar').  This method returns nothing in the
+        base::
 
             >>> w = Writer(None, None, None)
             >>> w.urls()
-            []
 
         '''
-        return []
+        pass
 
     def write(self):
         '''Write the objects to the filesystem.
+
+        This method does nothing in the base::
 
             >>> w = Writer(None, None, None)
             >>> w.write()
