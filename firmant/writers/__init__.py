@@ -32,6 +32,7 @@ outputted directory hierarchy.
 '''
 
 
+import abc
 import collections
 import logging
 
@@ -49,59 +50,30 @@ class Writer(object):
           returns False, it is likely that the writer would fail.
     '''
 
+    __metaclass__ = abc.ABCMeta
+
     def __init__(self, settings, objs, urlmapper):
         self.settings = settings
         self.objs = objs
         self.urlmapper = urlmapper
         self.log = logging.getLogger(class_name(self.__class__))
 
+    @abc.abstractmethod
     def urls(self):
         '''A list of paths that the writer will write.
 
         Each path is assumed to be relative to the webroot of the blog.  It is
         implicit that paths begin with '/' (e.g. the path 'foo/bar' translates
-        to a request URI of '/foo/bar').  This method returns nothing in the
-        base::
-
-            >>> w = Writer(None, None, None)
-            >>> w.urls()
-
+        implies a request URI of '/foo/bar').
         '''
-        pass
 
+    @abc.abstractmethod
     def write(self):
         '''Write the objects to the filesystem.
-
-        This method does nothing in the base::
-
-            >>> w = Writer(None, None, None)
-            >>> w.write()
-
         '''
-        pass
 
     def write_preconditions(self):
         '''Returns true if and only if it is acceptable to proceed with writing.
-
-        Normal conditions::
-
-            >>> # If the output dir is not set, log a critical error:
-            >>> from pysettings.settings import Settings
-            >>> w = Writer(Settings(OUTPUT_DIR='foo'), None, None)
-            >>> w.log = Mock('log')
-            >>> w.write_preconditions()
-            True
-
-        Error conditions::
-
-            >>> # If the output dir is not set, log a critical error:
-            >>> from pysettings.settings import Settings
-            >>> w = Writer(Settings(), None, None)
-            >>> w.log = Mock('log')
-            >>> w.write_preconditions()
-            Called log.critical('``OUTPUT_DIR`` not defined in settings.')
-            False
-
         '''
         # Fail if we do not have an output directory.
         if getattr(self.settings, 'OUTPUT_DIR', None) is None:
