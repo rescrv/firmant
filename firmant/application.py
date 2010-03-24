@@ -74,6 +74,7 @@ class Firmant(object):
         self.log = logging.getLogger(class_name(self.__class__))
 
         self.objs = dict()
+        self.writers = dict()
 
         # Setup parsers
         self.parsers = dict()
@@ -93,7 +94,7 @@ class Firmant(object):
     def setup_writers(self):
         '''Create instances of writer classes.
         '''
-        self.writers = writers = dict()
+        writers = self.writers
         for writer in self.settings.WRITERS:
             mod, attr = writer.rsplit('.', 1)
             mod = get_module(mod)
