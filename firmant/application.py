@@ -25,6 +25,12 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+'''The Firmant application.
+
+Orchestrates the high process of parsing, transforming, and writing content.
+'''
+
+
 import logging
 
 from pysettings.modules import get_module
