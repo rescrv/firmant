@@ -131,7 +131,7 @@ class Firmant(object):
             writer.write()
 
 
-def _setUp(self):
+def _setup(self):
     import tempfile
     self.globs['outdir'] = tempfile.mkdtemp()
 

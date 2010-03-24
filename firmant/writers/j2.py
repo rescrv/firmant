@@ -290,7 +290,7 @@ class Jinja2PostSingle(Jinja2Writer, posts.PostSingle):
         self.render_to_file(url, template, context)
 
 
-def _setUp(self):
+def _setup(self):
     import tempfile
     from minimock import Mock
 

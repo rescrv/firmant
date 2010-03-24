@@ -34,10 +34,17 @@ if __name__ == '__main__':
         extraglobs = {'Mock': Mock
                      ,'pprint': pprint
                      }
-        for attr in ['module_relative', 'package', 'setUp', 'tearDown', 'globs',
-                'optionflags', 'parser', 'encoding']:
-            if hasattr(mod, '_' + attr):
-                args[attr] = getattr(mod, '_' + attr)
+        for arg, attr in [('module_relative', '_module_relative')
+                         ,('package', '_package')
+                         ,('setUp', '_setup')
+                         ,('tearDown', '_tearDown')
+                         ,('globs', '_globs')
+                         ,('optionflags', '_optionflags')
+                         ,('parser', '_parser')
+                         ,('encoding', '_encoding')
+                         ]:
+            if hasattr(mod, attr):
+                args[arg] = getattr(mod, attr)
         extraglobs.update(args.get('extraglobs', dict()))
         args['extraglobs'] = extraglobs
         suite.addTest(doctest.DocTestSuite(mod, **args))

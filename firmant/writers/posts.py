@@ -410,7 +410,7 @@ class PostSingle(Writer):
         print 'Post %s/%s' % (post.published.strftime('%Y/%m/%d'), post.slug)
 
 
-def _setUp(self):
+def _setup(self):
     from pysettings.settings import Settings
     from firmant.application import Firmant
     from firmant.routing import URLMapper
