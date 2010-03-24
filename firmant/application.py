@@ -125,7 +125,7 @@ class Firmant(object):
     def write(self):
         '''Call ``write`` on each writer.
         '''
-        for key, writer in self.writers.iteritems():
+        for writer in self.writers.itervalues():
             writer.write()
 
 
