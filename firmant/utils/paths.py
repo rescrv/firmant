@@ -25,6 +25,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+'''Utilities for manipulating paths/filesystems.
+'''
+
+
 import os
 import sys
 
@@ -87,7 +91,7 @@ def cat(path, out=sys.stdout):
     '''
     f = open(path)
     for line in f:
-        print >>out, line,
+        print >> out, line,
     f.close()
 
 
