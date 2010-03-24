@@ -82,6 +82,8 @@ class Firmant(object):
             self.parsers[key] = parser(self.settings)
 
     def parse(self):
+        '''Call parse on each configured parser.
+        '''
         # Parse documents
         self.objs = dict()
         for key, parser in self.parsers.items():
