@@ -136,7 +136,7 @@ def _setup(self):
     self.globs['outdir'] = tempfile.mkdtemp()
 
 
-def _tearDown(test):
+def _teardown(test):
     '''Cleanup the Jinja2 test cases.
     '''
     import shutil

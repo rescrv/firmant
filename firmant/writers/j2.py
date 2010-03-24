@@ -318,7 +318,7 @@ def _setup(self):
     self.globs['cat']        = lambda out: cat(out, Mock('stdout'))
 
 
-def _tearDown(test):
+def _teardown(test):
     '''Cleanup the Jinja2 test cases.
     '''
     import shutil

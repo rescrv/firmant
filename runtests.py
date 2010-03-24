@@ -37,7 +37,7 @@ if __name__ == '__main__':
         for arg, attr in [('module_relative', '_module_relative')
                          ,('package', '_package')
                          ,('setUp', '_setup')
-                         ,('tearDown', '_tearDown')
+                         ,('tearDown', '_teardown')
                          ,('globs', '_globs')
                          ,('optionflags', '_optionflags')
                          ,('parser', '_parser')
