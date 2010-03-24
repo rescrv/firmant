@@ -25,6 +25,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+'''Paginate or group objects according to certain properties.
+'''
+
+
 def paginate(per_page, obj_list):
     '''Return a list of objects, broken up into lists of size per_page.
 
@@ -82,9 +86,9 @@ def split_boundary(key, obj_list):
 
     ret = list()
     tmp = list()
-    for cur, next in new_objs:
+    for cur, nex in new_objs:
         tmp.append(cur)
-        if key(cur) != key(next):
+        if key(cur) != key(nex):
             ret.append((key(cur), tmp))
             tmp = list()
     return ret
