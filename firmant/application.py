@@ -132,12 +132,24 @@ class Firmant(object):
 
 
 def _setup(self):
+    '''Setup the test cases.
+
+    Actions taken::
+
+        - Create a temporary directory.
+
+    '''
     import tempfile
     self.globs['outdir'] = tempfile.mkdtemp()
 
 
 def _teardown(test):
-    '''Cleanup the Jinja2 test cases.
+    '''Cleanup the test cases.
+
+    Actions taken::
+
+        - Remove the temporary directory.
+
     '''
     import shutil
     shutil.rmtree(test.globs['outdir'])
