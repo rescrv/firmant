@@ -32,15 +32,10 @@
 __all__ = ['Copyright', 'publish_parts_doc']
 
 
-import datetime
-
-from docutils.transforms.components import Filter
 from docutils.parsers.rst import Directive
 from docutils.parsers.rst import directives
 from docutils.transforms import Transform
 from docutils.readers import standalone
-from docutils.core import publish_programmatically
-from docutils import io
 from docutils import nodes
 
 from firmant.utils import strptime
