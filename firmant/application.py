@@ -73,6 +73,8 @@ class Firmant(object):
         self.urlmapper = URLMapper(getattr(settings, 'URLS', None))
         self.log = logging.getLogger(class_name(self.__class__))
 
+        self.objs = dict()
+
         # Setup parsers
         self.parsers = dict()
         for key, parser in settings.PARSERS.items():
@@ -85,7 +87,6 @@ class Firmant(object):
         '''Call parse on each configured parser.
         '''
         # Parse documents
-        self.objs = dict()
         for key, parser in self.parsers.items():
             self.objs[key] = parser.parse()
 
