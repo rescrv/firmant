@@ -29,6 +29,42 @@
 '''
 
 
+def paginate_action(num_per_page, obj_list, action):
+    '''Call ``action`` with the prev/cur/next page numbers and an obj_list.
+
+        >>> def action(obj_list, prev, cur, next):
+        ...     print obj_list, prev, cur, next
+        >>> paginate_action(1, [1, 2, 3, 4, 5, 6, 7], action)
+        [1] None 1 2
+        [2] 1 2 3
+        [3] 2 3 4
+        [4] 3 4 5
+        [5] 4 5 6
+        [6] 5 6 7
+        [7] 6 7 None
+        >>> paginate_action(2, [1, 2, 3, 4, 5, 6, 7], action)
+        [1, 2] None 1 2
+        [3, 4] 1 2 3
+        [5, 6] 2 3 4
+        [7] 3 4 None
+        >>> paginate_action(2, [], action)
+        >>> paginate_action(2, [1], action)
+        [1] None 1 None
+
+    '''
+    num_pages = (len(obj_list) + num_per_page - 1) / num_per_page
+
+    prev_list = [None] + range(1, num_pages)
+    cur_list  = range(1, num_pages + 1)
+    nex_list  = range(2, num_pages + 1) + [None]
+
+    for prev, cur, nex in zip(prev_list, cur_list, nex_list):
+        begin = (cur - 1) * num_per_page
+        end   = begin + num_per_page
+        objs  = obj_list[begin:end]
+        action(objs, prev, cur, nex)
+
+
 def paginate(per_page, obj_list):
     '''Return a list of objects, broken up into lists of size per_page.
 
