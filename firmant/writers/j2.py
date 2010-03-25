@@ -25,6 +25,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+'''Writers that use the Jinja2 templating engine to create html.
+'''
+
+
 import os
 
 from jinja2 import Environment
@@ -37,6 +41,8 @@ from firmant.writers import Writer
 
 
 class Jinja2Writer(Writer):
+    '''Base class used for functionality common to all J2 writers.
+    '''
 
     def __init__(self, *args, **kwargs):
         super(Jinja2Writer, self).__init__(*args, **kwargs)
@@ -167,6 +173,8 @@ class Jinja2PostArchiveYearly(Jinja2PostArchiveBase, posts.PostArchiveYearly):
 
 
 class Jinja2PostArchiveMonthly(Jinja2PostArchiveBase, posts.PostArchiveMonthly):
+    '''Render paginated post lists (grouped by month) with Jinja2 templates.
+    '''
 
     fmt = 'html'
 
@@ -213,6 +221,8 @@ class Jinja2PostArchiveMonthly(Jinja2PostArchiveBase, posts.PostArchiveMonthly):
 
 
 class Jinja2PostArchiveDaily(Jinja2PostArchiveBase, posts.PostArchiveDaily):
+    '''Render paginated post lists (grouped by day) with Jinja2 templates.
+    '''
 
     fmt = 'html'
 
@@ -265,6 +275,8 @@ class Jinja2PostArchiveDaily(Jinja2PostArchiveBase, posts.PostArchiveDaily):
 
 
 class Jinja2PostSingle(Jinja2Writer, posts.PostSingle):
+    '''Render each post using Jinja2 templates.
+    '''
 
     fmt = 'html'
 
@@ -302,6 +314,16 @@ class Jinja2PostSingle(Jinja2Writer, posts.PostSingle):
 
 
 def _setup(self):
+    '''Setup the test cases.
+
+    Actions taken::
+
+        - Create a temporary directory.
+        - Create a ``Settings`` object.
+        - Create a ``Firmant`` object.
+        - Load modules used in tests.
+
+    '''
     import tempfile
     from minimock import Mock
 

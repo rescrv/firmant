@@ -25,6 +25,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+'''Writers that write various views of the posts.
+'''
+
+
 from copy import copy
 
 from firmant import paginate
@@ -82,6 +86,8 @@ class PostArchiveBase(PostWriter):
         return super(PostArchiveBase, self).write_preconditions()
 
     def url(self, **kwargs):
+        '''Use the urlmapper to construct a url for the given attributes.
+        '''
         urlfor = self.urlmapper.urlfor
         return urlfor(self.fmt, type='post', **kwargs)
 
@@ -111,6 +117,8 @@ class PostArchiveAll(PostArchiveBase):
         '''
         ret = list()
         def action(post_list, pages):
+            '''The action to pass to paginate_action.
+            '''
             ret.append(self.url(page=pages.cur))
         paginate.paginate_action(self.settings.POSTS_PER_PAGE,
                 self._sorted_posts(), action)
@@ -174,6 +182,8 @@ class PostArchiveYearly(PostArchiveBase):
     fmt = 'html'
 
     def key(self, post):
+        '''The key for the post.
+        '''
         return (post.published.year,)
 
     def rev_key(self, key):
@@ -194,6 +204,8 @@ class PostArchiveYearly(PostArchiveBase):
         '''
         ret = list()
         def action(obj_list, years, pages):
+            '''The action to pass to split_paginate_action.
+            '''
             ret.append(self.url(page=pages.cur, year=years.cur[0]))
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
                 self.key, self._sorted_posts(), action)
@@ -276,6 +288,8 @@ class PostArchiveMonthly(PostArchiveBase):
     fmt = 'html'
 
     def key(self, post):
+        '''The key for the post.
+        '''
         return (post.published.year, post.published.month)
 
     def rev_key(self, key):
@@ -300,6 +314,8 @@ class PostArchiveMonthly(PostArchiveBase):
         '''
         ret = list()
         def action(obj_list, months, pages):
+            '''The action to pass to split_paginate_action.
+            '''
             ret.append(self.url(page=pages.cur, year=months.cur[0],
                 month=months.cur[1]))
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
@@ -389,6 +405,8 @@ class PostArchiveDaily(PostArchiveBase):
     fmt = 'html'
 
     def key(self, post):
+        '''The key for the post.
+        '''
         return (post.published.year, post.published.month, post.published.day)
 
     def rev_key(self, key):
@@ -416,6 +434,8 @@ class PostArchiveDaily(PostArchiveBase):
         '''
         ret = list()
         def action(obj_list, days, pages):
+            '''The action to pass to split_paginate_action.
+            '''
             ret.append(self.url(page=pages.cur, year=days.cur[0],
                 month=days.cur[1], day=days.cur[2]))
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
@@ -506,6 +526,8 @@ class PostSingle(PostWriter):
     fmt = 'html'
 
     def url(self, **kwargs):
+        '''Use the urlmapper to construct a url for the given attributes.
+        '''
         urlfor = self.urlmapper.urlfor
         return urlfor(self.fmt, type='post', **kwargs)
 
@@ -558,6 +580,15 @@ class PostSingle(PostWriter):
 
 
 def _setup(self):
+    '''Setup the test cases.
+
+    Actions taken::
+
+        - Create a ``Settings`` object.
+        - Create a ``Firmant`` object.
+        - Load modules used in tests.
+
+    '''
     from pysettings.settings import Settings
     from firmant.application import Firmant
     from firmant.routing import URLMapper
