@@ -105,6 +105,45 @@ def paginate_action(num_per_page, obj_list, action):
         action(objs, prev, cur, nex)
 
 
+def split_paginate_action(num_per_page, key_func, obj_list, action):
+    '''Split obj_list with split_list_action; then use paginate_action.
+
+    The lists will be split according to split_list_action.  Each of the
+    resulting lists will then be passed to paginate_action.  The result will be
+    the action callable will be called with arguments for the objects, the
+    prev/cur/next keys from split_list_action, and the prev/cur/next keys from
+    paginate_action (total of 7 args).
+
+        >>> def parity(x):
+        ...     return x % 2
+        >>> def action(obj_list, sprev, scur, snext, pprev, pcur, pnext):
+        ...     print obj_list, sprev, scur, snext, pprev, pcur, pnext
+        >>> split_paginate_action(2, parity, [1, 3, 5, 7, 9, 2, 4, 7, 9, 10], action)
+        [1, 3] None 1 0 None 1 2
+        [5, 7] None 1 0 1 2 3
+        [9] None 1 0 2 3 None
+        [2, 4] 1 0 1 None 1 None
+        [7, 9] 0 1 0 None 1 None
+        [10] 1 0 None None 1 None
+        >>> split_paginate_action(2, parity, [], action)
+        >>> split_paginate_action(2, parity, [1], action)
+        [1] None 1 None None 1 None
+        >>> split_paginate_action(2, parity, [1, 2], action)
+        [1] None 1 0 None 1 None
+        [2] 1 0 None None 1 None
+
+    '''
+    def new_act_split_list(obj_list, sprev, scur, snex):
+        '''The action to pass to split_list_action.
+        '''
+        def new_act_paginate(obj_list, pprev, pcur, pnex):
+            '''The action to pass to paginate_action.
+            '''
+            action(obj_list, sprev, scur, snex, pprev, pcur, pnex)
+        paginate_action(num_per_page, obj_list, new_act_paginate)
+    split_list_action(key_func, obj_list, new_act_split_list)
+
+
 def paginate(per_page, obj_list):
     '''Return a list of objects, broken up into lists of size per_page.
 
