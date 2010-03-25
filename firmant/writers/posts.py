@@ -169,6 +169,11 @@ class PostArchiveYearly(PostArchiveBase):
     def key(self, post):
         return (post.published.year,)
 
+    def rev_key(self, key):
+        '''Return a dictionary mapping attributes to values in the key.
+        '''
+        return {'year': key[0]}
+
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
 
@@ -271,6 +276,11 @@ class PostArchiveMonthly(PostArchiveBase):
 
     def key(self, post):
         return (post.published.year, post.published.month)
+
+    def rev_key(self, key):
+        '''Return a dictionary mapping attributes to values in the key.
+        '''
+        return {'year': key[0], 'month': key[1]}
 
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
@@ -385,6 +395,11 @@ class PostArchiveDaily(PostArchiveBase):
 
     def key(self, post):
         return (post.published.year, post.published.month, post.published.day)
+
+    def rev_key(self, key):
+        '''Return a dictionary mapping attributes to values in the key.
+        '''
+        return {'year': key[0], 'month': key[1], 'day': key[2]}
 
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
