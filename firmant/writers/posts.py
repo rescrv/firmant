@@ -28,26 +28,13 @@
 from copy import copy
 
 from firmant import paginate
+from firmant.i18n import _
 from firmant.writers import Writer
 
 
 class PostArchiveBase(Writer):
     '''Parse the posts into lists of size POSTS_PER_PAGE.
-
-    When instantiating, if the setting for ``POSTS_PER_PAGE`` is not a
-    positive, non-zero integer, it will raise a value error::
-
-        >>> from pysettings.settings import Settings
-        >>> PostArchiveAll(Settings(POSTS_PER_PAGE=0), {}, None)
-        Traceback (most recent call last):
-        ValueError: POSTS_PER_PAGE must be a positive value.
-
     '''
-
-    def __init__(self, *args, **kwargs):
-        super(PostArchiveBase, self).__init__(*args, **kwargs)
-        if self.settings.POSTS_PER_PAGE < 1:
-            raise ValueError('POSTS_PER_PAGE must be a positive value.')
 
     def for_split_posts(self, key, action):
         '''For each group, for each page in the group, call action.
@@ -66,6 +53,26 @@ class PostArchiveBase(Writer):
             split_posts = paginate.paginate(per_page, split_list)
             for page, num_pages, begin, end, posts in split_posts:
                 action(page, num_pages, begin, end, posts, *key)
+
+    def write_preconditions(self):
+        '''Returns true if and only if it is acceptable to proceed with writing.
+
+        It is a precondition for writing that ``POSTS_PER_PAGE`` be set to a
+        positive, non-zero integer.
+
+            >>> from pysettings.settings import Settings
+            >>> paa = PostArchiveAll(Settings(POSTS_PER_PAGE=0), {}, None)
+            >>> paa.log = Mock('log')
+            >>> paa.write_preconditions()
+            Called log.critical('``POSTS_PER_PAGE`` must be a positive int.')
+            False
+
+        '''
+        # Fail if we do not have an output directory.
+        if getattr(self.settings, 'POSTS_PER_PAGE', -1) < 1:
+            self.log.critical(_('``POSTS_PER_PAGE`` must be a positive int.'))
+            return False
+        return super(PostArchiveBase, self).write_preconditions()
 
     def url(self, **kwargs):
         urlfor = self.urlmapper.urlfor
