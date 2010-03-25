@@ -67,10 +67,23 @@ class PostArchiveBase(Writer):
             Called log.critical('``POSTS_PER_PAGE`` must be a positive int.')
             False
 
+        It is another precondition for writing that there be posts in the parsed
+        objects dictionary::
+
+            >>> from pysettings.settings import Settings
+            >>> paa = PostArchiveAll(Settings(POSTS_PER_PAGE=1), {}, None)
+            >>> paa.log = Mock('log')
+            >>> paa.write_preconditions()
+            Called log.critical('``posts`` must be in parsed objects.')
+            False
+
         '''
         # Fail if we do not have an output directory.
         if getattr(self.settings, 'POSTS_PER_PAGE', -1) < 1:
             self.log.critical(_('``POSTS_PER_PAGE`` must be a positive int.'))
+            return False
+        if 'posts' not in self.objs:
+            self.log.critical(_('``posts`` must be in parsed objects.'))
             return False
         return super(PostArchiveBase, self).write_preconditions()
 
