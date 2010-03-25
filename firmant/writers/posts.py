@@ -36,24 +36,6 @@ class PostArchiveBase(Writer):
     '''Parse the posts into lists of size POSTS_PER_PAGE.
     '''
 
-    def for_split_posts(self, key, action):
-        '''For each group, for each page in the group, call action.
-
-        Action will be provided with the page, the total number of pages, the
-        beginning and ending indices (1-indexed) of the posts, and the posts
-        themselves.  It will also get the elements of the key.
-        '''
-        per_page = self.settings.POSTS_PER_PAGE
-
-        posts = copy(self.objs['posts'])
-        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
-
-        split_lists = paginate.split_boundary(key, posts)
-        for key, split_list in split_lists:
-            split_posts = paginate.paginate(per_page, split_list)
-            for page, num_pages, begin, end, posts in split_posts:
-                action(page, num_pages, begin, end, posts, *key)
-
     def write_preconditions(self):
         '''Returns true if and only if it is acceptable to proceed with writing.
 
