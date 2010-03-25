@@ -101,8 +101,8 @@ class PostArchiveAll(PostArchiveBase):
         posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
 
         ret = list()
-        def action(post_list, prev, cur, nex):
-            ret.append(self.url(page=cur))
+        def action(post_list, pages):
+            ret.append(self.url(page=pages.cur))
         paginate.paginate_action(self.settings.POSTS_PER_PAGE, posts, action)
         return ret
 
@@ -135,20 +135,20 @@ class PostArchiveAll(PostArchiveBase):
         paginate.paginate_action(self.settings.POSTS_PER_PAGE,
                 posts, self.render)
 
-    def render(self, posts, prev, cur, nex):
+    def render(self, posts, pages):
         '''Render the view
 
         This should be overridden in child classes.
         '''
-        if prev is None:
+        if pages.prev is None:
             print 'No previous page.'
         else:
-            print 'Prev', prev
-        print 'Index', cur
-        if nex is None:
+            print 'Prev', pages.prev
+        print 'Index', pages.cur
+        if pages.next is None:
             print 'No next page.'
         else:
-            print 'Next', nex
+            print 'Next', pages.next
         for post in posts:
             s = post.published.strftime('  - %Y-%m-%d-%%s')
             print s % post.slug

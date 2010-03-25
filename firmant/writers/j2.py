@@ -61,7 +61,7 @@ class Jinja2PostArchiveAll(Jinja2Writer, posts.PostArchiveAll):
 
     fmt = 'html'
 
-    def render(self, post_list, prev, cur, nex):
+    def render(self, post_list, pages):
         r'''Render the data in a Jinja2 template.
 
             >>> c = components
@@ -85,13 +85,17 @@ class Jinja2PostArchiveAll(Jinja2Writer, posts.PostArchiveAll):
             Called stdout.write('2009-12-31-party\n')
 
         '''
-        url = self.url(page=cur)
+        url = self.url(page=pages.cur)
         template = 'posts/archive_all.html'
         context = dict()
-        if prev is not None:
-            prev = self.url(page=prev)
-        if nex is not None:
-            nex = self.url(page=nex)
+        if pages.prev is not None:
+            prev = self.url(page=pages.prev)
+        else:
+            prev = None
+        if pages.next is not None:
+            nex = self.url(page=pages.next)
+        else:
+            nex = None
         context['prev']          = prev
         context['next']          = nex
         context['posts']         = post_list

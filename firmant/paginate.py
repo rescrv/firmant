@@ -113,8 +113,8 @@ def split_list_action(key_func, obj_list, action):
 def paginate_action(num_per_page, obj_list, action):
     '''Call ``action`` with the prev/cur/next page numbers and an obj_list.
 
-        >>> def action(obj_list, prev, cur, next):
-        ...     print obj_list, prev, cur, next
+        >>> def action(obj_list, pages):
+        ...     print obj_list, pages.prev, pages.cur, pages.next
         >>> paginate_action(1, [1, 2, 3, 4, 5, 6, 7], action)
         [1] None 1 2
         [2] 1 2 3
@@ -143,7 +143,7 @@ def paginate_action(num_per_page, obj_list, action):
         begin = (cur - 1) * num_per_page
         end   = begin + num_per_page
         objs  = obj_list[begin:end]
-        action(objs, prev, cur, nex)
+        action(objs, Paginated(prev, cur, nex))
 
 
 def split_paginate_action(num_per_page, key_func, obj_list, action):
@@ -177,9 +177,10 @@ def split_paginate_action(num_per_page, key_func, obj_list, action):
     def new_act_split_list(obj_list, sprev, scur, snex):
         '''The action to pass to split_list_action.
         '''
-        def new_act_paginate(obj_list, pprev, pcur, pnex):
+        def new_act_paginate(obj_list, pages):
             '''The action to pass to paginate_action.
             '''
-            action(obj_list, sprev, scur, snex, pprev, pcur, pnex)
+            action(obj_list, sprev, scur, snex, pages.prev, pages.cur,
+                    pages.next)
         paginate_action(num_per_page, obj_list, new_act_paginate)
     split_list_action(key_func, obj_list, new_act_split_list)
