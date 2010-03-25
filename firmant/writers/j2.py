@@ -108,7 +108,7 @@ class Jinja2PostArchiveYearly(Jinja2Writer, posts.PostArchiveYearly):
 
     fmt = 'html'
 
-    def render(self, post_list, sprev, scur, snext, pprev, pcur, pnext):
+    def render(self, post_list, years, pages):
         r'''Render the data in a Jinja2 template.
 
             >>> c = components
@@ -138,18 +138,26 @@ class Jinja2PostArchiveYearly(Jinja2Writer, posts.PostArchiveYearly):
             Called stdout.write('2009-12-31-party\n')
 
         '''
-        url = self.url(page=pcur, year=scur[0])
+        url = self.url(page=pages.cur, year=years.cur[0])
         template = 'posts/archive_yearly.html'
         context = dict()
-        if sprev is not None:
-            sprev = self.url(page=1, year=sprev[0])
-        if snext is not None:
-            snext = self.url(page=1, year=snext[0])
-        if pprev is not None:
-            pprev = self.url(page=pprev, year=scur[0])
-        if pnext is not None:
-            pnext = self.url(page=pnext, year=scur[0])
-        context['year']          = scur[0]
+        if years.prev is not None:
+            sprev = self.url(page=1, year=years.prev[0])
+        else:
+            sprev = None
+        if years.next is not None:
+            snext = self.url(page=1, year=years.next[0])
+        else:
+            snext = None
+        if pages.prev is not None:
+            pprev = self.url(page=pages.prev, year=years.cur[0])
+        else:
+            pprev = None
+        if pages.next is not None:
+            pnext = self.url(page=pages.next, year=years.cur[0])
+        else:
+            pnext = None
+        context['year']           = years.cur[0]
         context['pprev']          = pprev
         context['pnext']          = pnext
         context['sprev']          = sprev
@@ -162,7 +170,7 @@ class Jinja2PostArchiveMonthly(Jinja2Writer, posts.PostArchiveMonthly):
 
     fmt = 'html'
 
-    def render(self, post_list, sprev, scur, snext, pprev, pcur, pnext):
+    def render(self, post_list, months, pages):
         r'''Render the data in a Jinja2 template.
 
             >>> c = components
@@ -198,19 +206,29 @@ class Jinja2PostArchiveMonthly(Jinja2Writer, posts.PostArchiveMonthly):
             Called stdout.write('2009-12-31-party\n')
 
         '''
-        url = self.url(page=pcur, year=scur[0], month=scur[1])
+        url = self.url(page=pages.cur, year=months.cur[0], month=months.cur[1])
         template = 'posts/archive_monthly.html'
         context = dict()
-        if sprev is not None:
-            sprev = self.url(page=1, year=sprev[0], month=sprev[1])
-        if snext is not None:
-            snext = self.url(page=1, year=snext[0], month=snext[1])
-        if pprev is not None:
-            pprev = self.url(page=pprev, year=scur[0], month=scur[1])
-        if pnext is not None:
-            pnext = self.url(page=pnext, year=scur[0], month=scur[1])
-        context['year']           = scur[0]
-        context['month']          = scur[1]
+        if months.prev is not None:
+            sprev = self.url(page=1, year=months.prev[0], month=months.prev[1])
+        else:
+            sprev = None
+        if months.next is not None:
+            snext = self.url(page=1, year=months.next[0], month=months.next[1])
+        else:
+            snext = None
+        if pages.prev is not None:
+            pprev = self.url(page=pages.prev, year=months.cur[0],
+                    month=months.cur[1])
+        else:
+            pprev = None
+        if pages.next is not None:
+            pnext = self.url(page=pages.next, year=months.cur[0],
+                    month=months.cur[1])
+        else:
+            pnext = None
+        context['year']           = months.cur[0]
+        context['month']          = months.cur[1]
         context['pprev']          = pprev
         context['pnext']          = pnext
         context['sprev']          = sprev
@@ -223,7 +241,7 @@ class Jinja2PostArchiveDaily(Jinja2Writer, posts.PostArchiveDaily):
 
     fmt = 'html'
 
-    def render(self, post_list, sprev, scur, snext, pprev, pcur, pnext):
+    def render(self, post_list, days, pages):
         r'''Render the data in a Jinja2 template.
 
             >>> c = components
@@ -265,24 +283,33 @@ class Jinja2PostArchiveDaily(Jinja2Writer, posts.PostArchiveDaily):
             Called stdout.write('2009-12-31-party\n')
 
         '''
-        url = self.url(page=pcur, year=scur[0], month=scur[1], day=scur[2])
+        url = self.url(page=pages.cur, year=days.cur[0], month=days.cur[1],
+                day=days.cur[2])
         template = 'posts/archive_daily.html'
         context = dict()
-        if sprev is not None:
-            sprev = self.url(page=1, year=sprev[0], month=sprev[1],
-                    day=sprev[2])
-        if snext is not None:
-            snext = self.url(page=1, year=snext[0], month=snext[1],
-                    day=snext[2])
-        if pprev is not None:
-            pprev = self.url(page=pprev, year=scur[0], month=scur[1],
-                    day=scur[2])
-        if pnext is not None:
-            pnext = self.url(page=pnext, year=scur[0], month=scur[1],
-                    day=scur[2])
-        context['year']           = scur[0]
-        context['month']          = scur[1]
-        context['day']            = scur[2]
+        if days.prev is not None:
+            sprev = self.url(page=1, year=days.prev[0], month=days.prev[1],
+                    day=days.prev[2])
+        else:
+            sprev = None
+        if days.next is not None:
+            snext = self.url(page=1, year=days.next[0], month=days.next[1],
+                    day=days.next[2])
+        else:
+            snext = None
+        if pages.prev is not None:
+            pprev = self.url(page=pages.prev, year=days.cur[0],
+                    month=days.cur[1], day=days.cur[2])
+        else:
+            pprev = None
+        if pages.next is not None:
+            pnext = self.url(page=pages.next, year=days.cur[0],
+                    month=days.cur[1], day=days.cur[2])
+        else:
+            pnext = None
+        context['year']           = days.cur[0]
+        context['month']          = days.cur[1]
+        context['day']            = days.cur[2]
         context['pprev']          = pprev
         context['pnext']          = pnext
         context['sprev']          = sprev

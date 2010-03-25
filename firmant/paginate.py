@@ -157,8 +157,9 @@ def split_paginate_action(num_per_page, key_func, obj_list, action):
 
         >>> def parity(x):
         ...     return x % 2
-        >>> def action(obj_list, sprev, scur, snext, pprev, pcur, pnext):
-        ...     print obj_list, sprev, scur, snext, pprev, pcur, pnext
+        >>> def action(obj_list, groups, pages):
+        ...     print obj_list, groups.prev, groups.cur, groups.next,
+        ...     print pages.prev, pages.cur, pages.next
         >>> split_paginate_action(2, parity, [1, 3, 5, 7, 9, 2, 4, 7, 9, 10], action)
         [1, 3] None 1 0 None 1 2
         [5, 7] None 1 0 1 2 3
@@ -180,7 +181,6 @@ def split_paginate_action(num_per_page, key_func, obj_list, action):
         def new_act_paginate(obj_list, pages):
             '''The action to pass to paginate_action.
             '''
-            action(obj_list, groups.prev, groups.cur, groups.next, pages.prev,
-                    pages.cur, pages.next)
+            action(obj_list, groups, pages)
         paginate_action(num_per_page, obj_list, new_act_paginate)
     split_list_action(key_func, obj_list, new_act_split_list)

@@ -185,8 +185,8 @@ class PostArchiveYearly(PostArchiveBase):
         posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
 
         ret = list()
-        def action(obj_list, sprev, scur, snext, pprev, pcur, pnext):
-            ret.append(self.url(page=pcur, year=scur[0]))
+        def action(obj_list, years, pages):
+            ret.append(self.url(page=pages.cur, year=years.cur[0]))
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
                 key_post_year, posts, action)
         return ret
@@ -229,30 +229,30 @@ class PostArchiveYearly(PostArchiveBase):
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
                 key_post_year, posts, self.render)
 
-    def render(self, posts, sprev, scur, snext, pprev, pcur, pnext):
+    def render(self, posts, years, pages):
         '''Render the page corresponding to a single year/page.
 
         This should be overridden in child classes.
         '''
-        if sprev is None:
+        if years.prev is None:
             print 'No previous year.'
         else:
-            print 'Previous year: %s' % sprev[0]
-        print 'Current year: %s' % scur[0]
-        if snext is None:
+            print 'Previous year: %s' % years.prev[0]
+        print 'Current year: %s' % years.cur[0]
+        if years.next is None:
             print 'No next year.'
         else:
-            print 'Next year: %s' % snext[0]
+            print 'Next year: %s' % years.next[0]
 
-        if pprev is None:
+        if pages.prev is None:
             print '    No previous page.'
         else:
-            print '    Prev', pprev
-        print '    Index', pcur
-        if pnext is None:
+            print '    Prev', pages.prev
+        print '    Index', pages.cur
+        if pages.next is None:
             print '    No next page.'
         else:
-            print '    Next', pnext
+            print '    Next', pages.next
         for post in posts:
             s = post.published.strftime('     - %Y-%m-%d-%%s')
             print s % post.slug
@@ -293,8 +293,9 @@ class PostArchiveMonthly(PostArchiveBase):
         posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
 
         ret = list()
-        def action(obj_list, sprev, scur, snext, pprev, pcur, pnext):
-            ret.append(self.url(page=pcur, year=scur[0], month=scur[1]))
+        def action(obj_list, months, pages):
+            ret.append(self.url(page=pages.cur, year=months.cur[0],
+                month=months.cur[1]))
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
                 key_post_month, posts, action)
         return ret
@@ -343,30 +344,30 @@ class PostArchiveMonthly(PostArchiveBase):
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
                 key_post_month, posts, self.render)
 
-    def render(self, posts, sprev, scur, snext, pprev, pcur, pnext):
+    def render(self, posts, months, pages):
         '''Render the page corresponding to a single month/page.
 
         This should be overridden in child classes.
         '''
-        if sprev is None:
+        if months.prev is None:
             print 'No previous month.'
         else:
-            print 'Previous month: %s-%s' % sprev
-        print 'Current month: %s-%s' % scur
-        if snext is None:
+            print 'Previous month: %s-%s' % months.prev
+        print 'Current month: %s-%s' % months.cur
+        if months.next is None:
             print 'No next month.'
         else:
-            print 'Next month: %s-%s' % snext
+            print 'Next month: %s-%s' % months.next
 
-        if pprev is None:
+        if pages.prev is None:
             print '    No previous page.'
         else:
-            print '    Prev', pprev
-        print '    Index', pcur
-        if pnext is None:
+            print '    Prev', pages.prev
+        print '    Index', pages.cur
+        if pages.next is None:
             print '    No next page.'
         else:
-            print '    Next', pnext
+            print '    Next', pages.next
         for post in posts:
             fmt_str = post.published.strftime('     - %Y-%m-%d-%%s')
             print fmt_str % post.slug
@@ -410,9 +411,9 @@ class PostArchiveDaily(PostArchiveBase):
         posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
 
         ret = list()
-        def action(obj_list, sprev, scur, snext, pprev, pcur, pnext):
-            ret.append(self.url(page=pcur, year=scur[0], month=scur[1],
-                    day=scur[2]))
+        def action(obj_list, days, pages):
+            ret.append(self.url(page=pages.cur, year=days.cur[0],
+                month=days.cur[1], day=days.cur[2]))
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
                 key_post_day, posts, action)
         return ret
@@ -468,30 +469,30 @@ class PostArchiveDaily(PostArchiveBase):
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
                 key_post_day, posts, self.render)
 
-    def render(self, posts, sprev, scur, snext, pprev, pcur, pnext):
+    def render(self, posts, days, pages):
         '''Render the page corresponding to a single day/page.
 
         This should be overridden in child classes.
         '''
-        if sprev is None:
+        if days.prev is None:
             print 'No previous day.'
         else:
-            print 'Previous day: %s-%s-%s' % sprev
-        print 'Current day: %s-%s-%s' % scur
-        if snext is None:
+            print 'Previous day: %s-%s-%s' % days.prev
+        print 'Current day: %s-%s-%s' % days.cur
+        if days.next is None:
             print 'No next day.'
         else:
-            print 'Next day: %s-%s-%s' % snext
+            print 'Next day: %s-%s-%s' % days.next
 
-        if pprev is None:
+        if pages.prev is None:
             print '    No previous page.'
         else:
-            print '    Prev', pprev
-        print '    Index', pcur
-        if pnext is None:
+            print '    Prev', pages.prev
+        print '    Index', pages.cur
+        if pages.next is None:
             print '    No next page.'
         else:
-            print '    Next', pnext
+            print '    Next', pages.next
         for post in posts:
             fmt_str = post.published.strftime('     - %Y-%m-%d-%%s')
             print fmt_str % post.slug
