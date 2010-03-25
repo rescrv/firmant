@@ -54,10 +54,12 @@ class Jinja2Writer(Writer):
 
 
 class Jinja2PostArchiveAll(Jinja2Writer, posts.PostArchiveAll):
+    '''Render paginated post lists with Jinja2 templates.
+    '''
 
     fmt = 'html'
 
-    def render(self, page, num_pages, first, last, posts):
+    def render(self, post_list, prev, cur, nex):
         r'''Render the data in a Jinja2 template.
 
             >>> c = components
@@ -66,29 +68,31 @@ class Jinja2PostArchiveAll(Jinja2Writer, posts.PostArchiveAll):
             >>> j2paa.log = Mock('log')
             >>> j2paa.write()
             >>> cat(os.path.join(settings.OUTPUT_DIR, 'index.html'))
-            Called stdout.write('Page 1/3\n')
-            Called stdout.write('Posts 1-2\n')
+            Called stdout.write('Prev: \n')
+            Called stdout.write('Next: page2/index.html\n')
             Called stdout.write('2010-02-02-newday2\n')
             Called stdout.write('2010-02-02-newday\n')
             >>> cat(os.path.join(settings.OUTPUT_DIR, 'page2/index.html'))
-            Called stdout.write('Page 2/3\n')
-            Called stdout.write('Posts 3-4\n')
+            Called stdout.write('Prev: index.html\n')
+            Called stdout.write('Next: page3/index.html\n')
             Called stdout.write('2010-02-01-newmonth\n')
             Called stdout.write('2010-01-01-newyear\n')
             >>> cat(os.path.join(settings.OUTPUT_DIR, 'page3/index.html'))
-            Called stdout.write('Page 3/3\n')
-            Called stdout.write('Posts 5-5\n')
+            Called stdout.write('Prev: page2/index.html\n')
+            Called stdout.write('Next: \n')
             Called stdout.write('2009-12-31-party\n')
 
         '''
-        url = self.url(page=page)
+        url = self.url(page=cur)
         template = 'posts/archive_all.html'
         context = dict()
-        context['page_no']       = page
-        context['page_max']      = num_pages
-        context['first_post_no'] = first
-        context['last_post_no']  = last
-        context['posts']         = posts
+        if prev is not None:
+            prev = self.url(page=prev)
+        if nex is not None:
+            nex = self.url(page=nex)
+        context['prev']          = prev
+        context['next']          = nex
+        context['posts']         = post_list
         self.render_to_file(url, template, context)
 
 

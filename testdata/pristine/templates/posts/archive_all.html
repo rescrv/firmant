@@ -1,5 +1,5 @@
-Page {{ page_no }}/{{ page_max }}
-Posts {{ first_post_no }}-{{ last_post_no }}
+Prev: {% if prev %}{{ prev }}{% endif %}
+Next: {% if next %}{{ next }}{% endif %}
 {% for post in posts -%}
     {{ post.published.date() }}-{{ post.slug }}
 {% endfor %}

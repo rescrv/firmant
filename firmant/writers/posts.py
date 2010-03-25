@@ -104,13 +104,6 @@ class PostArchiveAll(PostArchiveBase):
 
     fmt = 'html'
 
-    def key(self, post):
-        '''The key for a post is a constant zero-tuple.
-        '''
-        if post is None:
-            return None
-        return ()
-
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
 
@@ -122,10 +115,13 @@ class PostArchiveAll(PostArchiveBase):
         ['index.html', 'page2/index.html', 'page3/index.html']
 
         '''
+        posts = copy(self.objs['posts'])
+        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
+
         ret = list()
-        def action(page, num_pages, first, last, posts):
-            ret.append(self.url(page=page))
-        self.for_split_posts(self.key, action)
+        def action(post_list, prev, cur, nex):
+            ret.append(self.url(page=cur))
+        paginate.paginate_action(self.settings.POSTS_PER_PAGE, posts, action)
         return ret
 
     def write(self):
@@ -135,24 +131,42 @@ class PostArchiveAll(PostArchiveBase):
 
         >>> paa = PostArchiveAll(settings, objs, urlmapper)
         >>> paa.write()
-        Page 1 1-2 of 3:
+        No previous page.
+        Index 1
+        Next 2
           - 2010-02-02-newday2
           - 2010-02-02-newday
-        Page 2 3-4 of 3:
+        Prev 1
+        Index 2
+        Next 3
           - 2010-02-01-newmonth
           - 2010-01-01-newyear
-        Page 3 5-5 of 3:
+        Prev 2
+        Index 3
+        No next page.
           - 2009-12-31-party
 
         '''
-        self.for_split_posts(self.key, self.render)
+        posts = copy(self.objs['posts'])
+        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
 
-    def render(self, page, num_pages, first, last, posts):
-        '''Render the function.
+        paginate.paginate_action(self.settings.POSTS_PER_PAGE,
+                posts, self.render)
 
-        This should be overridden in base classes.
+    def render(self, posts, prev, cur, nex):
+        '''Render the view
+
+        This should be overridden in child classes.
         '''
-        print 'Page %i %i-%i of %i:' % (page, first, last, num_pages)
+        if prev is None:
+            print 'No previous page.'
+        else:
+            print 'Prev', prev
+        print 'Index', cur
+        if nex is None:
+            print 'No next page.'
+        else:
+            print 'Next', nex
         for post in posts:
             s = post.published.strftime('  - %Y-%m-%d-%%s')
             print s % post.slug
