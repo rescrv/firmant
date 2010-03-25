@@ -22,6 +22,7 @@ if __name__ == '__main__':
                'firmant.routing',
                'firmant.routing.components',
                'firmant.utils',
+               'firmant.utils.exceptions',
                'firmant.utils.paths',
                'firmant.writers',
                'firmant.writers.posts',

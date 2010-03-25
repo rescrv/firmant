@@ -36,6 +36,7 @@ from docutils.core import publish_programmatically
 from firmant.du import MetaDataStandaloneReader
 from firmant.i18n import _
 from firmant.utils import class_name
+from firmant.utils.exceptions import log_uncaught_exceptions
 
 
 __all__ = ['Parser']
@@ -53,37 +54,8 @@ class Parser(object):
     This class is meant to be used as a base, with the child implementing
     ``paths``, and ``parse_one``.
 
-    The ``parse`` method is careful to trap tracebacks.  For example, if
-    parse_one throws an exception, and the setting ``SAVE_TRACEBACK`` is False::
-
-        >>> from pysettings.settings import Settings
-        >>> class BadParser(Parser):
-        ...     def parse_one(self, path): raise RuntimeError('bad')
-        ...     def paths(self): return [1]
-        >>> bp = BadParser(Settings(SAVE_TRACEBACK=False))
-        >>> bp.log = Mock('log')
-        >>> bp.parse()
-        Called log.error('error parsing 1')
-        Called log.info('traceback not saved')
-        []
-
-    With SAVE_TRACEBACK enabled, it will save to a file using tempfile.mkstemp.
-
-    If an exception is thrown while saving to the file, it will warn about
-    the potential for infinite recursion and stop::
-
-        >>> from minimock import restore
-        >>> import tempfile
-        >>> tempfile.mkstemp = Mock('mkstemp')
-        >>> tempfile.mkstemp.mock_raises = ValueError
-        >>> bp = BadParser(Settings(SAVE_TRACEBACK=True))
-        >>> bp.log = Mock('log')
-        >>> bp.parse()
-        Called log.error('error parsing 1')
-        Called mkstemp(prefix='firmant', text=True)
-        Called log.error("it's turtles all the way down")
-        []
-        >>> restore()
+    The ``parse`` method is careful to trap tracebacks, and uses
+    firmant.utils.exceptions.log_uncaught_exceptions to do so.
 
     '''
 
@@ -98,24 +70,12 @@ class Parser(object):
         '''
         ret = list()
         for path in self.paths():
-            try:
+            def act():
                 obj = self.parse_one(path)
                 ret.append(obj)
-            except:
-                import traceback
-                self.log.error(_('error parsing %s') % path)
-                if getattr(self.settings, 'SAVE_TRACEBACK', False):
-                    try:
-                        t, path = tempfile.mkstemp(prefix='firmant', text=True)
-                        traceback.print_exc(file=t)
-                        t.flush()
-                        t.close()
-                        self.log.error(_('traceback saved to %s') % path)
-                    except:
-                        self.log.error(_("it's turtles all the way down"))
-                else:
-                    self.log.info(_('traceback not saved'))
-            else:
+            error = _('error parsing %s') % path
+            save  = getattr(self.settings, 'SAVE_TRACEBACK', False)
+            if log_uncaught_exceptions(act, self.log, error, save):
                 self.log.info(_('parsed %s') % path)
         return ret
 
