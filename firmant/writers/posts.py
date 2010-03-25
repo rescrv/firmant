@@ -154,10 +154,6 @@ class PostArchiveAll(PostArchiveBase):
             print s % post.slug
 
 
-def key_post_year(post):
-    return (post.published.year,)
-
-
 class PostArchiveYearly(PostArchiveBase):
     '''Parse the posts into a list, grouped by year, then by page.
 
@@ -169,6 +165,9 @@ class PostArchiveYearly(PostArchiveBase):
     '''
 
     fmt = 'html'
+
+    def key(self, post):
+        return (post.published.year,)
 
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
@@ -188,7 +187,7 @@ class PostArchiveYearly(PostArchiveBase):
         def action(obj_list, years, pages):
             ret.append(self.url(page=pages.cur, year=years.cur[0]))
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
-                key_post_year, posts, action)
+                self.key, posts, action)
         return ret
 
     def write(self):
@@ -227,7 +226,7 @@ class PostArchiveYearly(PostArchiveBase):
         posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
 
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
-                key_post_year, posts, self.render)
+                self.key, posts, self.render)
 
     def render(self, posts, years, pages):
         '''Render the page corresponding to a single year/page.
@@ -258,10 +257,6 @@ class PostArchiveYearly(PostArchiveBase):
             print s % post.slug
 
 
-def key_post_month(post):
-    return (post.published.year, post.published.month)
-
-
 class PostArchiveMonthly(PostArchiveBase):
     '''Parse the posts into a list, grouped by month, then by page.
 
@@ -273,6 +268,9 @@ class PostArchiveMonthly(PostArchiveBase):
     '''
 
     fmt = 'html'
+
+    def key(self, post):
+        return (post.published.year, post.published.month)
 
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
@@ -297,7 +295,7 @@ class PostArchiveMonthly(PostArchiveBase):
             ret.append(self.url(page=pages.cur, year=months.cur[0],
                 month=months.cur[1]))
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
-                key_post_month, posts, action)
+                self.key, posts, action)
         return ret
 
     def write(self):
@@ -342,7 +340,7 @@ class PostArchiveMonthly(PostArchiveBase):
         posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
 
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
-                key_post_month, posts, self.render)
+                self.key, posts, self.render)
 
     def render(self, posts, months, pages):
         '''Render the page corresponding to a single month/page.
@@ -373,10 +371,6 @@ class PostArchiveMonthly(PostArchiveBase):
             print fmt_str % post.slug
 
 
-def key_post_day(post):
-    return (post.published.year, post.published.month, post.published.day)
-
-
 class PostArchiveDaily(PostArchiveBase):
     '''Parse the posts into a list, grouped by day, then by page.
 
@@ -388,6 +382,9 @@ class PostArchiveDaily(PostArchiveBase):
     '''
 
     fmt = 'html'
+
+    def key(self, post):
+        return (post.published.year, post.published.month, post.published.day)
 
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
@@ -415,7 +412,7 @@ class PostArchiveDaily(PostArchiveBase):
             ret.append(self.url(page=pages.cur, year=days.cur[0],
                 month=days.cur[1], day=days.cur[2]))
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
-                key_post_day, posts, action)
+                self.key, posts, action)
         return ret
 
     def write(self):
@@ -467,7 +464,7 @@ class PostArchiveDaily(PostArchiveBase):
         posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
 
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
-                key_post_day, posts, self.render)
+                self.key, posts, self.render)
 
     def render(self, posts, days, pages):
         '''Render the page corresponding to a single day/page.
