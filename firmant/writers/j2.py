@@ -44,6 +44,8 @@ class Jinja2Writer(Writer):
         self._env = Environment(loader=loader)
 
     def render_to_file(self, path, template, context):
+        '''Render template with context and save to path.
+        '''
         template = self._env.get_template(template)
         data     = template.render(context)
         path     = os.path.join(self.settings.OUTPUT_DIR, path or '')
