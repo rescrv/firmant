@@ -172,6 +172,10 @@ class PostArchiveAll(PostArchiveBase):
             print s % post.slug
 
 
+def key_post_year(post):
+    return (post.published.year,)
+
+
 class PostArchiveYearly(PostArchiveBase):
     '''Parse the posts into a list, grouped by year, then by page.
 
@@ -184,13 +188,6 @@ class PostArchiveYearly(PostArchiveBase):
 
     fmt = 'html'
 
-    def key(self, post):
-        '''Posts are keyed by year.
-        '''
-        if post is None:
-            return None
-        return (post.published.year,)
-
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
 
@@ -202,10 +199,14 @@ class PostArchiveYearly(PostArchiveBase):
         ['2010/index.html', '2010/page2/index.html', '2009/index.html']
 
         '''
+        posts = copy(self.objs['posts'])
+        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
+
         ret = list()
-        def action(page, num_pages, first, last, posts, year):
-            ret.append(self.url(page=page, year=year))
-        self.for_split_posts(self.key, action)
+        def action(obj_list, sprev, scur, snext, pprev, pcur, pnext):
+            ret.append(self.url(page=pcur, year=scur[0]))
+        paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
+                key_post_year, posts, action)
         return ret
 
     def write(self):
@@ -215,30 +216,63 @@ class PostArchiveYearly(PostArchiveBase):
 
         >>> pay = PostArchiveYearly(settings, objs, urlmapper)
         >>> pay.write()
-        Year 2010:
-            Page 1 1-2 of 2:
-              - 2010-02-02-newday2
-              - 2010-02-02-newday
-        Year 2010:
-            Page 2 3-4 of 2:
-              - 2010-02-01-newmonth
-              - 2010-01-01-newyear
-        Year 2009:
-            Page 1 1-1 of 1:
-              - 2009-12-31-party
+        No previous year.
+        Current year: 2010
+        Next year: 2009
+            No previous page.
+            Index 1
+            Next 2
+             - 2010-02-02-newday2
+             - 2010-02-02-newday
+        No previous year.
+        Current year: 2010
+        Next year: 2009
+            Prev 1
+            Index 2
+            No next page.
+             - 2010-02-01-newmonth
+             - 2010-01-01-newyear
+        Previous year: 2010
+        Current year: 2009
+        No next year.
+            No previous page.
+            Index 1
+            No next page.
+             - 2009-12-31-party
 
         '''
-        self.for_split_posts(self.key, self.render)
+        posts = copy(self.objs['posts'])
+        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
 
-    def render(self, page, num_pages, first, last, posts, year):
-        '''Render the function.
+        paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
+                key_post_year, posts, self.render)
 
-        This should be overridden in base classes.
+    def render(self, posts, sprev, scur, snext, pprev, pcur, pnext):
+        '''Render the page corresponding to a single year/page.
+
+        This should be overridden in child classes.
         '''
-        print 'Year %04i:' % year
-        print '    Page %i %i-%i of %i:' % (page, first, last, num_pages)
+        if sprev is None:
+            print 'No previous year.'
+        else:
+            print 'Previous year: %s' % sprev[0]
+        print 'Current year: %s' % scur[0]
+        if snext is None:
+            print 'No next year.'
+        else:
+            print 'Next year: %s' % snext[0]
+
+        if pprev is None:
+            print '    No previous page.'
+        else:
+            print '    Prev', pprev
+        print '    Index', pcur
+        if pnext is None:
+            print '    No next page.'
+        else:
+            print '    Next', pnext
         for post in posts:
-            s = post.published.strftime('      - %Y-%m-%d-%%s')
+            s = post.published.strftime('     - %Y-%m-%d-%%s')
             print s % post.slug
 
 

@@ -99,10 +99,12 @@ class Jinja2PostArchiveAll(Jinja2Writer, posts.PostArchiveAll):
 
 
 class Jinja2PostArchiveYearly(Jinja2Writer, posts.PostArchiveYearly):
+    '''Render paginated post lists (grouped by year) with Jinja2 templates.
+    '''
 
     fmt = 'html'
 
-    def render(self, page, num_pages, first, last, posts, year):
+    def render(self, post_list, sprev, scur, snext, pprev, pcur, pnext):
         r'''Render the data in a Jinja2 template.
 
             >>> c = components
@@ -111,33 +113,44 @@ class Jinja2PostArchiveYearly(Jinja2Writer, posts.PostArchiveYearly):
             >>> j2pay.log = Mock('log')
             >>> j2pay.write()
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/index.html'))
-            Called stdout.write('Page 1/2\n')
-            Called stdout.write('Posts 1-2\n')
-            Called stdout.write('Year 2010\n')
+            Called stdout.write('Prev year: \n')
+            Called stdout.write('Next year: 2009/index.html\n')
+            Called stdout.write('Prev page: \n')
+            Called stdout.write('Next page: 2010/page2/index.html\n')
             Called stdout.write('2010-02-02-newday2\n')
             Called stdout.write('2010-02-02-newday\n')
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/page2/index.html'))
-            Called stdout.write('Page 2/2\n')
-            Called stdout.write('Posts 3-4\n')
-            Called stdout.write('Year 2010\n')
+            Called stdout.write('Prev year: \n')
+            Called stdout.write('Next year: 2009/index.html\n')
+            Called stdout.write('Prev page: 2010/index.html\n')
+            Called stdout.write('Next page: \n')
             Called stdout.write('2010-02-01-newmonth\n')
             Called stdout.write('2010-01-01-newyear\n')
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2009/index.html'))
-            Called stdout.write('Page 1/1\n')
-            Called stdout.write('Posts 1-1\n')
-            Called stdout.write('Year 2009\n')
+            Called stdout.write('Prev year: 2010/index.html\n')
+            Called stdout.write('Next year: \n')
+            Called stdout.write('Prev page: \n')
+            Called stdout.write('Next page: \n')
             Called stdout.write('2009-12-31-party\n')
 
         '''
-        url = self.url(page=page, year=year)
+        url = self.url(page=pcur, year=scur[0])
         template = 'posts/archive_yearly.html'
         context = dict()
-        context['year']          = year
-        context['page_no']       = page
-        context['page_max']      = num_pages
-        context['first_post_no'] = first
-        context['last_post_no']  = last
-        context['posts']         = posts
+        if sprev is not None:
+            sprev = self.url(page=1, year=sprev[0])
+        if snext is not None:
+            snext = self.url(page=1, year=snext[0])
+        if pprev is not None:
+            pprev = self.url(page=pprev, year=scur[0])
+        if pnext is not None:
+            pnext = self.url(page=pnext, year=scur[0])
+        context['year']          = scur[0]
+        context['pprev']          = pprev
+        context['pnext']          = pnext
+        context['sprev']          = sprev
+        context['snext']          = snext
+        context['posts']         = post_list
         self.render_to_file(url, template, context)
 
 
