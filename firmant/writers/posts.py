@@ -32,7 +32,19 @@ from firmant.i18n import _
 from firmant.writers import Writer
 
 
-class PostArchiveBase(Writer):
+class PostWriter(Writer):
+    '''Base class used for functionality common to all post writers.
+    '''
+
+    def _sorted_posts(self):
+        '''Return the posts sorted by (date, slug)
+        '''
+        posts = copy(self.objs['posts'])
+        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
+        return posts
+
+
+class PostArchiveBase(PostWriter):
     '''Parse the posts into lists of size POSTS_PER_PAGE.
     '''
 
@@ -97,13 +109,11 @@ class PostArchiveAll(PostArchiveBase):
         ['index.html', 'page2/index.html', 'page3/index.html']
 
         '''
-        posts = copy(self.objs['posts'])
-        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
-
         ret = list()
         def action(post_list, pages):
             ret.append(self.url(page=pages.cur))
-        paginate.paginate_action(self.settings.POSTS_PER_PAGE, posts, action)
+        paginate.paginate_action(self.settings.POSTS_PER_PAGE,
+                self._sorted_posts(), action)
         return ret
 
     def write(self):
@@ -129,11 +139,8 @@ class PostArchiveAll(PostArchiveBase):
           - 2009-12-31-party
 
         '''
-        posts = copy(self.objs['posts'])
-        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
-
         paginate.paginate_action(self.settings.POSTS_PER_PAGE,
-                posts, self.render)
+                self._sorted_posts(), self.render)
 
     def render(self, posts, pages):
         '''Render the view
@@ -185,14 +192,11 @@ class PostArchiveYearly(PostArchiveBase):
         ['2010/index.html', '2010/page2/index.html', '2009/index.html']
 
         '''
-        posts = copy(self.objs['posts'])
-        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
-
         ret = list()
         def action(obj_list, years, pages):
             ret.append(self.url(page=pages.cur, year=years.cur[0]))
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
-                self.key, posts, action)
+                self.key, self._sorted_posts(), action)
         return ret
 
     def write(self):
@@ -227,11 +231,8 @@ class PostArchiveYearly(PostArchiveBase):
              - 2009-12-31-party
 
         '''
-        posts = copy(self.objs['posts'])
-        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
-
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
-                self.key, posts, self.render)
+                self.key, self._sorted_posts(), self.render)
 
     def render(self, posts, years, pages):
         '''Render the page corresponding to a single year/page.
@@ -297,15 +298,12 @@ class PostArchiveMonthly(PostArchiveBase):
          '2009/12/index.html']
 
         '''
-        posts = copy(self.objs['posts'])
-        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
-
         ret = list()
         def action(obj_list, months, pages):
             ret.append(self.url(page=pages.cur, year=months.cur[0],
                 month=months.cur[1]))
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
-                self.key, posts, action)
+                self.key, self._sorted_posts(), action)
         return ret
 
     def write(self):
@@ -346,11 +344,8 @@ class PostArchiveMonthly(PostArchiveBase):
              - 2009-12-31-party
 
         '''
-        posts = copy(self.objs['posts'])
-        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
-
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
-                self.key, posts, self.render)
+                self.key, self._sorted_posts(), self.render)
 
     def render(self, posts, months, pages):
         '''Render the page corresponding to a single month/page.
@@ -419,15 +414,12 @@ class PostArchiveDaily(PostArchiveBase):
          '2009/12/31/index.html']
 
         '''
-        posts = copy(self.objs['posts'])
-        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
-
         ret = list()
         def action(obj_list, days, pages):
             ret.append(self.url(page=pages.cur, year=days.cur[0],
                 month=days.cur[1], day=days.cur[2]))
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
-                self.key, posts, action)
+                self.key, self._sorted_posts(), action)
         return ret
 
     def write(self):
@@ -475,11 +467,8 @@ class PostArchiveDaily(PostArchiveBase):
              - 2009-12-31-party
 
         '''
-        posts = copy(self.objs['posts'])
-        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
-
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
-                self.key, posts, self.render)
+                self.key, self._sorted_posts(), self.render)
 
     def render(self, posts, days, pages):
         '''Render the page corresponding to a single day/page.
@@ -510,7 +499,7 @@ class PostArchiveDaily(PostArchiveBase):
             print fmt_str % post.slug
 
 
-class PostSingle(Writer):
+class PostSingle(PostWriter):
     '''Parse the posts into single pages.
     '''
 
@@ -529,15 +518,15 @@ class PostSingle(Writer):
             >>> urlmapper.add(c.Type('post')/c.year/c.month/c.day/c.slug)
             >>> ps = PostSingle(settings, objs, urlmapper)
             >>> pprint(ps.urls())
-            ['2009/12/31/party/index.html',
-             '2010/01/01/newyear/index.html',
-             '2010/02/01/newmonth/index.html',
+            ['2010/02/02/newday2/index.html',
              '2010/02/02/newday/index.html',
-             '2010/02/02/newday2/index.html']
+             '2010/02/01/newmonth/index.html',
+             '2010/01/01/newyear/index.html',
+             '2009/12/31/party/index.html']
 
         '''
         ret = list()
-        for post in self.objs['posts']:
+        for post in self._sorted_posts():
             ret.append(self.url(year=post.published.year,
                 month=post.published.month, day=post.published.day,
                 slug=post.slug))
@@ -550,14 +539,14 @@ class PostSingle(Writer):
 
         >>> ps = PostSingle(settings, objs, urlmapper)
         >>> ps.write()
-        Post 2009/12/31/party
-        Post 2010/01/01/newyear
-        Post 2010/02/01/newmonth
-        Post 2010/02/02/newday
         Post 2010/02/02/newday2
+        Post 2010/02/02/newday
+        Post 2010/02/01/newmonth
+        Post 2010/01/01/newyear
+        Post 2009/12/31/party
 
         '''
-        for post in self.objs['posts']:
+        for post in self._sorted_posts():
             self.render(post)
 
     def render(self, post):
