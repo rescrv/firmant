@@ -29,6 +29,47 @@
 '''
 
 
+class Paginated(object):
+    '''An object representing keys in paginated lists.
+
+    The key used for each of the lists is stored in the properties ``prev``,
+    ``cur``, ``next``.  Instances are just nice containers in place of
+    3-tuples::
+
+        >>> p = Paginated(1, 2, 3)
+        >>> p.prev
+        1
+        >>> p.cur
+        2
+        >>> p.next
+        3
+
+    '''
+
+    def __init__(self, prev, cur, nex):
+        self._prev = prev
+        self._cur = cur
+        self._next = nex
+
+    @property
+    def prev(self):
+        '''The key of the previous list.
+        '''
+        return self._prev
+
+    @property
+    def cur(self):
+        '''The key of the current list.
+        '''
+        return self._cur
+
+    @property
+    def next(self):
+        '''The key of the next list.
+        '''
+        return self._next
+
+
 def split_list_action(key_func, obj_list, action):
     '''Split obj_list at boundaries determined by key_func and call action.
 
