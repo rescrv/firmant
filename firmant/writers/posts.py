@@ -390,6 +390,10 @@ class PostArchiveMonthly(PostArchiveBase):
             print fmt_str % post.slug
 
 
+def key_post_day(post):
+    return (post.published.year, post.published.month, post.published.day)
+
+
 class PostArchiveDaily(PostArchiveBase):
     '''Parse the posts into a list, grouped by day, then by page.
 
@@ -401,13 +405,6 @@ class PostArchiveDaily(PostArchiveBase):
     '''
 
     fmt = 'html'
-
-    def key(self, post):
-        '''Posts are keyed by day.
-        '''
-        if post is None:
-            return None
-        return (post.published.year, post.published.month, post.published.day)
 
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
@@ -427,10 +424,15 @@ class PostArchiveDaily(PostArchiveBase):
          '2009/12/31/index.html']
 
         '''
+        posts = copy(self.objs['posts'])
+        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
+
         ret = list()
-        def action(page, num_pages, first, last, posts, year, month, day):
-            ret.append(self.url(page=page, year=year, month=month, day=day))
-        self.for_split_posts(self.key, action)
+        def action(obj_list, sprev, scur, snext, pprev, pcur, pnext):
+            ret.append(self.url(page=pcur, year=scur[0], month=scur[1],
+                    day=scur[2]))
+        paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
+                key_post_day, posts, action)
         return ret
 
     def write(self):
@@ -441,35 +443,76 @@ class PostArchiveDaily(PostArchiveBase):
         >>> settings.POSTS_PER_PAGE = 1
         >>> pad = PostArchiveDaily(settings, objs, urlmapper)
         >>> pad.write()
-        Day 2010-02-02:
-            Page 1 1-1 of 2:
-              - 2010-02-02-newday2
-        Day 2010-02-02:
-            Page 2 2-2 of 2:
-              - 2010-02-02-newday
-        Day 2010-02-01:
-            Page 1 1-1 of 1:
-              - 2010-02-01-newmonth
-        Day 2010-01-01:
-            Page 1 1-1 of 1:
-              - 2010-01-01-newyear
-        Day 2009-12-31:
-            Page 1 1-1 of 1:
-              - 2009-12-31-party
+        No previous day.
+        Current day: 2010-2-2
+        Next day: 2010-2-1
+            No previous page.
+            Index 1
+            Next 2
+             - 2010-02-02-newday2
+        No previous day.
+        Current day: 2010-2-2
+        Next day: 2010-2-1
+            Prev 1
+            Index 2
+            No next page.
+             - 2010-02-02-newday
+        Previous day: 2010-2-2
+        Current day: 2010-2-1
+        Next day: 2010-1-1
+            No previous page.
+            Index 1
+            No next page.
+             - 2010-02-01-newmonth
+        Previous day: 2010-2-1
+        Current day: 2010-1-1
+        Next day: 2009-12-31
+            No previous page.
+            Index 1
+            No next page.
+             - 2010-01-01-newyear
+        Previous day: 2010-1-1
+        Current day: 2009-12-31
+        No next day.
+            No previous page.
+            Index 1
+            No next page.
+             - 2009-12-31-party
 
         '''
-        self.for_split_posts(self.key, self.render)
+        posts = copy(self.objs['posts'])
+        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
 
-    def render(self, page, num_pages, first, last, posts, year, month, day):
-        '''Render the function.
+        paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
+                key_post_day, posts, self.render)
 
-        This should be overridden in base classes.
+    def render(self, posts, sprev, scur, snext, pprev, pcur, pnext):
+        '''Render the page corresponding to a single day/page.
+
+        This should be overridden in child classes.
         '''
-        print 'Day %04i-%02i-%02i:' % (year, month, day)
-        print '    Page %i %i-%i of %i:' % (page, first, last, num_pages)
+        if sprev is None:
+            print 'No previous day.'
+        else:
+            print 'Previous day: %s-%s-%s' % sprev
+        print 'Current day: %s-%s-%s' % scur
+        if snext is None:
+            print 'No next day.'
+        else:
+            print 'Next day: %s-%s-%s' % snext
+
+        if pprev is None:
+            print '    No previous page.'
+        else:
+            print '    Prev', pprev
+        print '    Index', pcur
+        if pnext is None:
+            print '    No next page.'
+        else:
+            print '    Next', pnext
         for post in posts:
-            s = post.published.strftime('      - %Y-%m-%d-%%s')
-            print s % post.slug
+            fmt_str = post.published.strftime('     - %Y-%m-%d-%%s')
+            print fmt_str % post.slug
 
 
 class PostSingle(Writer):

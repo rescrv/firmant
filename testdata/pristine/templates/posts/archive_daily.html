@@ -1,8 +1,7 @@
-Page {{ page_no }}/{{ page_max }}
-Posts {{ first_post_no }}-{{ last_post_no }}
-Year {{ year }}
-Month {{ month }}
-Day {{ day }}
+Prev day: {% if sprev %}{{ sprev }}{% endif %}
+Next day: {% if snext %}{{ snext }}{% endif %}
+Prev page: {% if pprev %}{{ pprev }}{% endif %}
+Next page: {% if pnext %}{{ pnext }}{% endif %}
 {% for post in posts -%}
     {{ post.published.date() }}-{{ post.slug }}
 {% endfor %}

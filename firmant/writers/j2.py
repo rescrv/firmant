@@ -219,7 +219,7 @@ class Jinja2PostArchiveDaily(Jinja2Writer, posts.PostArchiveDaily):
 
     fmt = 'html'
 
-    def render(self, page, num_pages, first, last, posts, year, month, day):
+    def render(self, post_list, sprev, scur, snext, pprev, pcur, pnext):
         r'''Render the data in a Jinja2 template.
 
             >>> c = components
@@ -230,53 +230,60 @@ class Jinja2PostArchiveDaily(Jinja2Writer, posts.PostArchiveDaily):
             >>> j2pad.log = Mock('log')
             >>> j2pad.write()
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/02/index.html'))
-            Called stdout.write('Page 1/2\n')
-            Called stdout.write('Posts 1-1\n')
-            Called stdout.write('Year 2010\n')
-            Called stdout.write('Month 2\n')
-            Called stdout.write('Day 2\n')
+            Called stdout.write('Prev day: \n')
+            Called stdout.write('Next day: 2010/02/01/index.html\n')
+            Called stdout.write('Prev page: \n')
+            Called stdout.write('Next page: 2010/02/02/page2/index.html\n')
             Called stdout.write('2010-02-02-newday2\n')
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/02/page2/index.html'))
-            Called stdout.write('Page 2/2\n')
-            Called stdout.write('Posts 2-2\n')
-            Called stdout.write('Year 2010\n')
-            Called stdout.write('Month 2\n')
-            Called stdout.write('Day 2\n')
+            Called stdout.write('Prev day: \n')
+            Called stdout.write('Next day: 2010/02/01/index.html\n')
+            Called stdout.write('Prev page: 2010/02/02/index.html\n')
+            Called stdout.write('Next page: \n')
             Called stdout.write('2010-02-02-newday\n')
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/01/index.html'))
-            Called stdout.write('Page 1/1\n')
-            Called stdout.write('Posts 1-1\n')
-            Called stdout.write('Year 2010\n')
-            Called stdout.write('Month 2\n')
-            Called stdout.write('Day 1\n')
+            Called stdout.write('Prev day: 2010/02/02/index.html\n')
+            Called stdout.write('Next day: 2010/01/01/index.html\n')
+            Called stdout.write('Prev page: \n')
+            Called stdout.write('Next page: \n')
             Called stdout.write('2010-02-01-newmonth\n')
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/01/01/index.html'))
-            Called stdout.write('Page 1/1\n')
-            Called stdout.write('Posts 1-1\n')
-            Called stdout.write('Year 2010\n')
-            Called stdout.write('Month 1\n')
-            Called stdout.write('Day 1\n')
+            Called stdout.write('Prev day: 2010/02/01/index.html\n')
+            Called stdout.write('Next day: 2009/12/31/index.html\n')
+            Called stdout.write('Prev page: \n')
+            Called stdout.write('Next page: \n')
             Called stdout.write('2010-01-01-newyear\n')
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2009/12/31/index.html'))
-            Called stdout.write('Page 1/1\n')
-            Called stdout.write('Posts 1-1\n')
-            Called stdout.write('Year 2009\n')
-            Called stdout.write('Month 12\n')
-            Called stdout.write('Day 31\n')
+            Called stdout.write('Prev day: 2010/01/01/index.html\n')
+            Called stdout.write('Next day: \n')
+            Called stdout.write('Prev page: \n')
+            Called stdout.write('Next page: \n')
             Called stdout.write('2009-12-31-party\n')
 
         '''
-        url = self.url(page=page, year=year, month=month, day=day)
+        url = self.url(page=pcur, year=scur[0], month=scur[1], day=scur[2])
         template = 'posts/archive_daily.html'
         context = dict()
-        context['year']          = year
-        context['month']         = month
-        context['day']           = day
-        context['page_no']       = page
-        context['page_max']      = num_pages
-        context['first_post_no'] = first
-        context['last_post_no']  = last
-        context['posts']         = posts
+        if sprev is not None:
+            sprev = self.url(page=1, year=sprev[0], month=sprev[1],
+                    day=sprev[2])
+        if snext is not None:
+            snext = self.url(page=1, year=snext[0], month=snext[1],
+                    day=snext[2])
+        if pprev is not None:
+            pprev = self.url(page=pprev, year=scur[0], month=scur[1],
+                    day=scur[2])
+        if pnext is not None:
+            pnext = self.url(page=pnext, year=scur[0], month=scur[1],
+                    day=scur[2])
+        context['year']           = scur[0]
+        context['month']          = scur[1]
+        context['day']            = scur[2]
+        context['pprev']          = pprev
+        context['pnext']          = pnext
+        context['sprev']          = sprev
+        context['snext']          = snext
+        context['posts']          = post_list
         self.render_to_file(url, template, context)
 
 
