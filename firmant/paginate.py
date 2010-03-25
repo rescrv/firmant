@@ -29,6 +29,46 @@
 '''
 
 
+def split_list_action(key_func, obj_list, action):
+    '''Split obj_list at boundaries determined by key_func and call action.
+
+    At each point the value of key_func changes, split obj_list.  Then for each
+    new list, call action with the list, and the key values for prev/cur/next.
+
+    The function's behavior is undefined if key_func ever returns None.
+
+        >>> def parity(x):
+        ...     return x % 2
+        >>> def action(obj_list, prev, cur, next):
+        ...     print obj_list, prev, cur, next
+        >>> split_list_action(parity, [1, 3, 5, 2, 4, 7, 8, 9, 10], action)
+        [1, 3, 5] None 1 0
+        [2, 4] 1 0 1
+        [7] 0 1 0
+        [8] 1 0 1
+        [9] 0 1 0
+        [10] 1 0 None
+        >>> split_list_action(parity, [], action)
+        >>> split_list_action(parity, [1], action)
+        [1] None 1 None
+
+    '''
+    cur_list = obj_list
+    nex_list = cur_list[1:] + [None]
+
+    kprev = None
+
+    acc = list()
+    for cur, nex in zip(cur_list, nex_list):
+        kcur = cur and key_func(cur)
+        knex = nex and key_func(nex)
+        acc.append(cur)
+        if kcur != knex:
+            action(acc, kprev, kcur, knex)
+            kprev = kcur
+            acc = list()
+
+
 def paginate_action(num_per_page, obj_list, action):
     '''Call ``action`` with the prev/cur/next page numbers and an obj_list.
 
