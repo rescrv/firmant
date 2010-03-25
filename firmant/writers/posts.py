@@ -276,6 +276,10 @@ class PostArchiveYearly(PostArchiveBase):
             print s % post.slug
 
 
+def key_post_month(post):
+    return (post.published.year, post.published.month)
+
+
 class PostArchiveMonthly(PostArchiveBase):
     '''Parse the posts into a list, grouped by month, then by page.
 
@@ -287,13 +291,6 @@ class PostArchiveMonthly(PostArchiveBase):
     '''
 
     fmt = 'html'
-
-    def key(self, post):
-        '''Posts are keyed by month.
-        '''
-        if post is None:
-            return None
-        return (post.published.year, post.published.month)
 
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
@@ -310,10 +307,14 @@ class PostArchiveMonthly(PostArchiveBase):
          '2009/12/index.html']
 
         '''
+        posts = copy(self.objs['posts'])
+        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
+
         ret = list()
-        def action(page, num_pages, first, last, posts, year, month):
-            ret.append(self.url(page=page, year=year, month=month))
-        self.for_split_posts(self.key, action)
+        def action(obj_list, sprev, scur, snext, pprev, pcur, pnext):
+            ret.append(self.url(page=pcur, year=scur[0], month=scur[1]))
+        paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
+                key_post_month, posts, action)
         return ret
 
     def write(self):
@@ -323,33 +324,70 @@ class PostArchiveMonthly(PostArchiveBase):
 
         >>> pam = PostArchiveMonthly(settings, objs, urlmapper)
         >>> pam.write()
-        Month 2010-02:
-            Page 1 1-2 of 2:
-              - 2010-02-02-newday2
-              - 2010-02-02-newday
-        Month 2010-02:
-            Page 2 3-3 of 2:
-              - 2010-02-01-newmonth
-        Month 2010-01:
-            Page 1 1-1 of 1:
-              - 2010-01-01-newyear
-        Month 2009-12:
-            Page 1 1-1 of 1:
-              - 2009-12-31-party
+        No previous month.
+        Current month: 2010-2
+        Next month: 2010-1
+            No previous page.
+            Index 1
+            Next 2
+             - 2010-02-02-newday2
+             - 2010-02-02-newday
+        No previous month.
+        Current month: 2010-2
+        Next month: 2010-1
+            Prev 1
+            Index 2
+            No next page.
+             - 2010-02-01-newmonth
+        Previous month: 2010-2
+        Current month: 2010-1
+        Next month: 2009-12
+            No previous page.
+            Index 1
+            No next page.
+             - 2010-01-01-newyear
+        Previous month: 2010-1
+        Current month: 2009-12
+        No next month.
+            No previous page.
+            Index 1
+            No next page.
+             - 2009-12-31-party
 
         '''
-        self.for_split_posts(self.key, self.render)
+        posts = copy(self.objs['posts'])
+        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
 
-    def render(self, page, num_pages, first, last, posts, year, month):
-        '''Render the function.
+        paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
+                key_post_month, posts, self.render)
 
-        This should be overridden in base classes.
+    def render(self, posts, sprev, scur, snext, pprev, pcur, pnext):
+        '''Render the page corresponding to a single month/page.
+
+        This should be overridden in child classes.
         '''
-        print 'Month %04i-%02i:' % (year, month)
-        print '    Page %i %i-%i of %i:' % (page, first, last, num_pages)
+        if sprev is None:
+            print 'No previous month.'
+        else:
+            print 'Previous month: %s-%s' % sprev
+        print 'Current month: %s-%s' % scur
+        if snext is None:
+            print 'No next month.'
+        else:
+            print 'Next month: %s-%s' % snext
+
+        if pprev is None:
+            print '    No previous page.'
+        else:
+            print '    Prev', pprev
+        print '    Index', pcur
+        if pnext is None:
+            print '    No next page.'
+        else:
+            print '    Next', pnext
         for post in posts:
-            s = post.published.strftime('      - %Y-%m-%d-%%s')
-            print s % post.slug
+            fmt_str = post.published.strftime('     - %Y-%m-%d-%%s')
+            print fmt_str % post.slug
 
 
 class PostArchiveDaily(PostArchiveBase):
