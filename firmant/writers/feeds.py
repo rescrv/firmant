@@ -29,6 +29,8 @@
 '''
 
 
+from copy import copy
+
 from firmant.writers import Writer
 
 
@@ -68,7 +70,44 @@ class FeedSingle(FeedWriter):
         return ret
 
     def write(self):
-        pass
+        '''Write a parsed feed to the filesystem.
+
+        Example on testdata/pristine::
+
+            >>> fs = FeedSingle(settings, objs, urlmapper)
+            >>> fs.write()
+            Feed bar
+              2009/12/31/party
+              2010/01/01/newyear
+            Feed baz
+              2009/12/31/party
+              2010/02/01/newmonth
+              2010/02/02/newday
+              2010/02/02/newday2
+            Feed foo
+              2009/12/31/party
+              2010/01/01/newyear
+              2010/02/02/newday
+              2010/02/02/newday2
+            Feed quux
+              2009/12/31/party
+              2010/02/01/newmonth
+
+        '''
+        for feed in self.objs.get('feeds', []):
+            feed = copy(feed)
+            feed.posts.sort(key=lambda p: (p.published, p.slug))
+            feed.posts = feed.posts[:10]
+            self.render(feed)
+
+    def render(self, feed):
+        '''Render the feed.
+
+        This should be overridden in child classes.
+        '''
+        print 'Feed %s' % feed.slug
+        for post in feed.posts:
+            print '  %s/%s' % (post.published.strftime('%Y/%m/%d'), post.slug)
 
 
 def _setup(self):
@@ -97,6 +136,7 @@ def _setup(self):
     settings               = Settings(s)
     firmant                = Firmant(settings)
     firmant.parse()
+    firmant.cross_reference()
     self.globs['settings'] = settings
     self.globs['objs']  = firmant.objs
     self.globs['urlmapper'] = URLMapper()
