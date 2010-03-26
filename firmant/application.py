@@ -67,6 +67,28 @@ class Firmant(object):
                   <firmant.parsers.RstObject object at 0x...>,
                   <firmant.parsers.RstObject object at 0x...>,
                   <firmant.parsers.RstObject object at 0x...>]}
+        >>> f.cross_reference() #doctest: +ELLIPSIS
+        >>> for post in f.objs['posts']:
+        ...     pprint((post.tags, post.feeds)) #doctest: +ELLIPSIS
+        ([<firmant.parsers.RstObject object at 0x...>],
+         [<firmant.parsers.RstObject object at 0x...>,
+          <firmant.parsers.RstObject object at 0x...>,
+          <firmant.parsers.RstObject object at 0x...>,
+          <firmant.parsers.RstObject object at 0x...>])
+        ([<firmant.parsers.RstObject object at 0x...>],
+         [<firmant.parsers.RstObject object at 0x...>,
+          <firmant.parsers.RstObject object at 0x...>])
+        ([<firmant.parsers.RstObject object at 0x...>],
+         [<firmant.parsers.RstObject object at 0x...>,
+          <firmant.parsers.RstObject object at 0x...>])
+        ([<firmant.parsers.RstObject object at 0x...>,
+          <firmant.parsers.RstObject object at 0x...>],
+         [<firmant.parsers.RstObject object at 0x...>,
+          <firmant.parsers.RstObject object at 0x...>])
+        ([<firmant.parsers.RstObject object at 0x...>,
+          <firmant.parsers.RstObject object at 0x...>],
+         [<firmant.parsers.RstObject object at 0x...>,
+          <firmant.parsers.RstObject object at 0x...>])
         >>> f.setup_writers()
         >>> f.check_url_conflicts()
         >>> f.write()
@@ -95,6 +117,26 @@ class Firmant(object):
         # Parse documents
         for key, parser in self.parsers.items():
             self.objs[key] = parser.parse()
+
+    def cross_reference(self):
+        '''Cross reference tags and feeds
+        '''
+        for feed in self.objs.get('feeds', []):
+            feed.posts = list()
+        for tag in self.objs.get('tags', []):
+            tag.posts = list()
+        # TODO inefficient, notproud
+        for post in self.objs.get('posts', []):
+            for i, ptag in enumerate(post.tags):
+                for tag in self.objs.get('tags', []):
+                    if tag.slug == ptag:
+                        tag.posts.append(post)
+                        post.tags[i] = tag
+            for i, pfeed in enumerate(post.feeds):
+                for feed in self.objs.get('feeds', []):
+                    if feed.slug == pfeed:
+                        feed.posts.append(post)
+                        post.feeds[i] = feed
 
     def setup_writers(self):
         '''Create instances of writer classes.
