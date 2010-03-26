@@ -55,12 +55,17 @@ class Firmant(object):
         >>> f.parse()
         >>> pprint(f.objs) #doctest: +ELLIPSIS
         {'feeds': [<firmant.parsers.RstObject object at 0x...>,
+                   <firmant.parsers.RstObject object at 0x...>,
+                   <firmant.parsers.RstObject object at 0x...>,
                    <firmant.parsers.RstObject object at 0x...>],
          'posts': [<firmant.parsers.RstObject object at 0x...>,
                    <firmant.parsers.RstObject object at 0x...>,
                    <firmant.parsers.RstObject object at 0x...>,
+                   <firmant.parsers.RstObject object at 0x...>,
                    <firmant.parsers.RstObject object at 0x...>],
          'tags': [<firmant.parsers.RstObject object at 0x...>,
+                  <firmant.parsers.RstObject object at 0x...>,
+                  <firmant.parsers.RstObject object at 0x...>,
                   <firmant.parsers.RstObject object at 0x...>]}
         >>> f.setup_writers()
         >>> f.check_url_conflicts()

@@ -39,7 +39,7 @@ PARSERS = {'feeds': 'firmant.parsers.feeds.FeedParser'
           ,'posts': 'firmant.parsers.posts.PostParser'
           ,'tags': 'firmant.parsers.tags.TagParser'
           }
-CONTENT_ROOT = 'content'
+CONTENT_ROOT = 'testdata/pristine'
 FEEDS_SUBDIR = 'feeds'
 POSTS_SUBDIR = 'posts'
 TAGS_SUBDIR = 'tags'
