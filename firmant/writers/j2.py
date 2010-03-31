@@ -280,6 +280,8 @@ class Jinja2PostSingle(Jinja2Writer, posts.PostSingle):
 
     fmt = 'html'
 
+    permalinks_for = 'posts'
+
     def render(self, post):
         r'''Render the data in a Jinja2 template.
 
