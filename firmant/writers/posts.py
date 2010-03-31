@@ -525,11 +525,13 @@ class PostSingle(PostWriter):
 
     fmt = 'html'
 
-    def url(self, **kwargs):
+    def url(self, post):
         '''Use the urlmapper to construct a url for the given attributes.
         '''
         urlfor = self.urlmapper.urlfor
-        return urlfor(self.fmt, type='post', **kwargs)
+        return urlfor(self.fmt, type='post', year=post.published.year,
+                month=post.published.month, day=post.published.day,
+                slug=post.slug)
 
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
@@ -549,9 +551,7 @@ class PostSingle(PostWriter):
         '''
         ret = list()
         for post in self._sorted_posts():
-            ret.append(self.url(year=post.published.year,
-                month=post.published.month, day=post.published.day,
-                slug=post.slug))
+            ret.append(self.url(post=post))
         return ret
 
     def write(self):

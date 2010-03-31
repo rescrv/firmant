@@ -301,8 +301,7 @@ class Jinja2PostSingle(Jinja2Writer, posts.PostSingle):
             Called stdout.write('2009-12-31 | party by John Doe')
 
         '''
-        url = self.url(year=post.published.year, month=post.published.month,
-                day=post.published.day, slug=post.slug)
+        url = self.url(post=post)
         template = 'posts/single.html'
         context = dict()
         context['year']          = post.published.year
