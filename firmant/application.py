@@ -91,6 +91,15 @@ class Firmant(object):
           <firmant.parsers.RstObject object at 0x...>])
         >>> f.setup_writers()
         >>> f.check_url_conflicts()
+        >>> f.create_permalinks()
+        Called log.warning('Object type feeds has no permalink providers.')
+        Called log.warning('Object type tags has no permalink providers.')
+        >>> pprint([post.permalink for post in f.objs['posts']])
+        ['2009/12/31/party/index.html',
+         '2010/01/01/newyear/index.html',
+         '2010/02/01/newmonth/index.html',
+         '2010/02/02/newday/index.html',
+         '2010/02/02/newday2/index.html']
         >>> f.write()
 
     '''
@@ -170,6 +179,30 @@ class Firmant(object):
                     self.log.warning(warning)
                 else:
                     urls[url] = key
+
+    def create_permalinks(self):
+        '''Add a 'permalink' attribute to each parsed object.
+        '''
+        permalink_providers = dict()
+        for inst in self.writers.values():
+            if hasattr(inst, 'permalinks_for'):
+                p_for = inst.permalinks_for
+                if p_for in permalink_providers:
+                    warning  = _("Object type '%s' has multiple "
+                                 "permalink providers.")
+                    warning %= p_for
+                    self.log.warning(warning)
+                else:
+                    permalink_providers[p_for] = inst.url
+        for obj_tag, obj_list in self.objs.items():
+            if obj_tag in permalink_providers:
+                url_for = permalink_providers[obj_tag]
+                for obj in obj_list:
+                    setattr(obj, 'permalink', url_for(obj))
+            else:
+                warning  = _("Object type %s has no permalink providers.")
+                warning %= obj_tag
+                self.log.warning(warning)
 
     def write(self):
         '''Call ``write`` on each writer.
