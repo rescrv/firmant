@@ -95,18 +95,22 @@ class Firmant(object):
         Called log.warning('Object type feeds has no permalink providers.')
         Called log.warning('Object type tags has no permalink providers.')
         >>> pprint([post.permalink for post in f.objs['posts']])
-        ['2009/12/31/party/index.html',
-         '2010/01/01/newyear/index.html',
-         '2010/02/01/newmonth/index.html',
-         '2010/02/02/newday/index.html',
-         '2010/02/02/newday2/index.html']
+        ['http://test/2009/12/31/party/index.html',
+         'http://test/2010/01/01/newyear/index.html',
+         'http://test/2010/02/01/newmonth/index.html',
+         'http://test/2010/02/02/newday/index.html',
+         'http://test/2010/02/02/newday2/index.html']
         >>> f.write()
 
     '''
 
     def __init__(self, settings):
         self.settings = settings
-        self.urlmapper = URLMapper(getattr(settings, 'URLS', None))
+        if hasattr(settings, 'PERMALINK_ROOT'):
+            root = settings.PERMALINK_ROOT
+            self.urlmapper = URLMapper(getattr(settings, 'URLS', None), root)
+        else:
+            self.urlmapper = URLMapper(getattr(settings, 'URLS', None))
         self.log = logging.getLogger(class_name(self.__class__))
 
         self.objs = dict()

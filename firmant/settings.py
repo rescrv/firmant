@@ -59,3 +59,4 @@ URLS = [c.Type('post') /c.pageno
        ,c.Type('post') /c.year/c.month/c.day/c.slug
        ]
 OUTPUT_DIR = 'build/'
+PERMALINK_ROOT = 'http://test'

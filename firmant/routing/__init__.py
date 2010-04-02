@@ -333,7 +333,7 @@ class URLMapper(object):
         >>> day = SinglePathComponent('day', lambda d: '%02i' % d)
         >>> slug = SinglePathComponent('slug', str)
         >>> from pysettings.settings import Settings
-        >>> um = URLMapper()
+        >>> um = URLMapper(root='http://test')
         >>> um.add( post/year/month/day/slug )
         >>> um.add( post/year/month/day )
         >>> um.add( post/year/month )
@@ -358,11 +358,11 @@ class URLMapper(object):
     specified).
 
         >>> um.urlfor('html', type='post', absolute=True, slug='foobar', day=15, month=3, year=2010)
-        'http://firmant.org/2010/03/15/foobar/index.html'
+        'http://test/2010/03/15/foobar/index.html'
 
     '''
 
-    def __init__(self, urls=None, root='http://firmant.org'):
+    def __init__(self, urls=None, root=None):
         self.root=root
         self._paths = list()
         if urls is not None:
@@ -395,7 +395,7 @@ class URLMapper(object):
             return None
         path = path or ''
         if absolute and self.root is None:
-            return RuntimeError('Set the root for absolute URLs')
+            raise RuntimeError('Set the root for absolute URLs')
         elif absolute:
             return os.path.join(self.root, path, 'index.%s' % format)
         else:
