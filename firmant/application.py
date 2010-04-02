@@ -92,7 +92,6 @@ class Firmant(object):
         >>> f.setup_writers()
         >>> f.check_url_conflicts()
         >>> f.create_permalinks()
-        Called log.warning('Object type feeds has no permalink providers.')
         Called log.warning('Object type tags has no permalink providers.')
         >>> pprint([post.permalink for post in f.objs['posts']])
         ['http://test/2009/12/31/party/index.html',
@@ -100,6 +99,11 @@ class Firmant(object):
          'http://test/2010/02/01/newmonth/index.html',
          'http://test/2010/02/02/newday/index.html',
          'http://test/2010/02/02/newday2/index.html']
+        >>> pprint([feed.permalink for feed in f.objs['feeds']])
+        ['http://test/bar/index.atom',
+         'http://test/baz/index.atom',
+         'http://test/foo/index.atom',
+         'http://test/quux/index.atom']
         >>> f.write()
 
     '''

@@ -49,6 +49,7 @@ WRITERS = ['firmant.writers.j2.Jinja2PostArchiveAll'
           ,'firmant.writers.j2.Jinja2PostArchiveMonthly'
           ,'firmant.writers.j2.Jinja2PostArchiveDaily'
           ,'firmant.writers.j2.Jinja2PostSingle'
+          ,'firmant.writers.atom.AtomFeedSingle'
           ]
 POSTS_PER_PAGE = 10
 TEMPLATE_DIR = 'testdata/pristine/templates'
@@ -57,6 +58,7 @@ URLS = [c.Type('post') /c.pageno
        ,c.Type('post') /c.year/c.month/c.pageno
        ,c.Type('post') /c.year/c.month/c.day/c.pageno
        ,c.Type('post') /c.year/c.month/c.day/c.slug
+       ,c.Type('feed') /c.slug
        ]
 OUTPUT_DIR = 'build/'
 PERMALINK_ROOT = 'http://test'
