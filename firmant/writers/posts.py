@@ -85,8 +85,8 @@ class PostArchiveBase(PostWriter):
             return False
         return super(PostArchiveBase, self).write_preconditions()
 
-    def url(self, **kwargs):
-        '''Use the urlmapper to construct a url for the given attributes.
+    def path(self, **kwargs):
+        '''Use the urlmapper to construct a path for the given attributes.
         '''
         urlfor = self.urlmapper.urlfor
         return urlfor(self.fmt, type='post', **kwargs)
@@ -119,7 +119,7 @@ class PostArchiveAll(PostArchiveBase):
         def action(post_list, pages):
             '''The action to pass to paginate_action.
             '''
-            ret.append(self.url(page=pages.cur))
+            ret.append(self.path(page=pages.cur))
         paginate.paginate_action(self.settings.POSTS_PER_PAGE,
                 self._sorted_posts(), action)
         return ret
@@ -206,7 +206,7 @@ class PostArchiveYearly(PostArchiveBase):
         def action(obj_list, years, pages):
             '''The action to pass to split_paginate_action.
             '''
-            ret.append(self.url(page=pages.cur, year=years.cur[0]))
+            ret.append(self.path(page=pages.cur, year=years.cur[0]))
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
                 self.key, self._sorted_posts(), action)
         return ret
@@ -316,7 +316,7 @@ class PostArchiveMonthly(PostArchiveBase):
         def action(obj_list, months, pages):
             '''The action to pass to split_paginate_action.
             '''
-            ret.append(self.url(page=pages.cur, year=months.cur[0],
+            ret.append(self.path(page=pages.cur, year=months.cur[0],
                 month=months.cur[1]))
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
                 self.key, self._sorted_posts(), action)
@@ -436,7 +436,7 @@ class PostArchiveDaily(PostArchiveBase):
         def action(obj_list, days, pages):
             '''The action to pass to split_paginate_action.
             '''
-            ret.append(self.url(page=pages.cur, year=days.cur[0],
+            ret.append(self.path(page=pages.cur, year=days.cur[0],
                 month=days.cur[1], day=days.cur[2]))
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
                 self.key, self._sorted_posts(), action)
@@ -525,13 +525,21 @@ class PostSingle(PostWriter):
 
     fmt = 'html'
 
-    def url(self, post):
-        '''Use the urlmapper to construct a url for the given attributes.
+    def path(self, post):
+        '''Use the urlmapper to construct a path for the given attributes.
         '''
         urlfor = self.urlmapper.urlfor
         return urlfor(self.fmt, type='post', year=post.published.year,
                 month=post.published.month, day=post.published.day,
                 slug=post.slug)
+
+    def url(self, post):
+        '''Use the urlmapper to construct a URL for the given attributes.
+        '''
+        urlfor = self.urlmapper.urlfor
+        return urlfor(self.fmt, absolute=True, type='post',
+                year=post.published.year, month=post.published.month,
+                day=post.published.day, slug=post.slug)
 
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
@@ -551,7 +559,7 @@ class PostSingle(PostWriter):
         '''
         ret = list()
         for post in self._sorted_posts():
-            ret.append(self.url(post=post))
+            ret.append(self.path(post=post))
         return ret
 
     def write(self):

@@ -69,17 +69,17 @@ class Jinja2PostArchiveBase(Jinja2Writer, posts.PostArchiveBase):
         '''Return the url, template, and context, ready to render.
         '''
         rev      = self.rev_key(cal.cur)
-        url      = self.url(page=pages.cur, **rev)
+        url      = self.path(page=pages.cur, **rev)
         template = self.template
         context  = dict()
         context.update(rev)
         context['posts'] = post_list
-        context['pprev'] = pages.prev and self.url(page=pages.prev, **rev)
-        context['pnext'] = pages.next and self.url(page=pages.next, **rev)
+        context['pprev'] = pages.prev and self.path(page=pages.prev, **rev)
+        context['pnext'] = pages.next and self.path(page=pages.next, **rev)
         context['sprev'] = cal.prev and \
-                self.url(page=1, **self.rev_key(cal.prev))
+                self.path(page=1, **self.rev_key(cal.prev))
         context['snext'] = cal.next and \
-                self.url(page=1, **self.rev_key(cal.next))
+                self.path(page=1, **self.rev_key(cal.next))
         return url, template, context
 
 
@@ -113,15 +113,15 @@ class Jinja2PostArchiveAll(Jinja2Writer, posts.PostArchiveAll):
             Called stdout.write('2009-12-31-party\n')
 
         '''
-        url = self.url(page=pages.cur)
+        url = self.path(page=pages.cur)
         template = 'posts/archive_all.html'
         context = dict()
         if pages.prev is not None:
-            prev = self.url(page=pages.prev)
+            prev = self.path(page=pages.prev)
         else:
             prev = None
         if pages.next is not None:
-            nex = self.url(page=pages.next)
+            nex = self.path(page=pages.next)
         else:
             nex = None
         context['prev']          = prev
@@ -303,7 +303,7 @@ class Jinja2PostSingle(Jinja2Writer, posts.PostSingle):
             Called stdout.write('2009-12-31 | party by John Doe')
 
         '''
-        url = self.url(post=post)
+        url = self.path(post=post)
         template = 'posts/single.html'
         context = dict()
         context['year']          = post.published.year

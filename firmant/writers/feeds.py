@@ -45,11 +45,17 @@ class FeedSingle(FeedWriter):
 
     fmt = 'atom'
 
-    def url(self, feed):
-        '''Use the urlmapper to construct a url for the given attributes.
+    def path(self, feed):
+        '''Use the urlmapper to construct a path for the given attributes.
         '''
         urlfor = self.urlmapper.urlfor
         return urlfor(self.fmt, type='feed', slug=feed.slug)
+
+    def url(self, feed):
+        '''Use the urlmapper to construct a URL for the given attributes.
+        '''
+        urlfor = self.urlmapper.urlfor
+        return urlfor(self.fmt, absolute=True, type='feed', slug=feed.slug)
 
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
@@ -65,7 +71,7 @@ class FeedSingle(FeedWriter):
         '''
         ret = list()
         for feed in self.objs.get('feeds', []):
-            ret.append(self.url(feed=feed))
+            ret.append(self.path(feed=feed))
         ret.sort()
         return ret
 
