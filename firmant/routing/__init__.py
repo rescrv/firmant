@@ -354,9 +354,16 @@ class URLMapper(object):
         >>> um.urlfor('html', type='post', unknown_attribute=True) is None
         True
 
+    If `absoulte` is True, the URL will be prefixed with the root (if it was
+    specified).
+
+        >>> um.urlfor('html', type='post', absolute=True, slug='foobar', day=15, month=3, year=2010)
+        'http://firmant.org/2010/03/15/foobar/index.html'
+
     '''
 
-    def __init__(self, urls=None):
+    def __init__(self, urls=None, root='http://firmant.org'):
+        self.root=root
         self._paths = list()
         if urls is not None:
             self._paths.extend(urls)
@@ -375,7 +382,7 @@ class URLMapper(object):
                 return path.construct(kwargs)
         raise AttributeError('Attributes do not correspond to any path')
 
-    def urlfor(self, format, **kwargs):
+    def urlfor(self, format, absolute=False, **kwargs):
         '''Return the path of a page relative to the content root.
 
         Unless you know to do otherwise, use this method instead of
@@ -387,4 +394,9 @@ class URLMapper(object):
         except AttributeError:
             return None
         path = path or ''
-        return os.path.join(path, 'index.%s' % format)
+        if absolute and self.root is None:
+            return RuntimeError('Set the root for absolute URLs')
+        elif absolute:
+            return os.path.join(self.root, path, 'index.%s' % format)
+        else:
+            return os.path.join(path, 'index.%s' % format)
