@@ -101,16 +101,16 @@ class Jinja2PostArchiveAll(Jinja2Writer, posts.PostArchiveAll):
             >>> j2paa.write()
             >>> cat(os.path.join(settings.OUTPUT_DIR, 'index.html'))
             Called stdout.write('Prev: \n')
-            Called stdout.write('Next: page2/index.html\n')
+            Called stdout.write('Next: http://test/page2/index.html\n')
             Called stdout.write('2010-02-02-newday2\n')
             Called stdout.write('2010-02-02-newday\n')
             >>> cat(os.path.join(settings.OUTPUT_DIR, 'page2/index.html'))
-            Called stdout.write('Prev: index.html\n')
-            Called stdout.write('Next: page3/index.html\n')
+            Called stdout.write('Prev: http://test/index.html\n')
+            Called stdout.write('Next: http://test/page3/index.html\n')
             Called stdout.write('2010-02-01-newmonth\n')
             Called stdout.write('2010-01-01-newyear\n')
             >>> cat(os.path.join(settings.OUTPUT_DIR, 'page3/index.html'))
-            Called stdout.write('Prev: page2/index.html\n')
+            Called stdout.write('Prev: http://test/page2/index.html\n')
             Called stdout.write('Next: \n')
             Called stdout.write('2009-12-31-party\n')
 
@@ -119,11 +119,11 @@ class Jinja2PostArchiveAll(Jinja2Writer, posts.PostArchiveAll):
         template = 'posts/archive_all.html'
         context = dict()
         if pages.prev is not None:
-            prev = self.path(page=pages.prev)
+            prev = self.path(absolute=True, page=pages.prev)
         else:
             prev = None
         if pages.next is not None:
-            nex = self.path(page=pages.next)
+            nex = self.path(absolute=True, page=pages.next)
         else:
             nex = None
         context['prev']          = prev

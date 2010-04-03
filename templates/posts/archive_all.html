@@ -1,5 +1,24 @@
-Prev: {% if prev %}{{ prev }}{% endif %}
-Next: {% if next %}{{ next }}{% endif %}
-{% for post in posts -%}
-    {{ post.published.date() }}-{{ post.slug }}
-{% endfor %}
+{% extends 'posts/base.html' %}
+
+{% block title %}Recent Posts : {{ super() }}{% endblock %}
+
+{% block content %}
+    <h1 class="title">Recent Posts</h1>
+
+    <div class="post archive">
+        <div class="post list">
+            {% for post in posts %}
+                {% include 'posts/_single_stub.html' %}
+                {% if not loop.last %}<hr />{% endif %}
+            {% endfor %}
+        </div>
+        <div class="navigation">
+            {% if prev %}<div class="alignleft">
+                <a href="{{ prev }}">Previous Page</a>
+            </div>{% endif %}
+            {% if next %}<div class="alignright">
+                <a href="{{ next }}">Next Page</a>
+            </div>{% endif %}
+        </div>
+    </div>
+{% endblock %}
