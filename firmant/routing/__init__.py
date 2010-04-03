@@ -396,7 +396,13 @@ class URLMapper(object):
         path = path or ''
         if absolute and self.root is None:
             raise RuntimeError('Set the root for absolute URLs')
-        elif absolute:
-            return os.path.join(self.root, path, 'index.%s' % format)
+        path = os.path.join(path, 'index.%s' % format)
+        if absolute:
+            return self.absolute(path)
         else:
-            return os.path.join(path, 'index.%s' % format)
+            return path
+
+    def absolute(self, path):
+        '''Return the absolute url for the path.
+        '''
+        return os.path.join(self.root, path)
