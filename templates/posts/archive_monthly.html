@@ -1,0 +1,7 @@
+Prev month: {% if sprev %}{{ sprev }}{% endif %}
+Next month: {% if snext %}{{ snext }}{% endif %}
+Prev page: {% if pprev %}{{ pprev }}{% endif %}
+Next page: {% if pnext %}{{ pnext }}{% endif %}
+{% for post in posts -%}
+    {{ post.published.date() }}-{{ post.slug }}
+{% endfor %}
