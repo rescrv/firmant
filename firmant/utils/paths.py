@@ -33,51 +33,6 @@ import os
 import sys
 
 
-def safe_mkdir(path):
-    '''Make sure a directory exists.
-
-    This will only throw errors if creation is impossible.
-
-    Very similar in behavior to ``mkdir -p``.
-
-        >>> import tempfile
-        >>> root = tempfile.mkdtemp()
-
-        >>> # If the path exists, and is a dir, return immediately.
-        >>> safe_mkdir(root)
-
-        >>> # If the path exists, and is a file, raise an error.
-        >>> f = open(os.path.join(root, 'foo'), 'w+')
-        >>> safe_mkdir(os.path.join(root, 'foo'))
-        Traceback (most recent call last):
-        OSError
-
-        >>> # Else create the path.  If there is anything preventing the
-        >>> # directory from being created, raise an exception.
-        >>> safe_mkdir(os.path.join(root, 'bar/baz/quux'))
-
-        >>> # Cleanup after ourselves.
-        >>> import shutil
-        >>> shutil.rmtree(root)
-
-    '''
-    if os.path.exists(path) and os.path.isdir(path):
-        return
-    if os.path.exists(path):
-        raise OSError()
-    paths = list()
-    paths.append(os.path.split(path))
-    while paths[-1][0] not in ('/', ''):
-        paths.append(os.path.split(paths[-1][0]))
-    paths.pop()
-    while len(paths):
-        p = paths[-1][0]
-        if not os.path.exists(p):
-            os.mkdir(p)
-        paths.pop()
-    os.mkdir(path)
-
-
 def cat(path, out=sys.stdout):
     r'''Write the contents of file ``path`` to ``out``.
 
@@ -122,5 +77,11 @@ def create_or_truncate(path):
         >>> shutil.rmtree(root)
 
     '''
-    safe_mkdir(os.path.dirname(path))
+    par = os.path.dirname(path)
+    if par != '':
+        try:
+            os.makedirs(par)
+        except OSError, e:
+            if e.errno != 17:
+                raise
     return open(path, 'w+')
