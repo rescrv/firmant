@@ -1,1 +1,33 @@
-{{ post.published.strftime('%Y-%m-%d') }} | {{ post.slug }} by {{ post.author }}
+{% extends 'posts/base.html' %}
+
+{% block title %}{{ post.title | escape }} : {{ super() }}{% endblock %}
+
+{% block content %}
+    <h1 class="title">{{ post.title | escape }}</h1>
+
+    <div class="post single">
+        <div class="metadata">
+            <span>Written by {{ post.author | escape }}.</span>
+            <span>Published on {{ post.published.strftime("%Y-%m-%d") }} at
+                {{ post.published.strftime("%H:%M") }}.</span>
+        </div>
+
+        <div class="content">
+            {{ post.content }}
+        </div>
+
+        <div class="metadata">
+            {%- if post.tags -%}
+            <span>Filed under
+                {% for tag in post.tags %}
+                {{ tag.slug | escape -}}
+                {% endfor %}.
+            </span>
+            {%- else -%}
+            <span>Not filed</span>
+            {%- endif %}
+            <span>Last updated on {{ post.updated.strftime("%Y-%m-%d") }} at
+                {{ post.updated.strftime("%H:%M") }}.</span>
+        </div>
+    </div>
+{% endblock %}
