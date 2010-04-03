@@ -1,7 +1,30 @@
-Prev month: {% if sprev %}{{ sprev }}{% endif %}
-Next month: {% if snext %}{{ snext }}{% endif %}
-Prev page: {% if pprev %}{{ pprev }}{% endif %}
-Next page: {% if pnext %}{{ pnext }}{% endif %}
-{% for post in posts -%}
-    {{ post.published.date() }}-{{ post.slug }}
-{% endfor %}
+{% extends 'posts/base.html' %}
+
+{% block title %}Archive for {{ year | escape }}-{{ month | escape }} : {{ super() }}{% endblock %}
+
+{% block content %}
+    <h1 class="title">Archive for {{ year | escape }}-{{ month | escape }}</h1>
+
+    <div class="post archive">
+        <div class="post list">
+            {% for post in posts %}
+                {% include 'posts/_single_stub.html' %}
+                {% if not loop.last %}<hr />{% endif %}
+            {% endfor %}
+        </div>
+        <div class="navigation">
+            {% if pprev %}<div class="alignleft">
+                <a href="{{ pprev }}">Previous Page</a>
+            </div>{% endif %}
+            {% if pnext %}<div class="alignright">
+                <a href="{{ pnext }}">Next Page</a>
+            </div>{% endif %}
+            {% if sprev %}<div class="alignleft">
+                <a href="{{ sprev }}">Forward One Month</a>
+            </div>{% endif %}
+            {% if snext %}<div class="alignright">
+                <a href="{{ snext }}">Backward One Month</a>
+            </div>{% endif %}
+        </div>
+    </div>
+{% endblock %}
