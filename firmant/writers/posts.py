@@ -606,11 +606,12 @@ def _setup(self):
         ,'POSTS_SUBDIR': 'posts'
         ,'REST_EXTENSION': 'rst'
         ,'POSTS_PER_PAGE': 2
+        ,'PERMALINK_ROOT': 'http://test'
         }
     settings               = Settings(s)
     firmant                = Firmant(settings)
     firmant.parse()
     self.globs['settings'] = settings
     self.globs['objs']  = firmant.objs
-    self.globs['urlmapper'] = URLMapper()
+    self.globs['urlmapper'] = URLMapper(root=settings.PERMALINK_ROOT)
     self.globs['components'] = components
