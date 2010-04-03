@@ -25,42 +25,58 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-'''Default settings used within Firmant.
+import logging
+import stat
+import tempfile
+import os
 
-It is not generally safe to omit any of these settings.  Change or update them
-if necessary.
-'''
+from docutils import io
+from docutils.core import publish_programmatically
+
+from firmant.parsers import Parser
+from firmant.du import MetaDataStandaloneReader
+from firmant.i18n import _
+from firmant.utils import class_name
+from firmant.utils.exceptions import log_uncaught_exceptions
 
 
-from firmant.routing import components as c
+__all__ = ['StaticParser']
 
 
-PARSERS = {'feeds': 'firmant.parsers.feeds.FeedParser'
-          ,'posts': 'firmant.parsers.posts.PostParser'
-          ,'tags': 'firmant.parsers.tags.TagParser'
-          ,'static': 'firmant.parsers.static.StaticParser'
-          }
-CONTENT_ROOT = 'testdata/pristine'
-FEEDS_SUBDIR = 'feeds'
-POSTS_SUBDIR = 'posts'
-TAGS_SUBDIR = 'tags'
-STATIC_SUBDIR = 'static'
-REST_EXTENSION = 'rst'
-WRITERS = ['firmant.writers.j2.Jinja2PostArchiveAll'
-          ,'firmant.writers.j2.Jinja2PostArchiveYearly'
-          ,'firmant.writers.j2.Jinja2PostArchiveMonthly'
-          ,'firmant.writers.j2.Jinja2PostArchiveDaily'
-          ,'firmant.writers.j2.Jinja2PostSingle'
-          ,'firmant.writers.atom.AtomFeedSingle'
-          ]
-POSTS_PER_PAGE = 10
-TEMPLATE_DIR = 'testdata/pristine/templates'
-URLS = [c.Type('post') /c.pageno
-       ,c.Type('post') /c.year/c.pageno
-       ,c.Type('post') /c.year/c.month/c.pageno
-       ,c.Type('post') /c.year/c.month/c.day/c.pageno
-       ,c.Type('post') /c.year/c.month/c.day/c.slug
-       ,c.Type('feed') /c.slug
-       ]
-OUTPUT_DIR = 'build/'
-PERMALINK_ROOT = 'http://test'
+class StaticObject(object):
+    '''An object that serves as a placeholder for a file on the filesystem.
+    '''
+
+    __slots__ = ['fullpath', 'relpath']
+
+    def __repr__(self):
+        return 'static_obj<%s>' % self.fullpath
+
+
+class StaticParser(Parser):
+    '''Create stand-in objects for static files to be published.
+
+    '''
+
+    def paths(self):
+        '''Return a list of paths to objects on the file system.
+        '''
+        settings = self.settings
+        path  = os.path.join(settings.CONTENT_ROOT, settings.STATIC_SUBDIR)
+        all_files = []
+        for root, dirs, files in os.walk(path):
+            for file in files:
+                s = StaticObject()
+                s.fullpath = os.path.join(root, file)
+                if s.fullpath.startswith(path):
+                    s.relpath = s.fullpath[len(path):]
+                else:
+                    raise RuntimeError('Funky paths in StaticParser')
+                all_files.append(s)
+        all_files.sort(key=lambda s: s.relpath)
+        return all_files
+
+    def parse_one(self, path):
+        '''We use the identity function simply because we are copying files.
+        '''
+        return path
