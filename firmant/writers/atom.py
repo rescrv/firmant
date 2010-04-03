@@ -31,6 +31,7 @@
 '''
 
 
+import datetime
 import os
 
 from lxml import etree
@@ -67,7 +68,8 @@ class AtomFeedSingle(FeedSingle):
         add_text_subelement(feed, 'generator', 'Firmant')
         add_text_subelement(feed, 'title', feed_obj.title)
         add_text_subelement(feed, 'rights', feed_obj.copyright)
-        updated = max([post.published for post in feed_obj.posts])
+        updated = max([post.published for post in feed_obj.posts] +
+                [datetime.datetime(1900, 01, 01)])
         add_text_subelement(feed, 'updated', RFC3339(updated))
         add_text_subelement(feed, 'id', feed_obj.permalink)
         link = etree.SubElement(feed, 'link')
