@@ -67,3 +67,6 @@ URLS = [c.Type('post') /c.pageno
        ]
 OUTPUT_DIR = 'build/'
 PERMALINK_ROOT = 'http://test'
+
+SIDEBAR_POSTS_LEN = 10
+SIDEBAR_ARCHIVES_LEN = 5
