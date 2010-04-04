@@ -64,7 +64,7 @@ def log_uncaught_exceptions(func, log, message, save_traceback=False):
         >>> log_uncaught_exceptions(raises_error, Mock('log'), 'error!', True) #doctest: +ELLIPSIS
         Called log.error('error!')
         Called mkstemp(prefix='firmant', text=True)
-        Called log.error('traceback saved to /...')
+        Called log.error(...'traceback saved to /...')
         False
         >>> os.unlink(path)
         >>> restore()
