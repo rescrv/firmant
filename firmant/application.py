@@ -94,7 +94,6 @@ class Firmant(object):
         >>> f.setup_writers()
         >>> f.check_url_conflicts()
         >>> f.create_permalinks()
-        Called log.warning('Object type static has no permalink providers.')
         Called log.warning('Object type tags has no permalink providers.')
         >>> pprint([post.permalink for post in f.objs['posts']])
         ['http://test/2009/12/31/party/index.html',
@@ -107,6 +106,8 @@ class Firmant(object):
          'http://test/baz/index.atom',
          'http://test/foo/index.atom',
          'http://test/quux/index.atom']
+        >>> pprint([static.permalink for static in f.objs['static']])
+        ['http://test/images/88x31.png']
         >>> f.write()
 
     '''

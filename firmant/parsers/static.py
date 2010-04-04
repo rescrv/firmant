@@ -47,7 +47,7 @@ class StaticObject(object):
     '''An object that serves as a placeholder for a file on the filesystem.
     '''
 
-    __slots__ = ['fullpath', 'relpath']
+    __slots__ = ['fullpath', 'relpath', 'permalink']
 
     def __repr__(self):
         return 'static_obj<%s>' % self.fullpath
@@ -72,6 +72,8 @@ class StaticParser(Parser):
                     s.relpath = s.fullpath[len(path):]
                 else:
                     raise RuntimeError('Funky paths in StaticParser')
+                if s.relpath.startswith('/'):
+                    s.relpath = s.relpath[1:]
                 all_files.append(s)
         all_files.sort(key=lambda s: s.relpath)
         return all_files
