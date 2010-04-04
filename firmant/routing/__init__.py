@@ -360,6 +360,12 @@ class URLMapper(object):
         >>> um.urlfor('html', type='post', absolute=True, slug='foobar', day=15, month=3, year=2010)
         'http://test/2010/03/15/foobar/index.html'
 
+    If `format` is '', then the path formed by the attributes is kept as is and is
+    not interpreted as a directory with an 'index.%s' % format path appended::
+
+        >>> um.urlfor('', type='post', absolute=True, slug='foobar', day=15, month=3, year=2010)
+        'http://test/2010/03/15/foobar'
+
     '''
 
     def __init__(self, urls=None, root=None):
@@ -396,7 +402,8 @@ class URLMapper(object):
         path = path or ''
         if absolute and self.root is None:
             raise RuntimeError('Set the root for absolute URLs')
-        path = os.path.join(path, 'index.%s' % format)
+        if format != '':
+            path = os.path.join(path, 'index.%s' % format)
         if absolute:
             return self.absolute(path)
         else:
