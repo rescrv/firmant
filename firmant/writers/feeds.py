@@ -132,15 +132,18 @@ def _setup(self):
     from firmant.routing import components
     s = {'PARSERS': {'posts': 'firmant.parsers.posts.PostParser'
                     ,'feeds': 'firmant.parsers.feeds.FeedParser'
+                    ,'tags': 'firmant.parsers.tags.TagParser'
                     }
         ,'CONTENT_ROOT': 'testdata/pristine'
         ,'POSTS_SUBDIR': 'posts'
         ,'FEEDS_SUBDIR': 'feeds'
+        ,'TAGS_SUBDIR': 'feeds'
         ,'REST_EXTENSION': 'rst'
         ,'POSTS_PER_PAGE': 2
         }
     settings               = Settings(s)
     firmant                = Firmant(settings)
+    from minimock import Mock
     firmant.parse()
     firmant.cross_reference()
     self.globs['settings'] = settings

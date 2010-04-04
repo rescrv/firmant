@@ -102,16 +102,19 @@ def _setup(self):
     s = {'PARSERS': {'posts': 'firmant.parsers.posts.PostParser'
                     ,'feeds': 'firmant.parsers.feeds.FeedParser'
                     ,'static': 'firmant.parsers.static.StaticParser'
+                    ,'tags': 'firmant.parsers.tags.TagParser'
                     }
         ,'CONTENT_ROOT': 'testdata/pristine'
         ,'POSTS_SUBDIR': 'posts'
         ,'FEEDS_SUBDIR': 'feeds'
+        ,'TAGS_SUBDIR': 'feeds'
         ,'STATIC_SUBDIR': 'static'
         ,'REST_EXTENSION': 'rst'
         ,'POSTS_PER_PAGE': 2
         }
     settings               = Settings(s)
     firmant                = Firmant(settings)
+    from minimock import Mock
     firmant.parse()
     firmant.cross_reference()
     self.globs['settings'] = settings

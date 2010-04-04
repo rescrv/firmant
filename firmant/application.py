@@ -149,16 +149,36 @@ class Firmant(object):
             tag.posts = list()
         # TODO inefficient, notproud
         for post in self.objs.get('posts', []):
+            to_delete = list()
             for i, ptag in enumerate(post.tags):
+                seen = False
                 for tag in self.objs.get('tags', []):
                     if tag.slug == ptag:
+                        seen = True
                         tag.posts.append(post)
                         post.tags[i] = tag
+                if not seen:
+                    warning  = _("Tag '%s' referenced but not defined.")
+                    warning %= ptag
+                    self.log.warning(warning)
+                    to_delete.append(i)
+            for i in reversed(to_delete):
+                del post.tags[i]
+            to_delete = list()
             for i, pfeed in enumerate(post.feeds):
+                seen = False
                 for feed in self.objs.get('feeds', []):
                     if feed.slug == pfeed:
+                        seen = True
                         feed.posts.append(post)
                         post.feeds[i] = feed
+                if not seen:
+                    warning  = _("Tag '%s' referenced but not defined.")
+                    warning %= ptag
+                    self.log.warning(warning)
+                    to_delete.append(i)
+            for i in reversed(to_delete):
+                del post.feeds[i]
 
     def setup_writers(self):
         '''Create instances of writer classes.
