@@ -354,7 +354,7 @@ class URLMapper(object):
         >>> um.urlfor('html', type='post', unknown_attribute=True) is None
         True
 
-    If `absoulte` is True, the URL will be prefixed with the root (if it was
+    If `absolute` is True, the URL will be prefixed with the root (if it was
     specified).
 
         >>> um.urlfor('html', type='post', absolute=True, slug='foobar', day=15, month=3, year=2010)
