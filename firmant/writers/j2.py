@@ -53,7 +53,9 @@ class Jinja2Writer(Writer):
         '''Render template with context and save to path.
         '''
         template = self._env.get_template(template)
-        data     = template.render(context)
+        globals  = self.objs.get('globals', dict())
+        globals.update(context)
+        data     = template.render(globals)
         path     = os.path.join(self.settings.OUTPUT_DIR, path or '')
         f        = paths.create_or_truncate(path)
         f.write(data.encode('utf-8'))

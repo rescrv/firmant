@@ -216,6 +216,13 @@ class Firmant(object):
                 warning %= obj_tag
                 self.log.warning(warning)
 
+    def create_globals(self):
+        '''Create a dictionary of globals to be added to rendering contexts.
+        '''
+        self.objs['globals'] = globals = dict()
+        globals['urlfor'] = lambda fmt, **kwargs: \
+            self.urlmapper.urlfor(fmt, absolute=True, **kwargs)
+
     def write(self):
         '''Call ``write`` on each writer.
         '''
