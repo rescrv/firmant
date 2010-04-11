@@ -276,6 +276,8 @@ class Firmant(object):
                 for y in reversed(sorted(set([p.published.year
                     for p in self.objs.get('posts', [])])))] \
                 [:self.settings.SIDEBAR_ARCHIVES_LEN]
+        globals['static_pages'] = [(p.title, p.permalink) for p in
+                sorted(self.objs.get('staticrst', []), key=lambda p: p.title)]
 
     def write(self):
         '''Call ``write`` on each writer.
