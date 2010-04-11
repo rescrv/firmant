@@ -53,6 +53,7 @@ class Firmant(object):
         {'feeds': <firmant.parsers.feeds.FeedParser object at 0x...>,
          'posts': <firmant.parsers.posts.PostParser object at 0x...>,
          'static': <firmant.parsers.static.StaticParser object at 0x...>,
+         'staticrst': <firmant.parsers.static.StaticRstParser object at 0x...>,
          'tags': <firmant.parsers.tags.TagParser object at 0x...>}
         >>> f.parse()
         >>> pprint(f.objs) #doctest: +ELLIPSIS
@@ -66,6 +67,9 @@ class Firmant(object):
                    <firmant.parsers.RstObject object at 0x...>,
                    <firmant.parsers.RstObject object at 0x...>],
          'static': [static_obj<testdata/pristine/static/images/88x31.png>],
+         'staticrst': [<firmant.parsers.RstObject object at 0x...>,
+                       <firmant.parsers.RstObject object at 0x...>,
+                       <firmant.parsers.RstObject object at 0x...>],
          'tags': [<firmant.parsers.RstObject object at 0x...>,
                   <firmant.parsers.RstObject object at 0x...>,
                   <firmant.parsers.RstObject object at 0x...>,
@@ -95,6 +99,7 @@ class Firmant(object):
         >>> f.setup_writers()
         >>> f.check_url_conflicts()
         >>> f.create_permalinks()
+        Called log.warning('Object type staticrst has no permalink providers.')
         Called log.warning('Object type tags has no permalink providers.')
         >>> pprint([post.permalink for post in f.objs['posts']])
         ['http://test/2009/12/31/party/index.html',
