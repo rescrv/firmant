@@ -99,15 +99,9 @@ def _setup(self):
     from firmant.application import Firmant
     from firmant.routing import URLMapper
     from firmant.routing import components
-    s = {'PARSERS': {'posts': 'firmant.parsers.posts.PostParser'
-                    ,'feeds': 'firmant.parsers.feeds.FeedParser'
-                    ,'static': 'firmant.parsers.static.StaticParser'
-                    ,'tags': 'firmant.parsers.tags.TagParser'
+    s = {'PARSERS': {'static': 'firmant.parsers.static.StaticParser'
                     }
         ,'CONTENT_ROOT': 'testdata/pristine'
-        ,'POSTS_SUBDIR': 'posts'
-        ,'FEEDS_SUBDIR': 'feeds'
-        ,'TAGS_SUBDIR': 'feeds'
         ,'STATIC_SUBDIR': 'static'
         ,'REST_EXTENSION': 'rst'
         ,'POSTS_PER_PAGE': 2
