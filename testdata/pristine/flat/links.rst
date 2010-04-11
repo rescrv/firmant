@@ -1,4 +1,4 @@
-.. copyright:: 
+.. copyright::
 
     This document is part of the public domain.
 

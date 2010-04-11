@@ -37,6 +37,7 @@ from jinja2 import FileSystemLoader
 from firmant import utils
 from firmant.utils import paths
 from firmant.writers import posts
+from firmant.writers import static
 from firmant.writers import Writer
 
 
@@ -318,6 +319,37 @@ class Jinja2PostSingle(Jinja2Writer, posts.PostSingle):
         self.render_to_file(url, template, context)
 
 
+class Jinja2StaticRstSingle(Jinja2Writer, static.StaticRstWriter):
+    '''Render static rst using Jinja2 templates.
+    '''
+
+    fmt = 'html'
+
+    permalinks_for = 'staticrst'
+
+    def render(self, static):
+        r'''Render the data in a Jinja2 template.
+
+            >>> c = components
+            >>> urlmapper.add(c.Type('staticrst')/c.path)
+            >>> j2srs = Jinja2StaticRstSingle(settings, objs, urlmapper)
+            >>> j2srs.log = Mock('log')
+            >>> j2srs.write()
+            >>> join = os.path.join
+            >>> cat(join(settings.OUTPUT_DIR, 'about/index.html'))
+            Called stdout.write('About at about')
+            >>> cat(join(settings.OUTPUT_DIR, 'links/index.html'))
+            Called stdout.write('Links at links')
+
+        '''
+        url = self.path(static=static)
+        template = 'flat.html'
+        context = dict()
+        context['path']        = static.path
+        context['page']        = static
+        self.render_to_file(url, template, context)
+
+
 def _setup(self):
     '''Setup the test cases.
 
@@ -337,9 +369,11 @@ def _setup(self):
     from firmant.routing import URLMapper
     from firmant.routing import components
     from firmant.utils.paths import cat
-    s = {'PARSERS': {'posts': 'firmant.parsers.posts.PostParser'}
+    s = {'PARSERS': {'posts': 'firmant.parsers.posts.PostParser'
+                    ,'staticrst': 'firmant.parsers.static.StaticRstParser'}
         ,'CONTENT_ROOT': 'testdata/pristine'
         ,'POSTS_SUBDIR': 'posts'
+        ,'STATIC_RST_SUBDIR': 'flat'
         ,'REST_EXTENSION': 'rst'
         ,'POSTS_PER_PAGE': 2
         ,'OUTPUT_DIR': tempfile.mkdtemp()

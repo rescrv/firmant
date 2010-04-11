@@ -54,6 +54,7 @@ WRITERS = ['firmant.writers.j2.Jinja2PostArchiveAll'
           ,'firmant.writers.j2.Jinja2PostArchiveMonthly'
           ,'firmant.writers.j2.Jinja2PostArchiveDaily'
           ,'firmant.writers.j2.Jinja2PostSingle'
+          ,'firmant.writers.j2.Jinja2StaticRstSingle'
           ,'firmant.writers.atom.AtomFeedSingle'
           ,'firmant.writers.static.StaticWriter'
           ]
@@ -65,6 +66,7 @@ URLS = [c.Type('post') /c.pageno
        ,c.Type('post') /c.year/c.month/c.day/c.pageno
        ,c.Type('post') /c.year/c.month/c.day/c.slug
        ,c.Type('feed') /c.slug
+       ,c.Type('staticrst') /c.path
        ,r.SinglePathComponent('static', str)
        ]
 OUTPUT_DIR = 'build/'
