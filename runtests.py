@@ -19,6 +19,7 @@ if __name__ == '__main__':
                'firmant.parsers.feeds',
                'firmant.parsers.posts',
                'firmant.parsers.tags',
+               'firmant.parsers.static',
                'firmant.routing',
                'firmant.routing.components',
                'firmant.utils',
