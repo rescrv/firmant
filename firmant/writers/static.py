@@ -85,6 +85,76 @@ class StaticWriter(Writer):
             shutil.copy2(static.fullpath, abspath)
 
 
+class StaticRstWriter(Writer):
+    '''Parse the posts into single feed documents.
+    '''
+
+    fmt = 'html'
+
+    def path(self, static):
+        '''Use the urlmapper to construct a path for the given attributes.
+        '''
+        urlfor = self.urlmapper.urlfor
+        return urlfor(self.fmt, type='staticrst', path=static.path)
+
+    def url(self, static):
+        '''Use the urlmapper to construct a URL for the given attributes.
+        '''
+        urlfor = self.urlmapper.urlfor
+        return urlfor(self.fmt, absolute=True, type='staticrst',
+                path=static.path)
+
+    def urls(self):
+        '''A list of rooted paths that are the path component of URLs.
+
+        Example on testdata/pristine::
+
+            >>> from firmant import routing
+            >>> c = components
+            >>> urlmapper.add(c.Type('staticrst')/c.path)
+            >>> srw = StaticRstWriter(settings, objs, urlmapper)
+            >>> pprint(srw.urls())
+            ['http://test/about/index.html',
+             'http://test/empty/index.html',
+             'http://test/links/index.html']
+
+        '''
+        ret = list()
+        for static in self.objs.get('staticrst', []):
+            ret.append(self.url(static))
+        ret.sort()
+        return ret
+
+    def write(self):
+        '''Write the parsed posts to the filesystem.
+
+        Example on testdata/pristine::
+
+            >>> srw = StaticRstWriter(settings, objs, urlmapper)
+            >>> srw.write() #doctest: +ELLIPSIS
+            Static page  --- 
+            Static page About --- <p>Firmant is...</p>
+            <BLANKLINE>
+            Static page Links --- <ul class="simple">
+            <li>...</li>
+            <li>...</li>
+            </ul>
+            <BLANKLINE>
+
+        '''
+        pages = self.objs['staticrst']
+        pages.sort(key=lambda s: s.title)
+        for page in pages:
+            self.render(page)
+
+    def render(self, static):
+        '''Render the static page.
+
+        This should be overridden in child classes.
+        '''
+        print 'Static page %s --- %s' % (static.title, static.content)
+
+
 def _setup(self):
     '''Setup the test cases.
 
@@ -99,18 +169,15 @@ def _setup(self):
     from firmant.application import Firmant
     from firmant.routing import URLMapper
     from firmant.routing import components
-    s = {'PARSERS': {'posts': 'firmant.parsers.posts.PostParser'
-                    ,'feeds': 'firmant.parsers.feeds.FeedParser'
-                    ,'static': 'firmant.parsers.static.StaticParser'
-                    ,'tags': 'firmant.parsers.tags.TagParser'
+    s = {'PARSERS': {'static': 'firmant.parsers.static.StaticParser'
+                    ,'staticrst': 'firmant.parsers.static.StaticRstParser'
                     }
         ,'CONTENT_ROOT': 'testdata/pristine'
-        ,'POSTS_SUBDIR': 'posts'
-        ,'FEEDS_SUBDIR': 'feeds'
-        ,'TAGS_SUBDIR': 'feeds'
         ,'STATIC_SUBDIR': 'static'
+        ,'STATIC_RST_SUBDIR': 'flat'
         ,'REST_EXTENSION': 'rst'
         ,'POSTS_PER_PAGE': 2
+        ,'PERMALINK_ROOT': 'http://test'
         }
     settings               = Settings(s)
     firmant                = Firmant(settings)
@@ -119,5 +186,5 @@ def _setup(self):
     firmant.cross_reference()
     self.globs['settings'] = settings
     self.globs['objs']  = firmant.objs
-    self.globs['urlmapper'] = URLMapper()
+    self.globs['urlmapper'] = URLMapper(root=settings.PERMALINK_ROOT)
     self.globs['components'] = components

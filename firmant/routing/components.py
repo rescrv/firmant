@@ -152,6 +152,20 @@ class PageNo(routing.SinglePathComponent):
         super(PageNo, self).__init__('page', self._conv)
 
 
+class Path(routing.SinglePathComponent):
+    '''The name of the static rst page to be matched.
+
+    Example::
+
+        >>> Path().construct(path='about')
+        'about'
+
+    '''
+
+    def __init__(self):
+        super(Path, self).__init__('path', str)
+
+
 # Convenient instances of all classes not tied to settings.
 
 
@@ -160,3 +174,4 @@ month   = Month()
 day     = Day()
 slug    = Slug()
 pageno  = PageNo()
+path    = Path()
