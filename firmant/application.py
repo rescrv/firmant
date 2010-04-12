@@ -181,9 +181,9 @@ class Firmant(object):
                         feed.posts.append(post)
                         post.feeds[i] = feed
                 if not seen:
-                    warning  = _("Tag '%s' referenced but not defined.")
-                    warning %= pfeed
-                    self.log.warning(warning)
+                    error  = _("Feed '%s' referenced but not defined.")
+                    error %= pfeed
+                    self.log.error(error)
                     to_delete.append(i)
             for i in reversed(to_delete):
                 del post.feeds[i]
