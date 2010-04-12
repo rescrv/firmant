@@ -83,27 +83,26 @@ class FeedSingle(FeedWriter):
             >>> fs = FeedSingle(settings, objs, urlmapper)
             >>> fs.write()
             Feed bar
-              2009/12/31/party
               2010/01/01/newyear
+              2009/12/31/party
             Feed baz
-              2009/12/31/party
-              2010/02/01/newmonth
-              2010/02/02/newday
               2010/02/02/newday2
+              2010/02/02/newday
+              2010/02/01/newmonth
             Feed foo
-              2009/12/31/party
-              2010/01/01/newyear
-              2010/02/02/newday
               2010/02/02/newday2
+              2010/02/02/newday
+              2010/01/01/newyear
             Feed quux
-              2009/12/31/party
               2010/02/01/newmonth
+              2009/12/31/party
 
         '''
         for feed in self.objs.get('feeds', []):
-            feed = copy(feed)
-            feed.posts.sort(key=lambda p: (p.published, p.slug))
-            feed.posts = feed.posts[:self.settings.POSTS_PER_FEED]
+            feed  = copy(feed)
+            posts = [x for x in reversed(sorted(feed.posts,
+                    key=lambda p: (p.updated, p.published.date(), p.slug)))]
+            feed.posts = posts[:self.settings.POSTS_PER_FEED]
             self.render(feed)
 
     def render(self, feed):
@@ -140,7 +139,7 @@ def _setup(self):
         ,'TAGS_SUBDIR': 'feeds'
         ,'REST_EXTENSION': 'rst'
         ,'POSTS_PER_PAGE': 2
-        ,'POSTS_PER_FEED': 10
+        ,'POSTS_PER_FEED': 3
         }
     settings               = Settings(s)
     firmant                = Firmant(settings)
