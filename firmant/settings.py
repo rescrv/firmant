@@ -59,6 +59,7 @@ WRITERS = ['firmant.writers.j2.Jinja2PostArchiveAll'
           ,'firmant.writers.static.StaticWriter'
           ]
 POSTS_PER_PAGE = 10
+POSTS_PER_FEED = 10
 TEMPLATE_DIR = 'testdata/pristine/templates'
 URLS = [c.Type('post') /c.pageno
        ,c.Type('post') /c.year/c.pageno

@@ -103,7 +103,7 @@ class FeedSingle(FeedWriter):
         for feed in self.objs.get('feeds', []):
             feed = copy(feed)
             feed.posts.sort(key=lambda p: (p.published, p.slug))
-            feed.posts = feed.posts[:10]
+            feed.posts = feed.posts[:self.settings.POSTS_PER_FEED]
             self.render(feed)
 
     def render(self, feed):
@@ -140,6 +140,7 @@ def _setup(self):
         ,'TAGS_SUBDIR': 'feeds'
         ,'REST_EXTENSION': 'rst'
         ,'POSTS_PER_PAGE': 2
+        ,'POSTS_PER_FEED': 10
         }
     settings               = Settings(s)
     firmant                = Firmant(settings)
