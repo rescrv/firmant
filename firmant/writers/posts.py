@@ -44,7 +44,7 @@ class PostWriter(Writer):
         '''Return the posts sorted by (date, slug)
         '''
         posts = copy(self.objs['posts'])
-        posts.sort(key=lambda p: (p.published.date(), p.slug), reverse=True)
+        posts.sort(key=lambda p: (p.published, p.slug), reverse=True)
         return posts
 
 
