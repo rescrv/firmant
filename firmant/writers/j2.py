@@ -88,11 +88,13 @@ class Jinja2PostArchiveBase(Jinja2Writer, posts.PostArchiveBase):
         return url, template, context
 
 
-class Jinja2PostArchiveAll(Jinja2Writer, posts.PostArchiveAll):
+class Jinja2PostArchiveAll(Jinja2PostArchiveBase, posts.PostArchiveAll):
     '''Render paginated post lists with Jinja2 templates.
     '''
 
     fmt = 'html'
+
+    template = 'posts/archive_all.html'
 
     def render(self, post_list, pages):
         r'''Render the data in a Jinja2 template.
@@ -118,20 +120,14 @@ class Jinja2PostArchiveAll(Jinja2Writer, posts.PostArchiveAll):
             Called stdout.write('2009-12-31-party\n')
 
         '''
-        url = self.path(page=pages.cur)
-        template = 'posts/archive_all.html'
-        context = dict()
-        if pages.prev is not None:
-            prev = self.path(absolute=True, page=pages.prev)
-        else:
-            prev = None
-        if pages.next is not None:
-            nex = self.path(absolute=True, page=pages.next)
-        else:
-            nex = None
-        context['prev']          = prev
-        context['next']          = nex
-        context['posts']         = post_list
+        class EmptyCal(object):
+            def __init__(self):
+                self.prev = None
+                self.cur  = None
+                self.next = None
+        empty = EmptyCal()
+
+        url, template, context = self.render_common(post_list, empty, pages)
         self.render_to_file(url, template, context)
 
 

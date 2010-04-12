@@ -104,6 +104,11 @@ class PostArchiveAll(PostArchiveBase):
 
     fmt = 'html'
 
+    def rev_key(self, key):
+        '''Return a dictionary mapping attributes to values in the key.
+        '''
+        return {}
+
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
 
