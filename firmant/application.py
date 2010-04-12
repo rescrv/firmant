@@ -254,7 +254,7 @@ class Firmant(object):
             urlfor(fmt, absolute=True, **kwargs)
         globals['recent_posts'] = [(p.title, p.permalink) for p in
                 reversed(sorted(self.objs.get('posts', []),
-                    key=lambda p: (p.published.date(), p.slug)))] \
+                    key=lambda p: (p.published, p.slug)))] \
                 [:self.settings.SIDEBAR_POSTS_LEN]
         # TODO:  Disgusted with this.  I will make a real global object later.
         globals['daily_archives'] = \
