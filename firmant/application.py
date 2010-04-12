@@ -278,6 +278,8 @@ class Firmant(object):
                 [:self.settings.SIDEBAR_ARCHIVES_LEN]
         globals['static_pages'] = [(p.title, p.permalink) for p in
                 sorted(self.objs.get('staticrst', []), key=lambda p: p.title)]
+        globals['atom_feeds'] = [(f.slug, f.permalink) for f in
+                sorted(self.objs.get('feeds', []) , key=lambda f: f.slug)]
 
     def write(self):
         '''Call ``write`` on each writer.
