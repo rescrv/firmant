@@ -103,19 +103,19 @@ class Jinja2PostArchiveAll(Jinja2Writer, posts.PostArchiveAll):
             >>> j2paa.log = Mock('log')
             >>> j2paa.write()
             >>> cat(os.path.join(settings.OUTPUT_DIR, 'index.html'))
-            Called stdout.write('Prev: \n')
-            Called stdout.write('Next: http://test/page2/index.html\n')
-            Called stdout.write('2010-02-02-newday2\n')
-            Called stdout.write('2010-02-02-newday\n')
+            Prev: 
+            Next: http://test/page2/index.html
+            2010-02-02-newday2
+            2010-02-02-newday
             >>> cat(os.path.join(settings.OUTPUT_DIR, 'page2/index.html'))
-            Called stdout.write('Prev: http://test/index.html\n')
-            Called stdout.write('Next: http://test/page3/index.html\n')
-            Called stdout.write('2010-02-01-newmonth\n')
-            Called stdout.write('2010-01-01-newyear\n')
+            Prev: http://test/index.html
+            Next: http://test/page3/index.html
+            2010-02-01-newmonth
+            2010-01-01-newyear
             >>> cat(os.path.join(settings.OUTPUT_DIR, 'page3/index.html'))
-            Called stdout.write('Prev: http://test/page2/index.html\n')
-            Called stdout.write('Next: \n')
-            Called stdout.write('2009-12-31-party\n')
+            Prev: http://test/page2/index.html
+            Next: 
+            2009-12-31-party
 
         '''
         url = self.path(page=pages.cur)
@@ -152,25 +152,25 @@ class Jinja2PostArchiveYearly(Jinja2PostArchiveBase, posts.PostArchiveYearly):
             >>> j2pay.log = Mock('log')
             >>> j2pay.write()
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/index.html'))
-            Called stdout.write('Prev year: \n')
-            Called stdout.write('Next year: http://test/2009/index.html\n')
-            Called stdout.write('Prev page: \n')
-            Called stdout.write('Next page: http://test/2010/page2/index.html\n')
-            Called stdout.write('2010-02-02-newday2\n')
-            Called stdout.write('2010-02-02-newday\n')
+            Prev year: 
+            Next year: http://test/2009/index.html
+            Prev page: 
+            Next page: http://test/2010/page2/index.html
+            2010-02-02-newday2
+            2010-02-02-newday
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/page2/index.html'))
-            Called stdout.write('Prev year: \n')
-            Called stdout.write('Next year: http://test/2009/index.html\n')
-            Called stdout.write('Prev page: http://test/2010/index.html\n')
-            Called stdout.write('Next page: \n')
-            Called stdout.write('2010-02-01-newmonth\n')
-            Called stdout.write('2010-01-01-newyear\n')
+            Prev year: 
+            Next year: http://test/2009/index.html
+            Prev page: http://test/2010/index.html
+            Next page: 
+            2010-02-01-newmonth
+            2010-01-01-newyear
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2009/index.html'))
-            Called stdout.write('Prev year: http://test/2010/index.html\n')
-            Called stdout.write('Next year: \n')
-            Called stdout.write('Prev page: \n')
-            Called stdout.write('Next page: \n')
-            Called stdout.write('2009-12-31-party\n')
+            Prev year: http://test/2010/index.html
+            Next year: 
+            Prev page: 
+            Next page: 
+            2009-12-31-party
 
         '''
         url, template, context = self.render_common(post_list, years, pages)
@@ -195,30 +195,30 @@ class Jinja2PostArchiveMonthly(Jinja2PostArchiveBase, posts.PostArchiveMonthly):
             >>> j2pam.log = Mock('log')
             >>> j2pam.write()
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/index.html'))
-            Called stdout.write('Prev month: \n')
-            Called stdout.write('Next month: http://test/2010/01/index.html\n')
-            Called stdout.write('Prev page: \n')
-            Called stdout.write('Next page: http://test/2010/02/page2/index.html\n')
-            Called stdout.write('2010-02-02-newday2\n')
-            Called stdout.write('2010-02-02-newday\n')
+            Prev month: 
+            Next month: http://test/2010/01/index.html
+            Prev page: 
+            Next page: http://test/2010/02/page2/index.html
+            2010-02-02-newday2
+            2010-02-02-newday
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/page2/index.html'))
-            Called stdout.write('Prev month: \n')
-            Called stdout.write('Next month: http://test/2010/01/index.html\n')
-            Called stdout.write('Prev page: http://test/2010/02/index.html\n')
-            Called stdout.write('Next page: \n')
-            Called stdout.write('2010-02-01-newmonth\n')
+            Prev month: 
+            Next month: http://test/2010/01/index.html
+            Prev page: http://test/2010/02/index.html
+            Next page: 
+            2010-02-01-newmonth
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/01/index.html'))
-            Called stdout.write('Prev month: http://test/2010/02/index.html\n')
-            Called stdout.write('Next month: http://test/2009/12/index.html\n')
-            Called stdout.write('Prev page: \n')
-            Called stdout.write('Next page: \n')
-            Called stdout.write('2010-01-01-newyear\n')
+            Prev month: http://test/2010/02/index.html
+            Next month: http://test/2009/12/index.html
+            Prev page: 
+            Next page: 
+            2010-01-01-newyear
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2009/12/index.html'))
-            Called stdout.write('Prev month: http://test/2010/01/index.html\n')
-            Called stdout.write('Next month: \n')
-            Called stdout.write('Prev page: \n')
-            Called stdout.write('Next page: \n')
-            Called stdout.write('2009-12-31-party\n')
+            Prev month: http://test/2010/01/index.html
+            Next month: 
+            Prev page: 
+            Next page: 
+            2009-12-31-party
 
         '''
         url, template, context = self.render_common(post_list, months, pages)
@@ -244,35 +244,35 @@ class Jinja2PostArchiveDaily(Jinja2PostArchiveBase, posts.PostArchiveDaily):
             >>> j2pad.log = Mock('log')
             >>> j2pad.write()
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/02/index.html'))
-            Called stdout.write('Prev day: \n')
-            Called stdout.write('Next day: http://test/2010/02/01/index.html\n')
-            Called stdout.write('Prev page: \n')
-            Called stdout.write('Next page: http://test/2010/02/02/page2/index.html\n')
-            Called stdout.write('2010-02-02-newday2\n')
+            Prev day: 
+            Next day: http://test/2010/02/01/index.html
+            Prev page: 
+            Next page: http://test/2010/02/02/page2/index.html
+            2010-02-02-newday2
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/02/page2/index.html'))
-            Called stdout.write('Prev day: \n')
-            Called stdout.write('Next day: http://test/2010/02/01/index.html\n')
-            Called stdout.write('Prev page: http://test/2010/02/02/index.html\n')
-            Called stdout.write('Next page: \n')
-            Called stdout.write('2010-02-02-newday\n')
+            Prev day: 
+            Next day: http://test/2010/02/01/index.html
+            Prev page: http://test/2010/02/02/index.html
+            Next page: 
+            2010-02-02-newday
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/01/index.html'))
-            Called stdout.write('Prev day: http://test/2010/02/02/index.html\n')
-            Called stdout.write('Next day: http://test/2010/01/01/index.html\n')
-            Called stdout.write('Prev page: \n')
-            Called stdout.write('Next page: \n')
-            Called stdout.write('2010-02-01-newmonth\n')
+            Prev day: http://test/2010/02/02/index.html
+            Next day: http://test/2010/01/01/index.html
+            Prev page: 
+            Next page: 
+            2010-02-01-newmonth
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/01/01/index.html'))
-            Called stdout.write('Prev day: http://test/2010/02/01/index.html\n')
-            Called stdout.write('Next day: http://test/2009/12/31/index.html\n')
-            Called stdout.write('Prev page: \n')
-            Called stdout.write('Next page: \n')
-            Called stdout.write('2010-01-01-newyear\n')
+            Prev day: http://test/2010/02/01/index.html
+            Next day: http://test/2009/12/31/index.html
+            Prev page: 
+            Next page: 
+            2010-01-01-newyear
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2009/12/31/index.html'))
-            Called stdout.write('Prev day: http://test/2010/01/01/index.html\n')
-            Called stdout.write('Next day: \n')
-            Called stdout.write('Prev page: \n')
-            Called stdout.write('Next page: \n')
-            Called stdout.write('2009-12-31-party\n')
+            Prev day: http://test/2010/01/01/index.html
+            Next day: 
+            Prev page: 
+            Next page: 
+            2009-12-31-party
 
         '''
         url, template, context = self.render_common(post_list, days, pages)
@@ -297,15 +297,15 @@ class Jinja2PostSingle(Jinja2Writer, posts.PostSingle):
             >>> j2ps.write()
             >>> join = os.path.join
             >>> cat(join(settings.OUTPUT_DIR, '2010/02/02/newday2/index.html'))
-            Called stdout.write('2010-02-02 | newday2 by John Doe')
+            2010-02-02 | newday2 by John Doe
             >>> cat(join(settings.OUTPUT_DIR, '2010/02/02/newday/index.html'))
-            Called stdout.write('2010-02-02 | newday by John Doe')
+            2010-02-02 | newday by John Doe
             >>> cat(join(settings.OUTPUT_DIR, '2010/02/01/newmonth/index.html'))
-            Called stdout.write('2010-02-01 | newmonth by John Doe')
+            2010-02-01 | newmonth by John Doe
             >>> cat(join(settings.OUTPUT_DIR, '2010/01/01/newyear/index.html'))
-            Called stdout.write('2010-01-01 | newyear by John Doe')
+            2010-01-01 | newyear by John Doe
             >>> cat(join(settings.OUTPUT_DIR, '2009/12/31/party/index.html'))
-            Called stdout.write('2009-12-31 | party by John Doe')
+            2009-12-31 | party by John Doe
 
         '''
         url = self.path(post=post)
@@ -337,9 +337,9 @@ class Jinja2StaticRstSingle(Jinja2Writer, static.StaticRstWriter):
             >>> j2srs.write()
             >>> join = os.path.join
             >>> cat(join(settings.OUTPUT_DIR, 'about/index.html'))
-            Called stdout.write('About at about')
+            About at about
             >>> cat(join(settings.OUTPUT_DIR, 'links/index.html'))
-            Called stdout.write('Links at links')
+            Links at links
 
         '''
         url = self.path(static=static)
@@ -388,7 +388,7 @@ def _setup(self):
     self.globs['urlmapper']  = URLMapper(root=settings.PERMALINK_ROOT)
     self.globs['Mock']       = Mock
     self.globs['components'] = components
-    self.globs['cat']        = lambda out: cat(out, Mock('stdout'))
+    self.globs['cat']        = cat
 
 
 def _teardown(test):
