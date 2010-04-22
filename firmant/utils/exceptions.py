@@ -122,15 +122,16 @@ def log_uncaught_exceptions(func, log, message, save_traceback=False):
     '''
     try:
         func()
+    # pylint: disable-msg=W0702
     except:
         log.error(message)
         if save_traceback:
             try:
-                t, path = tempfile.mkstemp(prefix='firmant', text=True)
-                t = os.fdopen(t, 'w+')
-                traceback.print_exc(file=t)
-                t.flush()
-                t.close()
+                tmp, path = tempfile.mkstemp(prefix='firmant', text=True)
+                tmp = os.fdopen(tmp, 'w+')
+                traceback.print_exc(file=tmp)
+                tmp.flush()
+                tmp.close()
                 log.error(_('traceback saved to %s') % path)
             except:
                 log.error(_("it's turtles all the way down"))
