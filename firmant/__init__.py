@@ -48,4 +48,11 @@ Some of the benefits of this approach include:
    a repository a trivial task -- something that web application frameworks that
    are powered by relational databases do not consider.
 
+Modules in this package:
+
+.. autosummary::
+   :toctree: generated
+
+   utils
+
 '''
