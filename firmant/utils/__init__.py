@@ -25,6 +25,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+'''Utilities that don't fit anywhere else.
+'''
+
+
 import datetime
 import os
 import sys
