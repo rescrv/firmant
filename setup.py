@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(name='Firmant',
-        version='0.1',
+        version='0.2a',
         description='Static Blog Generator',
         author='Robert Escriva',
         author_email='projects@mail.robescriva.com',
