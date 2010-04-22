@@ -26,6 +26,14 @@
 
 
 '''Utilities that don't fit anywhere else.
+
+Modules in this package:
+
+.. autosummary::
+   :toctree: ../generated
+
+   exceptions
+
 '''
 
 

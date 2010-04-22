@@ -5,3 +5,4 @@ All Shipped Modules
    :toctree: generated
 
    firmant.utils
+   firmant.utils.exceptions
