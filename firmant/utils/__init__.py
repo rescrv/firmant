@@ -67,25 +67,30 @@ def class_name(cls):
 def strptime(date_string, formats):
     '''Cast the date_string to the first format to match.
 
-    Examples::
+    Each format string provided by `formats` is considered.  The first format to
+    match `date_string` will be used to determine the datetime.
 
-        >>> strptime('2009-02-01 11:51:15', ['%Y-%m-%d %H:%M:%S'])
-        datetime.datetime(2009, 2, 1, 11, 51, 15)
-        >>> strptime('11:51:15', ['%H:%M:%S'])
-        datetime.datetime(1900, 1, 1, 11, 51, 15)
+    .. doctest::
 
-    If the time does not match, a value error will be raised::
+       >>> strptime('2009-02-01 11:51:15', ['%Y-%m-%d %H:%M:%S'])
+       datetime.datetime(2009, 2, 1, 11, 51, 15)
+       >>> strptime('11:51:15', ['%Y-%m-%d', '%H:%M:%S'])
+       datetime.datetime(1900, 1, 1, 11, 51, 15)
 
-        >>> strptime('AB:CD:EF', ['%H:%M:%S'])
-        Traceback (most recent call last):
-        ValueError: time data 'AB:CD:EF' does not match any format.
+    If the time does not match, a value error will be raised.
+
+    .. doctest::
+
+       >>> strptime('AB:CD:EF', ['%H:%M:%S'])
+       Traceback (most recent call last):
+       ValueError: time data 'AB:CD:EF' does not match any format.
 
     '''
     error = None
     dt    = None
-    for format in formats:
+    for frmt in formats:
         try:
-            dt = dt or datetime.datetime.strptime(date_string, format)
+            dt = dt or datetime.datetime.strptime(date_string, frmt)
         except ValueError:
             pass
     if dt is None:
