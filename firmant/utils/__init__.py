@@ -30,20 +30,38 @@
 
 
 import datetime
+import inspect
 import os
 import sys
 
 
 def class_name(cls):
-    '''Return a string representation of a class's name.
+    '''The string representation of a class's name.
 
-        >>> class Foo(object): pass
-        ...
-        >>> class_name(Foo)
-        'firmant.utils.Foo'
+    For example if we define the class `Foo`, the full name of the class
+    is `firmant.utils.Foo`.  :func:`class_name` will return this as a string.
+
+    .. doctest::
+
+       >>> class Foo(object): pass
+       ...
+       >>> class_name(Foo)
+       'firmant.utils.Foo'
+
+    If an object that is not a class is passed to :func:`class_name`, then a
+    :exc:`TypeError` will be raised.
+
+    .. doctest::
+
+       >>> class_name('Foo')
+       Traceback (most recent call last):
+       TypeError: `cls` does not name a type.
 
     '''
-    return str(cls)[8:-2]
+    if inspect.isclass(cls):
+        return str(cls)[8:-2]
+    else:
+        raise TypeError('`cls` does not name a type.')
 
 
 def strptime(date_string, formats):
