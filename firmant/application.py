@@ -36,7 +36,6 @@ import datetime
 
 from pysettings.modules import get_module
 
-from firmant.i18n import _
 from firmant.routing import URLMapper
 from firmant.utils import class_name
 

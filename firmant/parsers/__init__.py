@@ -34,7 +34,6 @@ from docutils import io
 from docutils.core import publish_programmatically
 
 from firmant.du import MetaDataStandaloneReader
-from firmant.i18n import _
 from firmant.utils import class_name
 from firmant.utils.exceptions import log_uncaught_exceptions
 

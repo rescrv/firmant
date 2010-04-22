@@ -32,7 +32,6 @@
 from copy import copy
 
 from firmant import paginate
-from firmant.i18n import _
 from firmant.writers import Writer
 
 
