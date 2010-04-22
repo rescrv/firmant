@@ -100,28 +100,40 @@ def strptime(date_string, formats):
 
 
 def merge_dicts(a, *args):
-    '''Merge two dictionaries.  Return the merge.
+    '''Merge two dictionaries in a manner that doesn't lose information.
 
-    Where identical keys correspond to conflicting values, a ValueError is
-    rasied.
+    One or two dictionaries with disjoint sets of keys will merge with the same
+    rules as the :func:`update` function for dictionaries.
 
-        >>> pprint(merge_dicts({'a': 1}))
-        {'a': 1}
-        >>> pprint(merge_dicts({'a': 1}, {'b': 2}))
-        {'a': 1, 'b': 2}
-        >>> pprint(merge_dicts({'a': 1, 'b': 2}, {'b': 2}))
-        {'a': 1, 'b': 2}
+    .. doctest::
 
-    More than two dictionaries may be merged as well::
+       >>> pprint(merge_dicts({'a': 1}))
+       {'a': 1}
+       >>> pprint(merge_dicts({'a': 1}, {'b': 2}))
+       {'a': 1, 'b': 2}
 
-        >>> pprint(merge_dicts({'a': 1, 'b': 2}, {'b': 2}, {'c':3}))
-        {'a': 1, 'b': 2, 'c': 3}
+    If two keys have the same value, the merge happens cleanly.
 
-    Error conditions::
+    .. doctest::
 
-        >>> pprint(merge_dicts({'a': 1, 'b': 2}, {'b': 3}))
-        Traceback (most recent call last):
-        ValueError: Conflicting values for 'b'
+       >>> pprint(merge_dicts({'a': 1, 'b': 2}, {'b': 2}))
+       {'a': 1, 'b': 2}
+
+    An arbitrary number of dictionaries may be merged using :func:`merge_dicts`.
+
+    .. doctest::
+
+       >>> pprint(merge_dicts({'a': 1, 'b': 2}, {'b': 2}, {'c':3}))
+       {'a': 1, 'b': 2, 'c': 3}
+
+    If two instances have the same key, but different values, a
+    :exc:`ValueError` will be raised.
+
+    .. doctest::
+
+       >>> pprint(merge_dicts({'a': 1, 'b': 2}, {'b': 3}))
+       Traceback (most recent call last):
+       ValueError: Conflicting values for 'b'
 
     '''
     ret = a.copy()
