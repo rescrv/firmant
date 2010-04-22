@@ -33,7 +33,7 @@ import os
 import sys
 
 
-def cat(path, out=sys.stdout):
+def cat(path, out=None):
     r'''Write the contents of file ``path`` to ``out``.
 
     .. doctest::
@@ -43,13 +43,15 @@ def cat(path, out=sys.stdout):
 
     .. doctest::
 
-       >>> cat('testdata/settings/empty.py', sys.stdout) #doctest: +ELLIPSIS
+       >>> cat('testdata/settings/empty.py') #doctest: +ELLIPSIS
        # Copyright (c) 2010, Robert Escriva
        ...
        # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
     '''
     fil = open(path)
+    if out is None:
+        out = sys.stdout
     for line in fil:
         print >> out, line,
     fil.close()
