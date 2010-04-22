@@ -1,4 +1,6 @@
 #!/usr/bin/python
+
+import gettext
 import unittest
 import doctest
 import sys
@@ -8,12 +10,21 @@ from minimock import Mock
 from pprint import pprint
 from pysettings.modules import get_module
 
+
+gettext.install('firmant')
+
+
+def safe_displayhook(s):
+    if s is not None:
+        sys.stdout.write('%r\n' % s)
+sys.displayhook = safe_displayhook
+
+
 if __name__ == '__main__':
     suite = unittest.TestSuite()
 
     modules = ['firmant.application',
                'firmant.du',
-               'firmant.i18n',
                'firmant.paginate',
                'firmant.parsers',
                'firmant.parsers.feeds',
