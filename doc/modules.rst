@@ -6,3 +6,4 @@ All Shipped Modules
 
    firmant.utils
    firmant.utils.exceptions
+   firmant.utils.paths

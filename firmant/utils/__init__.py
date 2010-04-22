@@ -33,6 +33,7 @@ Modules in this package:
    :toctree: ../generated
 
    exceptions
+   paths
 
 '''
 
