@@ -58,30 +58,44 @@ def cat(path, out=None):
 
 
 def create_or_truncate(path):
-    r'''Return an ``path`` as an open file, creating dirs if necessary.
+    r'''Open ``path``, creating it or directories as necessary.
 
-    Example::
+    In this example, the file `path` is `foo/bar/baz/quux` relative to a
+    temporary directory.  It is opened once for reading and the string ``THIS IS
+    THE FIRST TIME`` is written to the file.  The file is closed and reopened
+    using create_or_truncate, and written again with ``THIS IS THE SECOND
+    TIME``.
 
-        >>> import tempfile
-        >>> root = tempfile.mkdtemp()
-        >>> path = os.path.join(root, 'foo/bar/baz/quux')
-        >>> f = create_or_truncate(path)
-        >>> f.write('THIS IS THE FIRST TIME\n')
-        >>> f.flush() and f.close()
+    .. doctest::
+       :hide:
 
-        >>> m = Mock('output')
-        >>> cat(path, m)
-        Called output.write('THIS IS THE FIRST TIME\n')
+       >>> import tempfile
+       >>> root = tempfile.mkdtemp()
 
-        >>> f2 = create_or_truncate(path)
-        >>> f2.write('THIS IS THE SECOND TIME\n')
-        >>> f2.flush() and f2.close()
-        >>> cat(path, m)
-        Called output.write('THIS IS THE SECOND TIME\n')
+    .. doctest::
 
-        >>> # Cleanup after ourselves.
-        >>> import shutil
-        >>> shutil.rmtree(root)
+       >>> path = os.path.join(root, 'foo/bar/baz/quux')
+
+       >>> f = create_or_truncate(path)
+       >>> f.write('THIS IS THE FIRST TIME\n')
+       >>> f.flush() and f.close()
+
+       >>> cat(path)
+       THIS IS THE FIRST TIME
+
+       >>> f2 = create_or_truncate(path)
+       >>> f2.write('THIS IS THE SECOND TIME\n')
+       >>> f2.flush() and f2.close()
+
+       >>> cat(path)
+       THIS IS THE SECOND TIME
+
+    .. doctest::
+       :hide:
+
+       >>> # Cleanup after ourselves.
+       >>> import shutil
+       >>> shutil.rmtree(root)
 
     '''
     par = os.path.dirname(path)
