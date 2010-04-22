@@ -44,10 +44,10 @@ def cat(path, out=sys.stdout):
             '# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n')
 
     '''
-    f = open(path)
-    for line in f:
+    fil = open(path)
+    for line in fil:
         print >> out, line,
-    f.close()
+    fil.close()
 
 
 def create_or_truncate(path):
@@ -81,7 +81,7 @@ def create_or_truncate(path):
     if par != '':
         try:
             os.makedirs(par)
-        except OSError, e:
-            if e.errno != 17:
+        except OSError, ex:
+            if ex.errno != 17:
                 raise
     return open(path, 'w+')
