@@ -36,12 +36,17 @@ import sys
 def cat(path, out=sys.stdout):
     r'''Write the contents of file ``path`` to ``out``.
 
-        >>> m = Mock('output')
-        >>> cat('testdata/settings/empty.py', m) #doctest: +ELLIPSIS
-        Called output.write('# Copyright (c) 2010, Robert Escriva\n')
-        ...
-        Called output.write(
-            '# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n')
+    .. doctest::
+       :hide:
+
+       >>> import sys
+
+    .. doctest::
+
+       >>> cat('testdata/settings/empty.py', sys.stdout) #doctest: +ELLIPSIS
+       # Copyright (c) 2010, Robert Escriva
+       ...
+       # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
     '''
     fil = open(path)
