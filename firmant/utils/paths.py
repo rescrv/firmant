@@ -97,6 +97,27 @@ def create_or_truncate(path):
        >>> import shutil
        >>> shutil.rmtree(root)
 
+    Errors from the underlying operating system will be raised.
+
+    .. doctest::
+
+       >>> create_or_truncate('/tmp')
+       Traceback (most recent call last):
+       IOError: [Errno 21] Is a directory: '/tmp'
+
+    .. doctest::
+       :hide:
+
+       >>> from minimock import restore
+       >>> old_makedirs = os.makedirs
+       >>> os.makedirs = Mock('makedirs')
+       >>> os.makedirs.mock_raises = OSError(21)
+       >>> os.makedirs.mock_raises.errno = 21
+       >>> create_or_truncate('/')
+       Traceback (most recent call last):
+       OSError: 21
+       >>> os.makedirs = old_makedirs
+
     '''
     par = os.path.dirname(path)
     if par != '':
