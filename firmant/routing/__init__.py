@@ -83,12 +83,15 @@ class AbstractPath(object):
 
     __metaclass__ = abc.ABCMeta
 
-    @abc.abstractproperty
     def attributes(self):
         '''All attributes that define the string representation of the path.
         '''
+    # TODO:  Proper decorator syntax http://bugs.python.org/issue8507
+    __old_doc__ = attributes.__doc__
+    attributes = abc.abstractproperty(attributes)
+    attributes.__doc__ = __old_doc__
+    del __old_doc__
 
-    @abc.abstractproperty
     def bound_attributes(self):
         '''Attributes with a fixed value.
 
@@ -96,6 +99,11 @@ class AbstractPath(object):
         of :attr:`bound_attributes` must match those specified in the query.
 
         '''
+    # TODO:  Proper decorator syntax http://bugs.python.org/issue8507
+    __old_doc__ = bound_attributes.__doc__
+    bound_attributes = abc.abstractproperty(bound_attributes)
+    bound_attributes.__doc__ = __old_doc__
+    del __old_doc__
 
     @property
     def free_attributes(self):
@@ -131,7 +139,6 @@ class AbstractPath(object):
         b = set(attrs.keys())
         return a & b == a | b
 
-    @abc.abstractmethod
     def construct(self, *args, **kwargs):
         '''Use the values given in `kwargs` to construct the string
         representation of the path.
@@ -140,6 +147,12 @@ class AbstractPath(object):
         type the path may safely convert to a string.
 
         '''
+    # TODO:  Proper decorator syntax http://bugs.python.org/issue8507
+    __old_doc__ = construct.__doc__
+    construct = abc.abstractmethod(construct)
+    # pylint: disable-msg=W0622
+    construct.__doc__ = __old_doc__
+    del __old_doc__
 
     def __div__(self, rhs):
         '''Concatenate two components (using :class:`CompoundComponent`).
