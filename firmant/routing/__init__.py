@@ -58,6 +58,10 @@ from firmant.utils import class_name
 from firmant.utils import merge_dicts
 
 
+__all__ = ['AbstractPath', 'BoundNullPathComponent', 'CompoundComponent',
+        'SinglePathComponent', 'StaticPathComponent', 'URLMapper']
+
+
 class AbstractPath(object):
     '''The path component of a URL.
 
