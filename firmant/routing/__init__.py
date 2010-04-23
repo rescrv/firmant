@@ -304,6 +304,7 @@ class BoundNullPathComponent(AbstractPath):
     '''
 
     def __init__(self, attribute, value):
+        super(BoundNullPathComponent, self).__init__()
         self._attribute = attribute
         self._value = value
 
@@ -319,9 +320,9 @@ class BoundNullPathComponent(AbstractPath):
     def bound_attributes(self):
         '''The single attribute is bound to the value specified.
         '''
-        d = dict()
-        d[self._attribute] = self._value
-        return d
+        attrs = dict()
+        attrs[self._attribute] = self._value
+        return attrs
 
     def construct(self, *args, **kwargs):
         '''This will return `None` if the attributes match, or raise a
