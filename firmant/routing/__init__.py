@@ -28,6 +28,14 @@
 '''This module handles mapping between paths and writers.
 
 Writers are able to request a URL for a given set of attributes.
+
+Modules in this package:
+
+.. autosummary::
+   :toctree: ../generated
+
+   components
+
 '''
 
 
@@ -380,7 +388,7 @@ class URLMapper(object):
     def lookup(self, **kwargs):
         '''Lookup the abstract representation of a page defined by attributes.
 
-        Unless you know to do otherwise, use :method:`urlfor` instead of this
+        Unless you know to do otherwise, use :meth:`urlfor` instead of this
         method.
         '''
         for path in self._paths:
@@ -392,7 +400,7 @@ class URLMapper(object):
         '''Return the path of a page relative to the content root.
 
         Unless you know to do otherwise, use this method instead of
-        :method:`lookup`.
+        :meth:`lookup`.
 
         '''
         try:

@@ -53,6 +53,7 @@ Modules in this package:
 .. autosummary::
    :toctree: generated
 
+   routing
    utils
 
 '''
