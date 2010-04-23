@@ -63,7 +63,7 @@ class FeedSingle(FeedWriter):
         Example on testdata/pristine::
 
             >>> c = components
-            >>> urlmapper.add(c.Type('feed')/c.slug)
+            >>> urlmapper.add(c.TYPE('feed')/c.SLUG)
             >>> fs = FeedSingle(settings, objs, urlmapper)
             >>> pprint(fs.urls())
             ['bar/index.atom', 'baz/index.atom', 'foo/index.atom', 'quux/index.atom']

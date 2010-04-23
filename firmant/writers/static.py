@@ -111,7 +111,7 @@ class StaticRstWriter(Writer):
 
             >>> from firmant import routing
             >>> c = components
-            >>> urlmapper.add(c.Type('staticrst')/c.path)
+            >>> urlmapper.add(c.TYPE('staticrst')/c.PATH)
             >>> srw = StaticRstWriter(settings, objs, urlmapper)
             >>> pprint(srw.urls())
             ['http://test/about/index.html',

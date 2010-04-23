@@ -26,6 +26,126 @@
 
 
 '''Predefined path components for use with URLMapper.
+
+Each of these pre-built components is meant for exactly one use case.  The
+attributes (both free and bound) are shown, and then the various behaviors are
+shown.  All should be self-explanatory.
+
+TYPE
+====
+
+.. doctest::
+
+   >>> TYPE('post').attributes
+   set(['type'])
+   >>> TYPE('post').bound_attributes
+   {'type': 'post'}
+   >>> TYPE('post').free_attributes
+   set([])
+
+   >>> TYPE('post').match(type='post')
+   True
+   >>> TYPE('post').match(type='tag')
+   False
+
+YEAR
+====
+
+.. doctest::
+
+   >>> YEAR.attributes
+   set(['year'])
+   >>> YEAR.bound_attributes
+   {}
+   >>> YEAR.free_attributes
+   set(['year'])
+
+   >>> YEAR.construct(year=2010)
+   '2010'
+   >>> YEAR.construct(year=4)
+   '0004'
+
+MONTH
+=====
+
+.. doctest::
+
+   >>> MONTH.attributes
+   set(['month'])
+   >>> MONTH.bound_attributes
+   {}
+   >>> MONTH.free_attributes
+   set(['month'])
+
+   >>> MONTH.construct(month=10)
+   '10'
+   >>> MONTH.construct(month=3)
+   '03'
+
+DAY
+===
+
+.. doctest::
+
+   >>> DAY.attributes
+   set(['day'])
+   >>> DAY.bound_attributes
+   {}
+   >>> DAY.free_attributes
+   set(['day'])
+
+   >>> DAY.construct(day=15)
+   '15'
+   >>> DAY.construct(day=1)
+   '01'
+
+SLUG
+====
+
+.. doctest::
+
+   >>> SLUG.attributes
+   set(['slug'])
+   >>> SLUG.bound_attributes
+   {}
+   >>> SLUG.free_attributes
+   set(['slug'])
+
+   >>> SLUG.construct(slug='foobar')
+   'foobar'
+
+PATH
+====
+
+.. doctest::
+
+   >>> PATH.attributes
+   set(['path'])
+   >>> PATH.bound_attributes
+   {}
+   >>> PATH.free_attributes
+   set(['path'])
+
+   >>> PATH.construct(path='foo/bar')
+   'foo/bar'
+
+PAGENO
+======
+
+.. doctest::
+
+   >>> PAGENO.attributes
+   set(['page'])
+   >>> PAGENO.bound_attributes
+   {}
+   >>> PAGENO.free_attributes
+   set(['page'])
+
+   >>> PAGENO.construct(page=1) is None
+   True
+   >>> PAGENO.construct(page=2)
+   'page2'
+
 '''
 
 
@@ -34,137 +154,19 @@ import functools
 from firmant import routing
 
 
-__all__ = ['Type', 'Year', 'Month', 'Day', 'Slug', 'PageNo',
-        'day', 'slug', 'pageno']
+__all__ = ['TYPE', 'YEAR', 'MONTH', 'DAY', 'SLUG', 'PATH', 'PAGENO']
 
 
-Type = functools.partial(routing.BoundNullPathComponent, 'type')
-'''The type of page.
-
-Attributes:
-
- * type
-
-.. doctest::
-
-   >>> Type('post').match(type='post')
-   True
-   >>> Type('post').match(type='tag')
-   False
-
-'''
+TYPE  = functools.partial(routing.BoundNullPathComponent, 'type')
+YEAR  = routing.SinglePathComponent('year', lambda y: '%04i' % y)
+MONTH = routing.SinglePathComponent('month', lambda m: '%02i' % m)
+DAY   = routing.SinglePathComponent('day', lambda d: '%02i' % d)
+SLUG  = routing.SinglePathComponent('slug', str)
+PATH  = routing.SinglePathComponent('path', str)
 
 
-Year = routing.SinglePathComponent('year', lambda y: '%04i' % y)
-'''The year associated with the page.
-
-Attributes:
-
- * year
-
-.. doctest::
-
-   >>> Year.construct(year=2010)
-   '2010'
-   >>> Year.construct(year=4)
-   '0004'
-
-'''
-
-
-Month = routing.SinglePathComponent('month', lambda m: '%02i' % m)
-'''The month associated with the page.
-
-Attributes:
-
- * month
-
-.. doctest::
-
-   >>> Month.construct(month=10)
-   '10'
-   >>> Month.construct(month=3)
-   '03'
-
-'''
-
-
-class Day(routing.SinglePathComponent):
-    '''A day associated with the page to be matched.
-
-    Example::
-
-        >>> Day().construct(day=15)
-        '15'
-
-    '''
-
-    @classmethod
-    def _conv(cls, value):
-        return '%02i' % value
-
-    def __init__(self):
-        super(Day, self).__init__('day', self._conv)
-
-
-class Slug(routing.SinglePathComponent):
-    '''The slug associated with the page to be matched.
-
-    Example::
-
-        >>> Slug().construct(slug='foobar')
-        'foobar'
-
-    '''
-
-    @classmethod
-    def _conv(cls, value):
-        return str(value)
-
-    def __init__(self):
-        super(Slug, self).__init__('slug', self._conv)
-
-
-class PageNo(routing.SinglePathComponent):
-    '''The page number associated with the page to be matched.
-
-    Example::
-
-        >>> PageNo().construct(page=1) is None
-        True
-        >>> PageNo().construct(page=2)
-        'page2'
-
-    '''
-
-    @classmethod
-    def _conv(cls, value):
-        if value == 1:
-            return None
-        return 'page%i' % value
-
-    def __init__(self):
-        super(PageNo, self).__init__('page', self._conv)
-
-
-class Path(routing.SinglePathComponent):
-    '''The name of the static rst page to be matched.
-
-    Example::
-
-        >>> Path().construct(path='about')
-        'about'
-
-    '''
-
-    def __init__(self):
-        super(Path, self).__init__('path', str)
-
-
-# Convenient instances of all classes not tied to settings.
-
-
-day     = Day()
-slug    = Slug()
-pageno  = PageNo()
-path    = Path()
+def __page_conv__(value):
+    if value == 1:
+        return None
+    return 'page%i' % value
+PAGENO = routing.SinglePathComponent('page', __page_conv__)

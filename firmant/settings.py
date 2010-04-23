@@ -61,13 +61,13 @@ WRITERS = ['firmant.writers.j2.Jinja2PostArchiveAll'
 POSTS_PER_PAGE = 10
 POSTS_PER_FEED = 10
 TEMPLATE_DIR = 'testdata/pristine/templates'
-URLS = [c.Type('post') /c.pageno
-       ,c.Type('post') /c.Year/c.pageno
-       ,c.Type('post') /c.Year/c.Month/c.pageno
-       ,c.Type('post') /c.Year/c.Month/c.day/c.pageno
-       ,c.Type('post') /c.Year/c.Month/c.day/c.slug
-       ,c.Type('feed') /c.slug
-       ,c.Type('staticrst') /c.path
+URLS = [c.TYPE('post') /c.PAGENO
+       ,c.TYPE('post') /c.YEAR/c.PAGENO
+       ,c.TYPE('post') /c.YEAR/c.MONTH/c.PAGENO
+       ,c.TYPE('post') /c.YEAR/c.MONTH/c.DAY/c.PAGENO
+       ,c.TYPE('post') /c.YEAR/c.MONTH/c.DAY/c.SLUG
+       ,c.TYPE('feed') /c.SLUG
+       ,c.TYPE('staticrst') /c.PATH
        ,r.SinglePathComponent('static', str)
        ]
 OUTPUT_DIR = 'build/'
