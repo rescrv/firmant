@@ -334,41 +334,65 @@ class BoundNullPathComponent(AbstractPath):
 
 
 class StaticPathComponent(AbstractPath):
-    '''A path component that does not have any attributes.
+    '''A path component with no attributes that creates a static string.
 
     In this example, a path component is created that will construct to the path
-    ``images``::
+    ``images``:
 
-        >>> spc = StaticPathComponent('images')
-        >>> spc.attributes
-        set([])
-        >>> spc.bound_attributes
-        {}
-        >>> spc.free_attributes
-        set([])
-        >>> spc.match({'month': 3})
-        False
-        >>> spc.match()
-        True
-        >>> spc.construct()
-        'images'
+    .. doctest::
+
+       >>> spc = StaticPathComponent('images')
+       >>> spc.attributes
+       set([])
+       >>> spc.bound_attributes
+       {}
+       >>> spc.free_attributes
+       set([])
+       >>> spc.match({'month': 3})
+       False
+       >>> spc.match()
+       True
+       >>> spc.construct()
+       'images'
+
+    It is an error to specify any attributes when constructing:
+
+    .. doctest::
+
+       >>> spc.construct(month=2)
+       Traceback (most recent call last):
+       ValueError: Do not specify attributes for StaticPathComponent
 
     '''
 
     def __init__(self, path):
+        super(StaticPathComponent, self).__init__()
         self._path = str(path)
 
     @property
     def attributes(self):
+        '''By definition, a :class:`StaticPathComponent` has no attributes.
+
+        This will return the empty set.
+
+        '''
         return set([])
 
     @property
     def bound_attributes(self):
+        '''By definition, a :class:`StaticPathComponent` has no attributes.
+
+        This will return an empty dictionary.
+
+        '''
         return {}
 
     def construct(self, *args, **kwargs):
+        '''The constructed path is always the string constant specified.
+        '''
         if not self.match(*args, **kwargs):
-            raise ValueError('Attributes do not match URL')
+            raise ValueError(
+                    'Do not specify attributes for StaticPathComponent')
         return self._path
 
 
