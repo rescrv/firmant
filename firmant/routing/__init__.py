@@ -25,9 +25,22 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-'''This module handles mapping between paths and writers.
+'''This module handles mapping between a set of attributes and a URL/document.
 
-Writers are able to request a URL for a given set of attributes.
+A :class:`URLMapper` serves as a means of converting a set of key-value pairs
+into a full URL string.  Each instance of :class:`URLMapper` has a list of
+objects that provide the :class:`AbstractPath` interface.  When querying
+:meth:`URLMapper.lookup`, :meth:`URLMapper.urlfor`, or
+:meth:`URLMapper.absolute`, the :class:`URLMapper` finds a path object for which
+the provided attributes exactly cover the attributes of the path.  Additionally,
+any bound variables must match the values provided in the query.
+
+.. note::
+
+   Matching of attributes to URLs is designed to be similar to unification as
+   found in Prolog, first order logic, and the lambda calculus; however, the
+   similarity should not be read into too deeply as it may not be adhered to in
+   the future.
 
 Modules in this package:
 
