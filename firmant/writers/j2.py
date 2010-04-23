@@ -190,7 +190,7 @@ class Jinja2PostArchiveMonthly(Jinja2PostArchiveBase, posts.PostArchiveMonthly):
 
             >>> c = components
             >>> urlmapper.add(
-            ...     c.Type('post')/c.Year/c.month/c.pageno)
+            ...     c.Type('post')/c.Year/c.Month/c.pageno)
             >>> j2pam = Jinja2PostArchiveMonthly(settings, objs, urlmapper)
             >>> j2pam.log = Mock('log')
             >>> j2pam.write()
@@ -239,7 +239,7 @@ class Jinja2PostArchiveDaily(Jinja2PostArchiveBase, posts.PostArchiveDaily):
             >>> c = components
             >>> settings.POSTS_PER_PAGE = 1
             >>> urlmapper.add(
-            ...     c.Type('post')/c.Year/c.month/c.day/c.pageno)
+            ...     c.Type('post')/c.Year/c.Month/c.day/c.pageno)
             >>> j2pad = Jinja2PostArchiveDaily(settings, objs, urlmapper)
             >>> j2pad.log = Mock('log')
             >>> j2pad.write()
@@ -291,7 +291,7 @@ class Jinja2PostSingle(Jinja2Writer, posts.PostSingle):
         r'''Render the data in a Jinja2 template.
 
             >>> c = components
-            >>> urlmapper.add(c.Type('post')/c.Year/c.month/c.day/c.slug)
+            >>> urlmapper.add(c.Type('post')/c.Year/c.Month/c.day/c.slug)
             >>> j2ps = Jinja2PostSingle(settings, objs, urlmapper)
             >>> j2ps.log = Mock('log')
             >>> j2ps.write()
