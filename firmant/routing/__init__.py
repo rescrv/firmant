@@ -148,58 +148,101 @@ class AbstractPath(object):
 
 
 class SinglePathComponent(AbstractPath):
-    '''A single piece of a URL.
+    '''A mapper between a single attribute and its string representation.
 
-    Example usage::
+    Each instance will match exactly one attribute.  At creation time, a
+    conversion function `conv` is specified that will be called to obtain the
+    string representation of the attribute.
 
-        >>> spc = SinglePathComponent('month', lambda m: '%02i' % m)
-        >>> spc.attributes
-        set(['month'])
-        >>> spc.bound_attributes
-        {}
-        >>> spc.free_attributes
-        set(['month'])
-        >>> spc.match({'month': 3})
-        True
-        >>> spc.match(month=3)
-        True
-        >>> spc.match(year=2010)
-        False
-        >>> spc.match(year=2010, month=3)
-        False
-        >>> spc.construct({'month': 3})
-        '03'
-        >>> spc.construct(month=3)
-        '03'
+    In this example, a component with the attribute `month` is created.  When
+    the :meth:`construct` method is called, it returns a two-digit
+    representation of the number.
 
-    Error conditions::
+    .. doctest::
 
-        >>> spc.match({'month': 2}, month=3)
-        Traceback (most recent call last):
-        ValueError: Conflicting values for 'month'
-        >>> spc.construct(month=3, year=10)
-        Traceback (most recent call last):
-        ValueError: Attributes do not match URL
+       >>> spc = SinglePathComponent('month', lambda m: '%02i' % m)
+       >>> spc.attributes
+       set(['month'])
+       >>> spc.bound_attributes
+       {}
+       >>> spc.free_attributes
+       set(['month'])
+       >>> spc.match({'month': 3})
+       True
+       >>> spc.match(month=3)
+       True
+       >>> spc.match(year=2010)
+       False
+       >>> spc.match(year=2010, month=3)
+       False
+       >>> spc.construct({'month': 3})
+       '03'
+       >>> spc.construct(month=3)
+       '03'
+
+    It is an error to provide the same attribute twice with two different
+    values:
+
+    .. doctest::
+
+       >>> spc.match({'month': 2}, month=3)
+       Traceback (most recent call last):
+       ValueError: Conflicting values for 'month'
+
+    Note that the same attribute can be specified multiple times if the values
+    are equal:
+
+    .. doctest::
+
+       >>> spc.match({'month': 3}, month=3)
+       True
+
+    If attributes not matching the single attribute are specified, then a
+    :exc:`ValueError` will be thrown.
+
+    .. doctest::
+
+       >>> spc.construct(month=3, year=10)
+       Traceback (most recent call last):
+       ValueError: Attributes do not match path
+       >>> spc.construct(year=10)
+       Traceback (most recent call last):
+       ValueError: Attributes do not match path
+       >>> spc.construct()
+       Traceback (most recent call last):
+       ValueError: Attributes do not match path
 
     '''
 
     def __init__(self, attribute, conv=lambda x:x):
+        super(SinglePathComponent, self).__init__()
         self._attribute = attribute
         self._conv = conv
 
     @property
     def attributes(self):
+        '''The set of attributes contains the single attribute specified at
+        creation time.
+        '''
         return set([self._attribute])
 
     @property
     def bound_attributes(self):
+        '''No attributes are bound.  This will always be an empty dictionary.
+        '''
         return dict()
 
     def construct(self, *args, **kwargs):
+        '''Create the string representation of the path.
+
+        The value of the attribute will be passed through the conversion
+        function.  The conversion function may return `None`.
+
+        '''
         if not self.match(*args, **kwargs):
-            raise ValueError('Attributes do not match URL')
-        d = merge_dicts(kwargs, *args)
-        return self._conv(d[self._attribute])
+            raise ValueError('Attributes do not match path')
+        attr = merge_dicts(kwargs, *args)
+        return self._conv(attr[self._attribute])
 
 
 class BoundNullPathComponent(AbstractPath):
