@@ -52,6 +52,7 @@ Modules in this package:
 '''
 
 
+import abc
 import os.path
 
 from firmant.utils import class_name
@@ -63,57 +64,86 @@ __all__ = ['AbstractPath', 'BoundNullPathComponent', 'CompoundComponent',
 
 
 class AbstractPath(object):
-    '''The path component of a URL.
+    '''The interface for all path objects.
 
-    This may be a single component, several components, or a whole URL.
+    The :class:`URLMapper` assumes all objects provided to it implement this
+    interface.
 
-    Intentionally the following methods and attributes raise errors indicating
-    that they have not been implemented::
+    Intuitively, a path is simply a string that is defined by a set of
+    key-value pairs.  The :attr:`attributes` property is the set of keys that
+    define the path.
 
-        >>> ap = AbstractPath()
-        >>> ap.attributes
-        Traceback (most recent call last):
-        RuntimeError: Not Implemented
-        >>> ap.bound_attributes
-        Traceback (most recent call last):
-        RuntimeError: Not Implemented
-        >>> ap.construct()
-        Traceback (most recent call last):
-        RuntimeError: Not Implemented
+    The following properties must be true in any valid path object:
+
+     * attributes = union(bound_attributes, free_attributes)
+     * attributes - free_attributes = bound_attributes
+     * attributes - bound_attributes = free_attributes
 
     '''
 
-    @property
-    def attributes(self):
-        raise RuntimeError("Not Implemented")
+    __metaclass__ = abc.ABCMeta
 
-    @property
+    @abc.abstractproperty
+    def attributes(self):
+        '''All attributes that define the string representation of the path.
+        '''
+
+    @abc.abstractproperty
     def bound_attributes(self):
-        raise RuntimeError("Not Implemented")
+        '''Attributes with a fixed value.
+
+        In order for a set of values to unify with this path, the keys and value
+        of :attr:`bound_attributes` must match those specified in the query.
+
+        '''
 
     @property
     def free_attributes(self):
+        '''Attributes with no value.
+
+        These attributes may be any value and still match the URL.
+
+        '''
         return self.attributes - set(self.bound_attributes.keys())
 
     def match(self, *args, **kwargs):
-        # Provided values must exactly cover all attributes and not conflict
-        # with bound attributes.
-        d = merge_dicts(kwargs, *args)
+        '''True if and only if `kwargs` and `args` specify the correct set of
+        attributes.
+
+        Each value in `args` should be a dictionary.  Provided keys must exactly
+        cover all attributes and provided values must not conflict with bound
+        attributes.  If the cover is not exact, or there are conflicting values,
+        the result of :meth:`match` is False.
+
+        '''
+        # Do the merging of all values (if this throws a ValueError, we let it
+        # rise because it is the fault of the caller).
+        attrs = merge_dicts(kwargs, *args)
 
         # Check for conflict with bound values
         try:
-            merge_dicts(d, self.bound_attributes)
+            merge_dicts(attrs, self.bound_attributes)
         except ValueError:
             return False
 
+        # Make sure the two sets are identical
         a = set(self.attributes)
-        b = set(d.keys())
+        b = set(attrs.keys())
         return a & b == a | b
 
+    @abc.abstractmethod
     def construct(self, *args, **kwargs):
-        raise RuntimeError("Not Implemented")
+        '''Use the values given in `kwargs` to construct the string
+        representation of the path.
+
+        The values in kwargs are not required to be any type, but should be of a
+        type the path may safely convert to a string.
+
+        '''
 
     def __div__(self, rhs):
+        '''Concatenate two components (using :class:`CompoundComponent`).
+        '''
         return CompoundComponent(self, rhs)
 
 
