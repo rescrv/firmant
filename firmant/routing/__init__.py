@@ -246,26 +246,60 @@ class SinglePathComponent(AbstractPath):
 
 
 class BoundNullPathComponent(AbstractPath):
-    '''A path component that does not impact the URL.
+    '''A mapper between a single attribute and the empty string.
 
-    In this example, a path component is created that will match if the
-    attribute `month` is 3::
+    Each instance will match exactly one attribute.  Construct will always
+    return `None` if there is a match.
 
-        >>> bnpc = BoundNullPathComponent('month', 3)
-        >>> bnpc.attributes
-        set(['month'])
-        >>> bnpc.bound_attributes
-        {'month': 3}
-        >>> bnpc.free_attributes
-        set([])
-        >>> bnpc.match({'month': 3})
-        True
-        >>> bnpc.match(month=3)
-        True
-        >>> bnpc.construct({'month': 3}) is None
-        True
-        >>> bnpc.construct(month=3) is None
-        True
+    .. doctest::
+
+       >>> bnpc = BoundNullPathComponent('month', 3)
+       >>> bnpc.attributes
+       set(['month'])
+       >>> bnpc.bound_attributes
+       {'month': 3}
+       >>> bnpc.free_attributes
+       set([])
+       >>> bnpc.match({'month': 3})
+       True
+       >>> bnpc.match(month=3)
+       True
+       >>> bnpc.construct({'month': 3}) is None
+       True
+       >>> bnpc.construct(month=3) is None
+       True
+
+    It is an error to provide the same attribute twice with two different
+    values:
+
+    .. doctest::
+
+       >>> bnpc.match({'month': 2}, month=3)
+       Traceback (most recent call last):
+       ValueError: Conflicting values for 'month'
+
+    Note that the same attribute can be specified multiple times if the values
+    are equal:
+
+    .. doctest::
+
+       >>> bnpc.match({'month': 3}, month=3)
+       True
+
+    If attributes not matching the single attribute are specified, then a
+    :exc:`ValueError` will be thrown.
+
+    .. doctest::
+
+       >>> bnpc.construct(month=3, year=10)
+       Traceback (most recent call last):
+       ValueError: Attributes do not match path
+       >>> bnpc.construct(year=10)
+       Traceback (most recent call last):
+       ValueError: Attributes do not match path
+       >>> bnpc.construct()
+       Traceback (most recent call last):
+       ValueError: Attributes do not match path
 
     '''
 
@@ -275,17 +309,26 @@ class BoundNullPathComponent(AbstractPath):
 
     @property
     def attributes(self):
+        '''The set of attributes contains the single attribute specified at
+        creation time.
+
+        '''
         return set([self._attribute])
 
     @property
     def bound_attributes(self):
+        '''The single attribute is bound to the value specified.
+        '''
         d = dict()
         d[self._attribute] = self._value
         return d
 
     def construct(self, *args, **kwargs):
+        '''This will return `None` if the attributes match, or raise a
+        :exc:`ValueError` otherwise.
+        '''
         if not self.match(*args, **kwargs):
-            raise ValueError('Attributes do not match URL')
+            raise ValueError('Attributes do not match path')
         return None
 
 
