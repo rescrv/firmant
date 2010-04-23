@@ -29,6 +29,8 @@
 '''
 
 
+import functools
+
 from firmant import routing
 
 
@@ -36,26 +38,21 @@ __all__ = ['Type', 'Year', 'Month', 'Day', 'Slug', 'PageNo', 'year', 'month',
         'day', 'slug', 'pageno']
 
 
-# Classes
+Type = functools.partial(routing.BoundNullPathComponent, 'type')
+'''The type of page.
 
+Attributes:
 
-class Type(routing.BoundNullPathComponent):
-    '''The type of page that is to be matched.
+ * type
 
-    For instance, a type of ``post`` will only match pages that declare
-    themselves to render posts.
+.. doctest::
 
-    Example::
+   >>> Type('post').match(type='post')
+   True
+   >>> Type('post').match(type='tag')
+   False
 
-        >>> Type('post').match(type='post')
-        True
-        >>> Type('post').match(type='tag')
-        False
-
-    '''
-
-    def __init__(self, value):
-        super(Type, self).__init__('type', value)
+'''
 
 
 class Year(routing.SinglePathComponent):
