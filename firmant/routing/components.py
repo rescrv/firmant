@@ -34,7 +34,7 @@ import functools
 from firmant import routing
 
 
-__all__ = ['Type', 'Year', 'Month', 'Day', 'Slug', 'PageNo', 'year', 'month',
+__all__ = ['Type', 'Year', 'Month', 'Day', 'Slug', 'PageNo', 'month',
         'day', 'slug', 'pageno']
 
 
@@ -55,22 +55,21 @@ Attributes:
 '''
 
 
-class Year(routing.SinglePathComponent):
-    '''A year associated with the page to be matched.
+Year = routing.SinglePathComponent('year', lambda y: '%04i' % y)
+'''The year associated with the page.
 
-    Example::
+Attributes:
 
-        >>> Year().construct(year=2010)
-        '2010'
+ * year
 
-    '''
+.. doctest::
 
-    @classmethod
-    def _conv(cls, value):
-        return '%04i' % value
+   >>> Year.construct(year=2010)
+   '2010'
+   >>> Year.construct(year=4)
+   '0004'
 
-    def __init__(self):
-        super(Year, self).__init__('year', self._conv)
+'''
 
 
 class Month(routing.SinglePathComponent):
@@ -166,7 +165,6 @@ class Path(routing.SinglePathComponent):
 # Convenient instances of all classes not tied to settings.
 
 
-year    = Year()
 month   = Month()
 day     = Day()
 slug    = Slug()

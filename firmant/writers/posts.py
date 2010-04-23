@@ -195,7 +195,7 @@ class PostArchiveYearly(PostArchiveBase):
 
         Example on testdata/pristine::
 
-        >>> urlmapper.add(components.Type('post')/components.year/components.pageno)
+        >>> urlmapper.add(components.Type('post')/components.Year/components.pageno)
         >>> pay = PostArchiveYearly(settings, objs, urlmapper)
         >>> pprint(pay.urls())
         ['2010/index.html', '2010/page2/index.html', '2009/index.html']
@@ -302,7 +302,7 @@ class PostArchiveMonthly(PostArchiveBase):
         Example on testdata/pristine::
 
         >>> urlmapper.add(
-        ...     components.Type('post')/components.year/components.month/components.pageno)
+        ...     components.Type('post')/components.Year/components.month/components.pageno)
         >>> pam = PostArchiveMonthly(settings, objs, urlmapper)
         >>> pprint(pam.urls())
         ['2010/02/index.html',
@@ -421,7 +421,7 @@ class PostArchiveDaily(PostArchiveBase):
         >>> c = components
         >>> settings.POSTS_PER_PAGE = 1
         >>> urlmapper.add(
-        ...     c.Type('post')/c.year/c.month/c.day/c.pageno)
+        ...     c.Type('post')/c.Year/c.month/c.day/c.pageno)
         >>> pad = PostArchiveDaily(settings, objs, urlmapper)
         >>> pprint(pad.urls())
         ['2010/02/02/index.html',
@@ -546,7 +546,7 @@ class PostSingle(PostWriter):
         Example on testdata/pristine::
 
             >>> c = components
-            >>> urlmapper.add(c.Type('post')/c.year/c.month/c.day/c.slug)
+            >>> urlmapper.add(c.Type('post')/c.Year/c.month/c.day/c.slug)
             >>> ps = PostSingle(settings, objs, urlmapper)
             >>> pprint(ps.urls())
             ['2010/02/02/newday2/index.html',
