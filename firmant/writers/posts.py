@@ -136,19 +136,19 @@ class PostArchiveAll(PostArchiveBase):
 
         >>> paa = PostArchiveAll(settings, objs, urlmapper)
         >>> paa.write()
-        No previous page.
         Index 1
-        Next 2
+          No previous page.
+          Next 2
           - 2010-02-02-newday2
           - 2010-02-02-newday
-        Prev 1
         Index 2
-        Next 3
+          Prev 1
+          Next 3
           - 2010-02-01-newmonth
           - 2010-01-01-newyear
-        Prev 2
         Index 3
-        No next page.
+          Prev 2
+          No next page.
           - 2009-12-31-party
 
         '''
@@ -160,15 +160,15 @@ class PostArchiveAll(PostArchiveBase):
 
         This should be overridden in child classes.
         '''
-        if pages.prev is None:
-            print 'No previous page.'
-        else:
-            print 'Prev', pages.prev
         print 'Index', pages.cur
-        if pages.next is None:
-            print 'No next page.'
+        if pages.prev is None:
+            print '  No previous page.'
         else:
-            print 'Next', pages.next
+            print '  Prev', pages.prev
+        if pages.next is None:
+            print '  No next page.'
+        else:
+            print '  Next', pages.next
         for post in posts:
             s = post.published.strftime('  - %Y-%m-%d-%%s')
             print s % post.slug
