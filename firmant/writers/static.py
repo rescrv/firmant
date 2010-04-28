@@ -41,17 +41,10 @@ class StaticWriter(Writer):
 
     permalinks_for = 'static'
 
-    def path(self, static):
-        '''Use the urlmapper to construct a path for the given attributes.
-        '''
-        urlfor = self.urlmapper.urlfor
-        return urlfor('', static=static.relpath)
-
     def url(self, static):
         '''Use the urlmapper to construct a URL for the given attributes.
         '''
-        urlfor = self.urlmapper.urlfor
-        return urlfor('', absolute=True, static=static.relpath)
+        return self.urlmapper.url(None, static=static.relpath)
 
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
@@ -62,12 +55,12 @@ class StaticWriter(Writer):
             >>> urlmapper.add(routing.SinglePathComponent('static', str))
             >>> sw = StaticWriter(settings, objs, urlmapper)
             >>> pprint(sw.urls())
-            ['images/88x31.png']
+            ['http://test/images/88x31.png']
 
         '''
         ret = list()
         for static in self.objs.get('static', []):
-            ret.append(self.path(static))
+            ret.append(self.url(static))
         ret.sort()
         return ret
 
@@ -91,18 +84,10 @@ class StaticRstWriter(Writer):
 
     fmt = 'html'
 
-    def path(self, static):
-        '''Use the urlmapper to construct a path for the given attributes.
-        '''
-        urlfor = self.urlmapper.urlfor
-        return urlfor(self.fmt, type='staticrst', path=static.path)
-
     def url(self, static):
         '''Use the urlmapper to construct a URL for the given attributes.
         '''
-        urlfor = self.urlmapper.urlfor
-        return urlfor(self.fmt, absolute=True, type='staticrst',
-                path=static.path)
+        return self.urlmapper.url(self.fmt, type='staticrst', path=static.path)
 
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
@@ -114,9 +99,7 @@ class StaticRstWriter(Writer):
             >>> urlmapper.add(c.TYPE('staticrst')/c.PATH)
             >>> srw = StaticRstWriter(settings, objs, urlmapper)
             >>> pprint(srw.urls())
-            ['http://test/about/index.html',
-             'http://test/empty/index.html',
-             'http://test/links/index.html']
+            ['http://test/about/', 'http://test/empty/', 'http://test/links/']
 
         '''
         ret = list()
@@ -173,6 +156,8 @@ def _setup(self):
                     ,'staticrst': 'firmant.parsers.static.StaticRstParser'
                     }
         ,'CONTENT_ROOT': 'testdata/pristine'
+        ,'OUTPUT_DIR': 'outputdir'
+        ,'PERMALINK_ROOT': 'http://urlroot'
         ,'STATIC_SUBDIR': 'static'
         ,'STATIC_RST_SUBDIR': 'flat'
         ,'REST_EXTENSION': 'rst'
@@ -186,5 +171,6 @@ def _setup(self):
     firmant.cross_reference()
     self.globs['settings'] = settings
     self.globs['objs']  = firmant.objs
-    self.globs['urlmapper'] = URLMapper(root=settings.PERMALINK_ROOT)
+    self.globs['urlmapper'] = URLMapper(settings.OUTPUT_DIR,
+            settings.PERMALINK_ROOT)
     self.globs['components'] = components
