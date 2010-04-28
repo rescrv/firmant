@@ -589,7 +589,7 @@ class URLMapper(object):
             path = self.__lookup__(**kwargs)
         except AttributeError:
             return None
-        path = os.path.join(self.output_dir, path or None)
+        path = os.path.join(self.output_dir, path or '')
         if extension is not None:
             path = os.path.join(path, 'index.%s' % extension)
         return path

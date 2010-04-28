@@ -57,7 +57,6 @@ class Jinja2Writer(Writer):
         globals  = self.objs.get('globals', dict())
         globals.update(context)
         data     = template.render(globals)
-        path     = os.path.join(self.settings.OUTPUT_DIR, path or '')
         f        = paths.create_or_truncate(path)
         f.write(data.encode('utf-8'))
         f.flush()
@@ -72,20 +71,21 @@ class Jinja2PostArchiveBase(Jinja2Writer, posts.PostArchiveBase):
         '''Return the url, template, and context, ready to render.
         '''
         rev      = self.rev_key(cal.cur)
-        url      = self.path(page=pages.cur, **rev)
+        url      = self.urlmapper.url(self.fmt, type='post', page=pages.cur, **rev)
+        path     = self.urlmapper.path(self.fmt, type='post', page=pages.cur, **rev)
         template = self.template
         context  = dict()
         context.update(rev)
         context['posts'] = post_list
         context['pprev'] = pages.prev and \
-                self.path(absolute=True, page=pages.prev, **rev)
+                self.urlmapper.url(self.fmt, type='post', page=pages.prev, **rev)
         context['pnext'] = pages.next and \
-                self.path(absolute=True, page=pages.next, **rev)
+                self.urlmapper.url(self.fmt, type='post', page=pages.next, **rev)
         context['sprev'] = cal.prev and \
-                self.path(absolute=True, page=1, **self.rev_key(cal.prev))
+                self.urlmapper.url(self.fmt, type='post', page=1, **self.rev_key(cal.prev))
         context['snext'] = cal.next and \
-                self.path(absolute=True, page=1, **self.rev_key(cal.next))
-        return url, template, context
+                self.urlmapper.url(self.fmt, type='post', page=1, **self.rev_key(cal.next))
+        return path, url, template, context
 
 
 class Jinja2PostArchiveAll(Jinja2Writer, posts.PostArchiveAll):
@@ -104,35 +104,35 @@ class Jinja2PostArchiveAll(Jinja2Writer, posts.PostArchiveAll):
             >>> j2paa.write()
             >>> cat(os.path.join(settings.OUTPUT_DIR, 'index.html'))
             Prev: 
-            Next: http://test/page2/index.html
+            Next: http://test/page2/
             2010-02-02-newday2
             2010-02-02-newday
             >>> cat(os.path.join(settings.OUTPUT_DIR, 'page2/index.html'))
-            Prev: http://test/index.html
-            Next: http://test/page3/index.html
+            Prev: http://test/
+            Next: http://test/page3/
             2010-02-01-newmonth
             2010-01-01-newyear
             >>> cat(os.path.join(settings.OUTPUT_DIR, 'page3/index.html'))
-            Prev: http://test/page2/index.html
+            Prev: http://test/page2/
             Next: 
             2009-12-31-party
 
         '''
-        url = self.path(page=pages.cur)
+        path = self.urlmapper.path(self.fmt, type='post', page=pages.cur)
         template = 'posts/archive_all.html'
         context = dict()
         if pages.prev is not None:
-            prev = self.path(absolute=True, page=pages.prev)
+            prev = self.urlmapper.url(self.fmt, type='post', page=pages.prev)
         else:
             prev = None
         if pages.next is not None:
-            nex = self.path(absolute=True, page=pages.next)
+            nex = self.urlmapper.url(self.fmt, type='post', page=pages.next)
         else:
             nex = None
         context['prev']          = prev
         context['next']          = nex
         context['posts']         = post_list
-        self.render_to_file(url, template, context)
+        self.render_to_file(path, template, context)
 
 
 class Jinja2PostArchiveYearly(Jinja2PostArchiveBase, posts.PostArchiveYearly):
@@ -153,28 +153,28 @@ class Jinja2PostArchiveYearly(Jinja2PostArchiveBase, posts.PostArchiveYearly):
             >>> j2pay.write()
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/index.html'))
             Prev year: 
-            Next year: http://test/2009/index.html
+            Next year: http://test/2009/
             Prev page: 
-            Next page: http://test/2010/page2/index.html
+            Next page: http://test/2010/page2/
             2010-02-02-newday2
             2010-02-02-newday
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/page2/index.html'))
             Prev year: 
-            Next year: http://test/2009/index.html
-            Prev page: http://test/2010/index.html
+            Next year: http://test/2009/
+            Prev page: http://test/2010/
             Next page: 
             2010-02-01-newmonth
             2010-01-01-newyear
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2009/index.html'))
-            Prev year: http://test/2010/index.html
+            Prev year: http://test/2010/
             Next year: 
             Prev page: 
             Next page: 
             2009-12-31-party
 
         '''
-        url, template, context = self.render_common(post_list, years, pages)
-        self.render_to_file(url, template, context)
+        path, url, template, context = self.render_common(post_list, years, pages)
+        self.render_to_file(path, template, context)
 
 
 class Jinja2PostArchiveMonthly(Jinja2PostArchiveBase, posts.PostArchiveMonthly):
@@ -196,33 +196,33 @@ class Jinja2PostArchiveMonthly(Jinja2PostArchiveBase, posts.PostArchiveMonthly):
             >>> j2pam.write()
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/index.html'))
             Prev month: 
-            Next month: http://test/2010/01/index.html
+            Next month: http://test/2010/01/
             Prev page: 
-            Next page: http://test/2010/02/page2/index.html
+            Next page: http://test/2010/02/page2/
             2010-02-02-newday2
             2010-02-02-newday
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/page2/index.html'))
             Prev month: 
-            Next month: http://test/2010/01/index.html
-            Prev page: http://test/2010/02/index.html
+            Next month: http://test/2010/01/
+            Prev page: http://test/2010/02/
             Next page: 
             2010-02-01-newmonth
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/01/index.html'))
-            Prev month: http://test/2010/02/index.html
-            Next month: http://test/2009/12/index.html
+            Prev month: http://test/2010/02/
+            Next month: http://test/2009/12/
             Prev page: 
             Next page: 
             2010-01-01-newyear
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2009/12/index.html'))
-            Prev month: http://test/2010/01/index.html
+            Prev month: http://test/2010/01/
             Next month: 
             Prev page: 
             Next page: 
             2009-12-31-party
 
         '''
-        url, template, context = self.render_common(post_list, months, pages)
-        self.render_to_file(url, template, context)
+        path, url, template, context = self.render_common(post_list, months, pages)
+        self.render_to_file(path, template, context)
 
 
 class Jinja2PostArchiveDaily(Jinja2PostArchiveBase, posts.PostArchiveDaily):
@@ -245,38 +245,38 @@ class Jinja2PostArchiveDaily(Jinja2PostArchiveBase, posts.PostArchiveDaily):
             >>> j2pad.write()
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/02/index.html'))
             Prev day: 
-            Next day: http://test/2010/02/01/index.html
+            Next day: http://test/2010/02/01/
             Prev page: 
-            Next page: http://test/2010/02/02/page2/index.html
+            Next page: http://test/2010/02/02/page2/
             2010-02-02-newday2
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/02/page2/index.html'))
             Prev day: 
-            Next day: http://test/2010/02/01/index.html
-            Prev page: http://test/2010/02/02/index.html
+            Next day: http://test/2010/02/01/
+            Prev page: http://test/2010/02/02/
             Next page: 
             2010-02-02-newday
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/02/01/index.html'))
-            Prev day: http://test/2010/02/02/index.html
-            Next day: http://test/2010/01/01/index.html
+            Prev day: http://test/2010/02/02/
+            Next day: http://test/2010/01/01/
             Prev page: 
             Next page: 
             2010-02-01-newmonth
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2010/01/01/index.html'))
-            Prev day: http://test/2010/02/01/index.html
-            Next day: http://test/2009/12/31/index.html
+            Prev day: http://test/2010/02/01/
+            Next day: http://test/2009/12/31/
             Prev page: 
             Next page: 
             2010-01-01-newyear
             >>> cat(os.path.join(settings.OUTPUT_DIR, '2009/12/31/index.html'))
-            Prev day: http://test/2010/01/01/index.html
+            Prev day: http://test/2010/01/01/
             Next day: 
             Prev page: 
             Next page: 
             2009-12-31-party
 
         '''
-        url, template, context = self.render_common(post_list, days, pages)
-        self.render_to_file(url, template, context)
+        path, url, template, context = self.render_common(post_list, days, pages)
+        self.render_to_file(path, template, context)
 
 
 class Jinja2PostSingle(Jinja2Writer, posts.PostSingle):
@@ -308,7 +308,9 @@ class Jinja2PostSingle(Jinja2Writer, posts.PostSingle):
             2009-12-31 | party by John Doe
 
         '''
-        url = self.path(post=post)
+        path = self.urlmapper.path(self.fmt, type='post', slug=post.slug,
+                year=post.published.year, month=post.published.month,
+                day=post.published.day)
         template = 'posts/single.html'
         context = dict()
         context['year']          = post.published.year
@@ -316,14 +318,12 @@ class Jinja2PostSingle(Jinja2Writer, posts.PostSingle):
         context['day']           = post.published.day
         context['slug']          = post.slug
         context['post']          = post
-        self.render_to_file(url, template, context)
+        self.render_to_file(path, template, context)
 
 
 class Jinja2StaticRstSingle(Jinja2Writer, static.StaticRstWriter):
     '''Render static rst using Jinja2 templates.
     '''
-
-    fmt = 'html'
 
     permalinks_for = 'staticrst'
 
@@ -342,12 +342,12 @@ class Jinja2StaticRstSingle(Jinja2Writer, static.StaticRstWriter):
             Links at links
 
         '''
-        url = self.path(static=static)
+        path = self.urlmapper.path('html', type='staticrst', path=static.path)
         template = 'flat.html'
         context = dict()
         context['path']        = static.path
         context['page']        = static
-        self.render_to_file(url, template, context)
+        self.render_to_file(path, template, context)
 
 
 def _setup(self):
@@ -372,6 +372,8 @@ def _setup(self):
     s = {'PARSERS': {'posts': 'firmant.parsers.posts.PostParser'
                     ,'staticrst': 'firmant.parsers.static.StaticRstParser'}
         ,'CONTENT_ROOT': 'testdata/pristine'
+        ,'OUTPUT_DIR': 'outputdir'
+        ,'PERMALINK_ROOT': 'http://urlroot'
         ,'POSTS_SUBDIR': 'posts'
         ,'STATIC_RST_SUBDIR': 'flat'
         ,'REST_EXTENSION': 'rst'
@@ -385,7 +387,8 @@ def _setup(self):
     firmant.parse()
     self.globs['settings']   = settings
     self.globs['objs']       = firmant.objs
-    self.globs['urlmapper']  = URLMapper(root=settings.PERMALINK_ROOT)
+    self.globs['urlmapper'] = URLMapper(settings.OUTPUT_DIR,
+            settings.PERMALINK_ROOT)
     self.globs['Mock']       = Mock
     self.globs['components'] = components
     self.globs['cat']        = cat
