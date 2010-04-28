@@ -26,6 +26,20 @@
 
 
 '''Functions for interacting with the docutils module.
+
+In particular this module makes creation of directives much more straightforward
+and simple.  The :func:`meta_data_directive` produces a
+:class:`MetaDataDirective`.  This result is suitable for registering with
+:func:`docutils.parsers.rst.directives.register_directive`.
+
+Docutils' processing is a multi-step process in which a module is read, parsed,
+transformed, and written.  Each directive created with
+:func:`meta_data_directive` creates a :class:`MetaDataNode` in the document tree
+created by docutils.  When the custom :class:`MetaDataStandaloneReader` class is
+used as the reader for docutils, these nodes that contain metadata are then
+removed from the document tree, and the metadata they store is added to the
+dictionary :class:`MetaDataStandaloneReader` has reference to.
+
 '''
 
 
