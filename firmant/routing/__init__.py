@@ -410,94 +410,80 @@ class StaticPathComponent(AbstractPath):
 
 
 class CompoundComponent(AbstractPath):
-    '''A compound path formed using zero or more AbstractPath objects.
+    '''A path object formed by joining two or more path objects with '/'.
 
-    Example usage::
+    A :class:`CompoundComponent` is transparently formed by dividing path
+    objects.
 
-        >>> year = SinglePathComponent('year', lambda y: '%04i' % y)
-        >>> month = SinglePathComponent('month', lambda m: '%02i' % m)
-        >>> day = SinglePathComponent('day', lambda d: '%02i' % d)
-        >>> ymd = year/month/day
-        >>> ymd #doctest: +ELLIPSIS
-        <firmant.routing.CompoundComponent object at 0x...>
-        >>> ymd.match(year=2010, month=3, day=14)
-        True
-        >>> ymd.match(year=2010, month=3, day=14, slug='foobar')
-        False
-        >>> ymd.construct(year=2010, month=3, day=14)
-        '2010/03/14'
+    .. doctest::
 
-    With a null path component::
+       >>> tags = StaticPathComponent('tags')
+       >>> type = BoundNullPathComponent('type', 'tag')
+       >>> slug = SinglePathComponent('slug', str)
+       >>> path = type/tags/slug
+       >>> path #doctest: +ELLIPSIS
+       <firmant.routing.CompoundComponent object at 0x...>
+       >>> path.match(type='tag', slug='foobar')
+       True
+       >>> path.match(type='tag')
+       False
+       >>> path.match(slug='foobar')
+       False
+       >>> path.construct(type='tag', slug='foobar')
+       'tags/foobar'
 
-        >>> bnpc = BoundNullPathComponent('type', 'tag')
-        >>> slug = SinglePathComponent('slug', str)
-        >>> path = bnpc/slug
-        >>> path #doctest: +ELLIPSIS
-        <firmant.routing.CompoundComponent object at 0x...>
-        >>> path.attributes
-        set(['type', 'slug'])
-        >>> path.bound_attributes
-        {'type': 'tag'}
-        >>> path.free_attributes
-        set(['slug'])
-        >>> path.match(slug='foobar')
-        False
-        >>> path.match(type='tag', slug='foobar')
-        True
-        >>> path.construct(type='tag', slug='foobar')
-        'foobar'
+    If :meth:`construct` is called with attributes that do not match the path,
+    then a :exc:`ValueError` will be thrown.
 
-    With a static path component::
+    .. doctest::
 
-        >>> spc = StaticPathComponent('images')
-        >>> slug = SinglePathComponent('slug', str)
-        >>> path = spc/slug
-        >>> path #doctest: +ELLIPSIS
-        <firmant.routing.CompoundComponent object at 0x...>
-        >>> path.attributes
-        set(['slug'])
-        >>> path.bound_attributes
-        {}
-        >>> path.free_attributes
-        set(['slug'])
-        >>> path.match(slug='foobar')
-        True
-        >>> path.match(type='tag', slug='foobar')
-        False
-        >>> path.construct(slug='foobar')
-        'images/foobar'
+       >>> path.construct(type='tag')
+       Traceback (most recent call last):
+       ValueError: Attributes do not match path
 
     '''
 
     def __init__(self, *args):
+        super(CompoundComponent, self).__init__()
         self._components = args
+        bound_attributes = [c.bound_attributes for c in self._components]
+        self._bound = merge_dicts({}, *bound_attributes)
 
     @property
     def attributes(self):
-        list_of_sets = map(lambda x: x.attributes, self._components)
-        return reduce(set.__or__, list_of_sets)
+        '''The attributes are the union of all components' attributes.
+        '''
+        return reduce(set.__or__, [c.attributes for c in self._components])
 
     @property
     def bound_attributes(self):
-        list_of_sets = map(lambda x: x.bound_attributes, self._components)
-        return reduce(merge_dicts, list_of_sets)
+        '''The attributes are the union of all components' bound_attributes.
+        '''
+        return self._bound
 
     def construct(self, *args, **kwargs):
+        '''Construct each path component, and join with '/'.
+        '''
         if not self.match(*args, **kwargs):
-            raise ValueError('Attributes do not match URL')
-        d = merge_dicts(kwargs, *args)
-        list_of_paths = map(lambda x: self._call_construct(x, d),
-                self._components)
-        list_of_paths = filter(bool, list_of_paths)
+            raise ValueError('Attributes do not match path')
+        bound = merge_dicts(kwargs, *args)
+        list_of_paths = [self._construct(x, bound) for x in self._components]
+        list_of_paths = [p for p in list_of_paths if p]
         return '/'.join(list_of_paths)
 
     @classmethod
-    def _call_construct(cls, component, d):
-        e = d.copy()
-        for key in e.keys():
+    def _construct(cls, component, d):
+        '''A utility function for construct.
+
+        Keys in `d` that are not in `component.attributes` are discarded before
+        calling `component.construct`.
+
+        '''
+        d = d.copy()
+        for key in d.keys():
             if key not in component.attributes:
-                e.pop(key, None)
-        return component.construct(e)
+                d.pop(key, None)
+        return component.construct(d)
 
 
 class URLMapper(object):
