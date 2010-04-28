@@ -29,9 +29,6 @@
 '''
 
 
-__all__ = ['Copyright', 'publish_parts_doc']
-
-
 from docutils.parsers.rst import Directive
 from docutils.parsers.rst import directives
 from docutils.transforms import Transform
@@ -88,11 +85,11 @@ def meta_data_directive(func, whitespace=False):
     return MetaDataDirective
 
 
-def copyright(d, content):
+def copyright_declaration(d, content):
     r'''Interpret the content as a copyright declaration.
 
         >>> d = dict()
-        >>> copyright(d, [u'foo', u'bar'])
+        >>> copyright_declaration(d, [u'foo', u'bar'])
         >>> d['copyright']
         u'foo\nbar'
 
@@ -213,26 +210,24 @@ def list_element(d, content, attr='element_plural'):
     d[attr] = list([''.join(content)])
 
 
-_Copyright = meta_data_directive(copyright, whitespace=True)
-directives.register_directive('copyright', _Copyright)
+directives.register_directive('copyright',
+    meta_data_directive(copyright_declaration, whitespace=True))
 
-_Time = meta_data_directive(time)
-directives.register_directive('time', _Time)
+directives.register_directive('time', meta_data_directive(time))
 
-_Timezone = meta_data_directive(lambda d, c: single_line(d, c, 'timezone'))
-directives.register_directive('timezone', _Timezone)
+directives.register_directive('timezone',
+    meta_data_directive(lambda d, c: single_line(d, c, 'timezone')))
 
-_Author = meta_data_directive(lambda d, c: single_line(d, c, 'author'))
-directives.register_directive('author', _Author)
+directives.register_directive('author',
+    meta_data_directive(lambda d, c: single_line(d, c, 'author')))
 
-_Updated = meta_data_directive(updated)
-directives.register_directive('updated', _Updated)
+directives.register_directive('updated', meta_data_directive(updated))
 
-_Tag = meta_data_directive(lambda d, c: list_element(d, c, 'tags'))
-directives.register_directive('tag', _Tag)
+directives.register_directive('tag',
+    meta_data_directive(lambda d, c: list_element(d, c, 'tags')))
 
-_Feed = meta_data_directive(lambda d, c: list_element(d, c, 'feeds'))
-directives.register_directive('feed', _Feed)
+directives.register_directive('feed',
+    meta_data_directive(lambda d, c: list_element(d, c, 'feeds')))
 
 
 def meta_data_transform(data):
