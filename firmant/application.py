@@ -100,22 +100,20 @@ class Firmant(object):
         >>> f.create_permalinks()
         Called log.warning('Object type tags has no permalink providers.')
         >>> pprint([post.permalink for post in f.objs['posts']])
-        ['http://test/2009/12/31/party/index.html',
-         'http://test/2010/01/01/newyear/index.html',
-         'http://test/2010/02/01/newmonth/index.html',
-         'http://test/2010/02/02/newday/index.html',
-         'http://test/2010/02/02/newday2/index.html']
+        ['http://test/2009/12/31/party/',
+         'http://test/2010/01/01/newyear/',
+         'http://test/2010/02/01/newmonth/',
+         'http://test/2010/02/02/newday/',
+         'http://test/2010/02/02/newday2/']
         >>> pprint([feed.permalink for feed in f.objs['feeds']])
-        ['http://test/bar/index.atom',
-         'http://test/baz/index.atom',
-         'http://test/foo/index.atom',
-         'http://test/quux/index.atom']
+        ['http://test/bar/',
+         'http://test/baz/',
+         'http://test/foo/',
+         'http://test/quux/']
         >>> pprint([static.permalink for static in f.objs['static']])
         ['http://test/images/88x31.png']
         >>> pprint([staticrst.permalink for staticrst in f.objs['staticrst']])
-        ['http://test/about/index.html',
-         'http://test/empty/index.html',
-         'http://test/links/index.html']
+        ['http://test/about/', 'http://test/empty/', 'http://test/links/']
         >>> f.write()
 
     '''

@@ -101,9 +101,9 @@ class AtomFeedSingle(FeedSingle):
                 category.set('term', tag.slug)
                 category.set('label', tag.title)
 
-        url = self.path(feed_obj)
+        path = self.urlmapper.path('atom', type='feed', slug=feed_obj.slug)
         data = etree.tostring(feed)
-        path = os.path.join(self.settings.OUTPUT_DIR, url or '')
+        path = os.path.join(self.settings.OUTPUT_DIR, path)
         f    = paths.create_or_truncate(path)
         f.write(data.encode('utf-8'))
         f.flush()

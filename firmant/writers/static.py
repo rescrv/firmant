@@ -68,7 +68,7 @@ class StaticWriter(Writer):
         '''Write a parsed feed to the filesystem.
         '''
         for static in self.objs.get('static', []):
-            relpath = self.path(static)
+            relpath = self.urlmapper.path(None, static=static.relpath)
             abspath = os.path.join(self.settings.OUTPUT_DIR, relpath)
             try:
                 os.makedirs(os.path.dirname(abspath))
