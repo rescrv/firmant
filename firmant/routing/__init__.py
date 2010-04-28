@@ -30,10 +30,10 @@
 A :class:`URLMapper` serves as a means of converting a set of key-value pairs
 into a full URL string.  Each instance of :class:`URLMapper` has a list of
 objects that provide the :class:`AbstractPath` interface.  When querying
-:meth:`URLMapper.lookup`, :meth:`URLMapper.urlfor`, or
-:meth:`URLMapper.absolute`, the :class:`URLMapper` finds a path object for which
-the provided attributes exactly cover the attributes of the path.  Additionally,
-any bound variables must match the values provided in the query.
+:meth:`URLMapper.url`, or :meth:`URLMapper.path`, the :class:`URLMapper` finds a
+path object for which the provided attributes exactly cover the attributes of
+the path.  Additionally, any bound variables must match the values provided in
+the query.
 
 .. note::
 
@@ -487,94 +487,109 @@ class CompoundComponent(AbstractPath):
 
 
 class URLMapper(object):
-    '''Convert between attributes and paths.
+    '''Find the url or filesystem path that correlate with a set of attributes.
 
-    Example::
+    The distinction between urls and paths is best described by example.  Let's
+    declare the attributes ``slug='foo'`` and ``type='object'``.  The path on
+    the filesystem, where the output would be written could be
+    ``/path/to/output/directory/objects/foo/index.html`` while the URL where the
+    document is accessible would be ``http://permanent.url/objects/foo/``.
 
-        >>> # setup (this would be done by the Firmant object)
-        >>> post = BoundNullPathComponent('type', 'post')
-        >>> year = SinglePathComponent('year', lambda y: '%04i' % y)
-        >>> month = SinglePathComponent('month', lambda m: '%02i' % m)
-        >>> day = SinglePathComponent('day', lambda d: '%02i' % d)
-        >>> slug = SinglePathComponent('slug', str)
-        >>> from pysettings.settings import Settings
-        >>> um = URLMapper(root='http://test')
-        >>> um.add( post/year/month/day/slug )
-        >>> um.add( post/year/month/day )
-        >>> um.add( post/year/month )
-        >>> um.add( post/year )
+    Having the URLMapper handle the logic of both paths and URLs makes sense.
+    Consider a case where the user wishes to have the above URL be
+    ``http://permanent.url/objects/foo.html``.  The local filesystem path
+    would need to adapt to ``/path/to/output/directory/objects/foo.html``
 
-        >>> # usage (this would be done within writers/transformers)
-        >>> um.lookup(type='post', slug='foobar', day=15, month=3, year=2010)
-        '2010/03/15/foobar'
-        >>> um.lookup(type='post', year=2010)
-        '2010'
-        >>> um.lookup(type='post', unknown_attribute=True)
-        Traceback (most recent call last):
-        AttributeError: Attributes do not correspond to any path
-        >>> um.urlfor('html', type='post', slug='foobar', day=15, month=3, year=2010)
-        '2010/03/15/foobar/index.html'
-        >>> um.urlfor('html', type='post', year=2010)
-        '2010/index.html'
-        >>> um.urlfor('html', type='post', unknown_attribute=True) is None
-        True
+    Creating a URLMapper is simple:
 
-    If `absolute` is True, the URL will be prefixed with the root (if it was
-    specified).
+    .. doctest::
 
-        >>> um.urlfor('html', type='post', absolute=True, slug='foobar', day=15, month=3, year=2010)
-        'http://test/2010/03/15/foobar/index.html'
+       >>> from firmant.routing.components import *
+       >>> um = URLMapper('/path/to/output/directory', 'http://permanent.url/')
+       >>> um.add( TYPE('post')/YEAR/MONTH/DAY/SLUG )
+       >>> um.add( TYPE('post')/YEAR/MONTH/DAY )
+       >>> um.add( TYPE('post')/YEAR/MONTH )
+       >>> um.add( TYPE('post')/YEAR )
 
-    If `format` is '', then the path formed by the attributes is kept as is and is
-    not interpreted as a directory with an 'index.%s' % format path appended::
+    Mapping a set of attributes to a path or URL is a matter of specifying the
+    extension of the document (e.g. 'html' or 'css') and a set of key-value
+    attributes.
 
-        >>> um.urlfor('', type='post', absolute=True, slug='foobar', day=15, month=3, year=2010)
-        'http://test/2010/03/15/foobar'
+    .. doctest::
+
+       >>> um.path('html', type='post', slug='foo', day=15, month=3, year=2010)
+       '/path/to/output/directory/2010/03/15/foo/index.html'
+       >>> um.url('html', type='post', slug='foo', day=15, month=3, year=2010)
+       'http://permanent.url/2010/03/15/foo/'
+
+    .. todo::
+
+       Add tests (and support) for multiple extensions for the same set of
+       attributes.
+
+    If the attributes do not correspond to any path definition, then the value
+    `None` is returned:
+
+    .. doctest::
+
+       >>> um.path('html', non_existent_attribute=True)
+       >>> um.url('html', non_existent_attribute=True)
+
+    If the extension is `None`, then the :meth:`path` and :meth:`url` methods
+    will not add any information to account for an extension.
+
+    .. doctest::
+
+       >>> um.path(None, type='post', slug='foo', day=15, month=3, year=2010)
+       '/path/to/output/directory/2010/03/15/foo'
+       >>> um.url(None, type='post', slug='foo', day=15, month=3, year=2010)
+       'http://permanent.url/2010/03/15/foo'
+
+    This is useful when it is known that the attributes specified promise to
+    resolve to a path.  Example uses include static files that are simply copied
+    into the output directory.
 
     '''
 
-    def __init__(self, urls=None, root=None):
-        self.root=root
+    def __init__(self, output_dir, url_root, urls=None):
+        self.output_dir = output_dir
+        self.url_root   = url_root
+
         self._paths = list()
         if urls is not None:
             self._paths.extend(urls)
 
     def add(self, path):
+        '''Add the path to the list of paths in the :class:`URLMapper`
+        '''
         self._paths.append(path)
 
-    def lookup(self, **kwargs):
-        '''Lookup the abstract representation of a page defined by attributes.
-
-        Unless you know to do otherwise, use :meth:`urlfor` instead of this
-        method.
-        '''
+    def __lookup__(self, **kwargs):
         for path in self._paths:
             if path.match(kwargs):
                 return path.construct(kwargs)
         raise AttributeError('Attributes do not correspond to any path')
 
-    def urlfor(self, format, absolute=False, **kwargs):
-        '''Return the path of a page relative to the content root.
-
-        Unless you know to do otherwise, use this method instead of
-        :meth:`lookup`.
-
+    def url(self, extension, **kwargs):
+        '''Return the URL corresponding to a set of attributes.
         '''
         try:
-            path = self.lookup(**kwargs)
+            path = self.__lookup__(**kwargs)
         except AttributeError:
             return None
-        path = path or ''
-        if absolute and self.root is None:
-            raise RuntimeError('Set the root for absolute URLs')
-        if format != '':
-            path = os.path.join(path, 'index.%s' % format)
-        if absolute:
-            return self.absolute(path)
-        else:
-            return path
+        path = os.path.join(self.url_root, path or None)
+        if extension is not None and not path.endswith('/'):
+            path += '/'
+        return path
 
-    def absolute(self, path):
-        '''Return the absolute url for the path.
+    def path(self, extension, **kwargs):
+        '''Return the filesystem path corresponding to a set of attributes.
         '''
-        return os.path.join(self.root, path)
+        try:
+            path = self.__lookup__(**kwargs)
+        except AttributeError:
+            return None
+        path = os.path.join(self.output_dir, path or None)
+        if extension is not None:
+            path = os.path.join(path, 'index.%s' % extension)
+        return path
