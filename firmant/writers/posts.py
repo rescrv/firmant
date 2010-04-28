@@ -84,12 +84,6 @@ class PostArchiveBase(PostWriter):
             return False
         return super(PostArchiveBase, self).write_preconditions()
 
-    def path(self, **kwargs):
-        '''Use the urlmapper to construct a path for the given attributes.
-        '''
-        urlfor = self.urlmapper.urlfor
-        return urlfor(self.fmt, type='post', **kwargs)
-
 
 class PostArchiveAll(PostArchiveBase):
     '''Parse the posts into a list, grouped by page.
@@ -111,14 +105,15 @@ class PostArchiveAll(PostArchiveBase):
         >>> urlmapper.add(components.TYPE('post')/components.PAGENO)
         >>> paa = PostArchiveAll(settings, objs, urlmapper)
         >>> pprint(paa.urls())
-        ['index.html', 'page2/index.html', 'page3/index.html']
+        ['http://test/', 'http://test/page2/', 'http://test/page3/']
 
         '''
         ret = list()
         def action(post_list, pages):
             '''The action to pass to paginate_action.
             '''
-            ret.append(self.path(page=pages.cur))
+            ret.append(self.urlmapper.url(self.fmt, type='post',
+                page=pages.cur))
         paginate.paginate_action(self.settings.POSTS_PER_PAGE,
                 self._sorted_posts(), action)
         return ret
@@ -198,14 +193,15 @@ class PostArchiveYearly(PostArchiveBase):
         >>> urlmapper.add(components.TYPE('post')/components.YEAR/components.PAGENO)
         >>> pay = PostArchiveYearly(settings, objs, urlmapper)
         >>> pprint(pay.urls())
-        ['2010/index.html', '2010/page2/index.html', '2009/index.html']
+        ['http://test/2010/', 'http://test/2010/page2/', 'http://test/2009/']
 
         '''
         ret = list()
         def action(obj_list, years, pages):
             '''The action to pass to split_paginate_action.
             '''
-            ret.append(self.path(page=pages.cur, year=years.cur[0]))
+            ret.append(self.urlmapper.url(self.fmt, type='post', page=pages.cur,
+                year=years.cur[0]))
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
                 self.key, self._sorted_posts(), action)
         return ret
@@ -305,18 +301,18 @@ class PostArchiveMonthly(PostArchiveBase):
         ...     components.TYPE('post')/components.YEAR/components.MONTH/components.PAGENO)
         >>> pam = PostArchiveMonthly(settings, objs, urlmapper)
         >>> pprint(pam.urls())
-        ['2010/02/index.html',
-         '2010/02/page2/index.html',
-         '2010/01/index.html',
-         '2009/12/index.html']
+        ['http://test/2010/02/',
+         'http://test/2010/02/page2/',
+         'http://test/2010/01/',
+         'http://test/2009/12/']
 
         '''
         ret = list()
         def action(obj_list, months, pages):
             '''The action to pass to split_paginate_action.
             '''
-            ret.append(self.path(page=pages.cur, year=months.cur[0],
-                month=months.cur[1]))
+            ret.append(self.urlmapper.url(self.fmt, type='post', page=pages.cur,
+                year=months.cur[0], month=months.cur[1]))
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
                 self.key, self._sorted_posts(), action)
         return ret
@@ -424,19 +420,19 @@ class PostArchiveDaily(PostArchiveBase):
         ...     c.TYPE('post')/c.YEAR/c.MONTH/c.DAY/c.PAGENO)
         >>> pad = PostArchiveDaily(settings, objs, urlmapper)
         >>> pprint(pad.urls())
-        ['2010/02/02/index.html',
-         '2010/02/02/page2/index.html',
-         '2010/02/01/index.html',
-         '2010/01/01/index.html',
-         '2009/12/31/index.html']
+        ['http://test/2010/02/02/',
+         'http://test/2010/02/02/page2/',
+         'http://test/2010/02/01/',
+         'http://test/2010/01/01/',
+         'http://test/2009/12/31/']
 
         '''
         ret = list()
         def action(obj_list, days, pages):
             '''The action to pass to split_paginate_action.
             '''
-            ret.append(self.path(page=pages.cur, year=days.cur[0],
-                month=days.cur[1], day=days.cur[2]))
+            ret.append(self.urlmapper.url(self.fmt, type='post', page=pages.cur,
+                year=days.cur[0], month=days.cur[1], day=days.cur[2]))
         paginate.split_paginate_action(self.settings.POSTS_PER_PAGE,
                 self.key, self._sorted_posts(), action)
         return ret
@@ -524,19 +520,10 @@ class PostSingle(PostWriter):
 
     fmt = 'html'
 
-    def path(self, post):
-        '''Use the urlmapper to construct a path for the given attributes.
-        '''
-        urlfor = self.urlmapper.urlfor
-        return urlfor(self.fmt, type='post', year=post.published.year,
-                month=post.published.month, day=post.published.day,
-                slug=post.slug)
-
     def url(self, post):
         '''Use the urlmapper to construct a URL for the given attributes.
         '''
-        urlfor = self.urlmapper.urlfor
-        return urlfor(self.fmt, absolute=True, type='post',
+        return self.urlmapper.url(self.fmt, type='post',
                 year=post.published.year, month=post.published.month,
                 day=post.published.day, slug=post.slug)
 
@@ -549,16 +536,16 @@ class PostSingle(PostWriter):
             >>> urlmapper.add(c.TYPE('post')/c.YEAR/c.MONTH/c.DAY/c.SLUG)
             >>> ps = PostSingle(settings, objs, urlmapper)
             >>> pprint(ps.urls())
-            ['2010/02/02/newday2/index.html',
-             '2010/02/02/newday/index.html',
-             '2010/02/01/newmonth/index.html',
-             '2010/01/01/newyear/index.html',
-             '2009/12/31/party/index.html']
+            ['http://test/2010/02/02/newday2/',
+             'http://test/2010/02/02/newday/',
+             'http://test/2010/02/01/newmonth/',
+             'http://test/2010/01/01/newyear/',
+             'http://test/2009/12/31/party/']
 
         '''
         ret = list()
         for post in self._sorted_posts():
-            ret.append(self.path(post=post))
+            ret.append(self.url(post=post))
         return ret
 
     def write(self):
@@ -602,6 +589,8 @@ def _setup(self):
     from firmant.routing import components
     s = {'PARSERS': {'posts': 'firmant.parsers.posts.PostParser'}
         ,'CONTENT_ROOT': 'testdata/pristine'
+        ,'OUTPUT_DIR': 'outputdir'
+        ,'PERMALINK_ROOT': 'http://urlroot'
         ,'POSTS_SUBDIR': 'posts'
         ,'REST_EXTENSION': 'rst'
         ,'POSTS_PER_PAGE': 2
@@ -612,5 +601,6 @@ def _setup(self):
     firmant.parse()
     self.globs['settings'] = settings
     self.globs['objs']  = firmant.objs
-    self.globs['urlmapper'] = URLMapper(root=settings.PERMALINK_ROOT)
+    self.globs['urlmapper'] = URLMapper(settings.OUTPUT_DIR,
+            settings.PERMALINK_ROOT)
     self.globs['components'] = components
