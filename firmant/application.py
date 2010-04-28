@@ -122,11 +122,8 @@ class Firmant(object):
 
     def __init__(self, settings):
         self.settings = settings
-        if hasattr(settings, 'PERMALINK_ROOT'):
-            root = settings.PERMALINK_ROOT
-            self.urlmapper = URLMapper(getattr(settings, 'URLS', None), root)
-        else:
-            self.urlmapper = URLMapper(getattr(settings, 'URLS', None))
+        self.urlmapper = URLMapper(settings.OUTPUT_DIR, settings.PERMALINK_ROOT,
+                getattr(settings, 'URLS', None))
         self.log = logging.getLogger(class_name(self.__class__))
 
         self.objs = dict()

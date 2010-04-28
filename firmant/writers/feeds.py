@@ -45,20 +45,13 @@ class FeedSingle(FeedWriter):
 
     fmt = 'atom'
 
-    def path(self, feed):
-        '''Use the urlmapper to construct a path for the given attributes.
-        '''
-        urlfor = self.urlmapper.urlfor
-        return urlfor(self.fmt, type='feed', slug=feed.slug)
-
     def url(self, feed):
         '''Use the urlmapper to construct a URL for the given attributes.
         '''
-        urlfor = self.urlmapper.urlfor
-        return urlfor(self.fmt, absolute=True, type='feed', slug=feed.slug)
+        return self.urlmapper.url(self.fmt, type='feed', slug=feed.slug)
 
     def urls(self):
-        '''A list of rooted paths that are the path component of URLs.
+        '''A list of URLs that the writer declares it will write to.
 
         Example on testdata/pristine::
 
@@ -66,12 +59,16 @@ class FeedSingle(FeedWriter):
             >>> urlmapper.add(c.TYPE('feed')/c.SLUG)
             >>> fs = FeedSingle(settings, objs, urlmapper)
             >>> pprint(fs.urls())
-            ['bar/index.atom', 'baz/index.atom', 'foo/index.atom', 'quux/index.atom']
+            ['http://urlroot/bar/',
+             'http://urlroot/baz/',
+             'http://urlroot/foo/',
+             'http://urlroot/quux/']
+
 
         '''
         ret = list()
         for feed in self.objs.get('feeds', []):
-            ret.append(self.path(feed=feed))
+            ret.append(self.url(feed))
         ret.sort()
         return ret
 
@@ -134,6 +131,8 @@ def _setup(self):
                     ,'tags': 'firmant.parsers.tags.TagParser'
                     }
         ,'CONTENT_ROOT': 'testdata/pristine'
+        ,'OUTPUT_DIR': 'outputdir'
+        ,'PERMALINK_ROOT': 'http://urlroot'
         ,'POSTS_SUBDIR': 'posts'
         ,'FEEDS_SUBDIR': 'feeds'
         ,'TAGS_SUBDIR': 'feeds'
@@ -148,5 +147,6 @@ def _setup(self):
     firmant.cross_reference()
     self.globs['settings'] = settings
     self.globs['objs']  = firmant.objs
-    self.globs['urlmapper'] = URLMapper()
+    self.globs['urlmapper'] = URLMapper(settings.OUTPUT_DIR,
+            settings.PERMALINK_ROOT)
     self.globs['components'] = components
