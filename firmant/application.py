@@ -175,9 +175,9 @@ class Firmant(object):
                         feed.posts.append(post)
                         post.feeds[i] = feed
                 if not seen:
-                    warning  = _("Tag '%s' referenced but not defined.")
-                    warning %= pfeed
-                    self.log.warning(warning)
+                    error  = _("Feed '%s' referenced but not defined.")
+                    error %= pfeed
+                    self.log.error(error)
                     to_delete.append(i)
             for i in reversed(to_delete):
                 del post.feeds[i]
@@ -248,7 +248,7 @@ class Firmant(object):
             urlfor(fmt, absolute=True, **kwargs)
         globals['recent_posts'] = [(p.title, p.permalink) for p in
                 reversed(sorted(self.objs.get('posts', []),
-                    key=lambda p: (p.published.date(), p.slug)))] \
+                    key=lambda p: (p.published, p.slug)))] \
                 [:self.settings.SIDEBAR_POSTS_LEN]
         # TODO:  Disgusted with this.  I will make a real global object later.
         globals['daily_archives'] = \
@@ -272,6 +272,8 @@ class Firmant(object):
                 [:self.settings.SIDEBAR_ARCHIVES_LEN]
         globals['static_pages'] = [(p.title, p.permalink) for p in
                 sorted(self.objs.get('staticrst', []), key=lambda p: p.title)]
+        globals['atom_feeds'] = [(f.slug, f.permalink) for f in
+                sorted(self.objs.get('feeds', []) , key=lambda f: f.slug)]
 
     def write(self):
         '''Call ``write`` on each writer.
