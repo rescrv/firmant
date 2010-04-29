@@ -116,10 +116,12 @@ def meta_data_directive(func, whitespace=False):
 def copyright_declaration(d, content):
     r'''Interpret the content as a copyright declaration.
 
-        >>> d = dict()
-        >>> copyright_declaration(d, [u'foo', u'bar'])
-        >>> d['copyright']
-        u'foo\nbar'
+    .. doctest::
+
+       >>> d = dict()
+       >>> copyright_declaration(d, [u'foo', u'bar'])
+       >>> d['copyright']
+       u'foo\nbar'
 
     '''
     d['copyright'] = '\n'.join(content)
@@ -128,33 +130,47 @@ def copyright_declaration(d, content):
 def time(d, content):
     '''Interpret the content as a time.
 
-    Using just hours::
+    There are multiple formats that are accepted.
 
-        >>> d = dict()
-        >>> time(d, ['15'])
-        >>> d['time']
-        datetime.time(15, 0)
+    .. todo::
 
-    Using hours and minutes::
+       Make the formats accepted integrate with the localization routines.
 
-        >>> d = dict()
-        >>> time(d, ['15:43'])
-        >>> d['time']
-        datetime.time(15, 43)
+    Using just hours:
 
-    Using hours, minutes, and seconds::
+    .. doctest::
 
-        >>> d = dict()
-        >>> time(d, ['15:43:42'])
-        >>> d['time']
-        datetime.time(15, 43, 42)
+       >>> d = dict()
+       >>> time(d, ['15'])
+       >>> d['time']
+       datetime.time(15, 0)
 
-    ValueError is raised on invalid time::
+    Using hours and minutes:
 
-        >>> d = dict()
-        >>> time(d, ['154342'])
-        Traceback (most recent call last):
-        ValueError: time data '154342' does not match any format.
+    .. doctest::
+
+       >>> d = dict()
+       >>> time(d, ['15:43'])
+       >>> d['time']
+       datetime.time(15, 43)
+
+    Using hours, minutes, and seconds:
+
+    .. doctest::
+
+       >>> d = dict()
+       >>> time(d, ['15:43:42'])
+       >>> d['time']
+       datetime.time(15, 43, 42)
+
+    ValueError is raised on invalid time:
+
+    .. doctest::
+
+       >>> d = dict()
+       >>> time(d, ['154342'])
+       Traceback (most recent call last):
+       ValueError: time data '154342' does not match any format.
 
     '''
     formats = ['%H', '%H:%M', '%H:%M:%S']
@@ -165,19 +181,25 @@ def time(d, content):
 def single_line(d, content, attr='line'):
     '''Interpret the content as a single line.
 
-    Default behavior::
+    A single line of content passed to this function will be stored as `line` in
+    the dictionary `d`.
 
-        >>> d = dict()
-        >>> single_line(d, [u'foobar'])
-        >>> d['line']
-        u'foobar'
+    .. doctest::
 
-    Specifying the attribute to save to::
+       >>> d = dict()
+       >>> single_line(d, [u'foobar'])
+       >>> d['line']
+       u'foobar'
 
-        >>> d = dict()
-        >>> single_line(d, [u'foobar'], 'attr')
-        >>> d['attr']
-        u'foobar'
+    Optionally, the attribute may be specified so that multiple `single_line`
+    directives can co-exist.
+
+    .. doctest::
+
+       >>> d = dict()
+       >>> single_line(d, [u'foobar'], 'attr')
+       >>> d['attr']
+       u'foobar'
 
     '''
     d[attr] = unicode(''.join(content))
@@ -186,26 +208,46 @@ def single_line(d, content, attr='line'):
 def updated(d, content):
     '''Interpret content as a full datetime.
 
-    YYYY-MM-DD HH:MM:SS (time may be omitted)::
+    There are multiple formats that are accepted.
 
-        >>> d = dict()
-        >>> updated(d, ['2009-02-01 14:15:51'])
-        >>> d['updated']
-        datetime.datetime(2009, 2, 1, 14, 15, 51)
+    .. todo::
 
-    MM-DD-YYYY HH:MM:SS (time may be omitted)::
+       Make the formats accepted integrate with the localization routines.
 
-        >>> d = dict()
-        >>> updated(d, ['02-01-2009 14:15:51'])
-        >>> d['updated']
-        datetime.datetime(2009, 2, 1, 14, 15, 51)
+    YYYY-MM-DD HH:MM:SS (time may be omitted):
 
-    ValueError is raised on invalid datetime::
+    .. doctest::
 
-        >>> d = dict()
-        >>> updated(d, ['154342'])
-        Traceback (most recent call last):
-        ValueError: time data '154342' does not match any format.
+       >>> d = dict()
+       >>> updated(d, ['2009-02-01 14:15:51'])
+       >>> d['updated']
+       datetime.datetime(2009, 2, 1, 14, 15, 51)
+
+       >>> updated(d, ['2009-02-01'])
+       >>> d['updated']
+       datetime.datetime(2009, 2, 1, 0, 0)
+
+    MM-DD-YYYY HH:MM:SS (time may be omitted):
+
+    .. doctest::
+
+       >>> d = dict()
+       >>> updated(d, ['02-01-2009 14:15:51'])
+       >>> d['updated']
+       datetime.datetime(2009, 2, 1, 14, 15, 51)
+
+       >>> updated(d, ['02-01-2009'])
+       >>> d['updated']
+       datetime.datetime(2009, 2, 1, 0, 0)
+
+    ValueError is raised on invalid datetime:
+
+    .. doctest::
+
+       >>> d = dict()
+       >>> updated(d, ['154342'])
+       Traceback (most recent call last):
+       ValueError: time data '154342' does not match any format.
 
     '''
     formats = ['%Y-%m-%d', '%Y-%m-%d %H', '%Y-%m-%d %H:%M',
@@ -217,22 +259,24 @@ def updated(d, content):
 def list_element(d, content, attr='element_plural'):
     '''Interpret content as an element in a list.
 
-    MetaData of this type may have several directives, each of which appends a
-    value to list.
+    It returns a list so that the metadata transform can append values to the
+    list.
 
-    It returns a list so that the metadata transforms may simply append tags::
+    .. doctest::
 
-        >>> d = dict()
-        >>> list_element(d, [u'foo'])
-        >>> d['element_plural']
-        [u'foo']
+       >>> d = dict()
+       >>> list_element(d, [u'foo'])
+       >>> d['element_plural']
+       [u'foo']
 
-    An attribute for storing values may be provided::
+    The key in which to store the values may be specified.
 
-        >>> d = dict()
-        >>> list_element(d, [u'foo'], 'attr')
-        >>> d['attr']
-        [u'foo']
+    .. doctest::
+
+       >>> d = dict()
+       >>> list_element(d, [u'foo'], 'attr')
+       >>> d['attr']
+       [u'foo']
 
     '''
     d[attr] = list([''.join(content)])
