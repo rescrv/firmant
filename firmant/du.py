@@ -52,9 +52,11 @@ from docutils import nodes
 from firmant.utils import strptime
 
 
-class MetaDataNode(nodes.Special, nodes.Invisible, nodes.Element):
+class MetaDataNode(nodes.Element, nodes.Invisible, nodes.Special):
     '''The MetaDataNode is a node that holds metadata for later Transforms.
     '''
+
+    # pylint: disable-msg=R0904
 
     def __init__(self, details=None, rawsource='', *children, **attributes):
         nodes.Element.__init__(self, rawsource, *children, **attributes)
@@ -81,6 +83,18 @@ def meta_data_directive(func, whitespace=False):
         has_content = True
 
         def run(self):
+            '''This will be called by the docutils parsing process.
+
+            It calls `func` with an empty dictionary, and the content that falls
+            under the scope of the directive.  It then replaces said content
+            with a :class:`MetaDataNode`.
+
+            If func encounters an error (and wishes to cleanly display it to the
+            user), it should throw a :exc:`ValueError` that should be presented
+            using the `str` function.  The error itself will not be included in
+            the final document.
+
+            '''
             # Raise an error if the directive does not have contents.
             self.assert_has_content()
 
@@ -88,8 +102,8 @@ def meta_data_directive(func, whitespace=False):
             d = dict()
             try:
                 func(d, self.content)
-            except ValueError, e:
-                error = self.state_machine.reporter.error(str(e))
+            except ValueError, ex:
+                self.state_machine.reporter.error(str(ex))
                 return []
 
             # Insert a MetaDataNode with the metadata.
@@ -245,6 +259,10 @@ directives.register_directive('feed',
 
 
 def meta_data_transform(data):
+    '''Create a docutils Transform that is a closure around the `data` dict.
+    '''
+
+    # pylint: disable-msg=R0903
 
     class MetaDataTransform(Transform):
         '''Remove MetaDataNode nodes and set attributes on document.
@@ -252,6 +270,13 @@ def meta_data_transform(data):
         default_priority = 700
 
         def apply(self):
+            '''This will be called by the docutils parsing process.
+
+            The `data` dictionary from :class:`meta_data_transform` will be
+            populated with the items in the `details` attribute of each
+            MetaDataNode encountered.
+
+            '''
             for node in self.document.traverse(MetaDataNode):
                 for key, val in node.details.items():
                     try:
@@ -262,6 +287,7 @@ def meta_data_transform(data):
                         pass
                     data[key] = val
                 node.parent.remove(node)
+
     return MetaDataTransform
 
 
@@ -276,5 +302,7 @@ class MetaDataStandaloneReader(standalone.Reader):
         self.data = data
 
     def get_transforms(self):
+        '''Add a transform for moving the meta data into the data dictionary.
+        '''
         return standalone.Reader.get_transforms(self) + \
             [meta_data_transform(self.data)]
