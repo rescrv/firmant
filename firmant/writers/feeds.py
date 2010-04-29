@@ -45,33 +45,30 @@ class FeedSingle(FeedWriter):
 
     fmt = 'atom'
 
-    def path(self, feed):
-        '''Use the urlmapper to construct a path for the given attributes.
-        '''
-        urlfor = self.urlmapper.urlfor
-        return urlfor(self.fmt, type='feed', slug=feed.slug)
-
     def url(self, feed):
         '''Use the urlmapper to construct a URL for the given attributes.
         '''
-        urlfor = self.urlmapper.urlfor
-        return urlfor(self.fmt, absolute=True, type='feed', slug=feed.slug)
+        return self.urlmapper.url(self.fmt, type='feed', slug=feed.slug)
 
     def urls(self):
-        '''A list of rooted paths that are the path component of URLs.
+        '''A list of URLs that the writer declares it will write to.
 
         Example on testdata/pristine::
 
             >>> c = components
-            >>> urlmapper.add(c.Type('feed')/c.slug)
+            >>> urlmapper.add(c.TYPE('feed')/c.SLUG)
             >>> fs = FeedSingle(settings, objs, urlmapper)
             >>> pprint(fs.urls())
-            ['bar/index.atom', 'baz/index.atom', 'foo/index.atom', 'quux/index.atom']
+            ['http://urlroot/bar/',
+             'http://urlroot/baz/',
+             'http://urlroot/foo/',
+             'http://urlroot/quux/']
+
 
         '''
         ret = list()
         for feed in self.objs.get('feeds', []):
-            ret.append(self.path(feed=feed))
+            ret.append(self.url(feed))
         ret.sort()
         return ret
 
@@ -83,27 +80,26 @@ class FeedSingle(FeedWriter):
             >>> fs = FeedSingle(settings, objs, urlmapper)
             >>> fs.write()
             Feed bar
-              2009/12/31/party
               2010/01/01/newyear
+              2009/12/31/party
             Feed baz
-              2009/12/31/party
-              2010/02/01/newmonth
-              2010/02/02/newday
               2010/02/02/newday2
+              2010/02/02/newday
+              2010/02/01/newmonth
             Feed foo
-              2009/12/31/party
-              2010/01/01/newyear
-              2010/02/02/newday
               2010/02/02/newday2
+              2010/02/02/newday
+              2010/01/01/newyear
             Feed quux
-              2009/12/31/party
               2010/02/01/newmonth
+              2009/12/31/party
 
         '''
         for feed in self.objs.get('feeds', []):
-            feed = copy(feed)
-            feed.posts.sort(key=lambda p: (p.published, p.slug))
-            feed.posts = feed.posts[:10]
+            feed  = copy(feed)
+            posts = [x for x in reversed(sorted(feed.posts,
+                    key=lambda p: (p.updated, p.published.date(), p.slug)))]
+            feed.posts = posts[:self.settings.POSTS_PER_FEED]
             self.render(feed)
 
     def render(self, feed):
@@ -135,11 +131,14 @@ def _setup(self):
                     ,'tags': 'firmant.parsers.tags.TagParser'
                     }
         ,'CONTENT_ROOT': 'testdata/pristine'
+        ,'OUTPUT_DIR': 'outputdir'
+        ,'PERMALINK_ROOT': 'http://urlroot'
         ,'POSTS_SUBDIR': 'posts'
         ,'FEEDS_SUBDIR': 'feeds'
         ,'TAGS_SUBDIR': 'feeds'
         ,'REST_EXTENSION': 'rst'
         ,'POSTS_PER_PAGE': 2
+        ,'POSTS_PER_FEED': 3
         }
     settings               = Settings(s)
     firmant                = Firmant(settings)
@@ -148,5 +147,6 @@ def _setup(self):
     firmant.cross_reference()
     self.globs['settings'] = settings
     self.globs['objs']  = firmant.objs
-    self.globs['urlmapper'] = URLMapper()
+    self.globs['urlmapper'] = URLMapper(settings.OUTPUT_DIR,
+            settings.PERMALINK_ROOT)
     self.globs['components'] = components

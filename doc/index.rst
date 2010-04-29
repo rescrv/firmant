@@ -8,11 +8,7 @@ Welcome to Firmant's documentation!
 
 Contents:
 
-.. autosummary::
-   :toctree: generated
-
-   firmant.du
-   firmant.feeds
+.. automodule:: firmant
 
 Indices and tables
 ==================
@@ -20,4 +16,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

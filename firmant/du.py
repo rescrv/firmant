@@ -26,10 +26,21 @@
 
 
 '''Functions for interacting with the docutils module.
+
+In particular this module makes creation of directives much more straightforward
+and simple.  The :func:`meta_data_directive` produces a
+:class:`MetaDataDirective`.  This result is suitable for registering with
+:func:`docutils.parsers.rst.directives.register_directive`.
+
+Docutils' processing is a multi-step process in which a module is read, parsed,
+transformed, and written.  Each directive created with
+:func:`meta_data_directive` creates a :class:`MetaDataNode` in the document tree
+created by docutils.  When the custom :class:`MetaDataStandaloneReader` class is
+used as the reader for docutils, these nodes that contain metadata are then
+removed from the document tree, and the metadata they store is added to the
+dictionary :class:`MetaDataStandaloneReader` has reference to.
+
 '''
-
-
-__all__ = ['Copyright', 'publish_parts_doc']
 
 
 from docutils.parsers.rst import Directive
@@ -41,9 +52,11 @@ from docutils import nodes
 from firmant.utils import strptime
 
 
-class MetaDataNode(nodes.Special, nodes.Invisible, nodes.Element):
+class MetaDataNode(nodes.Element, nodes.Invisible, nodes.Special):
     '''The MetaDataNode is a node that holds metadata for later Transforms.
     '''
+
+    # pylint: disable-msg=R0904
 
     def __init__(self, details=None, rawsource='', *children, **attributes):
         nodes.Element.__init__(self, rawsource, *children, **attributes)
@@ -70,6 +83,18 @@ def meta_data_directive(func, whitespace=False):
         has_content = True
 
         def run(self):
+            '''This will be called by the docutils parsing process.
+
+            It calls `func` with an empty dictionary, and the content that falls
+            under the scope of the directive.  It then replaces said content
+            with a :class:`MetaDataNode`.
+
+            If func encounters an error (and wishes to cleanly display it to the
+            user), it should throw a :exc:`ValueError` that should be presented
+            using the `str` function.  The error itself will not be included in
+            the final document.
+
+            '''
             # Raise an error if the directive does not have contents.
             self.assert_has_content()
 
@@ -77,8 +102,8 @@ def meta_data_directive(func, whitespace=False):
             d = dict()
             try:
                 func(d, self.content)
-            except ValueError, e:
-                error = self.state_machine.reporter.error(str(e))
+            except ValueError, ex:
+                self.state_machine.reporter.error(str(ex))
                 return []
 
             # Insert a MetaDataNode with the metadata.
@@ -88,13 +113,15 @@ def meta_data_directive(func, whitespace=False):
     return MetaDataDirective
 
 
-def copyright(d, content):
+def copyright_declaration(d, content):
     r'''Interpret the content as a copyright declaration.
 
-        >>> d = dict()
-        >>> copyright(d, [u'foo', u'bar'])
-        >>> d['copyright']
-        u'foo\nbar'
+    .. doctest::
+
+       >>> d = dict()
+       >>> copyright_declaration(d, [u'foo', u'bar'])
+       >>> d['copyright']
+       u'foo\nbar'
 
     '''
     d['copyright'] = '\n'.join(content)
@@ -103,33 +130,47 @@ def copyright(d, content):
 def time(d, content):
     '''Interpret the content as a time.
 
-    Using just hours::
+    There are multiple formats that are accepted.
 
-        >>> d = dict()
-        >>> time(d, ['15'])
-        >>> d['time']
-        datetime.time(15, 0)
+    .. todo::
 
-    Using hours and minutes::
+       Make the formats accepted integrate with the localization routines.
 
-        >>> d = dict()
-        >>> time(d, ['15:43'])
-        >>> d['time']
-        datetime.time(15, 43)
+    Using just hours:
 
-    Using hours, minutes, and seconds::
+    .. doctest::
 
-        >>> d = dict()
-        >>> time(d, ['15:43:42'])
-        >>> d['time']
-        datetime.time(15, 43, 42)
+       >>> d = dict()
+       >>> time(d, ['15'])
+       >>> d['time']
+       datetime.time(15, 0)
 
-    ValueError is raised on invalid time::
+    Using hours and minutes:
 
-        >>> d = dict()
-        >>> time(d, ['154342'])
-        Traceback (most recent call last):
-        ValueError: time data '154342' does not match any format.
+    .. doctest::
+
+       >>> d = dict()
+       >>> time(d, ['15:43'])
+       >>> d['time']
+       datetime.time(15, 43)
+
+    Using hours, minutes, and seconds:
+
+    .. doctest::
+
+       >>> d = dict()
+       >>> time(d, ['15:43:42'])
+       >>> d['time']
+       datetime.time(15, 43, 42)
+
+    ValueError is raised on invalid time:
+
+    .. doctest::
+
+       >>> d = dict()
+       >>> time(d, ['154342'])
+       Traceback (most recent call last):
+       ValueError: time data '154342' does not match any format.
 
     '''
     formats = ['%H', '%H:%M', '%H:%M:%S']
@@ -140,19 +181,25 @@ def time(d, content):
 def single_line(d, content, attr='line'):
     '''Interpret the content as a single line.
 
-    Default behavior::
+    A single line of content passed to this function will be stored as `line` in
+    the dictionary `d`.
 
-        >>> d = dict()
-        >>> single_line(d, [u'foobar'])
-        >>> d['line']
-        u'foobar'
+    .. doctest::
 
-    Specifying the attribute to save to::
+       >>> d = dict()
+       >>> single_line(d, [u'foobar'])
+       >>> d['line']
+       u'foobar'
 
-        >>> d = dict()
-        >>> single_line(d, [u'foobar'], 'attr')
-        >>> d['attr']
-        u'foobar'
+    Optionally, the attribute may be specified so that multiple `single_line`
+    directives can co-exist.
+
+    .. doctest::
+
+       >>> d = dict()
+       >>> single_line(d, [u'foobar'], 'attr')
+       >>> d['attr']
+       u'foobar'
 
     '''
     d[attr] = unicode(''.join(content))
@@ -161,26 +208,46 @@ def single_line(d, content, attr='line'):
 def updated(d, content):
     '''Interpret content as a full datetime.
 
-    YYYY-MM-DD HH:MM:SS (time may be omitted)::
+    There are multiple formats that are accepted.
 
-        >>> d = dict()
-        >>> updated(d, ['2009-02-01 14:15:51'])
-        >>> d['updated']
-        datetime.datetime(2009, 2, 1, 14, 15, 51)
+    .. todo::
 
-    MM-DD-YYYY HH:MM:SS (time may be omitted)::
+       Make the formats accepted integrate with the localization routines.
 
-        >>> d = dict()
-        >>> updated(d, ['02-01-2009 14:15:51'])
-        >>> d['updated']
-        datetime.datetime(2009, 2, 1, 14, 15, 51)
+    YYYY-MM-DD HH:MM:SS (time may be omitted):
 
-    ValueError is raised on invalid datetime::
+    .. doctest::
 
-        >>> d = dict()
-        >>> updated(d, ['154342'])
-        Traceback (most recent call last):
-        ValueError: time data '154342' does not match any format.
+       >>> d = dict()
+       >>> updated(d, ['2009-02-01 14:15:51'])
+       >>> d['updated']
+       datetime.datetime(2009, 2, 1, 14, 15, 51)
+
+       >>> updated(d, ['2009-02-01'])
+       >>> d['updated']
+       datetime.datetime(2009, 2, 1, 0, 0)
+
+    MM-DD-YYYY HH:MM:SS (time may be omitted):
+
+    .. doctest::
+
+       >>> d = dict()
+       >>> updated(d, ['02-01-2009 14:15:51'])
+       >>> d['updated']
+       datetime.datetime(2009, 2, 1, 14, 15, 51)
+
+       >>> updated(d, ['02-01-2009'])
+       >>> d['updated']
+       datetime.datetime(2009, 2, 1, 0, 0)
+
+    ValueError is raised on invalid datetime:
+
+    .. doctest::
+
+       >>> d = dict()
+       >>> updated(d, ['154342'])
+       Traceback (most recent call last):
+       ValueError: time data '154342' does not match any format.
 
     '''
     formats = ['%Y-%m-%d', '%Y-%m-%d %H', '%Y-%m-%d %H:%M',
@@ -192,50 +259,54 @@ def updated(d, content):
 def list_element(d, content, attr='element_plural'):
     '''Interpret content as an element in a list.
 
-    MetaData of this type may have several directives, each of which appends a
-    value to list.
+    It returns a list so that the metadata transform can append values to the
+    list.
 
-    It returns a list so that the metadata transforms may simply append tags::
+    .. doctest::
 
-        >>> d = dict()
-        >>> list_element(d, [u'foo'])
-        >>> d['element_plural']
-        [u'foo']
+       >>> d = dict()
+       >>> list_element(d, [u'foo'])
+       >>> d['element_plural']
+       [u'foo']
 
-    An attribute for storing values may be provided::
+    The key in which to store the values may be specified.
 
-        >>> d = dict()
-        >>> list_element(d, [u'foo'], 'attr')
-        >>> d['attr']
-        [u'foo']
+    .. doctest::
+
+       >>> d = dict()
+       >>> list_element(d, [u'foo'], 'attr')
+       >>> d['attr']
+       [u'foo']
 
     '''
     d[attr] = list([''.join(content)])
 
 
-_Copyright = meta_data_directive(copyright, whitespace=True)
-directives.register_directive('copyright', _Copyright)
+directives.register_directive('copyright',
+    meta_data_directive(copyright_declaration, whitespace=True))
 
-_Time = meta_data_directive(time)
-directives.register_directive('time', _Time)
+directives.register_directive('time', meta_data_directive(time))
 
-_Timezone = meta_data_directive(lambda d, c: single_line(d, c, 'timezone'))
-directives.register_directive('timezone', _Timezone)
+directives.register_directive('timezone',
+    meta_data_directive(lambda d, c: single_line(d, c, 'timezone')))
 
-_Author = meta_data_directive(lambda d, c: single_line(d, c, 'author'))
-directives.register_directive('author', _Author)
+directives.register_directive('author',
+    meta_data_directive(lambda d, c: single_line(d, c, 'author')))
 
-_Updated = meta_data_directive(updated)
-directives.register_directive('updated', _Updated)
+directives.register_directive('updated', meta_data_directive(updated))
 
-_Tag = meta_data_directive(lambda d, c: list_element(d, c, 'tags'))
-directives.register_directive('tag', _Tag)
+directives.register_directive('tag',
+    meta_data_directive(lambda d, c: list_element(d, c, 'tags')))
 
-_Feed = meta_data_directive(lambda d, c: list_element(d, c, 'feeds'))
-directives.register_directive('feed', _Feed)
+directives.register_directive('feed',
+    meta_data_directive(lambda d, c: list_element(d, c, 'feeds')))
 
 
 def meta_data_transform(data):
+    '''Create a docutils Transform that is a closure around the `data` dict.
+    '''
+
+    # pylint: disable-msg=R0903
 
     class MetaDataTransform(Transform):
         '''Remove MetaDataNode nodes and set attributes on document.
@@ -243,6 +314,13 @@ def meta_data_transform(data):
         default_priority = 700
 
         def apply(self):
+            '''This will be called by the docutils parsing process.
+
+            The `data` dictionary from :class:`meta_data_transform` will be
+            populated with the items in the `details` attribute of each
+            MetaDataNode encountered.
+
+            '''
             for node in self.document.traverse(MetaDataNode):
                 for key, val in node.details.items():
                     try:
@@ -253,6 +331,7 @@ def meta_data_transform(data):
                         pass
                     data[key] = val
                 node.parent.remove(node)
+
     return MetaDataTransform
 
 
@@ -267,5 +346,7 @@ class MetaDataStandaloneReader(standalone.Reader):
         self.data = data
 
     def get_transforms(self):
+        '''Add a transform for moving the meta data into the data dictionary.
+        '''
         return standalone.Reader.get_transforms(self) + \
             [meta_data_transform(self.data)]

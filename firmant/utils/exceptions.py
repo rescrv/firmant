@@ -33,73 +33,107 @@ import os
 import tempfile
 import traceback
 
-from firmant.i18n import _
-
 
 def log_uncaught_exceptions(func, log, message, save_traceback=False):
     '''Catch and log exceptions of ``func``.
 
-    Returns True if the function succeeded without throwing an exception.
+    Returns True if the function succeeds without throwing an exception.
 
-    A function for safely calling code that may throw exceptions and logging any
-    exceptions thrown.  Optionally it will save the traceback to a file::
+    `message` will be written to `log` if an exception is thrown, and False is
+    returned.  If save_trackback is true, the traceback will be saved to a
+    temporary file.
 
-        >>> def raises_error():
-        ...     raise RuntimeError('Intentionally thrown')
-        >>> log_uncaught_exceptions(raises_error, Mock('log'), 'error!')
-        Called log.error('error!')
-        Called log.info('traceback not saved')
-        False
+    In the normal case, the `func` will be called and True will be returned.
 
-    If ``save_traceback`` is True, it will save the file to one created with
-    ``tempfile.mkstemp``.
+    .. doctest::
+       :hide:
 
-        >>> from minimock import restore
-        >>> import tempfile
-        >>> f, path = tempfile.mkstemp()
-        >>> tempfile.mkstemp = Mock('mkstemp')
-        >>> tempfile.mkstemp.mock_returns = (f, path)
-        >>> def raises_error():
-        ...     raise RuntimeError('Intentionally thrown')
-        >>> log_uncaught_exceptions(raises_error, Mock('log'), 'error!', True) #doctest: +ELLIPSIS
-        Called log.error('error!')
-        Called mkstemp(prefix='firmant', text=True)
-        Called log.error(...'traceback saved to /...')
-        False
-        >>> os.unlink(path)
-        >>> restore()
+       >>> log = Mock('log')
+
+    .. doctest::
+
+       >>> def wont_raise_error():
+       ...     print 'Success!'
+       >>> log_uncaught_exceptions(wont_raise_error, log, 'error!')
+       Success!
+       True
+
+    When `func` raises an error, the error will be caught, and `message` will be
+    written to log as an error.
+
+    .. doctest::
+
+       >>> def raises_error():
+       ...     raise RuntimeError('Intentionally thrown')
+       >>> log_uncaught_exceptions(raises_error, log, 'error!')
+       Called log.error('error!')
+       Called log.info('traceback not saved')
+       False
+
+    If `save_traceback` is True, then a temporary file created with
+    `tempfile.mkstemp` will be used to store the traceback.
+
+    .. doctest::
+       :hide:
+
+       >>> import tempfile
+       >>> f, path = tempfile.mkstemp()
+       >>> tempfile.mkstemp = Mock('mkstemp')
+       >>> tempfile.mkstemp.mock_returns = (f, path)
+
+    .. doctest::
+
+       >>> log_uncaught_exceptions(raises_error, log, 'error!', True) #doctest: +ELLIPSIS
+       Called log.error('error!')
+       Called mkstemp(prefix='firmant', text=True)
+       Called log.error('...traceback saved to /...')
+       False
+
+    .. doctest::
+       :hide:
+
+       >>> os.unlink(path)
+       >>> from minimock import restore
+       >>> restore()
 
     If an exception is thrown while saving to the file, it will warn about
-    the potential for infinite recursion and stop::
+    the potential for infinite recursion and stop:
 
-        >>> from minimock import restore
-        >>> import tempfile
-        >>> tempfile.mkstemp = Mock('mkstemp')
-        >>> tempfile.mkstemp.mock_raises = ValueError
-        >>> def raises_error():
-        ...     raise RuntimeError('Intentionally thrown')
-        >>> log_uncaught_exceptions(raises_error, Mock('log'), 'error!', True)
-        Called log.error('error!')
-        Called mkstemp(prefix='firmant', text=True)
-        Called log.error("it's turtles all the way down")
-        False
-        >>> restore()
+    .. doctest::
+       :hide:
+
+       >>> tempfile.mkstemp = Mock('mkstemp')
+       >>> tempfile.mkstemp.mock_raises = ValueError
+
+    .. doctest::
+
+       >>> log_uncaught_exceptions(raises_error, log, 'error!', True)
+       Called log.error('error!')
+       Called mkstemp(prefix='firmant', text=True)
+       Called log.error("it's turtles all the way down")
+       False
+
+    .. doctest::
+       :hide:
+
+       >>> from minimock import restore
+       >>> restore()
 
     '''
     try:
         func()
+    # pylint: disable-msg=W0702
     except:
         log.error(message)
         if save_traceback:
             try:
-                t, path = tempfile.mkstemp(prefix='firmant', text=True)
-                t = os.fdopen(t, 'w+')
-                traceback.print_exc(file=t)
-                t.flush()
-                t.close()
+                tmp, path = tempfile.mkstemp(prefix='firmant', text=True)
+                tmp = os.fdopen(tmp, 'w+')
+                traceback.print_exc(file=tmp)
+                tmp.flush()
+                tmp.close()
                 log.error(_('traceback saved to %s') % path)
             except:
-                import sys
                 log.error(_("it's turtles all the way down"))
         else:
             log.info(_('traceback not saved'))

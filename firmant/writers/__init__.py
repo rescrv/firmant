@@ -36,7 +36,6 @@ import abc
 import collections
 import logging
 
-from firmant.i18n import _
 from firmant.utils import class_name
 
 
