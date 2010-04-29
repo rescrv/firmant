@@ -4,6 +4,8 @@ All Shipped Modules
 .. autosummary::
    :toctree: generated
 
+   firmant.du
+   firmant.paginate
    firmant.routing
    firmant.routing.components
    firmant.utils
