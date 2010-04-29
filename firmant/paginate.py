@@ -36,13 +36,15 @@ class Paginated(object):
     ``cur``, ``next``.  Instances are just nice containers in place of
     3-tuples::
 
-        >>> p = Paginated(1, 2, 3)
-        >>> p.prev
-        1
-        >>> p.cur
-        2
-        >>> p.next
-        3
+    .. doctest::
+
+       >>> p = Paginated(1, 2, 3)
+       >>> p.prev
+       1
+       >>> p.cur
+       2
+       >>> p.next
+       3
 
     '''
 
@@ -73,25 +75,30 @@ class Paginated(object):
 def split_list_action(key_func, obj_list, action):
     '''Split obj_list at boundaries determined by key_func and call action.
 
-    At each point the value of key_func changes, split obj_list.  Then for each
-    new list, call action with the list, and the key values for prev/cur/next.
+    At each point the return value of `key_func(obj)` changes, split `obj_list`.
+    Then for each newly created list, call `action` with the list, and the key
+    values for prev/cur/next.
 
-    The function's behavior is undefined if key_func ever returns None.
+    The function's behavior is undefined if `key_func` ever returns `None` (If
+    you're tempted to return `None` anyways, read this statement as "Your code
+    will break if `key_func` ever returns `None`).
 
-        >>> def parity(x):
-        ...     return x % 2
-        >>> def action(obj_list, groups):
-        ...     print obj_list, groups.prev, groups.cur, groups.next
-        >>> split_list_action(parity, [1, 3, 5, 2, 4, 7, 8, 9, 10], action)
-        [1, 3, 5] None 1 0
-        [2, 4] 1 0 1
-        [7] 0 1 0
-        [8] 1 0 1
-        [9] 0 1 0
-        [10] 1 0 None
-        >>> split_list_action(parity, [], action)
-        >>> split_list_action(parity, [1], action)
-        [1] None 1 None
+    .. doctest::
+
+       >>> def parity(x):
+       ...     return x % 2
+       >>> def action(obj_list, groups):
+       ...     print obj_list, groups.prev, groups.cur, groups.next
+       >>> split_list_action(parity, [1, 3, 5, 2, 4, 7, 8, 9, 10], action)
+       [1, 3, 5] None 1 0
+       [2, 4] 1 0 1
+       [7] 0 1 0
+       [8] 1 0 1
+       [9] 0 1 0
+       [10] 1 0 None
+       >>> split_list_action(parity, [], action)
+       >>> split_list_action(parity, [1], action)
+       [1] None 1 None
 
     '''
     cur_list = obj_list
@@ -147,32 +154,34 @@ def paginate_action(num_per_page, obj_list, action):
 
 
 def split_paginate_action(num_per_page, key_func, obj_list, action):
-    '''Split obj_list with split_list_action; then use paginate_action.
+    '''Split `obj_list` with `split_list_action`; then use `paginate_action`.
 
-    The lists will be split according to split_list_action.  Each of the
-    resulting lists will then be passed to paginate_action.  The result will be
-    the action callable will be called with arguments for the objects, the
+    The lists will be split according to `split_list_action`.  Each of the
+    resulting lists will then be passed to `paginate_action`.  The result will be
+    the `action` callable will be called with a list of objects, the
     prev/cur/next keys from split_list_action, and the prev/cur/next keys from
-    paginate_action (total of 7 args).
+    paginate_action (a total of 7 arguments).
 
-        >>> def parity(x):
-        ...     return x % 2
-        >>> def action(obj_list, groups, pages):
-        ...     print obj_list, groups.prev, groups.cur, groups.next,
-        ...     print pages.prev, pages.cur, pages.next
-        >>> split_paginate_action(2, parity, [1, 3, 5, 7, 9, 2, 4, 7, 9, 10], action)
-        [1, 3] None 1 0 None 1 2
-        [5, 7] None 1 0 1 2 3
-        [9] None 1 0 2 3 None
-        [2, 4] 1 0 1 None 1 None
-        [7, 9] 0 1 0 None 1 None
-        [10] 1 0 None None 1 None
-        >>> split_paginate_action(2, parity, [], action)
-        >>> split_paginate_action(2, parity, [1], action)
-        [1] None 1 None None 1 None
-        >>> split_paginate_action(2, parity, [1, 2], action)
-        [1] None 1 0 None 1 None
-        [2] 1 0 None None 1 None
+    .. doctest::
+
+       >>> def parity(x):
+       ...     return x % 2
+       >>> def action(obj_list, groups, pages):
+       ...     print obj_list, groups.prev, groups.cur, groups.next,
+       ...     print pages.prev, pages.cur, pages.next
+       >>> split_paginate_action(2, parity, [1, 3, 5, 7, 9, 2, 4, 7, 9, 10], action)
+       [1, 3] None 1 0 None 1 2
+       [5, 7] None 1 0 1 2 3
+       [9] None 1 0 2 3 None
+       [2, 4] 1 0 1 None 1 None
+       [7, 9] 0 1 0 None 1 None
+       [10] 1 0 None None 1 None
+       >>> split_paginate_action(2, parity, [], action)
+       >>> split_paginate_action(2, parity, [1], action)
+       [1] None 1 None None 1 None
+       >>> split_paginate_action(2, parity, [1, 2], action)
+       [1] None 1 0 None 1 None
+       [2] 1 0 None None 1 None
 
     '''
     def new_act_split_list(obj_list, groups):
