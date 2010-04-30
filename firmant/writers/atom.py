@@ -103,7 +103,6 @@ class AtomFeedSingle(FeedSingle):
 
         path = self.urlmapper.path('atom', type='feed', slug=feed_obj.slug)
         data = etree.tostring(feed)
-        path = os.path.join(self.settings.OUTPUT_DIR, path)
         f    = paths.create_or_truncate(path)
         f.write(data.encode('utf-8'))
         f.flush()

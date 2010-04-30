@@ -68,14 +68,13 @@ class StaticWriter(Writer):
         '''Write a parsed feed to the filesystem.
         '''
         for static in self.objs.get('static', []):
-            relpath = self.urlmapper.path(None, static=static.relpath)
-            abspath = os.path.join(self.settings.OUTPUT_DIR, relpath)
+            path = self.urlmapper.path(None, static=static.relpath)
             try:
-                os.makedirs(os.path.dirname(abspath))
+                os.makedirs(os.path.dirname(path))
             except OSError, e:
                 if e.errno != 17:
                     raise
-            shutil.copy2(static.fullpath, abspath)
+            shutil.copy2(static.fullpath, path)
 
 
 class StaticRstWriter(Writer):
