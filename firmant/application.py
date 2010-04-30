@@ -243,29 +243,28 @@ class Firmant(object):
         '''Create a dictionary of globals to be added to rendering contexts.
         '''
         self.objs['globals'] = globals = dict()
-        urlfor = self.urlmapper.urlfor
-        globals['urlfor'] = lambda fmt, **kwargs: \
-            urlfor(fmt, absolute=True, **kwargs)
+        url = self.urlmapper.url
+        globals['urlfor'] = url
         globals['recent_posts'] = [(p.title, p.permalink) for p in
                 reversed(sorted(self.objs.get('posts', []),
                     key=lambda p: (p.published, p.slug)))] \
                 [:self.settings.SIDEBAR_POSTS_LEN]
         # TODO:  Disgusted with this.  I will make a real global object later.
         globals['daily_archives'] = \
-                [(datetime.date(y, m, d), urlfor('html', absolute=True,
+                [(datetime.date(y, m, d), url('html',
                     type='post', year=y, month=m, day=d, page=1))
                 for y, m, d in reversed(sorted(set([(p.published.year,
                     p.published.month, p.published.day)
                     for p in self.objs.get('posts', [])])))] \
                 [:self.settings.SIDEBAR_ARCHIVES_LEN]
         globals['monthly_archives'] = \
-                [(datetime.date(y, m, 1), urlfor('html', absolute=True,
+                [(datetime.date(y, m, 1), url('html',
                     type='post', year=y, month=m, page=1))
                 for y, m in reversed(sorted(set([(p.published.year, p.published.month)
                     for p in self.objs.get('posts', [])])))] \
                 [:self.settings.SIDEBAR_ARCHIVES_LEN]
         globals['yearly_archives'] = \
-                [(datetime.date(y, 1, 1), urlfor('html', absolute=True,
+                [(datetime.date(y, 1, 1), url('html',
                     type='post', year=y, page=1))
                 for y in reversed(sorted(set([p.published.year
                     for p in self.objs.get('posts', [])])))] \
