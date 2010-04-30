@@ -50,3 +50,45 @@ best practices that should be observed include:
    the current chunk.
 
 '''
+
+
+import abc
+
+
+# pylint: disable-msg=R0903
+class AbstractChunk(object):
+    '''An :class:`AbstractChunk` defines the interface for all chunks.
+    '''
+
+    __metaclass__ = abc.ABCMeta
+
+    def __call__(self, environment, objects):
+        '''Execute the chunk with the state from environment/objects.
+
+        The return value should be a tuple `(new_env, new_objs, new_chunks)`.
+        The value of `new_env` will replace `environment` in calls to future
+        chunks.  The value of `new_objs` will replace `objects` in future
+        calls.  New chunks will be added to list of chunks to execute according
+        to the scheduling order.
+
+        '''
+    # TODO:  Proper decorator syntax http://bugs.python.org/issue8507
+    __old_doc__ = __call__.__doc__
+    __call__ = abc.abstractmethod(__call__)
+    # pylint: disable-msg=W0622
+    __call__.__doc__ = __old_doc__
+    del __old_doc__
+
+    def scheduling_order(self):
+        ''':prop:`scheduling_order` is a positive integer that determines chunk
+        execution order.
+
+        :prop:`scheduling_order` uses normal integer comparison.  Chunks of the
+        same priority will be executed in arbitrary order.
+
+        '''
+    # TODO:  Proper decorator syntax http://bugs.python.org/issue8507
+    __old_doc__ = scheduling_order.__doc__
+    scheduling_order = abc.abstractproperty(scheduling_order)
+    scheduling_order.__doc__ = __old_doc__
+    del __old_doc__
