@@ -24,6 +24,7 @@ if __name__ == '__main__':
     suite = unittest.TestSuite()
 
     modules = ['firmant.application',
+               'firmant.chunks',
                'firmant.du',
                'firmant.paginate',
                'firmant.parsers',

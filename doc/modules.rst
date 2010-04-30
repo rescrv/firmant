@@ -5,6 +5,7 @@ All Shipped Modules
    :toctree: generated
 
    firmant.du
+   firmant.chunks
    firmant.paginate
    firmant.routing
    firmant.routing.components
