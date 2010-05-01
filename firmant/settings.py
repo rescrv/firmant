@@ -55,7 +55,7 @@ WRITERS = ['firmant.writers.j2.Jinja2PostArchiveAll'
           ,'firmant.writers.j2.Jinja2PostArchiveDaily'
           ,'firmant.writers.j2.Jinja2PostSingle'
           ,'firmant.writers.j2.Jinja2StaticRstSingle'
-          ,'firmant.writers.atom.AtomFeedSingle'
+#          ,'firmant.writers.atom.AtomFeedSingle'
           ,'firmant.writers.static.StaticWriter'
           ]
 POSTS_PER_PAGE = 10

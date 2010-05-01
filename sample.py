@@ -50,7 +50,6 @@ def build(output, root):
     f.cross_reference()
     f.setup_writers()
     f.check_url_conflicts()
-    f.create_permalinks()
     f.write()
 
 build('preview', os.path.abspath('preview'))

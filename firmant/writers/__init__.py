@@ -36,6 +36,7 @@ import abc
 import collections
 import logging
 
+from firmant.chunks import AbstractChunk
 from firmant.utils import class_name
 
 
@@ -79,3 +80,35 @@ class Writer(object):
             self.log.critical(_('``OUTPUT_DIR`` not defined in settings.'))
             return False
         return True
+
+
+class WriterChunkURLs(AbstractChunk):
+    '''A simple wrapper to ease the transition to chunks.
+    '''
+
+    def __init__(self, writer):
+        self.writer = writer
+
+    def __call__(self, environment, objects):
+        newenv = environment.copy()
+        newobj = objects.copy()
+        newenv['urls'][class_name(self.writer.__class__)] = self.writer.urls()
+        return (newenv, newobj, [WriterChunkWrite(self.writer)])
+
+    scheduling_order = 500
+
+class WriterChunkWrite(AbstractChunk):
+    '''A simple wrapper to ease the transition to chunks.
+    '''
+
+    def __init__(self, writer):
+        self.writer = writer
+
+    def __call__(self, environment, objects):
+        newenv = environment.copy()
+        newobj = objects.copy()
+        self.writer.objs = objects
+        self.writer.write()
+        return (newenv, newobj, [])
+
+    scheduling_order = 900
