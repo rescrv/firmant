@@ -36,6 +36,7 @@ import datetime
 
 from pysettings.modules import get_module
 
+from firmant.chunks import AbstractChunk
 from firmant.routing import URLMapper
 from firmant.writers import WriterChunkURLs
 from firmant.utils import class_name
@@ -97,8 +98,7 @@ class Firmant(object):
          [<firmant.parsers.RstObject object at 0x...>,
           <firmant.parsers.RstObject object at 0x...>])
         >>> f.setup_writers()
-        >>> f.check_url_conflicts()
-        >>> f.write()
+        >>> f()
 
     '''
 
@@ -113,6 +113,9 @@ class Firmant(object):
         self.chunks = list()
         self.env    = dict()
 
+        self.chunks.append(CheckURLConflicts())
+        self.chunks.append(SetupURLConflicts())
+
         # Setup parsers
         self.parsers = dict()
         for key, parser in settings.PARSERS.items():
@@ -120,6 +123,17 @@ class Firmant(object):
             mod = get_module(mod)
             parser = getattr(mod, attr)
             self.parsers[key] = parser(self.settings)
+
+    def __call__(self):
+        while len(self.chunks):
+            self.chunks.sort(key = lambda x: x.scheduling_order)
+            chunk = self.chunks[0]
+            self.env, self.objs, newchunks = chunk(self.env, self.objs)
+            self.chunks = self.chunks[1:]
+            for c in newchunks:
+                if c.scheduling_order <= chunk.scheduling_order:
+                    error = _('New chunk violates scheduling_order constraint')
+                    self.log.error(error)
 
     def parse(self):
         '''Call parse on each configured parser.
@@ -183,30 +197,6 @@ class Firmant(object):
             self.chunks.append(WriterChunkURLs(writer(self.settings, self.objs,
                 self.urlmapper)))
 
-    def check_url_conflicts(self):
-        '''Create instances of writer classes.
-        '''
-        news = []
-        self.env['urls'] = {}
-        for chunk in self.chunks:
-            if chunk.scheduling_order == 500:
-                self.env, self.objs, newchunks = chunk(self.env, self.objs)
-                news += newchunks
-        self.chunks += news
-        urls = dict()
-        for key, inst in self.env['urls'].items():
-            for url in inst:
-                if url is None:
-                    warning  = _("Writer %s's URLs incompletely defined.")
-                    warning %= key
-                    self.log.warning(warning)
-                elif url in urls:
-                    warning  = _('Writers %s and %s conflict over %s.')
-                    warning %= urls[url], key, url
-                    self.log.warning(warning)
-                else:
-                    urls[url] = key
-
     def create_globals(self):
         '''Create a dictionary of globals to be added to rendering contexts.
         '''
@@ -242,12 +232,44 @@ class Firmant(object):
         #globals['atom_feeds'] = [(f.slug, f.permalink) for f in
         #        sorted(self.objs.get('feeds', []) , key=lambda f: f.slug)]
 
-    def write(self):
-        '''Call ``write`` on each writer.
+
+class SetupURLConflicts(AbstractChunk):
+    '''A chunk that sets up the empty dictionary for URL conflicts.
+    '''
+
+    def __call__(self, environment, objects):
+        '''Ensure that the sets of URLs are disjoint.
         '''
-        for chunk in self.chunks:
-            if chunk.scheduling_order == 900:
-                chunk(self.env, self.objs)
+        environment = environment.copy()
+        environment['urls'] = dict()
+        return environment, objects, []
+
+    scheduling_order = 499
+
+
+class CheckURLConflicts(AbstractChunk):
+    '''A chunk that warns of writers with conflicting URLs.
+    '''
+
+    def __call__(self, environment, objects):
+        '''Ensure that the sets of URLs are disjoint.
+        '''
+        urls = dict()
+        for key, inst in environment['urls'].items():
+            for url in inst:
+                if url is None:
+                    warning  = _("Writer %s's URLs incompletely defined.")
+                    warning %= key
+                    self.log.warning(warning)
+                elif url in urls:
+                    warning  = _('Writers %s and %s conflict over %s.')
+                    warning %= urls[url], key, url
+                    self.log.warning(warning)
+                else:
+                    urls[url] = key
+        return (environment, objects, [])
+
+    scheduling_order = 600
 
 
 def _setup(self):
