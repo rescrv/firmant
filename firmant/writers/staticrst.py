@@ -25,7 +25,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-'''Copy static objects into their proper place in the output.
+'''Render staticrst pages as HTML.
 '''
 
 
@@ -35,16 +35,16 @@ import shutil
 from firmant.writers import Writer
 
 
-class StaticWriter(Writer):
+class StaticRstWriter(Writer):
     '''Parse the posts into single feed documents.
     '''
 
-    permalinks_for = 'static'
+    fmt = 'html'
 
     def url(self, static):
         '''Use the urlmapper to construct a URL for the given attributes.
         '''
-        return self.urlmapper.url(None, static=static.relpath)
+        return self.urlmapper.url(self.fmt, type='staticrst', path=static.path)
 
     def urls(self):
         '''A list of rooted paths that are the path component of URLs.
@@ -52,30 +52,47 @@ class StaticWriter(Writer):
         Example on testdata/pristine::
 
             >>> from firmant import routing
-            >>> urlmapper.add(routing.SinglePathComponent('static', str))
-            >>> sw = StaticWriter(settings, objs, urlmapper)
-            >>> pprint(sw.urls())
-            ['http://test/images/88x31.png']
+            >>> c = components
+            >>> urlmapper.add(c.TYPE('staticrst')/c.PATH)
+            >>> srw = StaticRstWriter(settings, objs, urlmapper)
+            >>> pprint(srw.urls())
+            ['http://test/about/', 'http://test/empty/', 'http://test/links/']
 
         '''
         ret = list()
-        for static in self.objs.get('static', []):
+        for static in self.objs.get('staticrst', []):
             ret.append(self.url(static))
         ret.sort()
         return ret
 
     def write(self):
-        '''Write a parsed feed to the filesystem.
+        '''Write the parsed posts to the filesystem.
+
+        Example on testdata/pristine::
+
+            >>> srw = StaticRstWriter(settings, objs, urlmapper)
+            >>> srw.write() #doctest: +ELLIPSIS
+            Static page  --- 
+            Static page About --- <p>Firmant is...</p>
+            <BLANKLINE>
+            Static page Links --- <ul class="simple">
+            <li>...</li>
+            <li>...</li>
+            </ul>
+            <BLANKLINE>
+
         '''
-        for static in self.objs.get('static', []):
-            relpath = self.urlmapper.path(None, static=static.relpath)
-            abspath = os.path.join(self.settings.OUTPUT_DIR, relpath)
-            try:
-                os.makedirs(os.path.dirname(abspath))
-            except OSError, e:
-                if e.errno != 17:
-                    raise
-            shutil.copy2(static.fullpath, abspath)
+        pages = self.objs['staticrst']
+        pages.sort(key=lambda s: s.title)
+        for page in pages:
+            self.render(page)
+
+    def render(self, static):
+        '''Render the static page.
+
+        This should be overridden in child classes.
+        '''
+        print 'Static page %s --- %s' % (static.title, static.content)
 
 
 def _setup(self):

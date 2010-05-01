@@ -38,6 +38,7 @@ from firmant import utils
 from firmant.utils import paths
 from firmant.writers import posts
 from firmant.writers import static
+from firmant.writers import staticrst
 from firmant.writers import Writer
 
 
@@ -317,7 +318,7 @@ class Jinja2PostSingle(Jinja2Writer, posts.PostSingle):
         self.render_to_file(path, template, context)
 
 
-class Jinja2StaticRstSingle(Jinja2Writer, static.StaticRstWriter):
+class Jinja2StaticRstSingle(Jinja2Writer, staticrst.StaticRstWriter):
     '''Render static rst using Jinja2 templates.
     '''
 
@@ -341,8 +342,8 @@ class Jinja2StaticRstSingle(Jinja2Writer, static.StaticRstWriter):
         path = self.urlmapper.path('html', type='staticrst', path=static.path)
         template = 'flat.html'
         context = dict()
-        context['path']        = static.path
-        context['page']        = static
+        context['path'] = static.path
+        context['page'] = static
         self.render_to_file(path, template, context)
 
 
