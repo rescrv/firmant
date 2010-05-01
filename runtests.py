@@ -44,6 +44,9 @@ if __name__ == '__main__':
                'firmant.writers.j2'
               ]
 
+    if len(sys.argv[1:]) > 0:
+        modules = sys.argv[1:]
+
     for module in modules:
         mod = get_module(module)
         args = {}
