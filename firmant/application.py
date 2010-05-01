@@ -195,8 +195,11 @@ class Firmant(object):
             # from foo import Quux
             # really imports the class foo.bar.baz.Quux as Quux was imported
             # into the foo namespace.
-            self.chunks.append(WriterChunkURLs(writer(self.settings, self.objs,
-                self.urlmapper)))
+            if issubclass(writer, AbstractChunk):
+                self.chunks.append(writer(self.env, self.objs))
+            else:
+                self.chunks.append(WriterChunkURLs(writer(self.settings, self.objs,
+                    self.urlmapper)))
 
     def create_globals(self):
         '''Create a dictionary of globals to be added to rendering contexts.
