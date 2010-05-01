@@ -112,6 +112,7 @@ class Firmant(object):
         self.writers = dict()
         self.chunks = list()
         self.env    = dict()
+        self.env['log'] = self.log
 
         self.chunks.append(CheckURLConflicts())
         self.chunks.append(SetupURLConflicts())
@@ -260,11 +261,11 @@ class CheckURLConflicts(AbstractChunk):
                 if url is None:
                     warning  = _("Writer %s's URLs incompletely defined.")
                     warning %= key
-                    self.log.warning(warning)
+                    environment['log'].warning(warning)
                 elif url in urls:
                     warning  = _('Writers %s and %s conflict over %s.')
                     warning %= urls[url], key, url
-                    self.log.warning(warning)
+                    environment['log'].warning(warning)
                 else:
                     urls[url] = key
         return (environment, objects, [])
