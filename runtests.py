@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import gettext
+import logging
 import unittest
 import doctest
 import sys
@@ -18,6 +19,16 @@ def safe_displayhook(s):
     if s is not None:
         sys.stdout.write('%r\n' % s)
 sys.displayhook = safe_displayhook
+
+
+def get_logger():
+    logger = logging.getLogger('logger')
+    logger.setLevel(logging.INFO)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
+    handler.setLevel(logging.DEBUG)
+    logger.addHandler(handler)
+    return logger
 
 
 if __name__ == '__main__':
@@ -53,6 +64,7 @@ if __name__ == '__main__':
         args = {}
         extraglobs = {'Mock': Mock
                      ,'pprint': pprint
+                     ,'get_logger': get_logger
                      }
         for arg, attr in [('module_relative', '_module_relative')
                          ,('package', '_package')
