@@ -80,10 +80,10 @@ class AbstractChunk(object):
     del __old_doc__
 
     def scheduling_order(self):
-        ''':prop:`scheduling_order` is a positive integer that determines chunk
+        ''':attr:`scheduling_order` is a positive integer that determines chunk
         execution order.
 
-        :prop:`scheduling_order` uses normal integer comparison.  Chunks of the
+        :attr:`scheduling_order` uses normal integer comparison.  Chunks of the
         same priority will be executed in arbitrary order.
 
         '''
