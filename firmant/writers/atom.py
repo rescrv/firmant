@@ -47,7 +47,28 @@ def add_text_subelement(root, name, text):
     new.text = text
 
 
-def RFC3339(dt):
+def rfc3339(dt):
+    '''Render the datetime object `dt` properly accoring to rfc 3339.
+
+    It works properly without the time zone.
+
+    .. doctest::
+
+       >>> dt = datetime.datetime(2010, 05, 02, 01, 02, 03)
+       >>> rfc3339(dt)
+       '2010-05-02T01:02:03Z'
+
+    It works properly with the time zone.
+
+    .. doctest::
+
+       >>> import pytz
+       >>> eastern = pytz.timezone('US/Eastern')
+       >>> dt = eastern.localize(datetime.datetime(2010, 05, 02, 01, 02, 03))
+       >>> rfc3339(dt)
+       '2010-05-02T01:02:03-04:00'
+
+    '''
     frmt_str = '%Y-%m-%dT%H:%M:%S'
     timestamp = dt.strftime(frmt_str)
     timezone  = dt.strftime('%z')
@@ -72,7 +93,7 @@ class AtomFeedSingle(FeedSingle):
         add_text_subelement(feed, 'rights', feed_obj.copyright)
         updated = max([post.published for post in feed_obj.posts] +
                 [datetime.datetime(1900, 01, 01)])
-        add_text_subelement(feed, 'updated', RFC3339(updated))
+        add_text_subelement(feed, 'updated', rfc3339(updated))
         add_text_subelement(feed, 'id', feed_obj.permalink)
         link = etree.SubElement(feed, 'link')
         link.set('href', feed_obj.permalink)
@@ -81,8 +102,8 @@ class AtomFeedSingle(FeedSingle):
         for post_obj in feed_obj.posts:
             post = etree.SubElement(feed, 'entry')
             add_text_subelement(post, 'title', post_obj.title)
-            add_text_subelement(post, 'updated', RFC3339(post_obj.updated))
-            add_text_subelement(post, 'published', RFC3339(post_obj.published))
+            add_text_subelement(post, 'updated', rfc3339(post_obj.updated))
+            add_text_subelement(post, 'published', rfc3339(post_obj.published))
 
             author = etree.SubElement(post, 'author')
             add_text_subelement(author, 'name', post_obj.author)
