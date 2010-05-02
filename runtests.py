@@ -17,7 +17,10 @@ gettext.install('firmant')
 
 def safe_displayhook(s):
     if s is not None:
-        sys.stdout.write('%r\n' % s)
+        if isinstance(s, tuple):
+            sys.stdout.write('%r\n' % (s,))
+        else:
+            sys.stdout.write('%r\n' % s)
 sys.displayhook = safe_displayhook
 
 
