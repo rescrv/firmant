@@ -32,12 +32,12 @@
 
 
 import datetime
-import os
 
 from lxml import etree
 
 from firmant.utils import paths
-from firmant.writers.feeds import FeedSingle
+from firmant.utils import class_name
+from firmant.writers.feeds import FeedWriter
 
 
 def add_text_subelement(root, name, text):
@@ -78,11 +78,22 @@ def rfc3339(dt):
         return timestamp + 'Z'
 
 
-class AtomFeedSingle(FeedSingle):
+class AtomFeed(FeedWriter):
+    '''Write feeds in the Atom format.
 
-    permalinks_for = 'feeds'
+    Feeds will have the extension 'atom'.
 
-    def render(self, feed_obj):
+    '''
+
+    # pylint: disable-msg=R0903
+
+    def __init__(self, environment, objects):
+        # pylint: disable-msg=W0613
+        super(AtomFeed, self).__init__(class_name(self.__class__), 'atom', [],
+                self.__render_func__)
+
+    @staticmethod
+    def __render_func__(environment, path, feed_obj):
         '''Render the feed according to the Atom specification.
         '''
         feed = etree.Element('feed')
@@ -94,9 +105,12 @@ class AtomFeedSingle(FeedSingle):
         updated = max([post.published for post in feed_obj.posts] +
                 [datetime.datetime(1900, 01, 01)])
         add_text_subelement(feed, 'updated', rfc3339(updated))
-        add_text_subelement(feed, 'id', feed_obj.permalink)
+        # TODO switch to using permalink attribute (once it exists).
+        permalink = environment['urlmapper'].url('atom',
+                **AtomFeed.__key__(feed_obj))
+        add_text_subelement(feed, 'id', permalink)
         link = etree.SubElement(feed, 'link')
-        link.set('href', feed_obj.permalink)
+        link.set('href', permalink)
         link.set('rel', 'self')
 
         for post_obj in feed_obj.posts:
@@ -112,11 +126,14 @@ class AtomFeedSingle(FeedSingle):
             content.text = post_obj.content
             content.set('type', 'html')
 
+            # TODO switch to using permalink attribute (once it exists).
+            # TODO BROKEN.  FIX BEFORE 0.2.0
+            permalink = 'http://perma.link'
             l_alt = etree.SubElement(post, 'link')
-            l_alt.set('href', post_obj.permalink)
+            l_alt.set('href', permalink)
             l_alt.set('rel', 'alternate')
 
-            add_text_subelement(post, 'id', post_obj.permalink)
+            add_text_subelement(post, 'id', permalink)
             add_text_subelement(post, 'rights', post_obj.copyright)
 
             for tag in post_obj.tags:
@@ -124,10 +141,7 @@ class AtomFeedSingle(FeedSingle):
                 category.set('term', tag.slug)
                 category.set('label', tag.title)
 
-        path = self.urlmapper.path('atom', type='feed', slug=feed_obj.slug)
-        data = etree.tostring(feed)
-        path = os.path.join(self.settings.OUTPUT_DIR, path)
-        f    = paths.create_or_truncate(path)
-        f.write(data.encode('utf-8'))
-        f.flush()
-        f.close()
+        out    = paths.create_or_truncate(path)
+        out.write(etree.tostring(feed).encode('utf-8'))
+        out.flush()
+        out.close()
