@@ -194,6 +194,54 @@ class WriterURLs(AbstractChunk):
 
     This class checks that every precondition specified returns true.
 
+    Instances of this class will be created by :class:`WriterChunk`.
+
+    This class injects URLs into the environment.  This way, writers forward
+    declare which pages they wish to write, and conflicts may be detected.
+
+    .. doctest::
+       :hide:
+
+       >>> import sys
+       >>> from firmant import routing
+       >>> logger = get_logger()
+
+    .. doctest::
+
+       >>> writername = 'SampleWriter'
+       >>> extension = 'txt'
+       >>> obj_list = lambda e, o: o['objs']
+       >>> key = lambda o: {'obj': o}
+       >>> preconditions = None
+       >>> render = None
+       >>> environment = {'log': logger
+       ...               ,'urlmapper': urlmapper
+       ...               }
+       >>> environment['urlmapper'].add(
+       ...     routing.SinglePathComponent('obj', str)
+       ... )
+       >>> wu = WriterURLs(writername, extension, obj_list,
+       ...                 key, preconditions, render)
+       >>> pprint(wu(environment, {'objs': ['obj1', 'obj2', 'obj3']})) #doctest: +ELLIPSIS
+       ({'log': <logging.Logger instance at 0x...>,
+         'urlmapper': <firmant.routing.URLMapper object at 0x...>,
+         'urls': {'SampleWriter': ['http://testurl/obj1/',
+                                   'http://testurl/obj2/',
+                                   'http://testurl/obj3/']}},
+        {'objs': ['obj1', 'obj2', 'obj3']},
+        [])
+
+    It is an error to not pass a URLMapper in the environment.  In this case, a
+    :exc:`ValueError` is thrown because this is a condition in which we cannot
+    take the, "Log and move on," approach.
+
+    .. doctest::
+
+       >>> del environment['urlmapper']
+       >>> pprint(wu(environment, {'objs': ['obj1', 'obj2', 'obj3']}))
+       Traceback (most recent call last):
+       ValueError: `urlmapper` expected in `environment`
+
     '''
 
     # pylint: disable-msg=R0913
@@ -210,16 +258,13 @@ class WriterURLs(AbstractChunk):
         self.__render__ = render
 
     def __call__(self, environment, objects):
-        if 'urls' not in environment:
-            error = _('`urls` expected in `environment`')
-            environment['log'].error(error)
-            return
         if 'urlmapper' not in environment:
             error = _('`urlmapper` expected in `environment`')
-            environment['log'].error(error)
-            return
+            raise ValueError(error)
         urlmapper = environment['urlmapper']
         newenv = environment.copy()
+        if 'urls' not in newenv:
+            newenv['urls'] = {}
         newenv['urls'][self.__writername__] = ret = []
         for obj in self.__obj_list__(environment, objects):
             url = urlmapper.url(self.__extension__, **self.__key__(obj))
