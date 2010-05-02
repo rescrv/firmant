@@ -113,6 +113,7 @@ class Firmant(object):
         self.chunks = list()
         self.env    = dict()
         self.env['log'] = self.log
+        self.env['urlmapper'] = self.urlmapper
 
         self.chunks.append(CheckURLConflicts())
         self.chunks.append(SetupURLConflicts())
@@ -135,6 +136,8 @@ class Firmant(object):
                 if c.scheduling_order <= chunk.scheduling_order:
                     error = _('New chunk violates scheduling_order constraint')
                     self.log.error(error)
+                else:
+                    self.chunks.append(c)
 
     def parse(self):
         '''Call parse on each configured parser.
