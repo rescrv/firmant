@@ -238,6 +238,48 @@ class WriterPreconditions(AbstractChunk):
 
     It will check all of the write preconditions.
 
+    Instances of this class will be created by :class:`WriterChunk`.
+
+    When preconditions succeed, an instance of :class:`WriterWrite` will be
+    returned in the list of new chunks.
+
+    .. doctest::
+       :hide:
+
+       >>> import sys
+       >>> from firmant import routing
+       >>> logger = get_logger()
+
+    .. doctest::
+
+       >>> writername = 'SampleWriter'
+       >>> extension = 'txt'
+       >>> obj_list = None
+       >>> key = None
+       >>> preconditions = [lambda e, o: 'urlmapper' in e]
+       >>> render = None
+       >>> environment = {'log': logger
+       ...               ,'urlmapper': urlmapper
+       ...               }
+       >>> wp = WriterPreconditions(writername, extension, obj_list,
+       ...                          key, preconditions, render)
+       >>> wp(environment, {}) #doctest: +ELLIPSIS
+       ({...}, {}, [<firmant.writers.WriterWrite object at 0x...>])
+
+    If any preconditions fail, no new chunks will be returned.  It is up to the
+    precondition test to log an error.
+
+    .. doctest::
+
+       >>> def precondition(environment, object):
+       ...     print 'I ALWAYS FAIL'
+       ...     return False
+       >>> wp = WriterPreconditions(writername, extension, obj_list,
+       ...                          key, [precondition], render)
+       >>> wp(environment, {}) #doctest: +ELLIPSIS
+       I ALWAYS FAIL
+       ({...}, {}, [])
+
     '''
 
     # pylint: disable-msg=R0913
@@ -261,6 +303,8 @@ class WriterPreconditions(AbstractChunk):
                 [WriterWrite(self.__writername__, self.__extension__,
                     self.__obj_list__, self.__key__, self.__preconditions__,
                     self.__render__)])
+
+    scheduling_order = 800
 
 
 class WriterWrite(AbstractChunk):
