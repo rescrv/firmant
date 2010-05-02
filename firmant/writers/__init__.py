@@ -122,7 +122,7 @@ class WriterChunkWrite(AbstractChunk):
     scheduling_order = 900
 
 
-class WriterChunk(object):
+class WriterChunk(AbstractChunk):
     '''A chunk that makes it easy to create a writer.
 
     This class handles creating chunks that will be scheduled correctly.  All
