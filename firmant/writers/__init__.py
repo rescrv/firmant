@@ -162,6 +162,37 @@ class WriterChunk(object):
     In almost all cases, creating instances of this object is preferable to
     creating custom chunks to write objects.
 
+    When created (and later called), this object simply sets up more chunks to
+    be executed later.
+
+    .. doctest::
+
+       >>> import sys
+       >>> from firmant import routing
+       >>> logger = get_logger()
+
+    .. doctest::
+
+       >>> writername = 'SampleWriter'
+       >>> extension = 'txt'
+       >>> obj_list = lambda e, o: o['objs']
+       >>> key = lambda o: {'obj': o}
+       >>> preconditions = None
+       >>> render = None
+       >>> environment = {'log': logger
+       ...               ,'urlmapper': urlmapper
+       ...               }
+       >>> environment['urlmapper'].add(
+       ...     routing.SinglePathComponent('obj', str)
+       ... )
+       >>> wc = WriterChunk(writername, extension, obj_list,
+       ...                 key, preconditions, render)
+       >>> pprint(wc(environment, {'objs': ['obj1', 'obj2', 'obj3']})) #doctest: +ELLIPSIS
+       ({...},
+        {...},
+        [<firmant.writers.WriterURLs object at 0x...>,
+         <firmant.writers.WriterPreconditions object at 0x...>])
+
     '''
 
     # pylint: disable-msg=R0913
@@ -181,9 +212,12 @@ class WriterChunk(object):
         return (environment, objects,
                 [WriterURLs(self.__writername__, self.__extension__,
                     self.__obj_list__, self.__key__, self.__preconditions__,
-                    self.__render__)])
+                    self.__render__),
+                 WriterPreconditions(self.__writername__, self.__extension__,
+                     self.__obj_list__, self.__key__, self.__preconditions__,
+                     self.__render__)])
 
-    scheduling_order = 0
+    scheduling_order = 10
 
 
 class WriterURLs(AbstractChunk):
