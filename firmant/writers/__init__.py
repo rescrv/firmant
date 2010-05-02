@@ -272,6 +272,51 @@ class WriterWrite(AbstractChunk):
     It will call the `render` function with the objects returned by the callable
     `obj_list`.
 
+    This class will be used as a chunk that follows from chunks created by
+    :class:`WriterChunk`.
+
+    .. doctest::
+       :hide:
+
+       >>> from firmant import routing
+       >>> logger = get_logger()
+
+    .. doctest::
+
+       >>> writername = 'SampleWriter'
+       >>> extension = 'txt'
+       >>> obj_list = lambda e, o: o['objs']
+       >>> key = lambda o: {'obj': o}
+       >>> preconditions = None
+       >>> def render(environment, path, objects):
+       ...     print 'Save object "%s" to "%s"' % (objects, path)
+       ...
+       >>> environment = {'log': logger
+       ...               ,'urlmapper': urlmapper
+       ...               }
+       >>> environment['urlmapper'].add(
+       ...     routing.SinglePathComponent('obj', str)
+       ... )
+       >>> ww = WriterWrite(writername, extension, obj_list,
+       ...                  key, preconditions, render)
+       >>> ww(environment, {'objs': ['obj1', 'obj2', 'obj3']}) #doctest: +ELLIPSIS
+       Save object "obj1" to "outputdir/obj1/index.txt"
+       Save object "obj2" to "outputdir/obj2/index.txt"
+       Save object "obj3" to "outputdir/obj3/index.txt"
+       ({...}, {'objs': ['obj1', 'obj2', 'obj3']}, [])
+
+    .. note::
+
+       :meth:`__call__` expects a :class:`firmant.routing.URLMapper` to be in
+       the environment and will generate an error if there is not.  It will log
+       to the logger in the error case.
+
+       .. doctest::
+
+          >>> ww({'log': logger}, {}) #doctest: +ELLIPSIS
+          [ERROR] `urlmapper` expected in `environment`
+          ({'log': <logging.Logger instance at 0x...>}, {}, [])
+
     '''
 
     # pylint: disable-msg=R0913
@@ -291,9 +336,18 @@ class WriterWrite(AbstractChunk):
         if 'urlmapper' not in environment:
             error = _('`urlmapper` expected in `environment`')
             environment['log'].error(error)
-            return
+            return (environment, objects, [])
         urlmapper = environment['urlmapper']
         for obj in self.__obj_list__(environment, objects):
             path = urlmapper.path(self.__extension__, **self.__key__(obj))
             self.__render__(environment, path, obj)
         return (environment, objects, [])
+
+    scheduling_order = 900
+
+
+def _setup(self):
+    '''Setup the test cases.
+    '''
+    from firmant.routing import URLMapper
+    self.globs['urlmapper'] = URLMapper('outputdir', 'http://testurl/')
