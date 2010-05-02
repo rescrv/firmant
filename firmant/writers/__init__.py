@@ -49,6 +49,8 @@ class Writer(object):
         - write_preconditions:  Tests that the writer is able to write.  If this
           returns False, it is likely that the writer would fail.
     '''
+    # TODO:  Remove prior to 0.2
+    # pylint: disable-msg=R0903
 
     __metaclass__ = abc.ABCMeta
 
@@ -85,8 +87,11 @@ class Writer(object):
 class WriterChunkURLs(AbstractChunk):
     '''A simple wrapper to ease the transition to chunks.
     '''
+    # TODO:  Remove prior to 0.2
+    # pylint: disable-msg=R0903
 
     def __init__(self, writer):
+        super(WriterChunkURLs, self).__init__()
         self.writer = writer
 
     def __call__(self, environment, objects):
@@ -100,8 +105,11 @@ class WriterChunkURLs(AbstractChunk):
 class WriterChunkWrite(AbstractChunk):
     '''A simple wrapper to ease the transition to chunks.
     '''
+    # TODO:  Remove prior to 0.2
+    # pylint: disable-msg=R0903
 
     def __init__(self, writer):
+        super(WriterChunkWrite, self).__init__()
         self.writer = writer
 
     def __call__(self, environment, objects):
