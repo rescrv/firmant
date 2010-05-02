@@ -58,5 +58,6 @@ Modules in this package:
    paginate
    routing
    utils
+   writers
 
 '''
