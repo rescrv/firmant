@@ -25,128 +25,96 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-'''Writers that write various views of the feeds.
+'''Base classes for writing feeds.
+
+To use these classes, you only need to pass information specific to your writer.
+This typically includes the name of the writer, the extension or file format,
+and a rendering function.
 '''
 
 
-from copy import copy
-
-from firmant.writers import Writer
-
-
-class FeedWriter(Writer):
-    '''Base class used for functionality common to all feed writers.
-    '''
+from firmant import writers
+from firmant.chunks import AbstractChunk
 
 
-class FeedSingle(FeedWriter):
-    '''Parse the posts into single feed documents.
-    '''
+class FeedWriter(AbstractChunk):
+    '''Write/render individual feed objects.
 
-    fmt = 'atom'
+    The values of `writername`, `extension` and `render` will be passed directly
+    to :class:`firmant.writers.WriterChunk`.  Preconditions specified in
+    `preconditions` will be added to the following preconditions:
 
-    def url(self, feed):
-        '''Use the urlmapper to construct a URL for the given attributes.
-        '''
-        return self.urlmapper.url(self.fmt, type='feed', slug=feed.slug)
+     * OUTPUT_DIR is specified in the settings.
+     * OUTPUT_DIR is an existing directory.
+     * OUTPUT_DIR may be written to by the user.
+     * There are actually feed objects to write.
 
-    def urls(self):
-        '''A list of URLs that the writer declares it will write to.
+    This feed writer is intended to serve as the basis for other feed writers
+    (e.g. Atom or RSS).
 
-        Example on testdata/pristine::
+    .. doctest::
 
-            >>> c = components
-            >>> urlmapper.add(c.TYPE('feed')/c.SLUG)
-            >>> fs = FeedSingle(settings, objs, urlmapper)
-            >>> pprint(fs.urls())
-            ['http://urlroot/bar/',
-             'http://urlroot/baz/',
-             'http://urlroot/foo/',
-             'http://urlroot/quux/']
+       >>> fw = FeedWriter('SampleWriter', 'txt', [], lambda e, p, o: None)
+       >>> fw({}, {}) #doctest: +ELLIPSIS
+       ({}, {}, [<firmant.writers.WriterChunk object at 0x...>])
 
+    The :meth:`__key__` method will return a dictionary of attributes that
+    identify the object.  `type` and `slug` are the attributes that identify a
+    single feed.
 
-        '''
-        ret = list()
-        for feed in self.objs.get('feeds', []):
-            ret.append(self.url(feed))
-        ret.sort()
-        return ret
+    .. doctest::
 
-    def write(self):
-        '''Write a parsed feed to the filesystem.
+       >>> print objects.feeds[0].slug
+       foo
+       >>> pprint(fw.__key__(objects.feeds[0]))
+       {'slug': u'foo', 'type': u'feed'}
 
-        Example on testdata/pristine::
+    The :meth:`__obj_list__` method will return a list of objects that are
+    stored in `objects` under the key `feeds`.
 
-            >>> fs = FeedSingle(settings, objs, urlmapper)
-            >>> fs.write()
-            Feed bar
-              2010/01/01/newyear
-              2009/12/31/party
-            Feed baz
-              2010/02/02/newday2
-              2010/02/02/newday
-              2010/02/01/newmonth
-            Feed foo
-              2010/02/02/newday2
-              2010/02/02/newday
-              2010/01/01/newyear
-            Feed quux
-              2010/02/01/newmonth
-              2009/12/31/party
+    .. doctest::
 
-        '''
-        for feed in self.objs.get('feeds', []):
-            feed  = copy(feed)
-            posts = [x for x in reversed(sorted(feed.posts,
-                    key=lambda p: (p.updated, p.published.date(), p.slug)))]
-            feed.posts = posts[:self.settings.POSTS_PER_FEED]
-            self.render(feed)
-
-    def render(self, feed):
-        '''Render the feed.
-
-        This should be overridden in child classes.
-        '''
-        print 'Feed %s' % feed.slug
-        for post in feed.posts:
-            print '  %s/%s' % (post.published.strftime('%Y/%m/%d'), post.slug)
-
-
-def _setup(self):
-    '''Setup the test cases.
-
-    Actions taken::
-
-        - Create a ``Settings`` object.
-        - Create a ``Firmant`` object.
-        - Load modules used in tests.
+       >>> fw.__obj_list__(None, {})
+       []
+       >>> fw.__obj_list__(None, {'feeds': []})
+       []
+       >>> fw.__obj_list__(None, {'feeds': ['feedobj']})
+       ['feedobj']
 
     '''
-    from pysettings.settings import Settings
-    from firmant.application import Firmant
-    from firmant.routing import URLMapper
-    from firmant.routing import components
-    s = {'PARSERS': {'posts': 'firmant.parsers.posts.PostParser'
-                    ,'feeds': 'firmant.parsers.feeds.FeedParser'
-                    ,'tags': 'firmant.parsers.tags.TagParser'
-                    }
-        ,'CONTENT_ROOT': 'testdata/pristine'
-        ,'OUTPUT_DIR': 'outputdir'
-        ,'PERMALINK_ROOT': 'http://urlroot'
-        ,'POSTS_SUBDIR': 'posts'
-        ,'FEEDS_SUBDIR': 'feeds'
-        ,'TAGS_SUBDIR': 'feeds'
-        ,'REST_EXTENSION': 'rst'
-        ,'POSTS_PER_PAGE': 2
-        ,'POSTS_PER_FEED': 3
-        }
-    settings               = Settings(s)
-    firmant                = Firmant(settings)
-    from minimock import Mock
-    firmant.parse()
-    firmant.cross_reference()
-    self.globs['settings'] = settings
-    self.globs['objs']  = firmant.objs
-    self.globs['urlmapper'] = URLMapper(settings.OUTPUT_DIR,
-            settings.PERMALINK_ROOT)
-    self.globs['components'] = components
+
+    # pylint: disable-msg=R0903
+
+    def __init__(self, writername, extension, preconditions, render):
+        super(FeedWriter, self).__init__()
+        self.__writername__ = writername
+        self.__extension__ = extension
+        # TODO:  Actually add the preconditions we said we would.
+        self.__preconditions__ = preconditions
+        self.__render__ = render
+
+    def __call__(self, environment, objects):
+        return (environment, objects,
+               [writers.WriterChunk(self.__writername__, self.__extension__,
+                   self.__obj_list__, self.__key__, self.__preconditions__,
+                   self.__render__)])
+
+    @staticmethod
+    def __obj_list__(environment, objects):
+        # pylint: disable-msg=W0613
+        return objects.get('feeds', [])
+
+    @staticmethod
+    def __key__(feed):
+        '''Return the set of attributes suitable as input for url mapping.
+        '''
+        return {'type': u'feed', 'slug': feed.slug}
+
+    scheduling_order = 9
+
+
+def _setup(test):
+    '''Setup the environment for tests.
+    '''
+    from testdata.chunks import c900
+    test.globs['objects'] = c900
