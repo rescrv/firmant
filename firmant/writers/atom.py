@@ -41,6 +41,8 @@ from firmant.writers.feeds import FeedSingle
 
 
 def add_text_subelement(root, name, text):
+    '''Add a subelement named `name` to `root` with `text` inside.
+    '''
     new = etree.SubElement(root, name)
     new.text = text
 
