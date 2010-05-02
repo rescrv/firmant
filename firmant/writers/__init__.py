@@ -120,3 +120,180 @@ class WriterChunkWrite(AbstractChunk):
         return (newenv, newobj, [])
 
     scheduling_order = 900
+
+
+class WriterChunk(object):
+    '''A chunk that makes it easy to create a writer.
+
+    This class handles creating chunks that will be scheduled correctly.  All
+    that is necessary is to provide:
+
+    `writername`
+        The name, as it will be displayed to the user.  This should be the name
+        of the class they must specify in the settings file to include the
+        :class:`WriterChunk`.
+
+    `extension`
+        The extension that will be used when writing files out.  This will be
+        passed to a :class:`firmant.routing.URLMapper` instance.
+
+    `obj_list`
+        A callable that will return a list of objects to pass to `render`.  It
+        will be passed the `environment` and `objects` dictionaries passed to
+        the chunk.
+
+    `key`
+        A callable that returns a dictionary of attributes that should be passed
+        to the :class:`firmant.routing.URLMapper`'s :meth:`url` and :meth:`path`
+        methods.
+
+    `preconditions`
+        An iterable of callables that return booleans indicating success of
+        write preconditions.  These will be passed `environment` and `objects`.
+        On success, they should return True.  On failure, they should write a
+        message to `environment['log']` and return False.  It will short-circuit
+        on failure.
+
+    `render`
+        A callable that accepts the environment, the path to which it should
+        write, and an object that should be written.  The object to be written
+        is in the same form returned by the `obj_list` callable.
+
+    In almost all cases, creating instances of this object is preferable to
+    creating custom chunks to write objects.
+
+    '''
+
+    # pylint: disable-msg=R0913
+    # pylint: disable-msg=R0903
+
+    def __init__(self, writername, extension, obj_list, key, preconditions,
+            render):
+        super(WriterChunk, self).__init__()
+        self.__writername__ = writername
+        self.__extension__ = extension
+        self.__obj_list__ = obj_list
+        self.__key__ = key
+        self.__preconditions__ = preconditions
+        self.__render__ = render
+
+    def __call__(self, environment, objects):
+        return (environment, objects,
+                [WriterURLs(self.__writername__, self.__extension__,
+                    self.__obj_list__, self.__key__, self.__preconditions__,
+                    self.__render__)])
+
+    scheduling_order = 0
+
+
+class WriterURLs(AbstractChunk):
+    '''An internal class used by :class:`WriterChunk`.
+
+    You should never find it necessary to interact with this class.  It should
+    be considered an implementation detail, and not part of the public API.
+
+    This class checks that every precondition specified returns true.
+
+    '''
+
+    # pylint: disable-msg=R0913
+    # pylint: disable-msg=R0903
+
+    def __init__(self, writername, extension, obj_list, key, preconditions,
+            render):
+        super(WriterURLs, self).__init__()
+        self.__writername__ = writername
+        self.__extension__ = extension
+        self.__obj_list__ = obj_list
+        self.__key__ = key
+        self.__preconditions__ = preconditions
+        self.__render__ = render
+
+    def __call__(self, environment, objects):
+        if 'urls' not in environment:
+            error = _('`urls` expected in `environment`')
+            environment['log'].error(error)
+            return
+        if 'urlmapper' not in environment:
+            error = _('`urlmapper` expected in `environment`')
+            environment['log'].error(error)
+            return
+        urlmapper = environment['urlmapper']
+        newenv = environment.copy()
+        newenv['urls'][self.__writername__] = ret = []
+        for obj in self.__obj_list__(environment, objects):
+            url = urlmapper.url(self.__extension__, **self.__key__(obj))
+            ret.append(url)
+        ret.sort()
+        return (newenv, objects, [])
+
+    scheduling_order = 500
+
+
+class WriterPreconditions(AbstractChunk):
+    '''An internal class used by :class:`WriterChunk`.
+
+    You should never find it necessary to interact with this class.  It should
+    be considered an implementation detail, and not part of the public API.
+
+    It will check all of the write preconditions.
+
+    '''
+
+    # pylint: disable-msg=R0913
+    # pylint: disable-msg=R0903
+
+    def __init__(self, writername, extension, obj_list, key, preconditions,
+            render):
+        super(WriterPreconditions, self).__init__()
+        self.__writername__ = writername
+        self.__extension__ = extension
+        self.__obj_list__ = obj_list
+        self.__key__ = key
+        self.__preconditions__ = preconditions
+        self.__render__ = render
+
+    def __call__(self, environment, objects):
+        for precondition in self.__preconditions__:
+            if not precondition(environment, objects):
+                return (environment, objects, [])
+        return (environment, objects,
+                [WriterWrite(self.__writername__, self.__extension__,
+                    self.__obj_list__, self.__key__, self.__preconditions__,
+                    self.__render__)])
+
+
+class WriterWrite(AbstractChunk):
+    '''An internal class used by :class:`WriterChunk`.
+
+    You should never find it necessary to interact with this class.  It should
+    be considered an implementation detail, and not part of the public API.
+
+    It will call the `render` function with the objects returned by the callable
+    `obj_list`.
+
+    '''
+
+    # pylint: disable-msg=R0913
+    # pylint: disable-msg=R0903
+
+    def __init__(self, writername, extension, obj_list, key, preconditions,
+            render):
+        super(WriterWrite, self).__init__()
+        self.__writername__ = writername
+        self.__extension__ = extension
+        self.__obj_list__ = obj_list
+        self.__key__ = key
+        self.__preconditions__ = preconditions
+        self.__render__ = render
+
+    def __call__(self, environment, objects):
+        if 'urlmapper' not in environment:
+            error = _('`urlmapper` expected in `environment`')
+            environment['log'].error(error)
+            return
+        urlmapper = environment['urlmapper']
+        for obj in self.__obj_list__(environment, objects):
+            path = urlmapper.path(self.__extension__, **self.__key__(obj))
+            self.__render__(environment, path, obj)
+        return (environment, objects, [])
