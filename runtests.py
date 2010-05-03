@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import gettext
+import logging
 import unittest
 import doctest
 import sys
@@ -16,14 +17,28 @@ gettext.install('firmant')
 
 def safe_displayhook(s):
     if s is not None:
-        sys.stdout.write('%r\n' % s)
+        if isinstance(s, tuple):
+            sys.stdout.write('%r\n' % (s,))
+        else:
+            sys.stdout.write('%r\n' % s)
 sys.displayhook = safe_displayhook
+
+
+def get_logger():
+    logger = logging.getLogger('logger')
+    logger.setLevel(logging.INFO)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
+    handler.setLevel(logging.DEBUG)
+    logger.addHandler(handler)
+    return logger
 
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
 
     modules = ['firmant.application',
+               'firmant.chunks',
                'firmant.du',
                'firmant.paginate',
                'firmant.parsers',
@@ -37,17 +52,23 @@ if __name__ == '__main__':
                'firmant.utils.exceptions',
                'firmant.utils.paths',
                'firmant.writers',
-               'firmant.writers.feeds',
-               'firmant.writers.posts',
-               'firmant.writers.static',
-               'firmant.writers.j2'
+               #'firmant.writers.atom',
+               #'firmant.writers.feeds',
+               #'firmant.writers.posts',
+               #'firmant.writers.static',
+               #'firmant.writers.staticrst',
+               #'firmant.writers.j2'
               ]
+
+    if len(sys.argv[1:]) > 0:
+        modules = sys.argv[1:]
 
     for module in modules:
         mod = get_module(module)
         args = {}
         extraglobs = {'Mock': Mock
                      ,'pprint': pprint
+                     ,'get_logger': get_logger
                      }
         for arg, attr in [('module_relative', '_module_relative')
                          ,('package', '_package')

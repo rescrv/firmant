@@ -25,91 +25,74 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-'''Writers that write various views of the feeds.
+'''Render staticrst pages as HTML.
 '''
 
 
-from copy import copy
+import os
+import shutil
 
 from firmant.writers import Writer
 
 
-class FeedWriter(Writer):
-    '''Base class used for functionality common to all feed writers.
-    '''
-
-
-class FeedSingle(FeedWriter):
+class StaticRstWriter(Writer):
     '''Parse the posts into single feed documents.
     '''
 
-    fmt = 'atom'
+    fmt = 'html'
 
-    def url(self, feed):
+    def url(self, static):
         '''Use the urlmapper to construct a URL for the given attributes.
         '''
-        return self.urlmapper.url(self.fmt, type='feed', slug=feed.slug)
+        return self.urlmapper.url(self.fmt, type='staticrst', path=static.path)
 
     def urls(self):
-        '''A list of URLs that the writer declares it will write to.
+        '''A list of rooted paths that are the path component of URLs.
 
         Example on testdata/pristine::
 
+            >>> from firmant import routing
             >>> c = components
-            >>> urlmapper.add(c.TYPE('feed')/c.SLUG)
-            >>> fs = FeedSingle(settings, objs, urlmapper)
-            >>> pprint(fs.urls())
-            ['http://urlroot/bar/',
-             'http://urlroot/baz/',
-             'http://urlroot/foo/',
-             'http://urlroot/quux/']
-
+            >>> urlmapper.add(c.TYPE('staticrst')/c.PATH)
+            >>> srw = StaticRstWriter(settings, objs, urlmapper)
+            >>> pprint(srw.urls())
+            ['http://test/about/', 'http://test/empty/', 'http://test/links/']
 
         '''
         ret = list()
-        for feed in self.objs.get('feeds', []):
-            ret.append(self.url(feed))
+        for static in self.objs.get('staticrst', []):
+            ret.append(self.url(static))
         ret.sort()
         return ret
 
     def write(self):
-        '''Write a parsed feed to the filesystem.
+        '''Write the parsed posts to the filesystem.
 
         Example on testdata/pristine::
 
-            >>> fs = FeedSingle(settings, objs, urlmapper)
-            >>> fs.write()
-            Feed bar
-              2010/01/01/newyear
-              2009/12/31/party
-            Feed baz
-              2010/02/02/newday2
-              2010/02/02/newday
-              2010/02/01/newmonth
-            Feed foo
-              2010/02/02/newday2
-              2010/02/02/newday
-              2010/01/01/newyear
-            Feed quux
-              2010/02/01/newmonth
-              2009/12/31/party
+            >>> srw = StaticRstWriter(settings, objs, urlmapper)
+            >>> srw.write() #doctest: +ELLIPSIS
+            Static page  --- 
+            Static page About --- <p>Firmant is...</p>
+            <BLANKLINE>
+            Static page Links --- <ul class="simple">
+            <li>...</li>
+            <li>...</li>
+            </ul>
+            <BLANKLINE>
 
         '''
-        for feed in self.objs.get('feeds', []):
-            feed  = copy(feed)
-            posts = [x for x in reversed(sorted(feed.posts,
-                    key=lambda p: (p.updated, p.published.date(), p.slug)))]
-            feed.posts = posts[:self.settings.POSTS_PER_FEED]
-            self.render(feed)
+        pages = self.objs['staticrst']
+        pages.sort(key=lambda s: s.title)
+        for page in pages:
+            self.render(page)
 
-    def render(self, feed):
-        '''Render the feed.
+    def render(self, static):
+        '''Render the static page.
 
         This should be overridden in child classes.
         '''
-        print 'Feed %s' % feed.slug
-        for post in feed.posts:
-            print '  %s/%s' % (post.published.strftime('%Y/%m/%d'), post.slug)
+        print 'Static page %s --- %s' % (static.title, static.content)
 
 
 def _setup(self):
@@ -126,19 +109,17 @@ def _setup(self):
     from firmant.application import Firmant
     from firmant.routing import URLMapper
     from firmant.routing import components
-    s = {'PARSERS': {'posts': 'firmant.parsers.posts.PostParser'
-                    ,'feeds': 'firmant.parsers.feeds.FeedParser'
-                    ,'tags': 'firmant.parsers.tags.TagParser'
+    s = {'PARSERS': {'static': 'firmant.parsers.static.StaticParser'
+                    ,'staticrst': 'firmant.parsers.static.StaticRstParser'
                     }
         ,'CONTENT_ROOT': 'testdata/pristine'
         ,'OUTPUT_DIR': 'outputdir'
         ,'PERMALINK_ROOT': 'http://urlroot'
-        ,'POSTS_SUBDIR': 'posts'
-        ,'FEEDS_SUBDIR': 'feeds'
-        ,'TAGS_SUBDIR': 'feeds'
+        ,'STATIC_SUBDIR': 'static'
+        ,'STATIC_RST_SUBDIR': 'flat'
         ,'REST_EXTENSION': 'rst'
         ,'POSTS_PER_PAGE': 2
-        ,'POSTS_PER_FEED': 3
+        ,'PERMALINK_ROOT': 'http://test'
         }
     settings               = Settings(s)
     firmant                = Firmant(settings)

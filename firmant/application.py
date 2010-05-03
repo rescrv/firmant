@@ -36,6 +36,7 @@ import datetime
 
 from pysettings.modules import get_module
 
+from firmant.chunks import AbstractChunk
 from firmant.routing import URLMapper
 from firmant.utils import class_name
 
@@ -96,25 +97,7 @@ class Firmant(object):
          [<firmant.parsers.RstObject object at 0x...>,
           <firmant.parsers.RstObject object at 0x...>])
         >>> f.setup_writers()
-        >>> f.check_url_conflicts()
-        >>> f.create_permalinks()
-        Called log.warning('Object type tags has no permalink providers.')
-        >>> pprint([post.permalink for post in f.objs['posts']])
-        ['http://test/2009/12/31/party/',
-         'http://test/2010/01/01/newyear/',
-         'http://test/2010/02/01/newmonth/',
-         'http://test/2010/02/02/newday/',
-         'http://test/2010/02/02/newday2/']
-        >>> pprint([feed.permalink for feed in f.objs['feeds']])
-        ['http://test/bar/',
-         'http://test/baz/',
-         'http://test/foo/',
-         'http://test/quux/']
-        >>> pprint([static.permalink for static in f.objs['static']])
-        ['http://test/images/88x31.png']
-        >>> pprint([staticrst.permalink for staticrst in f.objs['staticrst']])
-        ['http://test/about/', 'http://test/empty/', 'http://test/links/']
-        >>> f.write()
+        >>> f()
 
     '''
 
@@ -126,6 +109,13 @@ class Firmant(object):
 
         self.objs = dict()
         self.writers = dict()
+        self.chunks = list()
+        self.env    = dict()
+        self.env['log'] = self.log
+        self.env['urlmapper'] = self.urlmapper
+
+        self.chunks.append(CheckURLConflicts())
+        self.chunks.append(SetupURLConflicts())
 
         # Setup parsers
         self.parsers = dict()
@@ -134,6 +124,19 @@ class Firmant(object):
             mod = get_module(mod)
             parser = getattr(mod, attr)
             self.parsers[key] = parser(self.settings)
+
+    def __call__(self):
+        while len(self.chunks):
+            self.chunks.sort(key = lambda x: x.scheduling_order)
+            chunk = self.chunks[0]
+            self.env, self.objs, newchunks = chunk(self.env, self.objs)
+            self.chunks = self.chunks[1:]
+            for c in newchunks:
+                if c.scheduling_order <= chunk.scheduling_order:
+                    error = _('New chunk violates scheduling_order constraint')
+                    self.log.error(error)
+                else:
+                    self.chunks.append(c)
 
     def parse(self):
         '''Call parse on each configured parser.
@@ -185,59 +188,11 @@ class Firmant(object):
     def setup_writers(self):
         '''Create instances of writer classes.
         '''
-        writers = self.writers
         for writer in self.settings.WRITERS:
             mod, attr = writer.rsplit('.', 1)
             mod = get_module(mod)
             writer = getattr(mod, attr)
-            # We do not retain the class name from settings as it may be the
-            # case that:
-            # from foo import Quux
-            # really imports the class foo.bar.baz.Quux as Quux was imported
-            # into the foo namespace.
-            writers[class_name(writer)] = writer(self.settings, self.objs,
-                    self.urlmapper)
-
-    def check_url_conflicts(self):
-        '''Create instances of writer classes.
-        '''
-        urls = dict()
-        for key, inst in self.writers.items():
-            for url in inst.urls():
-                if url is None:
-                    warning  = _("Writer %s's URLs incompletely defined.")
-                    warning %= key
-                    self.log.warning(warning)
-                elif url in urls:
-                    warning  = _('Writers %s and %s conflict over %s.')
-                    warning %= urls[url], key, url
-                    self.log.warning(warning)
-                else:
-                    urls[url] = key
-
-    def create_permalinks(self):
-        '''Add a 'permalink' attribute to each parsed object.
-        '''
-        permalink_providers = dict()
-        for inst in self.writers.values():
-            if hasattr(inst, 'permalinks_for'):
-                p_for = inst.permalinks_for
-                if p_for in permalink_providers:
-                    warning  = _("Object type '%s' has multiple "
-                                 "permalink providers.")
-                    warning %= p_for
-                    self.log.warning(warning)
-                else:
-                    permalink_providers[p_for] = inst.url
-        for obj_tag, obj_list in self.objs.items():
-            if obj_tag in permalink_providers:
-                url_for = permalink_providers[obj_tag]
-                for obj in obj_list:
-                    setattr(obj, 'permalink', url_for(obj))
-            else:
-                warning  = _("Object type %s has no permalink providers.")
-                warning %= obj_tag
-                self.log.warning(warning)
+            self.chunks.append(writer(self.env, self.objs))
 
     def create_globals(self):
         '''Create a dictionary of globals to be added to rendering contexts.
@@ -245,40 +200,73 @@ class Firmant(object):
         self.objs['globals'] = globals = dict()
         url = self.urlmapper.url
         globals['urlfor'] = url
-        globals['recent_posts'] = [(p.title, p.permalink) for p in
-                reversed(sorted(self.objs.get('posts', []),
-                    key=lambda p: (p.published, p.slug)))] \
-                [:self.settings.SIDEBAR_POSTS_LEN]
-        # TODO:  Disgusted with this.  I will make a real global object later.
-        globals['daily_archives'] = \
-                [(datetime.date(y, m, d), url('html',
-                    type='post', year=y, month=m, day=d, page=1))
-                for y, m, d in reversed(sorted(set([(p.published.year,
-                    p.published.month, p.published.day)
-                    for p in self.objs.get('posts', [])])))] \
-                [:self.settings.SIDEBAR_ARCHIVES_LEN]
-        globals['monthly_archives'] = \
-                [(datetime.date(y, m, 1), url('html',
-                    type='post', year=y, month=m, page=1))
-                for y, m in reversed(sorted(set([(p.published.year, p.published.month)
-                    for p in self.objs.get('posts', [])])))] \
-                [:self.settings.SIDEBAR_ARCHIVES_LEN]
-        globals['yearly_archives'] = \
-                [(datetime.date(y, 1, 1), url('html',
-                    type='post', year=y, page=1))
-                for y in reversed(sorted(set([p.published.year
-                    for p in self.objs.get('posts', [])])))] \
-                [:self.settings.SIDEBAR_ARCHIVES_LEN]
-        globals['static_pages'] = [(p.title, p.permalink) for p in
-                sorted(self.objs.get('staticrst', []), key=lambda p: p.title)]
-        globals['atom_feeds'] = [(f.slug, f.permalink) for f in
-                sorted(self.objs.get('feeds', []) , key=lambda f: f.slug)]
+        #globals['recent_posts'] = [(p.title, p.permalink) for p in
+        #        reversed(sorted(self.objs.get('posts', []),
+        #            key=lambda p: (p.published, p.slug)))] \
+        #        [:self.settings.SIDEBAR_POSTS_LEN]
+        ## TODO:  Disgusted with this.  I will make a real global object later.
+        #globals['daily_archives'] = \
+        #        [(datetime.date(y, m, d), url('html',
+        #            type='post', year=y, month=m, day=d, page=1))
+        #        for y, m, d in reversed(sorted(set([(p.published.year,
+        #            p.published.month, p.published.day)
+        #            for p in self.objs.get('posts', [])])))] \
+        #        [:self.settings.SIDEBAR_ARCHIVES_LEN]
+        #globals['monthly_archives'] = \
+        #        [(datetime.date(y, m, 1), url('html',
+        #            type='post', year=y, month=m, page=1))
+        #        for y, m in reversed(sorted(set([(p.published.year, p.published.month)
+        #            for p in self.objs.get('posts', [])])))] \
+        #        [:self.settings.SIDEBAR_ARCHIVES_LEN]
+        #globals['yearly_archives'] = \
+        #        [(datetime.date(y, 1, 1), url('html',
+        #            type='post', year=y, page=1))
+        #        for y in reversed(sorted(set([p.published.year
+        #            for p in self.objs.get('posts', [])])))] \
+        #        [:self.settings.SIDEBAR_ARCHIVES_LEN]
+        #globals['static_pages'] = [(p.title, p.permalink) for p in
+        #        sorted(self.objs.get('staticrst', []), key=lambda p: p.title)]
+        #globals['atom_feeds'] = [(f.slug, f.permalink) for f in
+        #        sorted(self.objs.get('feeds', []) , key=lambda f: f.slug)]
 
-    def write(self):
-        '''Call ``write`` on each writer.
+
+class SetupURLConflicts(AbstractChunk):
+    '''A chunk that sets up the empty dictionary for URL conflicts.
+    '''
+
+    def __call__(self, environment, objects):
+        '''Ensure that the sets of URLs are disjoint.
         '''
-        for writer in self.writers.itervalues():
-            writer.write()
+        environment = environment.copy()
+        environment['urls'] = dict()
+        return environment, objects, []
+
+    scheduling_order = 499
+
+
+class CheckURLConflicts(AbstractChunk):
+    '''A chunk that warns of writers with conflicting URLs.
+    '''
+
+    def __call__(self, environment, objects):
+        '''Ensure that the sets of URLs are disjoint.
+        '''
+        urls = dict()
+        for key, inst in environment['urls'].items():
+            for url in inst:
+                if url is None:
+                    warning  = _("Writer %s's URLs incompletely defined.")
+                    warning %= key
+                    environment['log'].warning(warning)
+                elif url in urls:
+                    warning  = _('Writers %s and %s conflict over %s.')
+                    warning %= urls[url], key, url
+                    environment['log'].warning(warning)
+                else:
+                    urls[url] = key
+        return (environment, objects, [])
+
+    scheduling_order = 600
 
 
 def _setup(self):

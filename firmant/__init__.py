@@ -53,9 +53,11 @@ Modules in this package:
 .. autosummary::
    :toctree: generated
 
+   chunks
    du
    paginate
    routing
    utils
+   writers
 
 '''

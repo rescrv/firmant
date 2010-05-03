@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright (c) 2010, Robert Escriva
 # All rights reserved.
 #
@@ -27,30 +25,28 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-'''Adapt this module for your own use in building Firmant blogs.
+'''Workarounds for bugs/incompatibilities in upstream code.
 '''
 
 
-import logging
-import os
+import abc
 
-from firmant.application import Firmant
-from pysettings.loaders import mod_to_settings
 
-logging.basicConfig(level=logging.INFO)
+# Workaroudns for broken upstream :mod:`abc` http://bugs.python.org/issue8507
+def abstractmethod(func):
+    '''Replacement for broken upstream :func:`abc.abstractmethod`.
+    '''
+    __old_doc__ = func.__doc__
+    func = abc.abstractmethod(func)
+    # pylint: disable-msg=W0622
+    func.__doc__ = __old_doc__
+    return func
 
-def build(output, root):
-    settings = mod_to_settings('firmant.settings')
-    settings.OUTPUT_DIR     = output
-    settings.TEMPLATE_DIR   = 'templates/simple'
-    settings.PERMALINK_ROOT = root
 
-    f = Firmant(settings)
-    f.parse()
-    f.cross_reference()
-    f.setup_writers()
-    f.check_url_conflicts()
-    f.write()
-
-build('preview', os.path.abspath('preview'))
-build('live', 'http://example.org/')
+def abstractproperty(prop):
+    '''Replacement for broken upstream :func:`abc.abstractproperty`.
+    '''
+    __old_doc__ = prop.__doc__
+    prop = abc.abstractproperty(prop)
+    prop.__doc__ = __old_doc__
+    return prop

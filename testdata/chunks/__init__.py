@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright (c) 2010, Robert Escriva
 # All rights reserved.
 #
@@ -26,31 +24,9 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+'''The data in this package is meant to be used in testing.
 
-'''Adapt this module for your own use in building Firmant blogs.
+Contained modules are named according to scheduling order values.  A module
+:mod:`testdata.chunks.v900` has effectively executed steps 0 through 899 and is
+ready to execute 900-level chunks.
 '''
-
-
-import logging
-import os
-
-from firmant.application import Firmant
-from pysettings.loaders import mod_to_settings
-
-logging.basicConfig(level=logging.INFO)
-
-def build(output, root):
-    settings = mod_to_settings('firmant.settings')
-    settings.OUTPUT_DIR     = output
-    settings.TEMPLATE_DIR   = 'templates/simple'
-    settings.PERMALINK_ROOT = root
-
-    f = Firmant(settings)
-    f.parse()
-    f.cross_reference()
-    f.setup_writers()
-    f.check_url_conflicts()
-    f.write()
-
-build('preview', os.path.abspath('preview'))
-build('live', 'http://example.org/')
