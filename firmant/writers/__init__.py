@@ -164,8 +164,7 @@ class WriterChunk(AbstractChunk):
         [<firmant.writers.SampleWriter object at 0x...>,
          <firmant.writers.SampleWriter object at 0x...>])
 
-    ::
-
+    ..
        This shows how the implementation works, but is not meant for public
        consumption.
 
