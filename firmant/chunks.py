@@ -54,6 +54,8 @@ best practices that should be observed include:
 
 import abc
 
+from firmant.utils import workarounds
+
 
 # pylint: disable-msg=R0903
 class AbstractChunk(object):
@@ -62,6 +64,7 @@ class AbstractChunk(object):
 
     __metaclass__ = abc.ABCMeta
 
+    @workarounds.abstractmethod
     def __call__(self, environment, objects):
         '''Execute the chunk with the state from environment/objects.
 
@@ -72,13 +75,8 @@ class AbstractChunk(object):
         to the scheduling order.
 
         '''
-    # TODO:  Proper decorator syntax http://bugs.python.org/issue8507
-    __old_doc__ = __call__.__doc__
-    __call__ = abc.abstractmethod(__call__)
-    # pylint: disable-msg=W0622
-    __call__.__doc__ = __old_doc__
-    del __old_doc__
 
+    @workarounds.abstractproperty
     def scheduling_order(self):
         ''':attr:`scheduling_order` is a positive integer that determines chunk
         execution order.
@@ -87,8 +85,3 @@ class AbstractChunk(object):
         same priority will be executed in arbitrary order.
 
         '''
-    # TODO:  Proper decorator syntax http://bugs.python.org/issue8507
-    __old_doc__ = scheduling_order.__doc__
-    scheduling_order = abc.abstractproperty(scheduling_order)
-    scheduling_order.__doc__ = __old_doc__
-    del __old_doc__

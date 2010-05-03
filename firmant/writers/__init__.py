@@ -39,6 +39,7 @@ import logging
 from firmant.chunks import AbstractChunk
 from firmant.utils import class_name
 from firmant import utils
+from firmant.utils import workarounds
 
 
 class Writer(object):
@@ -261,43 +262,29 @@ class WriterChunk(AbstractChunk):
         '''
         return utils.class_name(self.__class__)
 
+    @workarounds.abstractproperty
     def extension(self):
         '''The extension that will be used when finding the path/url of an
         object.
 
         This will be passed to a :class:`firmant.routing.URLMapper` instance.
         '''
-    # TODO:  Proper decorator syntax http://bugs.python.org/issue8507
-    __old_doc__ = extension.__doc__
-    extension = abc.abstractproperty(extension)
-    extension.__doc__ = __old_doc__
-    del __old_doc__
 
+    @workarounds.abstractmethod
     def obj_list(self, environment, objects):
         '''The objects that should be passed to :meth:`render`
 
         It will be passed the `environment` and `objects` dictionaries that were
         passed to the chunk.
         '''
-    # TODO:  Proper decorator syntax http://bugs.python.org/issue8507
-    __old_doc__ = obj_list.__doc__
-    obj_list = abc.abstractmethod(obj_list)
-    # pylint: disable-msg=W0622
-    obj_list.__doc__ = __old_doc__
-    del __old_doc__
 
+    @workarounds.abstractmethod
     def key(self, obj):
         '''Map the object to a dictionary of attributes.
 
         The attributes will be passed to the :meth:`path` and :meth`url` methods
         of :class:`firmant.routing.URLMapper`.
         '''
-    # TODO:  Proper decorator syntax http://bugs.python.org/issue8507
-    __old_doc__ = key.__doc__
-    key = abc.abstractmethod(key)
-    # pylint: disable-msg=W0622
-    key.__doc__ = __old_doc__
-    del __old_doc__
 
     def preconditions(self, environment, objects):
         '''A list of callables that indicate write preconditions.
@@ -309,19 +296,13 @@ class WriterChunk(AbstractChunk):
         '''
         return []
 
+    @workarounds.abstractmethod
     def render(self, environment, path, obj):
         '''Write the object to the path on filesystem.
 
         `path` will be a path under the output directory.  `obj` is one of
         the objects returned by obj_list.
         '''
-        pass
-    # TODO:  Proper decorator syntax http://bugs.python.org/issue8507
-    __old_doc__ = render.__doc__
-    render = abc.abstractmethod(render)
-    # pylint: disable-msg=W0622
-    render.__doc__ = __old_doc__
-    del __old_doc__
 
 
 def _setup(self):
