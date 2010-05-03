@@ -25,155 +25,129 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-'''Writers create the filesystem to be published.
+'''Writers transform parsed objects into files and directories on disk.
 
-Each writer will handle a subset of the objs, and create a portion of the
-outputted directory hierarchy.
+Writers are implemented behind the scenes in terms of chunks as defined in
+:mod:`firmant.chunks`.  This is because writers need to do work at two different
+points in time, with other chunks being scheduled in between.  The first chunk
+executed by a writer will forward-declare URLs that the writer claims
+responsibility for.  The second chunk renders objects and saves the result to
+disk.
 '''
 
 
-import abc
-import collections
-import logging
-
-from firmant.chunks import AbstractChunk
-from firmant.utils import class_name
+from firmant import chunks
 from firmant import utils
 from firmant.utils import workarounds
 
 
-class Writer(object):
-    '''Handle writing parsed objects to the filesystem.
+class Writer(chunks.AbstractChunk):
+    '''The base class of all writers.
 
-    It is assumed that a writer will have the following methods::
+    This class defines an abstract base class that all writers are required to
+    adhere to.  To use this class in the creation of a writer, create a subclass
+    with all necessary methods and properties overwritten.
 
-        - write:  Write all objects to the filesystem.
-        - write_preconditions:  Tests that the writer is able to write.  If this
-          returns False, it is likely that the writer would fail.
-    '''
-    # TODO:  Remove prior to 0.2
-    # pylint: disable-msg=R0903
+    .. seealso::
 
-    __metaclass__ = abc.ABCMeta
-
-    def __init__(self, settings, objs, urlmapper):
-        self.settings = settings
-        self.objs = objs
-        self.urlmapper = urlmapper
-        self.log = logging.getLogger(class_name(self.__class__))
-
-    @abc.abstractmethod
-    def urls(self):
-        '''A list of paths that the writer will write.
-
-        Each path is assumed to be relative to the webroot of the blog.  It is
-        implicit that paths begin with '/' (e.g. the path 'foo/bar' translates
-        implies a request URI of '/foo/bar').
-        '''
-
-    @abc.abstractmethod
-    def write(self):
-        '''Write the objects to the filesystem.
-        '''
-
-    def write_preconditions(self):
-        '''Returns true if and only if it is acceptable to proceed with writing.
-        '''
-        # Fail if we do not have an output directory.
-        if getattr(self.settings, 'OUTPUT_DIR', None) is None:
-            self.log.critical(_('``OUTPUT_DIR`` not defined in settings.'))
-            return False
-        return True
-
-
-class WriterChunkURLs(AbstractChunk):
-    '''A simple wrapper to ease the transition to chunks.
-    '''
-    # TODO:  Remove prior to 0.2
-    # pylint: disable-msg=R0903
-
-    def __init__(self, writer):
-        super(WriterChunkURLs, self).__init__()
-        self.writer = writer
-
-    def __call__(self, environment, objects):
-        newenv = environment.copy()
-        newobj = objects.copy()
-        newenv['urls'][class_name(self.writer.__class__)] = self.writer.urls()
-        return (newenv, newobj, [WriterChunkWrite(self.writer)])
-
-    scheduling_order = 500
-
-class WriterChunkWrite(AbstractChunk):
-    '''A simple wrapper to ease the transition to chunks.
-    '''
-    # TODO:  Remove prior to 0.2
-    # pylint: disable-msg=R0903
-
-    def __init__(self, writer):
-        super(WriterChunkWrite, self).__init__()
-        self.writer = writer
-
-    def __call__(self, environment, objects):
-        newenv = environment.copy()
-        newobj = objects.copy()
-        self.writer.objs = objects
-        self.writer.write()
-        return (newenv, newobj, [])
-
-    scheduling_order = 900
-
-
-class WriterChunk(AbstractChunk):
-    '''The base writer class.
-
-    It uses several template methods to allow the user to specify the behavior
-    of the writer.  Unless otherwise mentioned, all methods and properties are
-    abstract.
-
-    In almost all cases, creating instances of this object is preferable to
-    creating custom chunks to write objects.
+       Module :mod:`abc`
+          This module is part of the Python standard library in 2.6+.
 
     .. doctest::
+       :hide:
 
        >>> import sys
        >>> from firmant import routing
        >>> logger = get_logger()
 
+    To create a new type of writer, inherit from :class:`Writer`: 
+
     .. doctest::
 
-       >>> class SampleWriter(WriterChunk):
+       >>> class SampleWriter(Writer):
        ...     extension = 'txt'
-       ...     def key(self, object):
-       ...         return {'obj': str(object)}
+       ...     def key(self, obj):
+       ...         return {'obj': str(obj)}
        ...     def obj_list(self, environment, objects):
        ...         return objects.get('objs', [])
        ...     def render(self, environment, path, obj):
        ...         print 'Save object "%s" to "%s"' % (obj, path)
-       ...
+
+    The new writer meets the criteria for two different abstract base classes:
+
+    .. doctest::
+
+       >>> import firmant.chunks
+       >>> issubclass(SampleWriter, firmant.chunks.AbstractChunk)
+       True
+       >>> issubclass(SampleWriter, Writer)
+       True
+
+    .. warning::
+
+       When creating a writer, do not store state in the writer itself.  While
+       it appears that a writer is a single object, it will actually share state
+       across three or more chunks during typical usage.
+
+       If it is necessary to store state, place it in environment keyed to the
+       writer class:
+
+       .. doctest::
+          :hide:
+
+          >>> environment = {}
+
+       .. doctest::
+
+          >>> environment[SampleWriter] = 'stored state goes here'
+
+       This is because of the need to split actions between url
+       forward-declaration and rendering.
+
+    The remainder of this section is devoted to describing the implementation
+    details of :class:`Writer`'s template methods.
+
+    Chunks are passed environment and object dictionaries.  While it is not
+    technically a chunk, the :class:`Writer` interface follows the same pattern.
+    When called with an environment and set of objects, a writer will return two
+    more chunks (in addition to the environment and object dictionaries).
+
+    .. doctest::
+
        >>> environment = {'log': logger
        ...               ,'urlmapper': urlmapper
        ...               }
        >>> environment['urlmapper'].add(
        ...     routing.SinglePathComponent('obj', str)
        ... )
-       >>> objects = {'objs': ['obj1', 'obj2', 'obj3']}
+       >>> objects = {'objs': ['obj1', 'obj2', 'obj3']} 
        >>> sw = SampleWriter(environment, objects)
+       >>> sw.scheduling_order
+       10
        >>> pprint(sw(environment, objects)) #doctest: +ELLIPSIS
-       ({...},
-        {...},
+       ({'log': <logging.Logger instance at 0x...>,
+         'urlmapper': <firmant.routing.URLMapper object at 0x...>},
+        {'objs': ['obj1', 'obj2', 'obj3']},
         [<firmant.writers.SampleWriter object at 0x...>,
          <firmant.writers.SampleWriter object at 0x...>])
 
-    ..
-       This shows how the implementation works, but is not meant for public
-       consumption.
+    .. note::
+
+       The chunks returned do not share any state with the :class:`Writer` that
+       created them.  The fact that the class name is the same is an
+       implementation detail that may change in the future.
+
+    The first chunk is the chunk that will build the urls, while the second is
+    used for rendering.  Neither chunk returns more chunks.
 
     .. doctest::
-       :hide:
 
-       >>> e, o, (urlwriter, preconditions) = sw(environment, objects)
-       >>> pprint(urlwriter(environment, objects)) #doctest: +ELLIPSIS
+       >>> environment, objects, (urls, render) = sw(environment, objects)
+       >>> urls.scheduling_order
+       500
+       >>> render.scheduling_order
+       900
+       >>> pprint(urls(environment, objects)) #doctest: +ELLIPSIS
        ({'log': <logging.Logger instance at 0x...>,
          'urlmapper': <firmant.routing.URLMapper object at 0x...>,
          'urls': {'firmant.writers.SampleWriter': ['http://testurl/obj1/',
@@ -181,27 +155,52 @@ class WriterChunk(AbstractChunk):
                                                    'http://testurl/obj3/']}},
         {'objs': ['obj1', 'obj2', 'obj3']},
         [])
-       >>> pprint(preconditions(environment, objects)) #doctest: +ELLIPSIS
-       ({...},
-        {...},
-        [<firmant.writers.SampleWriter object at 0x...>])
-       >>> e, o, (renderer,) = preconditions(environment, objects)
-       >>> renderer(environment, objects) #doctest: +ELLIPSIS
+       >>> pprint(render(environment, objects)) #doctest: +ELLIPSIS
        Save object "obj1" to "outputdir/obj1/index.txt"
        Save object "obj2" to "outputdir/obj2/index.txt"
        Save object "obj3" to "outputdir/obj3/index.txt"
-       ({...}, {'objs': ['obj1', 'obj2', 'obj3']}, [])
+       ({'log': <logging.Logger instance at 0x...>,
+         'urlmapper': <firmant.routing.URLMapper object at 0x...>},
+        {'objs': ['obj1', 'obj2', 'obj3']},
+        [])
+
+    ..
+       These are for completeness of tests but don't contribute to docs.
+
+    ..
+       Make sure we don't accept bad actions.  This would break
+       :attr:`scheduling_order` and :meth:`__call__`
+
+    .. doctest::
+       :hide:
+
+       >>> SampleWriter({}, {}, action='something else')
+       Traceback (most recent call last):
+       ValueError: `action` is invalid
+
+    ..
+       Test the failure case for verifying that a urlmapper exists in the
+       environment.
+
+    .. doctest::
+
+       >>> SampleWriter({}, {}, action='urls')({}, {})
+       Traceback (most recent call last):
+       ValueError: `urlmapper` expected in `environment`
+       >>> SampleWriter({}, {}, action='renderer')({}, {})
+       Traceback (most recent call last):
+       ValueError: `urlmapper` expected in `environment`
 
     '''
 
     def __init__(self, environment, objects, action=None):
-        if action not in (None, 'urls', 'preconditions', 'renderer'):
+        # pylint: disable-msg=W0613
+        super(Writer, self).__init__()
+        if action not in (None, 'urls', 'renderer'):
             raise ValueError('`action` is invalid')
         self.__action__ = self.__default__
         if action == 'urls':
             self.__action__ = self.__urls__
-        elif action == 'preconditions':
-            self.__action__ = self.__preconditions__
         elif action == 'renderer':
             self.__action__ = self.__renderer__
 
@@ -210,15 +209,26 @@ class WriterChunk(AbstractChunk):
 
     @property
     def scheduling_order(self):
+        '''The following scheduling orders apply to writers:
+
+        10
+           At timestep 10, the writer will create the chunks for forward
+           declaration and rendering.
+
+        500
+           At timestep 500, the writer will forward-declare urls.
+
+        900
+           At timestep 900, the writer will render the objects.
+        '''
         return {self.__default__: 10
                ,self.__urls__: 500
-               ,self.__preconditions__: 800
                ,self.__renderer__: 900}[self.__action__]
 
     def __default__(self, environment, objects):
         return (environment, objects,
                 [self.__class__(environment, objects, 'urls'),
-                 self.__class__(environment, objects, 'preconditions')])
+                 self.__class__(environment, objects, 'renderer')])
 
     def __urls__(self, environment, objects):
         if 'urlmapper' not in environment:
@@ -235,32 +245,15 @@ class WriterChunk(AbstractChunk):
         ret.sort()
         return (newenv, objects, [])
 
-    def __preconditions__(self, environment, objects):
-        for precondition in self.preconditions(environment, objects):
-            if not precondition(environment, objects):
-                return (environment, objects, [])
-        return (environment, objects,
-                [self.__class__(environment, objects, 'renderer')])
-
     def __renderer__(self, environment, objects):
         if 'urlmapper' not in environment:
             error = _('`urlmapper` expected in `environment`')
-            environment['log'].error(error)
-            return (environment, objects, [])
+            raise ValueError(error)
         urlmapper = environment['urlmapper']
         for obj in self.obj_list(environment, objects):
             path = urlmapper.path(self.extension, **self.key(obj))
             self.render(environment, path, obj)
         return (environment, objects, [])
-
-    @property
-    def writername(self):
-        '''The string displayed when interacting with the user.
-
-        This should be the name of the class they must specify in the
-        configuration.  The default value should not be changed.
-        '''
-        return utils.class_name(self.__class__)
 
     @workarounds.abstractproperty
     def extension(self):
@@ -268,6 +261,14 @@ class WriterChunk(AbstractChunk):
         object.
 
         This will be passed to a :class:`firmant.routing.URLMapper` instance.
+        '''
+
+    @workarounds.abstractmethod
+    def key(self, obj):
+        '''Map the object to a dictionary of attributes.
+
+        The attributes will be passed to the :meth:`path` and :meth`url` methods
+        of :class:`firmant.routing.URLMapper`.
         '''
 
     @workarounds.abstractmethod
@@ -279,30 +280,21 @@ class WriterChunk(AbstractChunk):
         '''
 
     @workarounds.abstractmethod
-    def key(self, obj):
-        '''Map the object to a dictionary of attributes.
-
-        The attributes will be passed to the :meth:`path` and :meth`url` methods
-        of :class:`firmant.routing.URLMapper`.
-        '''
-
-    def preconditions(self, environment, objects):
-        '''A list of callables that indicate write preconditions.
-
-        Each callable will be passed `environment` and `objects`.  On success,
-        they should return True.  On failure, they should write a message to
-        `environment['log']` and return False.  It will short-circuit on
-        failure.
-        '''
-        return []
-
-    @workarounds.abstractmethod
     def render(self, environment, path, obj):
         '''Write the object to the path on filesystem.
 
         `path` will be a path under the output directory.  `obj` is one of
         the objects returned by obj_list.
         '''
+
+    @property
+    def writername(self):
+        '''The string displayed when interacting with the user.
+
+        This should be the name of the class they must specify in the
+        configuration.  The default value should not be changed.
+        '''
+        return utils.class_name(self.__class__)
 
 
 def _setup(self):
