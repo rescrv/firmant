@@ -38,7 +38,6 @@ from pysettings.modules import get_module
 
 from firmant.chunks import AbstractChunk
 from firmant.routing import URLMapper
-from firmant.writers import WriterChunkURLs
 from firmant.utils import class_name
 
 
@@ -193,16 +192,7 @@ class Firmant(object):
             mod, attr = writer.rsplit('.', 1)
             mod = get_module(mod)
             writer = getattr(mod, attr)
-            # We do not retain the class name from settings as it may be the
-            # case that:
-            # from foo import Quux
-            # really imports the class foo.bar.baz.Quux as Quux was imported
-            # into the foo namespace.
-            if issubclass(writer, AbstractChunk):
-                self.chunks.append(writer(self.env, self.objs))
-            else:
-                self.chunks.append(WriterChunkURLs(writer(self.settings, self.objs,
-                    self.urlmapper)))
+            self.chunks.append(writer(self.env, self.objs))
 
     def create_globals(self):
         '''Create a dictionary of globals to be added to rendering contexts.

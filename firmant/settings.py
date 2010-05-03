@@ -49,15 +49,16 @@ TAGS_SUBDIR = 'tags'
 STATIC_SUBDIR = 'static'
 STATIC_RST_SUBDIR = 'flat'
 REST_EXTENSION = 'rst'
-WRITERS = ['firmant.writers.j2.Jinja2PostArchiveAll'
-          ,'firmant.writers.j2.Jinja2PostArchiveYearly'
-          ,'firmant.writers.j2.Jinja2PostArchiveMonthly'
-          ,'firmant.writers.j2.Jinja2PostArchiveDaily'
-          ,'firmant.writers.j2.Jinja2PostSingle'
-          ,'firmant.writers.j2.Jinja2StaticRstSingle'
-          ,'firmant.writers.atom.AtomFeed'
-          ,'firmant.writers.static.StaticWriter'
-          ]
+#WRITERS = ['firmant.writers.j2.Jinja2PostArchiveAll'
+#          ,'firmant.writers.j2.Jinja2PostArchiveYearly'
+#          ,'firmant.writers.j2.Jinja2PostArchiveMonthly'
+#          ,'firmant.writers.j2.Jinja2PostArchiveDaily'
+#          ,'firmant.writers.j2.Jinja2PostSingle'
+#          ,'firmant.writers.j2.Jinja2StaticRstSingle'
+#          ,'firmant.writers.atom.AtomFeed'
+#          ,'firmant.writers.static.StaticWriter'
+#          ]
+WRITERS = []
 POSTS_PER_PAGE = 10
 POSTS_PER_FEED = 10
 TEMPLATE_DIR = 'testdata/pristine/templates'
