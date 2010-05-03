@@ -14,3 +14,4 @@ All Shipped Modules
    firmant.utils.paths
    firmant.writers
    firmant.writers.static
+   firmant.writers.staticrst

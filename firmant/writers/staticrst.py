@@ -25,109 +25,92 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-'''Render staticrst pages as HTML.
+'''Render static-rest pages.
 '''
 
 
-import os
-import shutil
-
-from firmant.writers import Writer
+from firmant import writers
 
 
-class StaticRstWriter(Writer):
-    '''Parse the posts into single feed documents.
-    '''
+class StaticRstWriter(writers.Writer):
+    '''Render static-rest pages to the file system.
 
-    fmt = 'html'
+    :class:`StaticRstWriter` is an incomplete subclass of :class:`Writer`.  That
+    is, there are still abstract methods/properties that are undefined.  In
+    particular, `extension` and `render` must be defined.
 
-    def url(self, static):
-        '''Use the urlmapper to construct a URL for the given attributes.
-        '''
-        return self.urlmapper.url(self.fmt, type='staticrst', path=static.path)
+    .. doctest::
 
-    def urls(self):
-        '''A list of rooted paths that are the path component of URLs.
-
-        Example on testdata/pristine::
-
-            >>> from firmant import routing
-            >>> c = components
-            >>> urlmapper.add(c.TYPE('staticrst')/c.PATH)
-            >>> srw = StaticRstWriter(settings, objs, urlmapper)
-            >>> pprint(srw.urls())
-            ['http://test/about/', 'http://test/empty/', 'http://test/links/']
-
-        '''
-        ret = list()
-        for static in self.objs.get('staticrst', []):
-            ret.append(self.url(static))
-        ret.sort()
-        return ret
-
-    def write(self):
-        '''Write the parsed posts to the filesystem.
-
-        Example on testdata/pristine::
-
-            >>> srw = StaticRstWriter(settings, objs, urlmapper)
-            >>> srw.write() #doctest: +ELLIPSIS
-            Static page  --- 
-            Static page About --- <p>Firmant is...</p>
-            <BLANKLINE>
-            Static page Links --- <ul class="simple">
-            <li>...</li>
-            <li>...</li>
-            </ul>
-            <BLANKLINE>
-
-        '''
-        pages = self.objs['staticrst']
-        pages.sort(key=lambda s: s.title)
-        for page in pages:
-            self.render(page)
-
-    def render(self, static):
-        '''Render the static page.
-
-        This should be overridden in child classes.
-        '''
-        print 'Static page %s --- %s' % (static.title, static.content)
-
-
-def _setup(self):
-    '''Setup the test cases.
-
-    Actions taken::
-
-        - Create a ``Settings`` object.
-        - Create a ``Firmant`` object.
-        - Load modules used in tests.
+       >>> class SampleStaticRstWriter(StaticRstWriter):
+       ...     extension = 'txt'
+       ...     def render(self, environment, path, obj):
+       ...         print 'Save staticrst "%s" to "%s"' % (obj.path, path)
+       ...
+       >>> ssrw = SampleStaticRstWriter({}, {})
 
     '''
-    from pysettings.settings import Settings
-    from firmant.application import Firmant
-    from firmant.routing import URLMapper
-    from firmant.routing import components
-    s = {'PARSERS': {'static': 'firmant.parsers.static.StaticParser'
-                    ,'staticrst': 'firmant.parsers.static.StaticRstParser'
-                    }
-        ,'CONTENT_ROOT': 'testdata/pristine'
-        ,'OUTPUT_DIR': 'outputdir'
-        ,'PERMALINK_ROOT': 'http://urlroot'
-        ,'STATIC_SUBDIR': 'static'
-        ,'STATIC_RST_SUBDIR': 'flat'
-        ,'REST_EXTENSION': 'rst'
-        ,'POSTS_PER_PAGE': 2
-        ,'PERMALINK_ROOT': 'http://test'
-        }
-    settings               = Settings(s)
-    firmant                = Firmant(settings)
-    from minimock import Mock
-    firmant.parse()
-    firmant.cross_reference()
-    self.globs['settings'] = settings
-    self.globs['objs']  = firmant.objs
-    self.globs['urlmapper'] = URLMapper(settings.OUTPUT_DIR,
-            settings.PERMALINK_ROOT)
-    self.globs['components'] = components
+
+    def key(self, staticrst):
+        '''Return the set of attributes suitable as input for url mapping.
+
+        Attributes that identify a static-rest object:
+
+            type
+               This is always ``staticrst``.
+
+            path
+               A path that describes the object relative to the input/output
+               directories.
+
+        .. doctest::
+           :hide:
+
+           >>> class SampleStaticRstWriter(StaticRstWriter):
+           ...     extension = 'txt'
+           ...     def render(self, environment, path, obj):
+           ...         print 'Save staticrst "%s" to "%s"' % (obj.path, path)
+           ...
+           >>> ssrw = SampleStaticRstWriter({}, {})
+
+        .. doctest::
+
+           >>> print objects.staticrst[0].path
+           about
+           >>> pprint(ssrw.key(objects.staticrst[0]))
+           {'path': u'about', 'type': u'staticrst'}
+
+        '''
+        return {'type': u'staticrst', 'path': staticrst.path}
+
+    def obj_list(self, environment, objects):
+        '''Return all objects stored under the key ``staticrst``.
+
+        .. doctest::
+           :hide:
+
+           >>> class SampleStaticRstWriter(StaticRstWriter):
+           ...     extension = 'txt'
+           ...     def render(self, environment, path, obj):
+           ...         print 'Save staticrst "%s" to "%s"' % (obj.path, path)
+           ...
+           >>> ssrw = SampleStaticRstWriter({}, {})
+
+        .. doctest::
+
+           >>> ssrw.obj_list(None, {})
+           []
+           >>> ssrw.obj_list(None, {'staticrst': []})
+           []
+           >>> ssrw.obj_list(None, {'staticrst': ['staticobj']})
+           ['staticobj']
+
+        '''
+        # pylint: disable-msg=W0613
+        return objects.get('staticrst', [])
+
+
+def _setup(test):
+    '''Setup the environment for tests.
+    '''
+    from testdata.chunks import c900
+    test.globs['objects'] = c900

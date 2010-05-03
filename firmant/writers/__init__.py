@@ -40,6 +40,7 @@ Modules in this package:
    :toctree: ../generated
 
    static
+   staticrst
 
 '''
 
