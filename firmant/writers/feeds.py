@@ -34,10 +34,9 @@ and a rendering function.
 
 
 from firmant import writers
-from firmant.chunks import AbstractChunk
 
 
-class FeedWriter(AbstractChunk):
+class FeedWriter(writers.WriterChunk):
     '''Write/render individual feed objects.
 
     The values of `writername`, `extension` and `render` will be passed directly
@@ -54,63 +53,53 @@ class FeedWriter(AbstractChunk):
 
     .. doctest::
 
-       >>> fw = FeedWriter('SampleWriter', 'txt', [], lambda e, p, o: None)
-       >>> fw({}, {}) #doctest: +ELLIPSIS
-       ({}, {}, [<firmant.writers.WriterChunk object at 0x...>])
+       >>> class SampleFeed(FeedWriter):
+       ...     extension = 'txt'
+       ...     def render(self, environment, path, obj):
+       ...         print 'Save feed "%s" to "%s"' % (obj.slug, path)
+       ...
+       >>> fw = SampleFeed({}, {})
+       >>> pprint(fw({}, {})) #doctest: +ELLIPSIS
+       ({},
+        {},
+        [<firmant.writers.feeds.SampleFeed object at 0x...>,
+         <firmant.writers.feeds.SampleFeed object at 0x...>])
 
-    The :meth:`__key__` method will return a dictionary of attributes that
-    identify the object.  `type` and `slug` are the attributes that identify a
-    single feed.
+    The :meth:`key` method will return a dictionary of attributes that identify
+    the object.  `type` and `slug` are the attributes that identify a single
+    feed.
 
     .. doctest::
 
        >>> print objects.feeds[0].slug
        foo
-       >>> pprint(fw.__key__(objects.feeds[0]))
+       >>> pprint(fw.key(objects.feeds[0]))
        {'slug': u'foo', 'type': u'feed'}
 
-    The :meth:`__obj_list__` method will return a list of objects that are
-    stored in `objects` under the key `feeds`.
+    The :meth:`obj_list` method will return a list of objects that are stored in
+    `objects` under the key `feeds`.
 
     .. doctest::
 
-       >>> fw.__obj_list__(None, {})
+       >>> fw.obj_list(None, {})
        []
-       >>> fw.__obj_list__(None, {'feeds': []})
+       >>> fw.obj_list(None, {'feeds': []})
        []
-       >>> fw.__obj_list__(None, {'feeds': ['feedobj']})
+       >>> fw.obj_list(None, {'feeds': ['feedobj']})
        ['feedobj']
 
     '''
 
-    # pylint: disable-msg=R0903
-
-    def __init__(self, writername, extension, preconditions, render):
-        super(FeedWriter, self).__init__()
-        self.__writername__ = writername
-        self.__extension__ = extension
-        # TODO:  Actually add the preconditions we said we would.
-        self.__preconditions__ = preconditions
-        self.__render__ = render
-
-    def __call__(self, environment, objects):
-        return (environment, objects,
-               [writers.WriterChunk(self.__writername__, self.__extension__,
-                   self.__obj_list__, self.__key__, self.__preconditions__,
-                   self.__render__)])
-
-    @staticmethod
-    def __obj_list__(environment, objects):
-        # pylint: disable-msg=W0613
+    def obj_list(self, environment, objects):
         return objects.get('feeds', [])
 
-    @staticmethod
-    def __key__(feed):
+    def key(self, feed):
         '''Return the set of attributes suitable as input for url mapping.
         '''
         return {'type': u'feed', 'slug': feed.slug}
 
-    scheduling_order = 9
+    def preconditions(self, environment, objects):
+        return []
 
 
 def _setup(test):

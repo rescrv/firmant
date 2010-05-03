@@ -85,15 +85,9 @@ class AtomFeed(FeedWriter):
 
     '''
 
-    # pylint: disable-msg=R0903
+    extension = 'atom'
 
-    def __init__(self, environment, objects):
-        # pylint: disable-msg=W0613
-        super(AtomFeed, self).__init__(class_name(self.__class__), 'atom', [],
-                self.__render_func__)
-
-    @staticmethod
-    def __render_func__(environment, path, feed_obj):
+    def render(self, environment, path, feed_obj):
         '''Render the feed according to the Atom specification.
         '''
         feed = etree.Element('feed')
@@ -107,7 +101,7 @@ class AtomFeed(FeedWriter):
         add_text_subelement(feed, 'updated', rfc3339(updated))
         # TODO switch to using permalink attribute (once it exists).
         permalink = environment['urlmapper'].url('atom',
-                **AtomFeed.__key__(feed_obj))
+                **self.key(feed_obj))
         add_text_subelement(feed, 'id', permalink)
         link = etree.SubElement(feed, 'link')
         link.set('href', permalink)
