@@ -35,50 +35,63 @@ import shutil
 from firmant import writers
 
 
-class StaticWriter(writers.WriterChunk):
+class StaticWriter(writers.Writer):
     '''Write copy or link the file pointed to by an object into the output
     directory.
-
-    The :meth:`key` method will return a dictionary of attributes that identify
-    the static object.  `type` and `path` are the attributes that identify a
-    single static object.
-
-    .. doctest::
-
-       >>> sw = StaticWriter({}, {'static': objects.static})
-       >>> print objects.static[0].relpath
-       images/88x31.png
-       >>> pprint(sw.key(objects.static[0]))
-       {'path': 'images/88x31.png', 'type': u'static'}
-
-    The :meth:`obj_list` method will return a list of objects that are stored in
-    `objects` under the key `static`.
-
-    .. doctest::
-
-       >>> sw.obj_list(None, {})
-       []
-       >>> sw.obj_list(None, {'static': []})
-       []
-       >>> sw.obj_list(None, {'static': ['feedobj']})
-       ['feedobj']
     '''
 
     extension = None
 
+    def key(self, static):
+        '''Return the set of attributes suitable as input for url mapping.
+
+        Attributes that identify a static object:
+
+            type
+               This is always ``static``.
+
+            path
+               A path that describes the object relative to the input/output
+               directories.
+
+        .. doctest::
+           :hide:
+
+           >>> sw = StaticWriter({}, {'static': objects.static})
+
+        .. doctest::
+
+           >>> print objects.static[0].relpath
+           images/88x31.png
+           >>> pprint(sw.key(objects.static[0]))
+           {'path': 'images/88x31.png', 'type': u'static'}
+
+        '''
+        return {'type': u'static', 'path': static.relpath}
+
     def obj_list(self, environment, objects):
-        '''Return all objects under the key `static`
+        '''Return all objects stored under the key ``static``.
+
+        .. doctest::
+           :hide:
+
+           >>> sw = StaticWriter({}, {'static': objects.static})
+
+        .. doctest::
+
+           >>> sw.obj_list(None, {})
+           []
+           >>> sw.obj_list(None, {'static': []})
+           []
+           >>> sw.obj_list(None, {'static': ['staticobj']})
+           ['staticobj']
+
         '''
         # pylint: disable-msg=W0613
         return objects.get('static', [])
 
-    def key(self, static):
-        '''Return the set of attributes suitable as input for url mapping.
-        '''
-        return {'type': u'static', 'path': static.relpath}
-
     def render(self, environment, path, static):
-        '''Copy the file to its proper location.
+        '''Copy the object to the correct place on the filesystem.
         '''
         try:
             os.makedirs(os.path.dirname(path))

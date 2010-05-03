@@ -33,6 +33,14 @@ points in time, with other chunks being scheduled in between.  The first chunk
 executed by a writer will forward-declare URLs that the writer claims
 responsibility for.  The second chunk renders objects and saves the result to
 disk.
+
+Modules in this package:
+
+.. autosummary::
+   :toctree: ../generated
+
+   static
+
 '''
 
 

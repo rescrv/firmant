@@ -13,3 +13,4 @@ All Shipped Modules
    firmant.utils.exceptions
    firmant.utils.paths
    firmant.writers
+   firmant.writers.static

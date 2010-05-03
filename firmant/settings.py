@@ -56,9 +56,9 @@ REST_EXTENSION = 'rst'
 #          ,'firmant.writers.j2.Jinja2PostSingle'
 #          ,'firmant.writers.j2.Jinja2StaticRstSingle'
 #          ,'firmant.writers.atom.AtomFeed'
-#          ,'firmant.writers.static.StaticWriter'
 #          ]
-WRITERS = []
+WRITERS = ['firmant.writers.static.StaticWriter'
+          ]
 POSTS_PER_PAGE = 10
 POSTS_PER_FEED = 10
 TEMPLATE_DIR = 'testdata/pristine/templates'
