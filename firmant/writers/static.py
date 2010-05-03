@@ -25,92 +25,71 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-'''Copy static objects into their proper place in the output.
+'''Copy static objects into the output directory.
 '''
 
 
 import os
 import shutil
 
-from firmant.writers import Writer
+from firmant import writers
 
 
-class StaticWriter(Writer):
-    '''Parse the posts into single feed documents.
+class StaticWriter(writers.WriterChunk):
+    '''Write copy or link the file pointed to by an object into the output
+    directory.
+
+    The :meth:`key` method will return a dictionary of attributes that identify
+    the static object.  `type` and `path` are the attributes that identify a
+    single static object.
+
+    .. doctest::
+
+       >>> sw = StaticWriter({}, {'static': objects.static})
+       >>> print objects.static[0].relpath
+       images/88x31.png
+       >>> pprint(sw.key(objects.static[0]))
+       {'path': 'images/88x31.png', 'type': u'static'}
+
+    The :meth:`obj_list` method will return a list of objects that are stored in
+    `objects` under the key `static`.
+
+    .. doctest::
+
+       >>> sw.obj_list(None, {})
+       []
+       >>> sw.obj_list(None, {'static': []})
+       []
+       >>> sw.obj_list(None, {'static': ['feedobj']})
+       ['feedobj']
     '''
 
-    permalinks_for = 'static'
+    extension = None
 
-    def url(self, static):
-        '''Use the urlmapper to construct a URL for the given attributes.
+    def obj_list(self, environment, objects):
+        '''Return all objects under the key `static`
         '''
-        return self.urlmapper.url(None, static=static.relpath)
+        # pylint: disable-msg=W0613
+        return objects.get('static', [])
 
-    def urls(self):
-        '''A list of rooted paths that are the path component of URLs.
-
-        Example on testdata/pristine::
-
-            >>> from firmant import routing
-            >>> urlmapper.add(routing.SinglePathComponent('static', str))
-            >>> sw = StaticWriter(settings, objs, urlmapper)
-            >>> pprint(sw.urls())
-            ['http://test/images/88x31.png']
-
+    def key(self, static):
+        '''Return the set of attributes suitable as input for url mapping.
         '''
-        ret = list()
-        for static in self.objs.get('static', []):
-            ret.append(self.url(static))
-        ret.sort()
-        return ret
+        return {'type': u'static', 'path': static.relpath}
 
-    def write(self):
-        '''Write a parsed feed to the filesystem.
+    def render(self, environment, path, static):
+        '''Copy the file to its proper location.
         '''
-        for static in self.objs.get('static', []):
-            relpath = self.urlmapper.path(None, static=static.relpath)
-            abspath = os.path.join(self.settings.OUTPUT_DIR, relpath)
-            try:
-                os.makedirs(os.path.dirname(abspath))
-            except OSError, e:
-                if e.errno != 17:
-                    raise
-            shutil.copy2(static.fullpath, abspath)
+        try:
+            os.makedirs(os.path.dirname(path))
+        except OSError, ex:
+            if ex.errno != 17:
+                raise
+        shutil.copy2(static.fullpath, path)
 
 
-def _setup(self):
-    '''Setup the test cases.
-
-    Actions taken::
-
-        - Create a ``Settings`` object.
-        - Create a ``Firmant`` object.
-        - Load modules used in tests.
-
+def _setup(test):
+    '''Setup the environment for tests.
     '''
-    from pysettings.settings import Settings
-    from firmant.application import Firmant
-    from firmant.routing import URLMapper
-    from firmant.routing import components
-    s = {'PARSERS': {'static': 'firmant.parsers.static.StaticParser'
-                    ,'staticrst': 'firmant.parsers.static.StaticRstParser'
-                    }
-        ,'CONTENT_ROOT': 'testdata/pristine'
-        ,'OUTPUT_DIR': 'outputdir'
-        ,'PERMALINK_ROOT': 'http://urlroot'
-        ,'STATIC_SUBDIR': 'static'
-        ,'STATIC_RST_SUBDIR': 'flat'
-        ,'REST_EXTENSION': 'rst'
-        ,'POSTS_PER_PAGE': 2
-        ,'PERMALINK_ROOT': 'http://test'
-        }
-    settings               = Settings(s)
-    firmant                = Firmant(settings)
-    from minimock import Mock
-    firmant.parse()
-    firmant.cross_reference()
-    self.globs['settings'] = settings
-    self.globs['objs']  = firmant.objs
-    self.globs['urlmapper'] = URLMapper(settings.OUTPUT_DIR,
-            settings.PERMALINK_ROOT)
-    self.globs['components'] = components
+    from testdata.chunks import c900
+    test.globs['objects'] = c900
