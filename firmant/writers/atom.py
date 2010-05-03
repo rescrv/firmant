@@ -36,7 +36,6 @@ import datetime
 from lxml import etree
 
 from firmant.utils import paths
-from firmant.utils import class_name
 from firmant.writers.feeds import FeedWriter
 
 
