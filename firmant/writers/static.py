@@ -38,6 +38,11 @@ from firmant import writers
 class StaticWriter(writers.Writer):
     '''Write copy or link the file pointed to by an object into the output
     directory.
+
+    .. doctest::
+
+       >>> sw = StaticWriter({}, {'static': objects.static})
+
     '''
 
     extension = None
