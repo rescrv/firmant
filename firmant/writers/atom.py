@@ -80,7 +80,12 @@ def rfc3339(dt):
 class AtomFeed(FeedWriter):
     '''Write feeds in the Atom format.
 
-    Feeds will have the extension 'atom'.
+    Uses :class:`firmant.writers.feeds.FeedWriter` to render feeds in Atom
+    format with the extension ``atom``.
+
+    .. doctest::
+
+       >>> AtomFeed({}, {'feeds': objects.feeds})
 
     '''
 
