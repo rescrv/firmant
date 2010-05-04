@@ -25,31 +25,14 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-'''Base classes for writing feeds.
-
-To use these classes, you only need to pass information specific to your writer.
-This typically includes the name of the writer, the extension or file format,
-and a rendering function.
-'''
-
-
 from firmant import writers
 
 
-class FeedWriter(writers.WriterChunk):
+class FeedWriter(writers.Writer):
     '''Write/render individual feed objects.
 
-    The values of `writername`, `extension` and `render` will be passed directly
-    to :class:`firmant.writers.WriterChunk`.  Preconditions specified in
-    `preconditions` will be added to the following preconditions:
-
-     * OUTPUT_DIR is specified in the settings.
-     * OUTPUT_DIR is an existing directory.
-     * OUTPUT_DIR may be written to by the user.
-     * There are actually feed objects to write.
-
-    This feed writer is intended to serve as the basis for other feed writers
-    (e.g. Atom or RSS).
+    This feed writer is serves as the basis for other feed writers (e.g. Atom or
+    RSS).
 
     .. doctest::
 
@@ -58,48 +41,70 @@ class FeedWriter(writers.WriterChunk):
        ...     def render(self, environment, path, obj):
        ...         print 'Save feed "%s" to "%s"' % (obj.slug, path)
        ...
-       >>> fw = SampleFeed({}, {})
-       >>> pprint(fw({}, {})) #doctest: +ELLIPSIS
+       >>> sf = SampleFeed({}, {})
+       >>> pprint(sf({}, {})) #doctest: +ELLIPSIS
        ({},
         {},
         [<firmant.writers.feeds.SampleFeed object at 0x...>,
          <firmant.writers.feeds.SampleFeed object at 0x...>])
 
-    The :meth:`key` method will return a dictionary of attributes that identify
-    the object.  `type` and `slug` are the attributes that identify a single
-    feed.
-
-    .. doctest::
-
-       >>> print objects.feeds[0].slug
-       foo
-       >>> pprint(fw.key(objects.feeds[0]))
-       {'slug': u'foo', 'type': u'feed'}
-
-    The :meth:`obj_list` method will return a list of objects that are stored in
-    `objects` under the key `feeds`.
-
-    .. doctest::
-
-       >>> fw.obj_list(None, {})
-       []
-       >>> fw.obj_list(None, {'feeds': []})
-       []
-       >>> fw.obj_list(None, {'feeds': ['feedobj']})
-       ['feedobj']
-
     '''
-
-    def obj_list(self, environment, objects):
-        return objects.get('feeds', [])
 
     def key(self, feed):
         '''Return the set of attributes suitable as input for url mapping.
+
+        Attributes that identify a feed object:
+
+            type
+               This is always ``feed``.
+
+            slug
+               The slug that is unique to the feed object.
+
+        .. doctest::
+           :hide:
+
+           >>> class SampleFeed(FeedWriter):
+           ...     extension = 'txt'
+           ...     def render(self, environment, path, obj):
+           ...         print 'Save feed "%s" to "%s"' % (obj.slug, path)
+           ...
+           >>> sf = SampleFeed({}, {'feeds': objects.feeds})
+
+        .. doctest::
+
+           >>> print objects.feeds[0].slug
+           foo
+           >>> pprint(sf.key(objects.feeds[0]))
+           {'slug': u'foo', 'type': u'feed'}
+
         '''
         return {'type': u'feed', 'slug': feed.slug}
 
-    def preconditions(self, environment, objects):
-        return []
+    def obj_list(self, environment, objects):
+        '''Return all objects stored under the key ``feeds``.
+
+        .. doctest::
+           :hide:
+
+           >>> class SampleFeed(FeedWriter):
+           ...     extension = 'txt'
+           ...     def render(self, environment, path, obj):
+           ...         print 'Save feed "%s" to "%s"' % (obj.slug, path)
+           ...
+           >>> sf = SampleFeed({}, {'feeds': objects.feeds})
+
+        .. doctest::
+
+           >>> sf.obj_list(None, {})
+           []
+           >>> sf.obj_list(None, {'feeds': []})
+           []
+           >>> sf.obj_list(None, {'feeds': ['feedobj']})
+           ['feedobj']
+
+        '''
+        return objects.get('feeds', [])
 
 
 def _setup(test):
