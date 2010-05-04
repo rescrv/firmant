@@ -47,6 +47,11 @@ class StaticRstWriter(writers.Writer):
        ...         print 'Save staticrst "%s" to "%s"' % (obj.path, path)
        ...
        >>> ssrw = SampleStaticRstWriter({}, {})
+       >>> pprint(ssrw({}, {})) #doctest: +ELLIPSIS
+       ({},
+        {},
+        [<firmant.writers.staticrst.SampleStaticRstWriter object at 0x...>,
+         <firmant.writers.staticrst.SampleStaticRstWriter object at 0x...>])
 
     '''
 
