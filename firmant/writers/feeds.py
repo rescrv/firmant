@@ -25,6 +25,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+'''Abstract base classes for writing feeds.
+'''
+
+
 from firmant import writers
 
 
