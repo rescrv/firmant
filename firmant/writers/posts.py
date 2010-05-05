@@ -126,6 +126,92 @@ class PostWriter(writers.Writer):
         return objects.get('posts', [])
 
 
+class PostArchiveAll(writers.Writer):
+    '''Write the posts into paginated pages.
+
+    .. doctest::
+
+       >>> class SamplePostArchiveAll(PostArchiveAll):
+       ...     extension = 'txt'
+       ...     def render(self, environment, path, obj): pass
+       >>> spaa = SamplePostArchiveAll({}, {})
+
+    '''
+
+    def key(self, obj):
+        '''Return the set of attributes suitable as input for url mapping.
+
+        Attributes that identify a archived year page:
+
+            type
+               This is always ``post``.
+
+            page
+               The 1-indexed page number of the page.
+
+        .. doctest::
+           :hide:
+
+           >>> class SamplePostArchiveAll(PostArchiveAll):
+           ...     extension = 'txt'
+           ...     def render(self, environment, path, obj): pass
+           >>> spaa = SamplePostArchiveAll({}, {})
+
+        .. doctest::
+
+           >>> obj = spaa.obj_list({'settings': settings},
+           ...                     {'posts': objects.posts})[0]
+           >>> pprint(obj) #doctest: +ELLIPSIS
+           ([<firmant.parsers.RstObject object at 0x...>,
+             <firmant.parsers.RstObject object at 0x...>],
+            Paginated(None, 1, 2))
+
+           >>> pprint(spaa.key(obj))
+           {'page': 1, 'type': u'post'}
+
+        '''
+        return {'type': u'post'
+               ,'page': obj[1].cur
+               }
+
+    def obj_list(self, environment, objects):
+        '''Return 3-tuples with the list of objects and prev/next information.
+
+        The prev/next information is stored in
+        :class:`firmant.paginate.Paginated` objects and is returned for both the
+        groupings by year, and for the groupings into pages.
+
+        .. doctest::
+           :hide:
+
+           >>> class SamplePostArchiveAll(PostArchiveAll):
+           ...     extension = 'txt'
+           ...     def render(self, environment, path, obj): pass
+           >>> spaa = SamplePostArchiveAll({}, {})
+
+        .. doctest::
+
+           >>> spaa.obj_list({'settings': settings}, {})
+           []
+           >>> spaa.obj_list({'settings': settings}, {'posts': []})
+           []
+           >>> pprint(spaa.obj_list({'settings': settings},
+           ...                      {'posts': objects.posts})) #doctest: +ELLIPSIS
+           [([<firmant.parsers.RstObject object at 0x...>,
+              <firmant.parsers.RstObject object at 0x...>],
+             Paginated(None, 1, 2)),
+            ([<firmant.parsers.RstObject object at 0x...>,
+              <firmant.parsers.RstObject object at 0x...>],
+             Paginated(1, 2, 3)),
+            ([<firmant.parsers.RstObject object at 0x...>], Paginated(2, 3, None))]
+
+        '''
+        num_per_page = environment['settings'].POSTS_PER_PAGE
+        posts = sorted(objects.get('posts', []),
+                       key=lambda p: (p.published, p.slug))
+        return paginate.paginate(num_per_page, posts)
+
+
 class PostArchiveYearly(writers.Writer):
     '''Write the posts into pages grouped by year and then paginated.
 
