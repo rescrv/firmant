@@ -39,6 +39,8 @@ class Paginated(object):
     .. doctest::
 
        >>> p = Paginated(1, 2, 3)
+       >>> p
+       Paginated(1, 2, 3)
        >>> p.prev
        1
        >>> p.cur
@@ -70,6 +72,12 @@ class Paginated(object):
         '''The key of the next list.
         '''
         return self._next
+
+    def __repr__(self):
+        '''A more human-friendly form for representing paginated objects.
+        '''
+        return 'Paginated(%s, %s, %s)' % \
+               (str(self._prev), str(self._cur), str(self._next))
 
 
 def split_list_action(key_func, obj_list, action):
