@@ -85,7 +85,8 @@ class AtomFeed(FeedWriter):
 
     .. doctest::
 
-       >>> AtomFeed({}, {'feeds': objects.feeds})
+       >>> AtomFeed({}, {'feeds': objects.feeds}) #doctest: +ELLIPSIS
+       <firmant.writers.atom.AtomFeed object at 0x...>
 
     '''
 
@@ -143,3 +144,10 @@ class AtomFeed(FeedWriter):
         out.write(etree.tostring(feed).encode('utf-8'))
         out.flush()
         out.close()
+
+
+def _setup(test):
+    '''Setup the environment for tests.
+    '''
+    from testdata.chunks import c900
+    test.globs['objects'] = c900

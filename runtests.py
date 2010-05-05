@@ -52,7 +52,7 @@ if __name__ == '__main__':
                'firmant.utils.exceptions',
                'firmant.utils.paths',
                'firmant.writers',
-               #'firmant.writers.atom',
+               'firmant.writers.atom',
                'firmant.writers.feeds',
                'firmant.writers.posts',
                'firmant.writers.static',
