@@ -220,6 +220,105 @@ class PostArchiveYearly(writers.Writer):
         return (post.published.year,)
 
 
+class PostArchiveMonthly(writers.Writer):
+    '''Write the posts into pages grouped by month and then paginated.
+
+    .. doctest::
+
+       >>> class SamplePostArchiveMonthly(PostArchiveMonthly):
+       ...     extension = 'txt'
+       ...     def render(self, environment, path, obj): pass
+       >>> spam = SamplePostArchiveMonthly({}, {})
+
+    '''
+
+    def key(self, obj):
+        '''Return the set of attributes suitable as input for url mapping.
+
+        Attributes that identify a archived month page:
+
+            type
+               This is always ``post``.
+
+            year
+               The year of publication.
+
+            month
+               The month of publication.
+
+        .. doctest::
+           :hide:
+
+           >>> class SamplePostArchiveMonthly(PostArchiveMonthly):
+           ...     extension = 'txt'
+           ...     def render(self, environment, path, obj): pass
+           >>> spam = SamplePostArchiveMonthly({}, {})
+
+        .. doctest::
+
+           >>> obj = spam.obj_list({'settings': settings},
+           ...                     {'posts': objects.posts})[0]
+           >>> pprint(obj) #doctest: +ELLIPSIS
+           ([<firmant.parsers.RstObject object at 0x...>],
+            Paginated(None, (2009, 12), (2010, 1)),
+            Paginated(None, 1, None))
+           >>> pprint(spam.key(obj))
+           {'month': 12, 'type': u'post', 'year': 2009}
+
+        '''
+        return {'type': u'post'
+               ,'year': obj[1].cur[0]
+               ,'month': obj[1].cur[1]
+               }
+
+    def obj_list(self, environment, objects):
+        '''Return 3-tuples with the list of objects and prev/next information.
+
+        The prev/next information is stored in
+        :class:`firmant.paginate.Paginated` objects and is returned for both the
+        groupings by month, and for the groupings into pages.
+
+        .. doctest::
+           :hide:
+
+           >>> class SamplePostArchiveMonthly(PostArchiveMonthly):
+           ...     extension = 'txt'
+           ...     def render(self, environment, path, obj): pass
+           >>> spam = SamplePostArchiveMonthly({}, {})
+
+        .. doctest::
+
+           >>> spam.obj_list({'settings': settings}, {})
+           []
+           >>> spam.obj_list({'settings': settings}, {'posts': []})
+           []
+           >>> pprint(spam.obj_list({'settings': settings},
+           ...                      {'posts': objects.posts})) #doctest: +ELLIPSIS
+           [([<firmant.parsers.RstObject object at 0x...>],
+             Paginated(None, (2009, 12), (2010, 1)),
+             Paginated(None, 1, None)),
+            ([<firmant.parsers.RstObject object at 0x...>],
+             Paginated((2009, 12), (2010, 1), (2010, 2)),
+             Paginated(None, 1, None)),
+            ([<firmant.parsers.RstObject object at 0x...>,
+              <firmant.parsers.RstObject object at 0x...>],
+             Paginated((2010, 1), (2010, 2), None),
+             Paginated(None, 1, 2)),
+            ([<firmant.parsers.RstObject object at 0x...>],
+             Paginated((2010, 1), (2010, 2), None),
+             Paginated(1, 2, None))]
+
+        '''
+        num_per_page = environment['settings'].POSTS_PER_PAGE
+        posts = sorted(objects.get('posts', []),
+                       key=lambda p: (p.published, p.slug))
+        return paginate.split_paginate(num_per_page, self.__splitfunc__, posts)
+
+    @staticmethod
+    def __splitfunc__(post):
+        return (post.published.year, post.published.month)
+
+
 def _setup(test):
     '''Setup the environment for tests.
     '''
