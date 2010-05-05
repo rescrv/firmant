@@ -29,6 +29,7 @@
 '''
 
 
+from firmant import paginate
 from firmant import writers
 
 
@@ -125,8 +126,106 @@ class PostWriter(writers.Writer):
         return objects.get('posts', [])
 
 
+class PostArchiveYearly(writers.Writer):
+    '''Write the posts into pages grouped by year and then paginated.
+
+    .. doctest::
+
+       >>> class SamplePostArchiveYearly(PostArchiveYearly):
+       ...     extension = 'txt'
+       ...     def render(self, environment, path, obj): pass
+       >>> spay = SamplePostArchiveYearly({}, {})
+
+    '''
+
+    def key(self, obj):
+        '''Return the set of attributes suitable as input for url mapping.
+
+        Attributes that identify a archived year page:
+
+            type
+               This is always ``post``.
+
+            year
+               The year of publication.
+
+        .. doctest::
+           :hide:
+
+           >>> class SamplePostArchiveYearly(PostArchiveYearly):
+           ...     extension = 'txt'
+           ...     def render(self, environment, path, obj): pass
+           >>> spay = SamplePostArchiveYearly({}, {})
+
+        .. doctest::
+
+           >>> obj = spay.obj_list({'settings': settings},
+           ...                     {'posts': objects.posts})[0]
+           >>> pprint(obj) #doctest: +ELLIPSIS
+           ([<firmant.parsers.RstObject object at 0x...>],
+            Paginated(None, (2009,), (2010,)),
+            Paginated(None, 1, None))
+           >>> pprint(spay.key(obj))
+           {'type': u'post', 'year': 2009}
+
+        '''
+        return {'type': u'post'
+               ,'year': obj[1].cur[0]
+               }
+
+    def obj_list(self, environment, objects):
+        '''Return 3-tuples with the list of objects and prev/next information.
+
+        The prev/next information is stored in
+        :class:`firmant.paginate.Paginated` objects and is returned for both the
+        groupings by year, and for the groupings into pages.
+
+        .. doctest::
+           :hide:
+
+           >>> class SamplePostArchiveYearly(PostArchiveYearly):
+           ...     extension = 'txt'
+           ...     def render(self, environment, path, obj): pass
+           >>> spay = SamplePostArchiveYearly({}, {})
+
+        .. doctest::
+
+           >>> spay.obj_list({'settings': settings}, {})
+           []
+           >>> spay.obj_list({'settings': settings}, {'posts': []})
+           []
+           >>> pprint(spay.obj_list({'settings': settings},
+           ...                      {'posts': objects.posts})) #doctest: +ELLIPSIS
+           [([<firmant.parsers.RstObject object at 0x...>],
+             Paginated(None, (2009,), (2010,)),
+             Paginated(None, 1, None)),
+            ([<firmant.parsers.RstObject object at 0x...>,
+              <firmant.parsers.RstObject object at 0x...>],
+             Paginated((2009,), (2010,), None),
+             Paginated(None, 1, 2)),
+            ([<firmant.parsers.RstObject object at 0x...>,
+              <firmant.parsers.RstObject object at 0x...>],
+             Paginated((2009,), (2010,), None),
+             Paginated(1, 2, None))]
+
+
+        '''
+        num_per_page = environment['settings'].POSTS_PER_PAGE
+        posts = sorted(objects.get('posts', []),
+                       key=lambda p: (p.published, p.slug))
+        return paginate.split_paginate(num_per_page, self.__splitfunc__, posts)
+
+    @staticmethod
+    def __splitfunc__(post):
+        return (post.published.year,)
+
+
 def _setup(test):
     '''Setup the environment for tests.
     '''
+    from pysettings.settings import Settings
     from testdata.chunks import c900
+    settings = Settings()
+    settings.POSTS_PER_PAGE = 2
+    test.globs['settings'] = settings
     test.globs['objects'] = c900
