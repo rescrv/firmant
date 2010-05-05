@@ -54,7 +54,7 @@ if __name__ == '__main__':
                'firmant.writers',
                #'firmant.writers.atom',
                'firmant.writers.feeds',
-               #'firmant.writers.posts',
+               'firmant.writers.posts',
                'firmant.writers.static',
                'firmant.writers.staticrst',
                #'firmant.writers.j2'

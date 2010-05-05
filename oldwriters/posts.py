@@ -519,65 +519,6 @@ class PostArchiveDaily(PostArchiveBase):
             print fmt_str % post.slug
 
 
-class PostSingle(PostWriter):
-    '''Parse the posts into single pages.
-    '''
-
-    fmt = 'html'
-
-    def url(self, post):
-        '''Use the urlmapper to construct a URL for the given attributes.
-        '''
-        return self.urlmapper.url(self.fmt, type='post',
-                year=post.published.year, month=post.published.month,
-                day=post.published.day, slug=post.slug)
-
-    def urls(self):
-        '''A list of rooted paths that are the path component of URLs.
-
-        Example on testdata/pristine::
-
-            >>> c = components
-            >>> urlmapper.add(c.TYPE('post')/c.YEAR/c.MONTH/c.DAY/c.SLUG)
-            >>> ps = PostSingle(settings, objs, urlmapper)
-            >>> pprint(ps.urls())
-            ['http://test/2010/02/02/newday2/',
-             'http://test/2010/02/02/newday/',
-             'http://test/2010/02/01/newmonth/',
-             'http://test/2010/01/01/newyear/',
-             'http://test/2009/12/31/party/']
-
-        '''
-        ret = list()
-        for post in self._sorted_posts():
-            ret.append(self.url(post=post))
-        return ret
-
-    def write(self):
-        '''Write the parsed posts to the filesystem.
-
-        Example on testdata/pristine::
-
-        >>> ps = PostSingle(settings, objs, urlmapper)
-        >>> ps.write()
-        Post 2010/02/02/newday2
-        Post 2010/02/02/newday
-        Post 2010/02/01/newmonth
-        Post 2010/01/01/newyear
-        Post 2009/12/31/party
-
-        '''
-        for post in self._sorted_posts():
-            self.render(post)
-
-    def render(self, post):
-        '''Render the posts.
-
-        This should be overridden in child classes.
-        '''
-        print 'Post %s/%s' % (post.published.strftime('%Y/%m/%d'), post.slug)
-
-
 def _setup(self):
     '''Setup the test cases.
 

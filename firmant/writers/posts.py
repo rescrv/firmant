@@ -27,3 +27,106 @@
 
 '''Abstract base classes for writing posts.
 '''
+
+
+from firmant import writers
+
+
+class PostWriter(writers.Writer):
+    '''Write/render individual post objects.
+
+    This post writer is serves as the basis for other post writers that write
+    posts individually.
+
+    .. doctest::
+
+       >>> class SamplePost(PostWriter):
+       ...     extension = 'txt'
+       ...     def render(self, environment, path, obj):
+       ...         print 'Save post "%s %s" to "%s"' % \
+                       (obj.published.strftime('%Y-%m-%d'), obj.slug, path)
+       >>> sp = SamplePost({}, {})
+       >>> pprint(sp({}, {})) #doctest: +ELLIPSIS
+       ({},
+        {},
+        [<firmant.writers.posts.SamplePost object at 0x...>,
+         <firmant.writers.posts.SamplePost object at 0x...>])
+
+    '''
+
+    def key(self, post):
+        '''Return the set of attributes suitable as input for url mapping.
+
+        Attributes that identify a post object:
+
+            type
+               This is always ``post``.
+
+            year
+               The year of publication.
+
+            month
+               The month of publication.
+
+            day
+               The day of publication.
+
+            slug
+               The slug that is unique to the feed object.
+
+        .. doctest::
+           :hide:
+
+           >>> class SamplePost(PostWriter):
+           ...     extension = 'txt'
+           ...     def render(self, environment, path, obj):
+           ...         print 'Save post "%s %s" to "%s"' % \
+                           (obj.published.strftime('%Y-%m-%d'), obj.slug, path)
+           >>> sp = SamplePost({}, {})
+
+        .. doctest::
+
+           >>> print objects.posts[0].published.date(), objects.posts[0].slug
+           2009-12-31 party
+           >>> pprint(sp.key(objects.posts[0]))
+           {'day': 31, 'month': 12, 'slug': u'party', 'type': u'post', 'year': 2009}
+
+        '''
+        return {'type': u'post'
+               ,'slug': post.slug
+               ,'year': post.published.year
+               ,'month': post.published.month
+               ,'day': post.published.day
+               }
+
+    def obj_list(self, environment, objects):
+        '''Return all objects stored under the key ``posts``.
+
+        .. doctest::
+           :hide:
+
+           >>> class SamplePost(PostWriter):
+           ...     extension = 'txt'
+           ...     def render(self, environment, path, obj):
+           ...         print 'Save post "%s %s" to "%s"' % \
+                           (obj.published.strftime('%Y-%m-%d'), obj.slug, path)
+           >>> sp = SamplePost({}, {})
+
+        .. doctest::
+
+           >>> sp.obj_list(None, {})
+           []
+           >>> sp.obj_list(None, {'posts': []})
+           []
+           >>> sp.obj_list(None, {'posts': ['postobj']})
+           ['postobj']
+
+        '''
+        return objects.get('posts', [])
+
+
+def _setup(test):
+    '''Setup the environment for tests.
+    '''
+    from testdata.chunks import c900
+    test.globs['objects'] = c900
