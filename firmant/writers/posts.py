@@ -319,6 +319,109 @@ class PostArchiveMonthly(writers.Writer):
         return (post.published.year, post.published.month)
 
 
+class PostArchiveDaily(writers.Writer):
+    '''Write the posts into pages grouped by day and then paginated.
+
+    .. doctest::
+
+       >>> class SamplePostArchiveDaily(PostArchiveDaily):
+       ...     extension = 'txt'
+       ...     def render(self, environment, path, obj): pass
+       >>> spad = SamplePostArchiveDaily({}, {})
+
+    '''
+
+    def key(self, obj):
+        '''Return the set of attributes suitable as input for url mapping.
+
+        Attributes that identify an archived day page:
+
+            type
+               This is always ``post``.
+
+            year
+               The year of publication.
+
+            month
+               The month of publication.
+
+            day
+               The day of publication.
+
+        .. doctest::
+           :hide:
+
+           >>> class SamplePostArchiveDaily(PostArchiveDaily):
+           ...     extension = 'txt'
+           ...     def render(self, environment, path, obj): pass
+           >>> spad = SamplePostArchiveDaily({}, {})
+
+        .. doctest::
+
+           >>> obj = spad.obj_list({'settings': settings},
+           ...                     {'posts': objects.posts})[0]
+           >>> pprint(obj) #doctest: +ELLIPSIS
+           ([<firmant.parsers.RstObject object at 0x...>],
+            Paginated(None, (2009, 12, 31), (2010, 1, 1)),
+            Paginated(None, 1, None))
+           >>> pprint(spad.key(obj))
+           {'day': 31, 'month': 12, 'type': u'post', 'year': 2009}
+
+        '''
+        return {'type': u'post'
+               ,'year': obj[1].cur[0]
+               ,'month': obj[1].cur[1]
+               ,'day': obj[1].cur[2]
+               }
+
+    def obj_list(self, environment, objects):
+        '''Return 3-tuples with the list of objects and prev/next information.
+
+        The prev/next information is stored in
+        :class:`firmant.paginate.Paginated` objects and is returned for both the
+        groupings by day, and for the groupings into pages.
+
+        .. doctest::
+           :hide:
+
+           >>> class SamplePostArchiveDaily(PostArchiveDaily):
+           ...     extension = 'txt'
+           ...     def render(self, environment, path, obj): pass
+           >>> spad = SamplePostArchiveDaily({}, {})
+
+        .. doctest::
+
+           >>> spad.obj_list({'settings': settings}, {})
+           []
+           >>> spad.obj_list({'settings': settings}, {'posts': []})
+           []
+           >>> pprint(spad.obj_list({'settings': settings},
+           ...                      {'posts': objects.posts})) #doctest: +ELLIPSIS
+           [([<firmant.parsers.RstObject object at 0x...>],
+             Paginated(None, (2009, 12, 31), (2010, 1, 1)),
+             Paginated(None, 1, None)),
+            ([<firmant.parsers.RstObject object at 0x...>],
+             Paginated((2009, 12, 31), (2010, 1, 1), (2010, 2, 1)),
+             Paginated(None, 1, None)),
+            ([<firmant.parsers.RstObject object at 0x...>],
+             Paginated((2010, 1, 1), (2010, 2, 1), (2010, 2, 2)),
+             Paginated(None, 1, None)),
+            ([<firmant.parsers.RstObject object at 0x...>,
+              <firmant.parsers.RstObject object at 0x...>],
+             Paginated((2010, 2, 1), (2010, 2, 2), None),
+             Paginated(None, 1, None))]
+
+        '''
+        num_per_page = environment['settings'].POSTS_PER_PAGE
+        posts = sorted(objects.get('posts', []),
+                       key=lambda p: (p.published, p.slug))
+        return paginate.split_paginate(num_per_page, self.__splitfunc__, posts)
+
+    @staticmethod
+    def __splitfunc__(post):
+        return (post.published.year, post.published.month, post.published.day)
+
+
 def _setup(test):
     '''Setup the environment for tests.
     '''
