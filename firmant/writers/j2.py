@@ -30,13 +30,11 @@
 
 
 import abc
-import os
 
 import jinja2
 
-from firmant import writers
-import firmant.writers.staticrst
-import firmant.writers.posts
+from firmant.writers import staticrst
+from firmant.writers import posts
 from firmant.utils import paths
 from firmant.utils import workarounds
 
@@ -66,7 +64,7 @@ class Jinja2Base(object):
         out.close()
 
 
-class Jinja2StaticRst(Jinja2Base, writers.staticrst.StaticRstWriter):
+class Jinja2StaticRst(Jinja2Base, staticrst.StaticRstWriter):
     '''Render staticrst objects using the :class:`StaticRstWriter` base.
     '''
 
@@ -78,24 +76,12 @@ class Jinja2StaticRst(Jinja2Base, writers.staticrst.StaticRstWriter):
         '''Render the data in a Jinja2 template.
 
         .. doctest::
-           :hide:
 
-           >>> import tempfile
-           >>> path = tempfile.NamedTemporaryFile(delete=False).name
-           >>> objs = {'staticrst': objects.staticrst}
-
-        .. doctest::
-
-           >>> j2sr = Jinja2StaticRst(environment, objs)
-           >>> obj = j2sr.obj_list(environment, objs)[0]
+           >>> j2sr = Jinja2StaticRst(environment, objects)
+           >>> obj = j2sr.obj_list(environment, objects)[0]
            >>> j2sr.render(environment, path, obj)
            >>> cat(path)
            About at about
-
-        .. doctest::
-           :hide:
-
-           >>> os.unlink(path)
 
         '''
         context = dict()
@@ -104,7 +90,7 @@ class Jinja2StaticRst(Jinja2Base, writers.staticrst.StaticRstWriter):
         self.render_to_file(path, self.template, context)
 
 
-class Jinja2PostWriter(Jinja2Base, writers.posts.PostWriter):
+class Jinja2PostWriter(Jinja2Base, posts.PostWriter):
     '''Render each post individually using Jinja2 templates.
     '''
 
@@ -116,24 +102,12 @@ class Jinja2PostWriter(Jinja2Base, writers.posts.PostWriter):
         r'''Render the data in a Jinja2 template.
 
         .. doctest::
-           :hide:
 
-           >>> import tempfile
-           >>> path = tempfile.NamedTemporaryFile(delete=False).name
-           >>> objs = {'posts': objects.posts}
-
-        .. doctest::
-
-           >>> j2pw = Jinja2PostWriter(environment, objs)
-           >>> obj = j2pw.obj_list(environment, objs)[0]
+           >>> j2pw = Jinja2PostWriter(environment, objects)
+           >>> obj = j2pw.obj_list(environment, objects)[0]
            >>> j2pw.render(environment, path, obj)
            >>> cat(path)
            2009-12-31 | party by John Doe
-
-        .. doctest::
-           :hide:
-
-           >>> os.unlink(path)
 
         '''
         context = dict()
@@ -204,22 +178,27 @@ class Jinja2PostArchiveBase(Jinja2Base):
         self.render_to_file(path, self.template, context)
 
 
-class Jinja2PostArchiveAll(Jinja2PostArchiveBase, writers.posts.PostArchiveAll):
+class Jinja2PostArchiveAll(Jinja2PostArchiveBase, posts.PostArchiveAll):
+    '''Render paginated post lists with Jinja2 templates.
+    '''
     template = 'posts/archive_all.html'
 
 
-class Jinja2PostArchiveYearly(Jinja2PostArchiveBase,
-        writers.posts.PostArchiveYearly):
+class Jinja2PostArchiveYearly(Jinja2PostArchiveBase, posts.PostArchiveYearly):
+    '''Render paginated post lists (grouped by year) with Jinja2 templates.
+    '''
     template = 'posts/archive_yearly.html'
 
 
-class Jinja2PostArchiveMonthly(Jinja2PostArchiveBase,
-        writers.posts.PostArchiveMonthly):
+class Jinja2PostArchiveMonthly(Jinja2PostArchiveBase, posts.PostArchiveMonthly):
+    '''Render paginated post lists (grouped by month) with Jinja2 templates.
+    '''
     template = 'posts/archive_monthly.html'
 
 
-class Jinja2PostArchiveDaily(Jinja2PostArchiveBase,
-        writers.posts.PostArchiveDaily):
+class Jinja2PostArchiveDaily(Jinja2PostArchiveBase, posts.PostArchiveDaily):
+    '''Render paginated post lists (grouped by day) with Jinja2 templates.
+    '''
     template = 'posts/archive_daily.html'
 
 
@@ -227,45 +206,33 @@ def _setup(self):
     '''Setup the test cases.
     '''
     import tempfile
-    from minimock import Mock
-
+    import os
     from pysettings.settings import Settings
-    from firmant.application import Firmant
     from firmant.routing import URLMapper
-    from firmant.routing import components
     from firmant.utils.paths import cat
-    s = {'PARSERS': {'posts': 'firmant.parsers.posts.PostParser'
-                    ,'staticrst': 'firmant.parsers.static.StaticRstParser'}
-        ,'CONTENT_ROOT': 'testdata/pristine'
-        ,'POSTS_SUBDIR': 'posts'
-        ,'STATIC_RST_SUBDIR': 'flat'
-        ,'REST_EXTENSION': 'rst'
-        ,'POSTS_PER_PAGE': 2
-        ,'OUTPUT_DIR': tempfile.mkdtemp()
-        ,'TEMPLATE_DIR': 'testdata/pristine/templates'
-        ,'PERMALINK_ROOT': 'http://testurl'
-        }
-    settings               = Settings(s)
-    firmant                = Firmant(settings)
-    firmant.parse()
     from testdata.chunks import c900
+    settings = Settings({'POSTS_PER_PAGE': 2
+                        ,'OUTPUT_DIR': tempfile.mkdtemp()
+                        ,'PERMALINK_ROOT': 'http://testurl'
+                        ,'TEMPLATE_DIR': 'testdata/pristine/templates'
+                        })
+    urlmapper = URLMapper(settings.OUTPUT_DIR, settings.PERMALINK_ROOT)
     self.globs['settings']   = settings
-    self.globs['objs']       = firmant.objs
-    self.globs['urlmapper'] = URLMapper(settings.OUTPUT_DIR,
-            settings.PERMALINK_ROOT)
-    self.globs['Mock']       = Mock
-    self.globs['components'] = components
     self.globs['cat']        = cat
     self.globs['environment'] = {'settings': settings
-                                ,'urlmapper': self.globs['urlmapper']
+                                ,'urlmapper': urlmapper
                                 }
-    settings.POSTS_PER_PAGE = 2
-    self.globs['settings'] = settings
-    self.globs['objects'] = c900
+    self.globs['objects'] = {'posts': c900.posts, 'staticrst': c900.staticrst}
+    self.globs['os'] = os
+    self.globs['tempfile'] = os
+    self.globs['path'] = tempfile.NamedTemporaryFile(delete=False).name
+    self.globs['__path__'] = self.globs['path']
 
 
 def _teardown(test):
     '''Cleanup the Jinja2 test cases.
     '''
+    import os
     import shutil
+    os.unlink(test.globs['__path__'])
     shutil.rmtree(test.globs['settings'].OUTPUT_DIR)
