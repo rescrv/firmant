@@ -104,12 +104,9 @@ class AtomFeed(FeedWriter):
         updated = max([post.published for post in feed_obj.posts] +
                 [datetime.datetime(1900, 01, 01)])
         add_text_subelement(feed, 'updated', rfc3339(updated))
-        # TODO switch to using permalink attribute (once it exists).
-        permalink = environment['urlmapper'].url('atom',
-                **self.key(feed_obj))
-        add_text_subelement(feed, 'id', permalink)
+        add_text_subelement(feed, 'id', feed_obj.permalink)
         link = etree.SubElement(feed, 'link')
-        link.set('href', permalink)
+        link.set('href', feed_obj.permalink)
         link.set('rel', 'self')
 
         for post_obj in feed_obj.posts:
@@ -125,14 +122,11 @@ class AtomFeed(FeedWriter):
             content.text = post_obj.content
             content.set('type', 'html')
 
-            # TODO switch to using permalink attribute (once it exists).
-            # TODO BROKEN.  FIX BEFORE 0.2.0
-            permalink = 'http://perma.link'
             l_alt = etree.SubElement(post, 'link')
-            l_alt.set('href', permalink)
+            l_alt.set('href', post_obj.permalink)
             l_alt.set('rel', 'alternate')
 
-            add_text_subelement(post, 'id', permalink)
+            add_text_subelement(post, 'id', post_obj.permalink)
             add_text_subelement(post, 'rights', post_obj.copyright)
 
             for tag in post_obj.tags:

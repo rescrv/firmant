@@ -75,6 +75,7 @@ class Firmant(object):
                   <firmant.parsers.RstObject object at 0x...>,
                   <firmant.parsers.RstObject object at 0x...>]}
         >>> f.cross_reference() #doctest: +ELLIPSIS
+        >>> f.create_permalinks() #doctest: +ELLIPSIS
         >>> for post in f.objs['posts']:
         ...     pprint((post.tags, post.feeds)) #doctest: +ELLIPSIS
         ([<firmant.parsers.RstObject object at 0x...>],
@@ -195,40 +196,61 @@ class Firmant(object):
             writer = getattr(mod, attr)
             self.chunks.append(writer(self.env, self.objs))
 
+    def create_permalinks(self):
+        '''Add permalinks to objects.
+        '''
+        # TODO:  Remove prior to 0.2.0
+        url = self.urlmapper.url
+        for post in self.objs.get('posts', []):
+            post.permalink = url('atom', **{'type': 'post'
+                                           ,'year': post.published.year
+                                           ,'month': post.published.month
+                                           ,'day': post.published.day
+                                           ,'slug': post.slug
+                                           })
+        for tag in self.objs.get('tags', []):
+            tag.permalink = url('html', **{'type': 'tag'
+                                          ,'slug': tag.slug
+                                          })
+        for feed in self.objs.get('feeds', []):
+            feed.permalink = url('atom', **{'type': 'feed'
+                                           ,'slug': feed.slug
+                                           })
+
     def create_globals(self):
         '''Create a dictionary of globals to be added to rendering contexts.
         '''
-        self.objs['globals'] = globals = dict()
+        self.env['j2globals'] = globals = dict()
         url = self.urlmapper.url
         globals['urlfor'] = url
-        #globals['recent_posts'] = [(p.title, p.permalink) for p in
-        #        reversed(sorted(self.objs.get('posts', []),
-        #            key=lambda p: (p.published, p.slug)))] \
-        #        [:self.settings.SIDEBAR_POSTS_LEN]
-        ## TODO:  Disgusted with this.  I will make a real global object later.
-        #globals['daily_archives'] = \
-        #        [(datetime.date(y, m, d), url('html',
-        #            type='post', year=y, month=m, day=d, page=1))
-        #        for y, m, d in reversed(sorted(set([(p.published.year,
-        #            p.published.month, p.published.day)
-        #            for p in self.objs.get('posts', [])])))] \
-        #        [:self.settings.SIDEBAR_ARCHIVES_LEN]
-        #globals['monthly_archives'] = \
-        #        [(datetime.date(y, m, 1), url('html',
-        #            type='post', year=y, month=m, page=1))
-        #        for y, m in reversed(sorted(set([(p.published.year, p.published.month)
-        #            for p in self.objs.get('posts', [])])))] \
-        #        [:self.settings.SIDEBAR_ARCHIVES_LEN]
-        #globals['yearly_archives'] = \
-        #        [(datetime.date(y, 1, 1), url('html',
-        #            type='post', year=y, page=1))
-        #        for y in reversed(sorted(set([p.published.year
-        #            for p in self.objs.get('posts', [])])))] \
-        #        [:self.settings.SIDEBAR_ARCHIVES_LEN]
-        #globals['static_pages'] = [(p.title, p.permalink) for p in
-        #        sorted(self.objs.get('staticrst', []), key=lambda p: p.title)]
-        #globals['atom_feeds'] = [(f.slug, f.permalink) for f in
-        #        sorted(self.objs.get('feeds', []) , key=lambda f: f.slug)]
+        globals['recent_posts'] = [(p.title, p.permalink) for p in
+                reversed(sorted(self.objs.get('posts', []),
+                    key=lambda p: (p.published, p.slug)))] \
+                [:self.settings.SIDEBAR_POSTS_LEN]
+        # TODO:  Disgusted with this.  I will make a real global object later.
+        globals['daily_archives'] = \
+                [(datetime.date(y, m, d), url('html',
+                    type='post', year=y, month=m, day=d, page=1))
+                for y, m, d in reversed(sorted(set([(p.published.year,
+                    p.published.month, p.published.day)
+                    for p in self.objs.get('posts', [])])))] \
+                [:self.settings.SIDEBAR_ARCHIVES_LEN]
+        globals['monthly_archives'] = \
+                [(datetime.date(y, m, 1), url('html',
+                    type='post', year=y, month=m, page=1))
+                for y, m in reversed(sorted(set([(p.published.year, p.published.month)
+                    for p in self.objs.get('posts', [])])))] \
+                [:self.settings.SIDEBAR_ARCHIVES_LEN]
+        globals['yearly_archives'] = \
+                [(datetime.date(y, 1, 1), url('html',
+                    type='post', year=y, page=1))
+                for y in reversed(sorted(set([p.published.year
+                    for p in self.objs.get('posts', [])])))] \
+                [:self.settings.SIDEBAR_ARCHIVES_LEN]
+        globals['static_pages'] = [(p.title, p.permalink) for p in
+                sorted(self.objs.get('staticrst', []), key=lambda p: p.title)]
+        globals['atom_feeds'] = [(f.slug, f.permalink) for f in
+                sorted(self.objs.get('feeds', []) , key=lambda f: f.slug)]
 
 
 class SetupURLConflicts(AbstractChunk):
