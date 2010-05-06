@@ -60,10 +60,10 @@ class Jinja2Base(object):
         globs    = self.__environment__.get('j2globals', dict())
         globs.update(context)
         data     = template.render(globs)
-        f        = paths.create_or_truncate(path)
-        f.write(data.encode('utf-8'))
-        f.flush()
-        f.close()
+        out      = paths.create_or_truncate(path)
+        out.write(data.encode('utf-8'))
+        out.flush()
+        out.close()
 
 
 class Jinja2StaticRst(Jinja2Base, writers.staticrst.StaticRstWriter):
