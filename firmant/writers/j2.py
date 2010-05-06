@@ -157,45 +157,55 @@ class Jinja2PostArchiveBase(Jinja2Base):
         context = dict()
         context['posts'] = obj[0]
         urlmapper = environment['urlmapper']
+        if len(obj) == 3:
+            pages = 2
+            calen = 1
+        elif len(obj) == 2:
+            pages = 1
+            calen = False
         # Construct the urls for prev/next paginated pages
-        if obj[2].prev:
+        if obj[pages].prev:
             d = key.copy()
-            d['page'] = obj[2].prev
+            d['page'] = obj[pages].prev
             context['page_prev'] = urlmapper.url(self.extension, **d)
         else:
             context['page_prev'] = None
-        if obj[2].next:
+        if obj[pages].next:
             d = key.copy()
-            d['page'] = obj[2].next
+            d['page'] = obj[pages].next
             context['page_next'] = urlmapper.url(self.extension, **d)
         else:
             context['page_next'] = None
         # Construct the urls for prev/next archive pages
-        if obj[1].prev:
+        if calen and obj[calen].prev:
             d = key.copy()
             d['page'] = 1
             if len(obj[1].prev) >= 1:
-                d['year'] = obj[1].prev[0]
+                d['year'] = obj[calen].prev[0]
             if len(obj[1].prev) >= 2:
-                d['month'] = obj[1].prev[1]
+                d['month'] = obj[calen].prev[1]
             if len(obj[1].prev) >= 3:
-                d['day'] = obj[1].prev[2]
+                d['day'] = obj[calen].prev[2]
             context['cal_prev'] = urlmapper.url(self.extension, **d)
         else:
             context['cal_prev'] = None
-        if obj[1].next:
+        if calen and obj[calen].next:
             d = key.copy()
             d['page'] = 1
             if len(obj[1].next) >= 1:
-                d['year'] = obj[1].next[0]
+                d['year'] = obj[calen].next[0]
             if len(obj[1].next) >= 2:
-                d['month'] = obj[1].next[1]
+                d['month'] = obj[calen].next[1]
             if len(obj[1].next) >= 3:
-                d['day'] = obj[1].next[2]
+                d['day'] = obj[calen].next[2]
             context['cal_next'] = urlmapper.url(self.extension, **d)
         else:
             context['cal_next'] = None
         self.render_to_file(path, self.template, context)
+
+
+class Jinja2PostArchiveAll(Jinja2PostArchiveBase, writers.posts.PostArchiveAll):
+    template = 'posts/archive_all.html'
 
 
 class Jinja2PostArchiveYearly(Jinja2PostArchiveBase,

@@ -49,13 +49,13 @@ TAGS_SUBDIR = 'tags'
 STATIC_SUBDIR = 'static'
 STATIC_RST_SUBDIR = 'flat'
 REST_EXTENSION = 'rst'
-#WRITERS = ['firmant.writers.j2.Jinja2PostArchiveAll'
-WRITERS = [
-          'firmant.writers.j2.Jinja2PostArchiveYearly'
+WRITERS = ['firmant.writers.j2.Jinja2PostArchiveAll'
+          ,'firmant.writers.j2.Jinja2PostArchiveYearly'
           ,'firmant.writers.j2.Jinja2PostArchiveMonthly'
           ,'firmant.writers.j2.Jinja2PostArchiveDaily'
           ,'firmant.writers.j2.Jinja2PostWriter'
           ,'firmant.writers.j2.Jinja2StaticRst'
+          ,'firmant.writers.static.StaticWriter'
           ,'firmant.writers.atom.AtomFeed'
           ]
 POSTS_PER_PAGE = 10
