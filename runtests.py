@@ -57,7 +57,7 @@ if __name__ == '__main__':
                'firmant.writers.posts',
                'firmant.writers.static',
                'firmant.writers.staticrst',
-               #'firmant.writers.j2'
+               'firmant.writers.j2'
               ]
 
     if len(sys.argv[1:]) > 0:

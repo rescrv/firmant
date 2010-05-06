@@ -42,28 +42,6 @@ from firmant.writers import staticrst
 from firmant.writers import Writer
 
 
-class Jinja2Writer(Writer):
-    '''Base class used for functionality common to all J2 writers.
-    '''
-
-    def __init__(self, *args, **kwargs):
-        super(Jinja2Writer, self).__init__(*args, **kwargs)
-        loader = FileSystemLoader(self.settings.TEMPLATE_DIR)
-        self._env = Environment(loader=loader)
-
-    def render_to_file(self, path, template, context):
-        '''Render template with context and save to path.
-        '''
-        template = self._env.get_template(template)
-        globals  = self.objs.get('globals', dict())
-        globals.update(context)
-        data     = template.render(globals)
-        f        = paths.create_or_truncate(path)
-        f.write(data.encode('utf-8'))
-        f.flush()
-        f.close()
-
-
 class Jinja2PostArchiveBase(Jinja2Writer, posts.PostArchiveBase):
     '''Common functionality for rendering Jinja2 archive views.
     '''
@@ -315,35 +293,6 @@ class Jinja2PostSingle(Jinja2Writer, posts.PostSingle):
         context['day']           = post.published.day
         context['slug']          = post.slug
         context['post']          = post
-        self.render_to_file(path, template, context)
-
-
-class Jinja2StaticRstSingle(Jinja2Writer, staticrst.StaticRstWriter):
-    '''Render static rst using Jinja2 templates.
-    '''
-
-    permalinks_for = 'staticrst'
-
-    def render(self, static):
-        r'''Render the data in a Jinja2 template.
-
-            >>> c = components
-            >>> urlmapper.add(c.TYPE('staticrst')/c.PATH)
-            >>> j2srs = Jinja2StaticRstSingle(settings, objs, urlmapper)
-            >>> j2srs.log = Mock('log')
-            >>> j2srs.write()
-            >>> join = os.path.join
-            >>> cat(join(settings.OUTPUT_DIR, 'about/index.html'))
-            About at about
-            >>> cat(join(settings.OUTPUT_DIR, 'links/index.html'))
-            Links at links
-
-        '''
-        path = self.urlmapper.path('html', type='staticrst', path=static.path)
-        template = 'flat.html'
-        context = dict()
-        context['path'] = static.path
-        context['page'] = static
         self.render_to_file(path, template, context)
 
 
