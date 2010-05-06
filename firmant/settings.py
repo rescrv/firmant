@@ -50,14 +50,13 @@ STATIC_SUBDIR = 'static'
 STATIC_RST_SUBDIR = 'flat'
 REST_EXTENSION = 'rst'
 #WRITERS = ['firmant.writers.j2.Jinja2PostArchiveAll'
-#          ,'firmant.writers.j2.Jinja2PostArchiveYearly'
-#          ,'firmant.writers.j2.Jinja2PostArchiveMonthly'
-#          ,'firmant.writers.j2.Jinja2PostArchiveDaily'
-#          ,'firmant.writers.j2.Jinja2PostSingle'
-#          ,'firmant.writers.j2.Jinja2StaticRstSingle'
-#          ,'firmant.writers.atom.AtomFeed'
-#          ]
-WRITERS = ['firmant.writers.static.StaticWriter'
+WRITERS = [
+          'firmant.writers.j2.Jinja2PostArchiveYearly'
+          ,'firmant.writers.j2.Jinja2PostArchiveMonthly'
+          ,'firmant.writers.j2.Jinja2PostArchiveDaily'
+          ,'firmant.writers.j2.Jinja2PostWriter'
+          ,'firmant.writers.j2.Jinja2StaticRst'
+          ,'firmant.writers.atom.AtomFeed'
           ]
 POSTS_PER_PAGE = 10
 POSTS_PER_FEED = 10

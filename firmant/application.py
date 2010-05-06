@@ -113,6 +113,7 @@ class Firmant(object):
         self.env    = dict()
         self.env['log'] = self.log
         self.env['urlmapper'] = self.urlmapper
+        self.env['settings'] = self.settings
 
         self.chunks.append(CheckURLConflicts())
         self.chunks.append(SetupURLConflicts())

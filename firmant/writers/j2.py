@@ -29,20 +29,24 @@
 '''
 
 
+import abc
 import os
 
 import jinja2
 
 from firmant import writers
+import firmant.writers.staticrst
+import firmant.writers.posts
 from firmant.utils import paths
+from firmant.utils import workarounds
 
 
 class Jinja2Base(object):
     '''Base class used for functionality common to all J2 writers.
     '''
 
-    def __init__(self, environment, objects):
-        super(Jinja2Base, self).__init__(environment, objects)
+    def __init__(self, environment, objects, *args, **kwargs):
+        super(Jinja2Base, self).__init__(environment, objects, *args, **kwargs)
         settings = environment['settings']
         self.__environment__ = environment
         self.__objects__ = objects
@@ -135,6 +139,78 @@ class Jinja2PostWriter(Jinja2Base, writers.posts.PostWriter):
         context = dict()
         context['post']  = post
         self.render_to_file(path, self.template, context)
+
+
+class Jinja2PostArchiveBase(Jinja2Base):
+    '''Common functionality for rendering Jinja2 archive views.
+    '''
+
+    __metaclass__ = abc.ABCMeta
+
+    extension = 'html'
+
+    @workarounds.abstractproperty
+    def template(self): pass
+
+    def render(self, environment, path, obj):
+        key = self.key(obj)
+        context = dict()
+        context['posts'] = obj[0]
+        urlmapper = environment['urlmapper']
+        # Construct the urls for prev/next paginated pages
+        if obj[2].prev:
+            d = key.copy()
+            d['page'] = obj[2].prev
+            context['page_prev'] = urlmapper.url(self.extension, **d)
+        else:
+            context['page_prev'] = None
+        if obj[2].next:
+            d = key.copy()
+            d['page'] = obj[2].next
+            context['page_next'] = urlmapper.url(self.extension, **d)
+        else:
+            context['page_next'] = None
+        # Construct the urls for prev/next archive pages
+        if obj[1].prev:
+            d = key.copy()
+            d['page'] = 1
+            if len(obj[1].prev) >= 1:
+                d['year'] = obj[1].prev[0]
+            if len(obj[1].prev) >= 2:
+                d['month'] = obj[1].prev[1]
+            if len(obj[1].prev) >= 3:
+                d['day'] = obj[1].prev[2]
+            context['cal_prev'] = urlmapper.url(self.extension, **d)
+        else:
+            context['cal_prev'] = None
+        if obj[1].next:
+            d = key.copy()
+            d['page'] = 1
+            if len(obj[1].next) >= 1:
+                d['year'] = obj[1].next[0]
+            if len(obj[1].next) >= 2:
+                d['month'] = obj[1].next[1]
+            if len(obj[1].next) >= 3:
+                d['day'] = obj[1].next[2]
+            context['cal_next'] = urlmapper.url(self.extension, **d)
+        else:
+            context['cal_next'] = None
+        self.render_to_file(path, self.template, context)
+
+
+class Jinja2PostArchiveYearly(Jinja2PostArchiveBase,
+        writers.posts.PostArchiveYearly):
+    template = 'posts/archive_yearly.html'
+
+
+class Jinja2PostArchiveMonthly(Jinja2PostArchiveBase,
+        writers.posts.PostArchiveMonthly):
+    template = 'posts/archive_monthly.html'
+
+
+class Jinja2PostArchiveDaily(Jinja2PostArchiveBase,
+        writers.posts.PostArchiveDaily):
+    template = 'posts/archive_daily.html'
 
 
 def _setup(self):
