@@ -235,6 +235,9 @@ class PostArchiveYearly(writers.Writer):
             year
                The year of publication.
 
+            page
+               The 1-indexed page number of the page.
+
         .. doctest::
            :hide:
 
@@ -252,11 +255,12 @@ class PostArchiveYearly(writers.Writer):
             Paginated(None, (2009,), (2010,)),
             Paginated(None, 1, None))
            >>> pprint(spay.key(obj))
-           {'type': u'post', 'year': 2009}
+           {'page': 1, 'type': u'post', 'year': 2009}
 
         '''
         return {'type': u'post'
                ,'year': obj[1].cur[0]
+               ,'page': obj[2].cur
                }
 
     def obj_list(self, environment, objects):
@@ -332,6 +336,9 @@ class PostArchiveMonthly(writers.Writer):
             month
                The month of publication.
 
+            page
+               The 1-indexed page number of the page.
+
         .. doctest::
            :hide:
 
@@ -349,12 +356,13 @@ class PostArchiveMonthly(writers.Writer):
             Paginated(None, (2009, 12), (2010, 1)),
             Paginated(None, 1, None))
            >>> pprint(spam.key(obj))
-           {'month': 12, 'type': u'post', 'year': 2009}
+           {'month': 12, 'page': 1, 'type': u'post', 'year': 2009}
 
         '''
         return {'type': u'post'
                ,'year': obj[1].cur[0]
                ,'month': obj[1].cur[1]
+               ,'page': obj[2].cur
                }
 
     def obj_list(self, environment, objects):
@@ -434,6 +442,9 @@ class PostArchiveDaily(writers.Writer):
             day
                The day of publication.
 
+            page
+               The 1-indexed page number of the page.
+
         .. doctest::
            :hide:
 
@@ -451,13 +462,14 @@ class PostArchiveDaily(writers.Writer):
             Paginated(None, (2009, 12, 31), (2010, 1, 1)),
             Paginated(None, 1, None))
            >>> pprint(spad.key(obj))
-           {'day': 31, 'month': 12, 'type': u'post', 'year': 2009}
+           {'day': 31, 'month': 12, 'page': 1, 'type': u'post', 'year': 2009}
 
         '''
         return {'type': u'post'
                ,'year': obj[1].cur[0]
                ,'month': obj[1].cur[1]
                ,'day': obj[1].cur[2]
+               ,'page': obj[2].cur
                }
 
     def obj_list(self, environment, objects):
