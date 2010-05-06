@@ -207,8 +207,8 @@ class PostArchiveAll(writers.Writer):
 
         '''
         num_per_page = environment['settings'].POSTS_PER_PAGE
-        posts = sorted(objects.get('posts', []),
-                       key=lambda p: (p.published, p.slug))
+        posts = [p for p in reversed(sorted(objects.get('posts', []),
+                       key=lambda p: (p.published, p.slug)))]
         return paginate.paginate(num_per_page, posts)
 
 
@@ -252,10 +252,10 @@ class PostArchiveYearly(writers.Writer):
            ...                     {'posts': objects.posts})[0]
            >>> pprint(obj) #doctest: +ELLIPSIS
            ([<firmant.parsers.RstObject object at 0x...>],
-            Paginated(None, (2009,), (2010,)),
-            Paginated(None, 1, None))
+            Paginated(None, (2010,), (2009,)),
+            Paginated(None, 1, 2))
            >>> pprint(spay.key(obj))
-           {'page': 1, 'type': u'post', 'year': 2009}
+           {'page': 1, 'type': u'post', 'year': 2010}
 
         '''
         return {'type': u'post'
@@ -286,23 +286,22 @@ class PostArchiveYearly(writers.Writer):
            []
            >>> pprint(spay.obj_list({'settings': settings},
            ...                      {'posts': objects.posts})) #doctest: +ELLIPSIS
-           [([<firmant.parsers.RstObject object at 0x...>],
-             Paginated(None, (2009,), (2010,)),
-             Paginated(None, 1, None)),
-            ([<firmant.parsers.RstObject object at 0x...>,
+           [([<firmant.parsers.RstObject object at 0x...>,
               <firmant.parsers.RstObject object at 0x...>],
-             Paginated((2009,), (2010,), None),
+             Paginated(None, (2010,), (2009,)),
              Paginated(None, 1, 2)),
             ([<firmant.parsers.RstObject object at 0x...>,
               <firmant.parsers.RstObject object at 0x...>],
-             Paginated((2009,), (2010,), None),
-             Paginated(1, 2, None))]
-
+             Paginated(None, (2010,), (2009,)),
+             Paginated(1, 2, None)),
+            ([<firmant.parsers.RstObject object at 0x...>],
+             Paginated((2010,), (2009,), None),
+             Paginated(None, 1, None))]
 
         '''
         num_per_page = environment['settings'].POSTS_PER_PAGE
-        posts = sorted(objects.get('posts', []),
-                       key=lambda p: (p.published, p.slug))
+        posts = [p for p in reversed(sorted(objects.get('posts', []),
+                       key=lambda p: (p.published, p.slug)))]
         return paginate.split_paginate(num_per_page, self.__splitfunc__, posts)
 
     @staticmethod
@@ -352,11 +351,12 @@ class PostArchiveMonthly(writers.Writer):
            >>> obj = spam.obj_list({'settings': settings},
            ...                     {'posts': objects.posts})[0]
            >>> pprint(obj) #doctest: +ELLIPSIS
-           ([<firmant.parsers.RstObject object at 0x...>],
-            Paginated(None, (2009, 12), (2010, 1)),
-            Paginated(None, 1, None))
+           ([<firmant.parsers.RstObject object at 0x...>,
+             <firmant.parsers.RstObject object at 0x...>],
+            Paginated(None, (2010, 2), (2010, 1)),
+            Paginated(None, 1, 2))
            >>> pprint(spam.key(obj))
-           {'month': 12, 'page': 1, 'type': u'post', 'year': 2009}
+           {'month': 2, 'page': 1, 'type': u'post', 'year': 2010}
 
         '''
         return {'type': u'post'
@@ -388,24 +388,24 @@ class PostArchiveMonthly(writers.Writer):
            []
            >>> pprint(spam.obj_list({'settings': settings},
            ...                      {'posts': objects.posts})) #doctest: +ELLIPSIS
-           [([<firmant.parsers.RstObject object at 0x...>],
-             Paginated(None, (2009, 12), (2010, 1)),
-             Paginated(None, 1, None)),
-            ([<firmant.parsers.RstObject object at 0x...>],
-             Paginated((2009, 12), (2010, 1), (2010, 2)),
-             Paginated(None, 1, None)),
-            ([<firmant.parsers.RstObject object at 0x...>,
+           [([<firmant.parsers.RstObject object at 0x...>,
               <firmant.parsers.RstObject object at 0x...>],
-             Paginated((2010, 1), (2010, 2), None),
+             Paginated(None, (2010, 2), (2010, 1)),
              Paginated(None, 1, 2)),
             ([<firmant.parsers.RstObject object at 0x...>],
-             Paginated((2010, 1), (2010, 2), None),
-             Paginated(1, 2, None))]
+             Paginated(None, (2010, 2), (2010, 1)),
+             Paginated(1, 2, None)),
+            ([<firmant.parsers.RstObject object at 0x...>],
+             Paginated((2010, 2), (2010, 1), (2009, 12)),
+             Paginated(None, 1, None)),
+            ([<firmant.parsers.RstObject object at 0x...>],
+             Paginated((2010, 1), (2009, 12), None),
+             Paginated(None, 1, None))]
 
         '''
         num_per_page = environment['settings'].POSTS_PER_PAGE
-        posts = sorted(objects.get('posts', []),
-                       key=lambda p: (p.published, p.slug))
+        posts = [p for p in reversed(sorted(objects.get('posts', []),
+                       key=lambda p: (p.published, p.slug)))]
         return paginate.split_paginate(num_per_page, self.__splitfunc__, posts)
 
     @staticmethod
@@ -458,11 +458,12 @@ class PostArchiveDaily(writers.Writer):
            >>> obj = spad.obj_list({'settings': settings},
            ...                     {'posts': objects.posts})[0]
            >>> pprint(obj) #doctest: +ELLIPSIS
-           ([<firmant.parsers.RstObject object at 0x...>],
-            Paginated(None, (2009, 12, 31), (2010, 1, 1)),
+           ([<firmant.parsers.RstObject object at 0x...>,
+             <firmant.parsers.RstObject object at 0x...>],
+            Paginated(None, (2010, 2, 2), (2010, 2, 1)),
             Paginated(None, 1, None))
            >>> pprint(spad.key(obj))
-           {'day': 31, 'month': 12, 'page': 1, 'type': u'post', 'year': 2009}
+           {'day': 2, 'month': 2, 'page': 1, 'type': u'post', 'year': 2010}
 
         '''
         return {'type': u'post'
@@ -495,24 +496,24 @@ class PostArchiveDaily(writers.Writer):
            []
            >>> pprint(spad.obj_list({'settings': settings},
            ...                      {'posts': objects.posts})) #doctest: +ELLIPSIS
-           [([<firmant.parsers.RstObject object at 0x...>],
-             Paginated(None, (2009, 12, 31), (2010, 1, 1)),
-             Paginated(None, 1, None)),
-            ([<firmant.parsers.RstObject object at 0x...>],
-             Paginated((2009, 12, 31), (2010, 1, 1), (2010, 2, 1)),
-             Paginated(None, 1, None)),
-            ([<firmant.parsers.RstObject object at 0x...>],
-             Paginated((2010, 1, 1), (2010, 2, 1), (2010, 2, 2)),
-             Paginated(None, 1, None)),
-            ([<firmant.parsers.RstObject object at 0x...>,
+           [([<firmant.parsers.RstObject object at 0x...>,
               <firmant.parsers.RstObject object at 0x...>],
-             Paginated((2010, 2, 1), (2010, 2, 2), None),
+             Paginated(None, (2010, 2, 2), (2010, 2, 1)),
+             Paginated(None, 1, None)),
+            ([<firmant.parsers.RstObject object at 0x...>],
+             Paginated((2010, 2, 2), (2010, 2, 1), (2010, 1, 1)),
+             Paginated(None, 1, None)),
+            ([<firmant.parsers.RstObject object at 0x...>],
+             Paginated((2010, 2, 1), (2010, 1, 1), (2009, 12, 31)),
+             Paginated(None, 1, None)),
+            ([<firmant.parsers.RstObject object at 0x...>],
+             Paginated((2010, 1, 1), (2009, 12, 31), None),
              Paginated(None, 1, None))]
 
         '''
         num_per_page = environment['settings'].POSTS_PER_PAGE
-        posts = sorted(objects.get('posts', []),
-                       key=lambda p: (p.published, p.slug))
+        posts = [p for p in reversed(sorted(objects.get('posts', []),
+                       key=lambda p: (p.published, p.slug)))]
         return paginate.split_paginate(num_per_page, self.__splitfunc__, posts)
 
     @staticmethod
