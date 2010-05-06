@@ -100,6 +100,43 @@ class Jinja2StaticRst(Jinja2Base, writers.staticrst.StaticRstWriter):
         self.render_to_file(path, self.template, context)
 
 
+class Jinja2PostWriter(Jinja2Base, writers.posts.PostWriter):
+    '''Render each post individually using Jinja2 templates.
+    '''
+
+    extension = 'html'
+
+    template = 'posts/single.html'
+
+    def render(self, environment, path, post):
+        r'''Render the data in a Jinja2 template.
+
+        .. doctest::
+           :hide:
+
+           >>> import tempfile
+           >>> path = tempfile.NamedTemporaryFile(delete=False).name
+           >>> objs = {'posts': objects.posts}
+
+        .. doctest::
+
+           >>> j2pw = Jinja2PostWriter(environment, objs)
+           >>> obj = j2pw.obj_list(environment, objs)[0]
+           >>> j2pw.render(environment, path, obj)
+           >>> cat(path)
+           2009-12-31 | party by John Doe
+
+        .. doctest::
+           :hide:
+
+           >>> os.unlink(path)
+
+        '''
+        context = dict()
+        context['post']  = post
+        self.render_to_file(path, self.template, context)
+
+
 def _setup(self):
     '''Setup the test cases.
     '''

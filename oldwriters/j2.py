@@ -254,48 +254,6 @@ class Jinja2PostArchiveDaily(Jinja2PostArchiveBase, posts.PostArchiveDaily):
         self.render_to_file(path, template, context)
 
 
-class Jinja2PostSingle(Jinja2Writer, posts.PostSingle):
-    '''Render each post using Jinja2 templates.
-    '''
-
-    fmt = 'html'
-
-    permalinks_for = 'posts'
-
-    def render(self, post):
-        r'''Render the data in a Jinja2 template.
-
-            >>> c = components
-            >>> urlmapper.add(c.TYPE('post')/c.YEAR/c.MONTH/c.DAY/c.SLUG)
-            >>> j2ps = Jinja2PostSingle(settings, objs, urlmapper)
-            >>> j2ps.log = Mock('log')
-            >>> j2ps.write()
-            >>> join = os.path.join
-            >>> cat(join(settings.OUTPUT_DIR, '2010/02/02/newday2/index.html'))
-            2010-02-02 | newday2 by John Doe
-            >>> cat(join(settings.OUTPUT_DIR, '2010/02/02/newday/index.html'))
-            2010-02-02 | newday by John Doe
-            >>> cat(join(settings.OUTPUT_DIR, '2010/02/01/newmonth/index.html'))
-            2010-02-01 | newmonth by John Doe
-            >>> cat(join(settings.OUTPUT_DIR, '2010/01/01/newyear/index.html'))
-            2010-01-01 | newyear by John Doe
-            >>> cat(join(settings.OUTPUT_DIR, '2009/12/31/party/index.html'))
-            2009-12-31 | party by John Doe
-
-        '''
-        path = self.urlmapper.path(self.fmt, type='post', slug=post.slug,
-                year=post.published.year, month=post.published.month,
-                day=post.published.day)
-        template = 'posts/single.html'
-        context = dict()
-        context['year']          = post.published.year
-        context['month']         = post.published.month
-        context['day']           = post.published.day
-        context['slug']          = post.slug
-        context['post']          = post
-        self.render_to_file(path, template, context)
-
-
 def _setup(self):
     '''Setup the test cases.
 
