@@ -533,6 +533,14 @@ class URLMapper(object):
        >>> um.url(None, type='post', slug='foo', day=15, month=3, year=2010)
        'http://permanent.url/2010/03/15/foo'
 
+    As a special corner case, the :meth:`url` method will return the permalink
+    root if it is asked for ``extension=None`` with no arguments.
+
+    .. doctest::
+
+       >>> um.url(None)
+       'http://permanent.url/'
+
     This is useful when it is known that the attributes specified promise to
     resolve to a path.  Example uses include static files that are simply copied
     into the output directory.
@@ -561,10 +569,13 @@ class URLMapper(object):
     def url(self, extension, **kwargs):
         '''Return the URL corresponding to a set of attributes.
         '''
-        try:
-            path = self.__lookup__(**kwargs)
-        except AttributeError:
-            return None
+        if extension is None and kwargs == {}:
+            path = ''
+        else:
+            try:
+                path = self.__lookup__(**kwargs)
+            except AttributeError:
+                return None
         path = os.path.join(self.url_root, path or '')
         if extension is not None and not path.endswith('/'):
             path += '/'
