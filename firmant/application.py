@@ -216,6 +216,10 @@ class Firmant(object):
             feed.permalink = url('atom', **{'type': 'feed'
                                            ,'slug': feed.slug
                                            })
+        for staticrst in self.objs.get('staticrst', []):
+            staticrst.permalink = url('html', **{'type': 'staticrst'
+                                                ,'path': staticrst.path
+                                                })
 
     def create_globals(self):
         '''Create a dictionary of globals to be added to rendering contexts.
