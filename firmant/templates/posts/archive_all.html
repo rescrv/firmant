@@ -1,6 +1,7 @@
 {% extends 'posts/archive_base.html' %}
+{% import 'config.html' as config with context %}
 
 {% block headers %}
 {{ super() }}
-        <link href="http://chasmd.org/all/index.atom" rel="alternate" title="ATOM" type="application/atom+xml" />
+        <link href="{{ config.primaryatomfeed }}" rel="alternate" title="Atom Feed" type="application/atom+xml" />
 {% endblock %}
