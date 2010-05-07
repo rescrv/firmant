@@ -1,3 +1,4 @@
+{% import 'config.html' as config with context %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
@@ -12,13 +13,17 @@
         <link rel="stylesheet" href="{{ urlfor(None, type='static', path='css/style.css') }}" type="text/css" />
         {% endblock %}
 
-        <title>{% block title %}Robert Escriva's Blog{% endblock %}</title>
+        <title>{% block documenttitle %}{{ config.doctitle }}{% endblock %}</title>
     </head>
     <body>
-        <div id="doc3" class="yui-t5">
+        <div id="{{ config.divdocid }}" class="{{ config.divdocclass }}">
             <div id="hd">
-                <h1 class="title"><a href="http://robescriva.com/" title="">Robert Escriva</a></h1>
-                <div class="tagline">Things I wish I learned earlier</div>
+                <h1 class="title">
+                    <a href="{{ urlfor(None) }}" title="Home">
+                        {{ config.sitetitle }}
+                    </a>
+                </h1>
+                <div class="tagline">{{ config.tagline }}</div>
             </div><!-- hd -->
             <div id="bd">
                 <div id="yui-main">
