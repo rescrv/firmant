@@ -1,0 +1,10 @@
+{% if recent_posts -%}
+<div class="sidebox">
+    <h2>Recent Posts</h2>
+    <ul>
+        {%- for post in recent_posts %}
+        <li><a href="{{ post[1] }}">{{ post[0] }}</a></li>
+        {% endfor %}
+    </ul>
+</div><!-- sidebox -->
+{% endif %}

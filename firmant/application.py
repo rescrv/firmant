@@ -38,6 +38,7 @@ from pysettings.modules import get_module
 
 from firmant.chunks import AbstractChunk
 from firmant.routing import URLMapper
+from firmant.writers import j2
 from firmant.utils import class_name
 
 
@@ -76,6 +77,7 @@ class Firmant(object):
                   <firmant.parsers.RstObject object at 0x...>]}
         >>> f.cross_reference() #doctest: +ELLIPSIS
         >>> f.create_permalinks() #doctest: +ELLIPSIS
+        >>> f.create_globals() #doctest: +ELLIPSIS
         >>> for post in f.objs['posts']:
         ...     pprint((post.tags, post.feeds)) #doctest: +ELLIPSIS
         ([<firmant.parsers.RstObject object at 0x...>],
@@ -216,11 +218,17 @@ class Firmant(object):
             feed.permalink = url('atom', **{'type': 'feed'
                                            ,'slug': feed.slug
                                            })
+        for staticrst in self.objs.get('staticrst', []):
+            staticrst.permalink = url('html', **{'type': 'staticrst'
+                                                ,'path': staticrst.path
+                                                })
 
     def create_globals(self):
         '''Create a dictionary of globals to be added to rendering contexts.
         '''
-        self.env['j2globals'] = globals = dict()
+        j2env = self.env.get(j2.Jinja2Base, {})
+        self.env[j2.Jinja2Base] = j2env
+        j2env['globals'] = globals = dict()
         url = self.urlmapper.url
         globals['urlfor'] = url
         globals['recent_posts'] = [(p.title, p.permalink) for p in

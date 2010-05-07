@@ -43,19 +43,20 @@ class Jinja2Base(object):
     '''Base class used for functionality common to all J2 writers.
     '''
 
-    def __init__(self, environment, objects, *args, **kwargs):
-        super(Jinja2Base, self).__init__(environment, objects, *args, **kwargs)
-        settings = environment['settings']
-        self.__environment__ = environment
-        self.__objects__ = objects
-        loader = jinja2.FileSystemLoader(settings.TEMPLATE_DIR)
-        self.__j2env__ = jinja2.Environment(loader=loader)
-
-    def render_to_file(self, path, template, context):
+    @staticmethod
+    def render_to_file(environment, path, template, context):
         '''Render template with context and save to path.
         '''
-        template = self.__j2env__.get_template(template)
-        globs    = self.__environment__.get('j2globals', dict())
+        j2env = environment.get(Jinja2Base, {})
+        environment[Jinja2Base] = j2env
+        if 'env' not in j2env:
+            settings = environment['settings']
+            loader = getattr(settings, 'TEMPLATE_LOADER', None)
+            if loader is None:
+                loader = jinja2.PackageLoader('firmant', 'templates')
+            j2env['env'] = jinja2.Environment(loader=loader)
+        template = j2env['env'].get_template(template)
+        globs    = j2env.get('globals', dict())
         globs.update(context)
         data     = template.render(globs)
         out      = paths.create_or_truncate(path)
@@ -87,7 +88,7 @@ class Jinja2StaticRst(Jinja2Base, staticrst.StaticRstWriter):
         context = dict()
         context['path'] = obj.path
         context['page'] = obj
-        self.render_to_file(path, self.template, context)
+        self.render_to_file(environment, path, self.template, context)
 
 
 class Jinja2PostWriter(Jinja2Base, posts.PostWriter):
@@ -112,7 +113,7 @@ class Jinja2PostWriter(Jinja2Base, posts.PostWriter):
         '''
         context = dict()
         context['post']  = post
-        self.render_to_file(path, self.template, context)
+        self.render_to_file(environment, path, self.template, context)
 
 
 class Jinja2PostArchiveBase(Jinja2Base):
@@ -175,7 +176,7 @@ class Jinja2PostArchiveBase(Jinja2Base):
             context['cal_next'] = urlmapper.url(self.extension, **d)
         else:
             context['cal_next'] = None
-        self.render_to_file(path, self.template, context)
+        self.render_to_file(environment, path, self.template, context)
 
 
 class Jinja2PostArchiveAll(Jinja2PostArchiveBase, posts.PostArchiveAll):
@@ -214,13 +215,16 @@ def _setup(self):
     settings = Settings({'POSTS_PER_PAGE': 2
                         ,'OUTPUT_DIR': tempfile.mkdtemp()
                         ,'PERMALINK_ROOT': 'http://testurl'
-                        ,'TEMPLATE_DIR': 'testdata/pristine/templates'
+                        ,'TEMPLATE_LOADER':
+                        jinja2.FileSystemLoader('testdata/pristine/templates')
                         })
     urlmapper = URLMapper(settings.OUTPUT_DIR, settings.PERMALINK_ROOT)
     self.globs['settings']   = settings
     self.globs['cat']        = cat
     self.globs['environment'] = {'settings': settings
                                 ,'urlmapper': urlmapper
+                                ,Jinja2Base: {'globals':
+                                              {'urlfor': urlmapper.url}}
                                 }
     self.globs['objects'] = {'posts': c900.posts, 'staticrst': c900.staticrst}
     self.globs['os'] = os

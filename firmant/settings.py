@@ -32,6 +32,8 @@ if necessary.
 '''
 
 
+import jinja2
+
 from firmant import routing as r
 from firmant.routing import components as c
 
@@ -60,7 +62,7 @@ WRITERS = ['firmant.writers.j2.Jinja2PostArchiveAll'
           ]
 POSTS_PER_PAGE = 10
 POSTS_PER_FEED = 10
-TEMPLATE_DIR = 'testdata/pristine/templates'
+TEMPLATE_LOADER = jinja2.PackageLoader('firmant', 'templates')
 URLS = [c.TYPE('post') /c.PAGENO
        ,c.TYPE('post') /c.YEAR/c.PAGENO
        ,c.TYPE('post') /c.YEAR/c.MONTH/c.PAGENO

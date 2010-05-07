@@ -1,0 +1,10 @@
+{% if daily_archives %}
+<div class="sidebox">
+    <h2>Daily Archives</h2>
+    <ul>
+        {%- for day in daily_archives %}
+        <li><a href="{{ day[1] }}">{{ day[0].strftime("%B %d, %Y") }}</a></li>
+        {% endfor %}
+    </ul>
+</div><!-- sidebox -->
+{% endif %}

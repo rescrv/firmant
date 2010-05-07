@@ -1,0 +1,10 @@
+{% if yearly_archives %}
+<div class="sidebox">
+    <h2>Yearly Archives</h2>
+    <ul>
+        {%- for year in yearly_archives %}
+        <li><a href="{{ year[1] }}">{{ year[0].strftime("%Y") }}</a></li>
+        {% endfor %}
+    </ul>
+</div><!-- sidebox -->
+{% endif %}

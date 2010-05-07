@@ -1,0 +1,39 @@
+{% extends 'posts/base.html' %}
+
+{% block headers %}
+        <meta name="robots" content="noindex, noarchive, noimageindex" />
+{% endblock %}
+
+{% block content %}
+    {% for post in posts %}
+        {% include 'posts/_single_stub.html' %}
+    {% endfor %}
+    {% if page_prev or page_next %}
+    <div class="navigation">
+        {% if page_prev %}
+        <div class="alignleft">
+            <a href="{{ page_prev }}">{% block prevpage %}Previous Page {% endblock %}</a>
+        </div><!-- alignleft -->
+        {% endif %}
+        {% if page_next %}
+        <div class="alignright">
+            <a href="{{ page_next }}">{% block nextpage %}Next Page {% endblock %}</a>
+        </div><!-- alignright -->
+        {% endif %}
+    </div><!-- navigation -->
+    {% endif %}
+    {% if cal_prev or cal_next %}
+    <div class="navigation">
+        {% if cal_prev %}
+        <div class="alignleft">
+            <a href="{{ cal_prev }}">{% block prevcal %}More Recent{% endblock %}</a>
+        </div><!-- alignleft -->
+        {% endif %}
+        {% if cal_next %}
+        <div class="alignright">
+            <a href="{{ cal_next }}">{% block nextcal %}Less Recent{% endblock %}</a>
+        </div><!-- alignright -->
+        {% endif %}
+    </div><!-- navigation -->
+    {% endif %}
+{% endblock %}

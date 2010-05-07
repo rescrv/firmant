@@ -1,9 +1,0 @@
-{% extends 'posts/base.html' %}
-
-{% block title %}{{ post.title | escape }} : {{ super() }}{% endblock %}
-
-{% block content %}
-    <h1 class="title">{{ post.title | escape }}</h1>
-
-    {% include 'posts/_single_stub.html' %}
-{% endblock %}
