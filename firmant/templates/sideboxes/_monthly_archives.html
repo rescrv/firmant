@@ -1,0 +1,10 @@
+{% if monthly_archives %}
+<div class="sidebox">
+    <h2>Monthly Archives</h2>
+    <ul>
+        {%- for month in monthly_archives %}
+        <li><a href="{{ month[1] }}">{{ month[0].strftime("%B %Y") }}</a></li>
+        {% endfor %}
+    </ul>
+</div><!-- sidebox -->
+{% endif %}

@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+        <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.0r4/build/reset-fonts-grids/reset-fonts-grids.css">
+        <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.0r4/build/base/base-min.css">
+
+        <link rel="stylesheet" href="{{ urlfor(None, type='static', path='css/style.css') }}" type="text/css" />
+        {% block headers %}
+        {% endblock %}
+
+        <title>{% block title %}Robert Escriva's Blog{% endblock %}</title>
+    </head>
+    <body>
+        <div id="doc3" class="yui-t5">
+            <div id="hd">
+                <h1 class="title"><a href="http://robescriva.com/" title="">Robert Escriva</a></h1>
+                <div class="tagline">Things I wish I learned earlier</div>
+            </div><!-- hd -->
+            <div id="bd">
+                <div id="yui-main">
+                    <div class="yui-b">
+                        {%- block content %}{% endblock %}
+                    </div><!-- yui-b -->
+                </div><!-- yui-main -->
+                <div class="yui-b sidebar">
+                {%- block sidebar %}
+                {% include 'sideboxes/_recent_posts.html' %}
+                {% include 'sideboxes/_daily_archives.html' %}
+                {% include 'sideboxes/_monthly_archives.html' %}
+                {% include 'sideboxes/_yearly_archives.html' %}
+                {% endblock %}
+                </div><!-- yui-b sidebar-->
+            </div><!-- bd -->
+            <div id="ft">
+                <p>Copyright &copy; 2010 Robert Escriva &brvbar;
+                Powered by <a href="http://firmant.org/">Firmant</a></p>
+            </div><!-- ft -->
+        </div><!-- doc3 -->
+    </body>
+</html>

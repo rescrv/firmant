@@ -1,0 +1,26 @@
+<div class="entry">
+    <div class="header">
+        <h2><a href="{{ post.permalink }}">{{ post.title }}</a></h2>
+        <div class="metadata">
+            <div class="authorship">
+                <span class="author">Posted by {{ post.author }} on {#
+                    #}{{ post.published.strftime("%B %d, %Y") }} at {#
+                    #}{{ post.published.strftime("%H:%M %p") }}</span>
+                <!--<img class="license" alt="" src= "cc-by-sa.png" />-->
+            </div><!-- authorship -->
+            {%- if post.tags -%}
+            <div class="tags">
+                <ul>
+                    {% for tag in post.tags %}
+                    <li>{{ tag.slug | escape }}</li>
+                    {% endfor %}
+                </ul>
+            </div><!-- tags -->
+            {% endif %}
+        </div><!-- metadata -->
+    </div><!-- header -->
+
+    <div class="content">
+        {{ post.content }}
+    </div><!-- content -->
+</div><!-- entry -->
