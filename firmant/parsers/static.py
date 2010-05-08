@@ -36,7 +36,6 @@ from docutils.core import publish_programmatically
 from firmant.parsers import Parser
 from firmant.parsers import RstObject
 from firmant.parsers import RstParser
-from firmant.du import MetaDataStandaloneReader
 from firmant.utils import class_name
 from firmant.utils.exceptions import log_uncaught_exceptions
 

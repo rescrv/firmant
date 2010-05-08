@@ -35,14 +35,17 @@ and simple.  The :func:`meta_data_directive` produces a
 Docutils' processing is a multi-step process in which a module is read, parsed,
 transformed, and written.  Each directive created with
 :func:`meta_data_directive` creates a :class:`MetaDataNode` in the document tree
-created by docutils.  When the custom :class:`MetaDataStandaloneReader` class is
-used as the reader for docutils, these nodes that contain metadata are then
-removed from the document tree, and the metadata they store is added to the
-dictionary :class:`MetaDataStandaloneReader` has reference to.
+created by docutils.  When the custom :class:`CustomTransformReader` class is
+used as the reader for docutils, and is passed :func:`meta_data_transform`
+class, these nodes that contain metadata are then removed from the document
+tree, and the metadata they store is added to the dictionary that the
+:func:`meta_data_transform` is closed around.
 
 '''
 
 
+from docutils import io
+from docutils import core
 from docutils.parsers.rst import Directive
 from docutils.parsers.rst import directives
 from docutils.transforms import Transform
@@ -335,18 +338,64 @@ def meta_data_transform(data):
     return MetaDataTransform
 
 
-class MetaDataStandaloneReader(standalone.Reader):
+class CustomTransformsReader(standalone.Reader):
     '''Add transformations to read MetaData from doctree.
     '''
 
-    def __init__(self, parser=None, parser_name=None, data=None):
+    def __init__(self, parser=None, parser_name=None, transforms=[]):
         standalone.Reader.__init__(self, parser, parser_name)
-        if data is None:
-            data = dict()
-        self.data = data
+        self.transforms = transforms
 
     def get_transforms(self):
         '''Add a transform for moving the meta data into the data dictionary.
         '''
-        return standalone.Reader.get_transforms(self) + \
-            [meta_data_transform(self.data)]
+        return standalone.Reader.get_transforms(self) + self.transforms
+
+
+def publish(path, transforms=[]):
+    '''Publish the rst document that resides at `path` on the filesystem.
+
+    This function returns a :class:`docutils.core.Publisher` object.  The
+    optional `transforms` attribute may be passed with a list of transform
+    classes that will be passed to the reader.
+
+    '''
+    args = {'source': None
+           ,'source_path': path
+           ,'source_class': io.FileInput
+           ,'destination_class': io.StringOutput
+           ,'destination': None
+           ,'destination_path': None
+           ,'reader': CustomTransformsReader(transforms=transforms), 'reader_name': None
+           ,'parser': None, 'parser_name': 'restructuredtext'
+           ,'writer': None, 'writer_name': 'html'
+           ,'settings': None, 'settings_spec': None
+           ,'settings_overrides': None
+           ,'config_section': None
+           ,'enable_exit_status': None
+           }
+
+    # Code borrowed from :mod:`docutils.core` from version 0.5 of docutils.
+    # This is the implementation of the :func:`publish_programmatically`
+    # function.  It is reimplemented so that it may be fractured into
+    # transformation steps later.
+
+    # From the module:
+    # Author: David Goodger <goodger@python.org>
+    # Copyright: This module has been placed in the public domain.
+
+    pub = core.Publisher(args['reader'], args['parser'], args['writer'],
+            settings=args['settings'],
+            source_class=args['source_class'],
+            destination_class=args['destination_class'])
+    pub.set_components(args['reader_name'], args['parser_name'],
+            args['writer_name'])
+    pub.process_programmatic_settings( args['settings_spec'],
+            args['settings_overrides'], args['config_section'])
+    pub.set_source(args['source'], args['source_path'])
+    pub.set_destination(args['destination'], args['destination_path'])
+    pub.publish(enable_exit_status=args['enable_exit_status'])
+
+    # End borrowed code.
+
+    return pub

@@ -34,7 +34,7 @@ from docutils import io
 from docutils.core import publish_programmatically
 from docutils.core import Publisher
 
-from firmant.du import MetaDataStandaloneReader
+from firmant import du
 from firmant.utils import class_name
 from firmant.utils.exceptions import log_uncaught_exceptions
 
@@ -145,43 +145,8 @@ class RstParser(Parser):
         '''Transform one path on the filesystem into a parsed object.
         '''
         d = dict()
-        args = {'source': None
-               ,'source_path': path
-               ,'source_class': io.FileInput
-               ,'destination_class': io.StringOutput
-               ,'destination': None
-               ,'destination_path': None
-               ,'reader': MetaDataStandaloneReader(data=d), 'reader_name': None
-               ,'parser': None, 'parser_name': 'restructuredtext'
-               ,'writer': None, 'writer_name': 'html'
-               ,'settings': None, 'settings_spec': None
-               ,'settings_overrides': None
-               ,'config_section': None
-               ,'enable_exit_status': None
-               }
-
-        # Code borrowed from :mod:`docutils.core` from version 0.5 of docutils.
-        # This is the implementation of the :func:`publish_programmatically`
-        # function.  It is reimplemented so that it may be fractured into
-        # transformation steps later.
-
-        # From the module:
-        # Author: David Goodger <goodger@python.org>
-        # Copyright: This module has been placed in the public domain.
-
-        pub = Publisher(args['reader'], args['parser'], args['writer'],
-                settings=args['settings'],
-                source_class=args['source_class'],
-                destination_class=args['destination_class'])
-        pub.set_components(args['reader_name'], args['parser_name'],
-                args['writer_name'])
-        pub.process_programmatic_settings( args['settings_spec'],
-                args['settings_overrides'], args['config_section'])
-        pub.set_source(args['source'], args['source_path'])
-        pub.set_destination(args['destination'], args['destination_path'])
-        pub.publish(enable_exit_status=args['enable_exit_status'])
-
-        # End borrowed code.
+        transforms = [du.meta_data_transform(d)]
+        pub = du.publish(path, transforms)
 
         # Create a new object, using information from path and dictionary to
         # fill in all values not filled by auto_metadata or the defaults.
