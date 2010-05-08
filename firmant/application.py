@@ -36,6 +36,7 @@ import datetime
 
 from pysettings.modules import get_module
 
+from firmant import utils
 from firmant.chunks import AbstractChunk
 from firmant.routing import URLMapper
 from firmant.writers import j2
@@ -119,24 +120,18 @@ class Firmant(object):
         self.chunks.append(CheckURLConflicts())
 
         for glob in settings.GLOBALS:
-            mod, attr = glob.rsplit('.', 1)
-            mod = get_module(mod)
-            glob = getattr(mod, attr)
+            glob = utils.get_obj(glob)
             self.chunks.append(glob(self.env, self.objs))
 
         # Setup parsers
         self.parsers = dict()
         for key, parser in settings.PARSERS.items():
-            mod, attr = parser.rsplit('.', 1)
-            mod = get_module(mod)
-            parser = getattr(mod, attr)
+            parser = utils.get_obj(parser)
             self.parsers[key] = parser(self.settings)
 
         # Setup writers
         for writer in self.settings.WRITERS:
-            mod, attr = writer.rsplit('.', 1)
-            mod = get_module(mod)
-            writer = getattr(mod, attr)
+            writer = utils.get_obj(writer)
             self.chunks.append(writer(self.env, self.objs))
 
     def __call__(self):

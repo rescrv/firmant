@@ -43,6 +43,8 @@ import inspect
 import os
 import sys
 
+from pysettings import modules
+
 
 def class_name(cls):
     '''The string representation of a class's name.
@@ -153,3 +155,17 @@ def merge_dicts(a, *args):
                 raise ValueError("Conflicting values for '%s'" % key)
         ret.update(b)
     return ret
+
+
+def get_obj(path):
+    '''Get an object by its Python import path.
+
+    .. doctest::
+
+       >>> get_obj('os.path.join') #doctest: +ELLIPSIS
+       <function join at 0x...>
+
+    '''
+    mod, attr = path.rsplit('.', 1)
+    mod = modules.get_module(mod)
+    return getattr(mod, attr)
