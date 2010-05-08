@@ -55,7 +55,7 @@ class Firmant(object):
         {'feeds': <firmant.parsers.feeds.FeedParser object at 0x...>,
          'posts': <firmant.parsers.posts.PostParser object at 0x...>,
          'static': <firmant.parsers.static.StaticParser object at 0x...>,
-         'staticrst': <firmant.parsers.static.StaticRstParser object at 0x...>,
+         'staticrst': <firmant.parsers.staticrst.StaticRstParser object at 0x...>,
          'tags': <firmant.parsers.tags.TagParser object at 0x...>}
         >>> f.parse()
         >>> pprint(f.objs) #doctest: +ELLIPSIS

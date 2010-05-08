@@ -42,7 +42,7 @@ PARSERS = {'feeds': 'firmant.parsers.feeds.FeedParser'
           ,'posts': 'firmant.parsers.posts.PostParser'
           ,'tags': 'firmant.parsers.tags.TagParser'
           ,'static': 'firmant.parsers.static.StaticParser'
-          ,'staticrst': 'firmant.parsers.static.StaticRstParser'
+          ,'staticrst': 'firmant.parsers.staticrst.StaticRstParser'
           }
 CONTENT_ROOT = 'testdata/pristine'
 FEEDS_SUBDIR = 'feeds'
