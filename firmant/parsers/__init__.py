@@ -34,12 +34,11 @@ from docutils import io
 from docutils.core import publish_programmatically
 from docutils.core import Publisher
 
+from firmant import chunks
 from firmant import du
 from firmant.utils import class_name
+from firmant.utils import workarounds
 from firmant.utils.exceptions import log_uncaught_exceptions
-
-
-__all__ = ['Parser']
 
 
 class Parser(object):
@@ -88,6 +87,192 @@ class Parser(object):
         '''Transform one path on the filesystem into a parsed object.
         '''
         return path
+
+
+class ChunkedParser(chunks.AbstractChunk):
+    '''The base class of all chunks.
+
+    This class defines an abstract base class that all parsers are required to
+    adhere to.  To use this class in the creation of a parser, create a subclass
+    with all necessary methods and properties overwritten.
+
+    .. seealso::
+
+       Module :mod:`abc`
+          This module is part of the Python standard library in 2.6+.
+
+    .. doctest::
+       :hide:
+
+       >>> import sys
+       >>> logger = get_logger()
+
+    To create a new type of parser, inherit from :class:`Parser`:
+
+    .. doctest::
+
+       >>> class SampleParser(ChunkedParser):
+       ...     type = 'objs'
+       ...     def paths(self, environment, objects):
+       ...         return [1, 2, 3]
+       ...     def parse(self, environment, objects, path):
+       ...         objects[self.type].append(str(path))
+
+    The new parser meets the criteria for two different abstract base classes:
+
+    .. doctest::
+
+       >>> import firmant.chunks
+       >>> issubclass(SampleParser, firmant.chunks.AbstractChunk)
+       True
+       >>> issubclass(SampleParser, ChunkedParser)
+       True
+
+    .. warning::
+
+       When creating a parser, do not store state in the parser itself.  While
+       it appears that a parser is a single object, it will actually share state
+       across two or more chunks during typical usage.
+
+       If it is necessary to store state, place it in environment keyed to the
+       parser class:
+
+       .. doctest::
+          :hide:
+
+          >>> environment = {}
+
+       .. doctest::
+
+          >>> environment[SampleParser] = 'stored state goes here'
+
+       This is because of the split between path selection and parsing.
+
+    The remainder of this section is devoted to describing the implementation
+    details of :class:`ChunkedParser`'s template methods.
+
+    Chunks are passed environment and object dictionaries.  While it is not
+    technically a chunk, the :class:`ChunkedParser` interface follows the same
+    pattern.  When called with an environment and set of objects, a parser will
+    return one more chunk (in addition to the environment and object
+    dictionaries).
+
+    .. doctest::
+
+       >>> environment = {'log': logger
+       ...               }
+       >>> objects = {}
+       >>> sp = SampleParser(environment, objects)
+       >>> sp.scheduling_order
+       10
+       >>> pprint(sp(environment, objects)) #doctest: +ELLIPSIS
+       ({'log': <logging.Logger instance at 0x...>},
+        {},
+        [<firmant.parsers.SampleParser object at 0x...>])
+
+    .. note::
+
+       The chunks returned do not share any state with the :class:`ChunkedParser` that
+       created them.  The fact that the class name is the same is an
+       implementation detail that may change in the future.
+
+    The first chunk performs all parsing.  In the future, parsing may be broken
+    into more fine-grained steps.  Right now, this is unnecessary.
+
+    .. doctest::
+
+       >>> environment, objects, (parse,) = sp(environment, objects)
+       >>> parse.scheduling_order
+       200
+       >>> pprint(parse(environment, objects)) #doctest: +ELLIPSIS
+       ({'log': <logging.Logger instance at 0x...>},
+        {'objs': ['1', '2', '3']},
+        [])
+
+    ..
+       These are for completeness of tests but don't contribute to docs.
+
+    ..
+       Make sure we don't accept bad actions.  This would break
+       :attr:`scheduling_order` and :meth:`__call__`
+
+    .. doctest::
+       :hide:
+
+       >>> SampleParser({}, {}, action='something else')
+       Traceback (most recent call last):
+       ValueError: `action` is invalid
+
+    '''
+
+    def __init__(self, environment, objects, action=None):
+        # pylint: disable-msg=W0613
+        super(ChunkedParser, self).__init__()
+        if action not in (None, 'parse'):
+            raise ValueError('`action` is invalid')
+        self.__action__ = self.__default__
+        if action == 'parse':
+            self.__action__ = self.__parse__
+
+    def __call__(self, environment, objects):
+        return self.__action__(environment, objects)
+
+    @property
+    def scheduling_order(self):
+        '''The following scheduling orders apply to parsers:
+
+        10
+           At timestep 10, the parser will create the chunks for finding paths
+           and parsing.
+
+        200
+           Iterate over the paths in :meth:`paths` and pass each path to the
+           :meth:`parse` method.  All new objects should be placed in the
+           dictionary by :meth:`parse`.
+
+        '''
+        return {self.__default__: 10
+               ,self.__parse__: 200}[self.__action__]
+
+    def __default__(self, environment, objects):
+        return (environment, objects,
+                [self.__class__(environment, objects, 'parse')])
+
+    def __parse__(self, environment, objects):
+        for path in self.paths(environment, objects):
+            if self.type not in objects:
+                objects[self.type] = []
+            self.parse(environment, objects, path)
+        return environment, objects, []
+
+    @workarounds.abstractmethod
+    def paths(self, environment, objects):
+        '''Determine which paths should be parsed.
+
+        This function should not open the files, but should verify that the
+        pathnames meet all constraints necessary.  It should add the paths to
+        the objects dictionary keyed by the object name (e.g. ``posts`` or
+        ``feeds``).
+        '''
+
+    @workarounds.abstractmethod
+    def parse(self, environment, objects, path):
+        '''Parse the object at path.
+
+        Any new objects that are created during the parsing of the object at
+        path should be added directly to the objects dictionary (this includes
+        the parsed object itself).
+        '''
+
+    @workarounds.abstractproperty
+    def type(self):
+        '''The type of the primary object to be parsed (e.g. ``posts``).
+
+        Parsed objects will be added to the objects dictionary under this key.
+
+        This value has no impact on secondary objects that are generated (e.g.
+        objects that are created from embedded LaTeX equations).
+        '''
 
 
 class RstObject(object):
