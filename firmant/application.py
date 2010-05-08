@@ -127,7 +127,10 @@ class Firmant(object):
         self.parsers = dict()
         for key, parser in settings.PARSERS.items():
             parser = utils.get_obj(parser)
-            self.parsers[key] = parser(self.settings)
+            if issubclass(AbstractChunk, parser):
+                self.chunks.append(parser(self.env, self.objs))
+            else:
+                self.parsers[key] = parser(self.settings)
 
         # Setup writers
         for writer in self.settings.WRITERS:
