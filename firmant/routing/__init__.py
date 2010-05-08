@@ -510,11 +510,6 @@ class URLMapper(object):
        >>> um.url('html', type='post', slug='foo', day=15, month=3, year=2010)
        'http://permanent.url/2010/03/15/foo/'
 
-    .. todo::
-
-       Add tests (and support) for multiple extensions for the same set of
-       attributes.
-
     If the attributes do not correspond to any path definition, then the value
     `None` is returned:
 
