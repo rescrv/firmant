@@ -119,7 +119,6 @@ class Firmant(object):
         self.env['settings'] = self.settings
 
         self.chunks.append(CheckURLConflicts())
-        self.chunks.append(SetupURLConflicts())
 
         # Setup parsers
         self.parsers = dict()
@@ -259,20 +258,6 @@ class Firmant(object):
                 sorted(self.objs.get('staticrst', []), key=lambda p: p.title)]
         globals['atom_feeds'] = [(f.slug, f.permalink) for f in
                 sorted(self.objs.get('feeds', []) , key=lambda f: f.slug)]
-
-
-class SetupURLConflicts(AbstractChunk):
-    '''A chunk that sets up the empty dictionary for URL conflicts.
-    '''
-
-    def __call__(self, environment, objects):
-        '''Ensure that the sets of URLs are disjoint.
-        '''
-        environment = environment.copy()
-        environment['urls'] = dict()
-        return environment, objects, []
-
-    scheduling_order = 499
 
 
 class CheckURLConflicts(AbstractChunk):
