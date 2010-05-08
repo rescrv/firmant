@@ -74,6 +74,14 @@ URLS = [c.TYPE('post') /c.PAGENO
        ]
 OUTPUT_DIR = 'build/'
 PERMALINK_ROOT = 'http://test'
+GLOBALS = ['firmant.globs.URLFor'
+          ,'firmant.globs.RecentPosts'
+          ,'firmant.globs.DailyArchives'
+          ,'firmant.globs.MonthlyArchives'
+          ,'firmant.globs.YearlyArchives'
+          ,'firmant.globs.StaticPages'
+          ,'firmant.globs.AtomFeeds'
+          ]
 
 SIDEBAR_POSTS_LEN = 10
 SIDEBAR_ARCHIVES_LEN = 5
