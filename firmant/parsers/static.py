@@ -33,6 +33,8 @@ import os
 from docutils import io
 from docutils.core import publish_programmatically
 
+from firmant import du
+from firmant import parsers
 from firmant.parsers import Parser
 from firmant.parsers import RstObject
 from firmant.parsers import RstParser
@@ -40,14 +42,26 @@ from firmant.utils import class_name
 from firmant.utils.exceptions import log_uncaught_exceptions
 
 
-__all__ = ['StaticParser', 'StaticRstParser']
-
-
-class StaticObject(object):
+class StaticObject(parsers.ParsedObject):
     '''An object that serves as a placeholder for a file on the filesystem.
+
+    Attributes of :class:`StaticObject`:
+
+        fullpath
+           A path that points to the object on the filesystem.  It is possible
+           to `open` or copy using `fullpath`.
+
+        relpath
+           The path relative to the root where the static objects are stored.
+
+    .. doctest::
+
+       >>> StaticObject(fullpath='/tmp/path/to/static/object')
+       static_obj</tmp/path/to/static/object>
+
     '''
 
-    __slots__ = ['fullpath', 'relpath', 'permalink']
+    __slots__ = ['fullpath', 'relpath']
 
     def __repr__(self):
         return 'static_obj<%s>' % self.fullpath
