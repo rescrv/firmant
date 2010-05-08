@@ -98,7 +98,6 @@ class Firmant(object):
           <firmant.parsers.RstObject object at 0x...>],
          [<firmant.parsers.RstObject object at 0x...>,
           <firmant.parsers.RstObject object at 0x...>])
-        >>> f.setup_writers()
         >>> f()
 
     '''
@@ -132,6 +131,13 @@ class Firmant(object):
             mod = get_module(mod)
             parser = getattr(mod, attr)
             self.parsers[key] = parser(self.settings)
+
+        # Setup writers
+        for writer in self.settings.WRITERS:
+            mod, attr = writer.rsplit('.', 1)
+            mod = get_module(mod)
+            writer = getattr(mod, attr)
+            self.chunks.append(writer(self.env, self.objs))
 
     def __call__(self):
         while len(self.chunks):
@@ -192,15 +198,6 @@ class Firmant(object):
                     to_delete.append(i)
             for i in reversed(to_delete):
                 del post.feeds[i]
-
-    def setup_writers(self):
-        '''Create instances of writer classes.
-        '''
-        for writer in self.settings.WRITERS:
-            mod, attr = writer.rsplit('.', 1)
-            mod = get_module(mod)
-            writer = getattr(mod, attr)
-            self.chunks.append(writer(self.env, self.objs))
 
     def create_permalinks(self):
         '''Add permalinks to objects.

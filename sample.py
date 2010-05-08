@@ -48,8 +48,6 @@ def build(output, root):
     f = Firmant(settings)
     f.parse()
     f.cross_reference()
-    f.setup_writers()
-    f.check_url_conflicts()
     f.write()
 
 build('preview', os.path.abspath('preview'))
