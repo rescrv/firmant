@@ -89,6 +89,50 @@ class Parser(object):
         return path
 
 
+class ParsedObject(object):
+    '''A parsed object that represents the structures on disk in a form that is
+    suitable for writing.
+
+    The constructor will accept keyword arguments to automatically fill slots.
+
+    .. doctest::
+
+       >>> ParsedObject(permalink='http://').permalink
+       'http://'
+       >>> class SampleObject(ParsedObject):
+       ...     __slots__ = ['someattr']
+       ...
+       >>> SampleObject(someattr='value').someattr
+       'value'
+       >>> SampleObject(permalink='http://').permalink
+       'http://'
+
+    It is an error to provide arguments that are not in the slots of the class
+    (or its base classes).
+
+    .. doctest::
+
+       >>> SampleObject(notinslots=True)
+       Traceback (most recent call last):
+       AttributeError: Excess attributes: 'notinslots'
+
+    '''
+
+    __slots__ = ['permalink']
+
+    def __init__(self, **kwargs):
+        slots  = [set(getattr(cls, '__slots__', []))
+                  for cls in self.__class__.__mro__]
+        slots  = reduce(set.union, slots)
+        excess = set(kwargs.keys()) - slots
+        if len(excess) > 0:
+            error = _("Excess attributes: '%s'") % \
+                    "', '".join(excess)
+            raise AttributeError(error)
+        for attr in kwargs.keys():
+            setattr(self, attr, kwargs.get(attr, None))
+
+
 class ChunkedParser(chunks.AbstractChunk):
     '''The base class of all chunks.
 
