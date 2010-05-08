@@ -117,6 +117,8 @@ class ChunkedParser(chunks.AbstractChunk):
        ...         return [1, 2, 3]
        ...     def parse(self, environment, objects, path):
        ...         objects[self.type].append(str(path))
+       ...     def attributes(self, environment, path):
+       ...         return {'path': path}
 
     The new parser meets the criteria for two different abstract base classes:
 
@@ -262,6 +264,20 @@ class ChunkedParser(chunks.AbstractChunk):
         Any new objects that are created during the parsing of the object at
         path should be added directly to the objects dictionary (this includes
         the parsed object itself).
+        '''
+
+    @workarounds.abstractmethod
+    def attributes(self, environment, path):
+        '''The dict of attributes that define permalink of the object at path.
+
+        The permalink will be derived from these attributes by passing them to
+        a :class:`firmant.routing.URLMapper`.
+
+        Passing only `path` and not the parsed object is intended to force
+        objects on the filesystem to be unique.  It's entirely possible to make
+        two paths on the filesystem have the same set of attributes; try to
+        avoid this.
+
         '''
 
     @workarounds.abstractproperty
