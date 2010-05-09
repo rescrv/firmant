@@ -127,7 +127,7 @@ class Firmant(object):
         self.parsers = dict()
         for key, parser in settings.PARSERS.items():
             parser = utils.get_obj(parser)
-            if issubclass(AbstractChunk, parser):
+            if issubclass(parser, AbstractChunk):
                 self.chunks.append(parser(self.env, self.objs))
             else:
                 self.parsers[key] = parser(self.settings)
