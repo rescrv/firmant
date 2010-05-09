@@ -25,19 +25,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import logging
-import stat
-import tempfile
 import os
 
-from docutils import io
-from docutils.core import publish_programmatically
-
-from firmant.parsers import Parser
 from firmant.parsers import RstObject
 from firmant.parsers import RstParser
-from firmant.utils import class_name
-from firmant.utils.exceptions import log_uncaught_exceptions
 
 
 class StaticRstParser(RstParser):
