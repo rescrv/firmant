@@ -34,6 +34,7 @@ import os
 
 from firmant.parsers import RstObject
 from firmant.parsers import RstParser
+from firmant.utils import paths
 
 
 class StaticRstParser(RstParser):
@@ -78,28 +79,21 @@ class StaticRstParser(RstParser):
                     ]
 
     def paths(self):
-        '''Return a list of paths to tag objects on the filesystem.
+        '''A list of files to parse.
 
-        Consider all the contents of the tags directory (by default this is
-        ``content_root/flat``).  Only files ending in ``suffix`` are considered.
+        .. doctest::
+           :hide:
 
-        Directory entries that are not files are ignored.
+           >>> srp = StaticRstParser(settings)
 
-            >>> p = StaticRstParser(settings)
-            >>> p.paths()
-            ['content/flat/about.rst', 'content/flat/empty.rst', 'content/flat/links.rst']
+        .. doctest::
+
+           >>> pprint(srp.paths())
+           ['content/flat/about.rst', 'content/flat/empty.rst', 'content/flat/links.rst']
 
         '''
-        settings = self.settings
-        path = os.path.join(settings.CONTENT_ROOT, settings.STATIC_RST_SUBDIR)
-        all_files = []
-        for root, dirs, files in os.walk(path):
-            files = filter(lambda f: f.endswith(settings.REST_EXTENSION), files)
-            files = map(lambda f: os.path.join(root, f), files)
-            files = filter(lambda f: os.path.isfile(f), files)
-            all_files += files
-        all_files.sort()
-        return all_files
+        path = self.root_path({'settings': self.settings})
+        return sorted(paths.recursive_listdir(path, matches='.*\.rst'))
 
     def new_object(self, path, d, pub):
         '''Return an instance of the object to which rst documents are parsed.
@@ -119,6 +113,13 @@ class StaticRstParser(RstParser):
         '''
         d = {}
         return d.get(attr, u'')
+
+    @staticmethod
+    def root_path(environment):
+        '''The directory under which all static objects reside.
+        '''
+        settings = environment['settings']
+        return os.path.join(settings.CONTENT_ROOT, settings.STATIC_RST_SUBDIR)
 
 
 def _setup(test):
