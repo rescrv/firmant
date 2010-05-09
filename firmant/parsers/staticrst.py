@@ -40,21 +40,12 @@ from firmant.utils import class_name
 from firmant.utils.exceptions import log_uncaught_exceptions
 
 
-__all__ = ['StaticParser', 'StaticRstParser']
-
-
 class StaticRstParser(RstParser):
     '''Create a static page from reStructured Text.
 
     For each reSt document, parse it to a page and extract its metadata.
 
-        >>> from pysettings.settings import Settings
-        >>> s = {'CONTENT_ROOT': 'content'
-        ...     ,'STATIC_RST_SUBDIR': 'flat'
-        ...     ,'REST_EXTENSION': 'rst'
-        ...     }
-        >>> s = Settings(s)
-        >>> p = StaticRstParser(s)
+        >>> p = StaticRstParser(settings)
         >>> p = p.parse_one('content/flat/links.rst')
         >>> p.copyright
         u'This document is part of the public domain.'
@@ -65,13 +56,7 @@ class StaticRstParser(RstParser):
 
     Default values::
 
-        >>> from pysettings.settings import Settings
-        >>> s = {'CONTENT_ROOT': 'content'
-        ...     ,'STATIC_RST_SUBDIR': 'flat'
-        ...     ,'REST_EXTENSION': 'rst'
-        ...     }
-        >>> s = Settings(s)
-        >>> p = StaticRstParser(s)
+        >>> p = StaticRstParser(settings)
         >>> p = p.parse_one('content/flat/empty.rst')
         >>> p.title
         u''
@@ -80,13 +65,7 @@ class StaticRstParser(RstParser):
 
     All static pages may be retrieved with::
 
-        >>> from pysettings.settings import Settings
-        >>> s = {'CONTENT_ROOT': 'content'
-        ...     ,'STATIC_RST_SUBDIR': 'flat'
-        ...     ,'REST_EXTENSION': 'rst'
-        ...     }
-        >>> s = Settings(s)
-        >>> p = StaticRstParser(s)
+        >>> p = StaticRstParser(settings)
         >>> p.log = Mock('log')
         >>> pprint(map(lambda p: p.title, p.parse()))
         Called log.info('parsed content/flat/about.rst')
@@ -110,13 +89,7 @@ class StaticRstParser(RstParser):
 
         Directory entries that are not files are ignored.
 
-            >>> from pysettings.settings import Settings
-            >>> s = {'CONTENT_ROOT': 'content'
-            ...     ,'STATIC_RST_SUBDIR': 'flat'
-            ...     ,'REST_EXTENSION': 'rst'
-            ...     }
-            >>> s = Settings(s)
-            >>> p = StaticRstParser(s)
+            >>> p = StaticRstParser(settings)
             >>> p.paths()
             ['content/flat/about.rst', 'content/flat/empty.rst', 'content/flat/links.rst']
 
@@ -150,3 +123,11 @@ class StaticRstParser(RstParser):
         '''
         d = {}
         return d.get(attr, u'')
+
+
+def _setup(test):
+    from pysettings.settings import Settings
+    test.globs['settings'] = Settings({'CONTENT_ROOT': 'content'
+                                      ,'STATIC_RST_SUBDIR': 'flat'
+                                      ,'REST_EXTENSION': 'rst'
+                                      })
