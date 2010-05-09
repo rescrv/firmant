@@ -25,21 +25,17 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import logging
-import stat
-import tempfile
+'''Static objects are simply references to files.
+
+The most common use for static objects is copying images and css into the proper
+location in the output hierarchy.
+'''
+
+
 import os
 
-from docutils import io
-from docutils.core import publish_programmatically
-
-from firmant import du
 from firmant import parsers
-from firmant.parsers import Parser
-from firmant.parsers import RstObject
-from firmant.parsers import RstParser
-from firmant.utils import class_name
-from firmant.utils.exceptions import log_uncaught_exceptions
+from firmant.utils import paths
 
 
 class StaticObject(parsers.ParsedObject):
@@ -61,38 +57,60 @@ class StaticObject(parsers.ParsedObject):
 
     '''
 
+    # pylint: disable-msg=R0903
+
     __slots__ = ['fullpath', 'relpath']
 
     def __repr__(self):
-        return 'static_obj<%s>' % self.fullpath
+        return 'static_obj<%s>' % getattr(self, 'fullpath', None)
 
 
-class StaticParser(Parser):
+class StaticParser(parsers.ChunkedParser):
     '''Create stand-in objects for static files to be published.
-
     '''
 
-    def paths(self):
+    type = 'static'
+
+    def paths(self, environment, objects):
         '''Return a list of paths to objects on the file system.
         '''
-        settings = self.settings
-        path  = os.path.join(settings.CONTENT_ROOT, settings.STATIC_SUBDIR)
-        all_files = []
-        for root, dirs, files in os.walk(path):
-            for file in files:
-                s = StaticObject()
-                s.fullpath = os.path.join(root, file)
-                if s.fullpath.startswith(path):
-                    s.relpath = s.fullpath[len(path):]
-                else:
-                    raise RuntimeError('Funky paths in StaticParser')
-                if s.relpath.startswith('/'):
-                    s.relpath = s.relpath[1:]
-                all_files.append(s)
-        all_files.sort(key=lambda s: s.relpath)
-        return all_files
+        if 'settings' not in environment:
+            environment['log'].error(_('Expected `settings` in environment.'))
+            return
+        return paths.recursive_listdir(self.root_path(environment))
 
-    def parse_one(self, path):
-        '''We use the identity function simply because we are copying files.
+    def parse(self, environment, objects, path):
+        '''Parse the object at `path` and save it under ``objects[self.type]``
         '''
-        return path
+        if 'settings' not in environment:
+            environment['log'].error(_('Expected `settings` in environment.'))
+            return
+        root = self.root_path(environment)
+        if path.startswith(root):
+            relpath = path[len(root):]
+        else:
+            raise RuntimeError(_('fullpath expected to exist under root'))
+        while relpath.startswith('/'):
+            relpath = relpath[1:]
+        objects[self.type].append(StaticObject(fullpath=path, relpath=relpath))
+
+    def attributes(self, environment, path):
+        '''Attributes that identify a static object:
+
+            type
+               This is always ``static``.
+
+            path
+               A path that describes the object relative to the input/output
+               directories.
+
+        '''
+        root = self.root_path(environment)
+        return {'type': self.type, 'path': path[len(root):]}
+
+    @staticmethod
+    def root_path(environment):
+        '''The directory under which all static objects reside.
+        '''
+        settings = environment['settings']
+        return os.path.join(settings.CONTENT_ROOT, settings.STATIC_SUBDIR)

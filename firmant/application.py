@@ -54,7 +54,6 @@ class Firmant(object):
         >>> pprint(f.parsers) #doctest: +ELLIPSIS
         {'feeds': <firmant.parsers.feeds.FeedParser object at 0x...>,
          'posts': <firmant.parsers.posts.PostParser object at 0x...>,
-         'static': <firmant.parsers.static.StaticParser object at 0x...>,
          'staticrst': <firmant.parsers.staticrst.StaticRstParser object at 0x...>,
          'tags': <firmant.parsers.tags.TagParser object at 0x...>}
         >>> f.parse()
@@ -68,7 +67,6 @@ class Firmant(object):
                    <firmant.parsers.RstObject object at 0x...>,
                    <firmant.parsers.RstObject object at 0x...>,
                    <firmant.parsers.RstObject object at 0x...>],
-         'static': [static_obj<testdata/pristine/static/images/88x31.png>],
          'staticrst': [<firmant.parsers.RstObject object at 0x...>,
                        <firmant.parsers.RstObject object at 0x...>,
                        <firmant.parsers.RstObject object at 0x...>],
