@@ -30,6 +30,7 @@
 
 
 import os
+import re
 import sys
 
 
@@ -127,3 +128,48 @@ def create_or_truncate(path):
             if ex.errno != 17:
                 raise
     return open(path, 'w+')
+
+
+def recursive_listdir(path, matches=None):
+    '''Provide a list of all files in a directory and its subdirectories.
+
+    .. doctest::
+
+       >>> pprint(sorted(recursive_listdir('testdata/pristine/posts')))
+       ['testdata/pristine/posts/2009-12-31-party.rst',
+        'testdata/pristine/posts/2010-01-01-newyear.rst',
+        'testdata/pristine/posts/2010-02-01-newmonth.rst',
+        'testdata/pristine/posts/2010-02-02-newday.rst',
+        'testdata/pristine/posts/2010-02-02-newday2.rst']
+
+    An optional regex string `matches` may be specified and will be compared to
+    the :func:`os.path.basename` of each entry under path.
+
+    .. doctest::
+
+       >>> pprint(sorted(recursive_listdir('testdata/pristine',
+       ...                                 matches='.*\.rst$')))
+       ['testdata/pristine/feeds/bar.rst',
+        'testdata/pristine/feeds/baz.rst',
+        'testdata/pristine/feeds/foo.rst',
+        'testdata/pristine/feeds/quux.rst',
+        'testdata/pristine/flat/about.rst',
+        'testdata/pristine/flat/empty.rst',
+        'testdata/pristine/flat/links.rst',
+        'testdata/pristine/posts/2009-12-31-party.rst',
+        'testdata/pristine/posts/2010-01-01-newyear.rst',
+        'testdata/pristine/posts/2010-02-01-newmonth.rst',
+        'testdata/pristine/posts/2010-02-02-newday.rst',
+        'testdata/pristine/posts/2010-02-02-newday2.rst',
+        'testdata/pristine/tags/bar.rst',
+        'testdata/pristine/tags/baz.rst',
+        'testdata/pristine/tags/foo.rst',
+        'testdata/pristine/tags/quux.rst']
+
+    '''
+    ret = []
+    for root, dirs, files in os.walk(path):
+        for ent in dirs + files:
+            if not matches or re.match(matches, os.path.basename(ent)):
+                ret.append(os.path.join(root, ent))
+    return ret
