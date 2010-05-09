@@ -130,7 +130,7 @@ def create_or_truncate(path):
     return open(path, 'w+')
 
 
-def recursive_listdir(path, matches=None):
+def recursive_listdir(path, matches=None, files_only=True):
     '''Provide a list of all files in a directory and its subdirectories.
 
     .. doctest::
@@ -169,6 +169,8 @@ def recursive_listdir(path, matches=None):
     '''
     ret = []
     for root, dirs, files in os.walk(path):
+        if files_only:
+            dirs = []
         for ent in dirs + files:
             if not matches or re.match(matches, os.path.basename(ent)):
                 ret.append(os.path.join(root, ent))
