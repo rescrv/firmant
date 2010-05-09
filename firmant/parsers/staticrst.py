@@ -25,6 +25,11 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+'''StaticRst objects (also known as "flatpages")  provide for free-form page
+layouts.
+'''
+
+
 import os
 
 from firmant.parsers import RstObject
