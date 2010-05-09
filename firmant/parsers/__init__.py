@@ -335,6 +335,51 @@ class ChunkedParser(chunks.AbstractChunk):
         '''
 
 
+class ChunkedRstParser(ChunkedParser):
+    '''A parser containing common functionality for parsing reStructuredTest.
+    '''
+
+    def parse(self, environment, objects, path):
+        '''Parse the reStructuredText doc at `path` and pass the relevant pieces
+        to :meth:`rstparse`.
+        '''
+        metadata = {}
+        transforms = [du.meta_data_transform(metadata)]
+        pub = du.publish(path, transforms)
+        pieces = {}
+        pieces['metadata'] = metadata
+        pieces['document'] = pub.document
+        pieces['pub_parts'] = pub.writer.parts
+        self.rstparse(environment, objects, path, pieces)
+
+    @workarounds.abstractproperty
+    def cls(self):
+        '''The class object that should be used for new parsed objects.
+        '''
+
+    @workarounds.abstractmethod
+    def rstparse(self, environment, objects, path, pieces):
+        '''The main method to override when creating new reStructuredText
+        parsers.
+
+        The `pieces` dictionary contains the following keys:
+
+        metadata
+           All pieces of metadata pulled from the document using
+           :func:`firmant.du.meta_data_transform`.
+
+        pub_parts
+           The pieces returned by the html writer.
+
+        document
+           The actual doctree of that was produced as a result of parsing, and
+           applying transformations.
+
+        '''
+        # TODO figure out how to handle transforms later (by deferring
+        # attributes derived from pub_parts).
+
+
 class RstObject(object):
     '''An object representing a parsed restructured text document.
     '''
