@@ -56,6 +56,7 @@ Modules in this package:
    chunks
    du
    paginate
+   parsers
    routing
    utils
    writers

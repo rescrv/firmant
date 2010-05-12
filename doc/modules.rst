@@ -7,6 +7,7 @@ All Shipped Modules
    firmant.du
    firmant.chunks
    firmant.paginate
+   firmant.parsers
    firmant.routing
    firmant.routing.components
    firmant.utils
