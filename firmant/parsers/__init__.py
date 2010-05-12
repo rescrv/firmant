@@ -37,6 +37,7 @@ from docutils.core import Publisher
 from firmant import chunks
 from firmant import du
 from firmant.utils import class_name
+from firmant.utils import paths
 from firmant.utils import workarounds
 from firmant.utils.exceptions import log_uncaught_exceptions
 
@@ -157,12 +158,13 @@ class ChunkedParser(chunks.AbstractChunk):
 
        >>> class SampleParser(ChunkedParser):
        ...     type = 'objs'
-       ...     def paths(self, environment, objects):
-       ...         return [1, 2, 3]
+       ...     paths = '^numbers/[0-9]$'
        ...     def parse(self, environment, objects, path):
        ...         objects[self.type].append(str(path))
        ...     def attributes(self, environment, path):
        ...         return {'path': path}
+       ...     def root(self, environment):
+       ...          return 'testdata/pristine/sample'
 
     The new parser meets the criteria for two different abstract base classes:
 
@@ -232,7 +234,7 @@ class ChunkedParser(chunks.AbstractChunk):
        200
        >>> pprint(parse(environment, objects)) #doctest: +ELLIPSIS
        ({'log': <logging.Logger instance at 0x...>},
-        {'objs': ['1', '2', '3']},
+        {'objs': ['numbers/1', 'numbers/2', 'numbers/3']},
         [])
 
     ..
@@ -285,20 +287,19 @@ class ChunkedParser(chunks.AbstractChunk):
                 [self.__class__(environment, objects, 'parse')])
 
     def __parse__(self, environment, objects):
-        for path in self.paths(environment, objects):
+        for path in sorted(paths.recursive_listdir(self.root(environment),
+            matches=self.paths)):
             if self.type not in objects:
                 objects[self.type] = []
             self.parse(environment, objects, path)
         return environment, objects, []
 
-    @workarounds.abstractmethod
-    def paths(self, environment, objects):
+    @workarounds.abstractproperty
+    def paths(self):
         '''Determine which paths should be parsed.
 
-        This function should not open the files, but should verify that the
-        pathnames meet all constraints necessary.  It should add the paths to
-        the objects dictionary keyed by the object name (e.g. ``posts`` or
-        ``feeds``).
+        This is a regular expression that will be used to match pathnames
+        relative to :meth:`root`.
         '''
 
     @workarounds.abstractmethod
@@ -332,6 +333,11 @@ class ChunkedParser(chunks.AbstractChunk):
 
         This value has no impact on secondary objects that are generated (e.g.
         objects that are created from embedded LaTeX equations).
+        '''
+
+    @workarounds.abstractmethod
+    def root(self, environment):
+        '''The root under which all objects to be parsed by this parser reside.
         '''
 
 

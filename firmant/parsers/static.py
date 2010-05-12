@@ -65,19 +65,14 @@ class StaticObject(parsers.ParsedObject):
         return 'static_obj<%s>' % getattr(self, 'fullpath', None)
 
 
+# TODO:  This is untested and may very well be 100% broken
 class StaticParser(parsers.ChunkedParser):
     '''Create stand-in objects for static files to be published.
     '''
 
     type = 'static'
 
-    def paths(self, environment, objects):
-        '''Return a list of paths to objects on the file system.
-        '''
-        if 'settings' not in environment:
-            environment['log'].error(_('Expected `settings` in environment.'))
-            return
-        return paths.recursive_listdir(self.root_path(environment))
+    paths = '.*\.rst$'
 
     def parse(self, environment, objects, path):
         '''Parse the object at `path` and save it under ``objects[self.type]``
@@ -109,7 +104,7 @@ class StaticParser(parsers.ChunkedParser):
         return {'type': self.type, 'path': path[len(root):]}
 
     @staticmethod
-    def root_path(environment):
+    def root(environment):
         '''The directory under which all static objects reside.
         '''
         settings = environment['settings']
