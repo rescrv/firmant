@@ -65,29 +65,33 @@ class StaticObject(parsers.ParsedObject):
         return 'static_obj<%s>' % getattr(self, 'fullpath', None)
 
 
-# TODO:  This is untested and may very well be 100% broken
 class StaticParser(parsers.ChunkedParser):
     '''Create stand-in objects for static files to be published.
+
+    .. doctest::
+       :hide:
+
+       >>> environment['log'] = get_logger()
+
+    .. doctest::
+
+       >>> sp = StaticParser(environment, objects)
+       >>> environment, objects, (parser,) = sp(environment, objects)
+       >>> pprint(parser(environment, objects)) #doctest: +ELLIPSIS
+       ({...},
+        {'static': [static_obj<images/88x31.png>]},
+        [])
+
     '''
 
     type = 'static'
-
-    paths = '.*\.rst$'
+    paths = '.*'
 
     def parse(self, environment, objects, path):
         '''Parse the object at `path` and save it under ``objects[self.type]``
         '''
-        if 'settings' not in environment:
-            environment['log'].error(_('Expected `settings` in environment.'))
-            return
-        root = self.root_path(environment)
-        if path.startswith(root):
-            relpath = path[len(root):]
-        else:
-            raise RuntimeError(_('fullpath expected to exist under root'))
-        while relpath.startswith('/'):
-            relpath = relpath[1:]
-        objects[self.type].append(StaticObject(fullpath=path, relpath=relpath))
+        fullpath = os.path.join(self.root(environment), path)
+        objects[self.type].append(StaticObject(fullpath=path, relpath=path))
 
     def attributes(self, environment, path):
         '''Attributes that identify a static object:
@@ -99,9 +103,19 @@ class StaticParser(parsers.ChunkedParser):
                A path that describes the object relative to the input/output
                directories.
 
+        .. doctest::
+           :hide:
+
+           >>> environment['log'] = get_logger()
+           >>> sp = StaticParser(environment, objects)
+
+        .. doctest::
+
+           >>> pprint(sp.attributes(environment, 'images/88x31.png'))
+           {'path': 'images/88x31.png', 'type': 'static'}
+
         '''
-        root = self.root_path(environment)
-        return {'type': self.type, 'path': path[len(root):]}
+        return {'type': self.type, 'path': path}
 
     @staticmethod
     def root(environment):
@@ -109,3 +123,13 @@ class StaticParser(parsers.ChunkedParser):
         '''
         settings = environment['settings']
         return os.path.join(settings.CONTENT_ROOT, settings.STATIC_SUBDIR)
+
+
+def _setup(test):
+    from pysettings.settings import Settings
+    test.globs['settings'] = Settings({'CONTENT_ROOT': 'testdata/pristine'
+                                      ,'STATIC_SUBDIR': 'static'
+                                      })
+    test.globs['environment'] = {'settings': test.globs['settings']
+                                }
+    test.globs['objects'] = {}
