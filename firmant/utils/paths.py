@@ -130,17 +130,17 @@ def create_or_truncate(path):
     return open(path, 'w+')
 
 
-def recursive_listdir(path, matches=None, files_only=True):
+def recursive_listdir(root, matches=None, files_only=True):
     '''Provide a list of all files in a directory and its subdirectories.
 
     .. doctest::
 
        >>> pprint(sorted(recursive_listdir('testdata/pristine/posts')))
-       ['testdata/pristine/posts/2009-12-31-party.rst',
-        'testdata/pristine/posts/2010-01-01-newyear.rst',
-        'testdata/pristine/posts/2010-02-01-newmonth.rst',
-        'testdata/pristine/posts/2010-02-02-newday.rst',
-        'testdata/pristine/posts/2010-02-02-newday2.rst']
+       ['2009-12-31-party.rst',
+        '2010-01-01-newyear.rst',
+        '2010-02-01-newmonth.rst',
+        '2010-02-02-newday.rst',
+        '2010-02-02-newday2.rst']
 
     An optional regex string `matches` may be specified and will be compared to
     the :func:`os.path.basename` of each entry under path.
@@ -149,29 +149,36 @@ def recursive_listdir(path, matches=None, files_only=True):
 
        >>> pprint(sorted(recursive_listdir('testdata/pristine',
        ...                                 matches='.*\.rst$')))
-       ['testdata/pristine/feeds/bar.rst',
-        'testdata/pristine/feeds/baz.rst',
-        'testdata/pristine/feeds/foo.rst',
-        'testdata/pristine/feeds/quux.rst',
-        'testdata/pristine/flat/about.rst',
-        'testdata/pristine/flat/empty.rst',
-        'testdata/pristine/flat/links.rst',
-        'testdata/pristine/posts/2009-12-31-party.rst',
-        'testdata/pristine/posts/2010-01-01-newyear.rst',
-        'testdata/pristine/posts/2010-02-01-newmonth.rst',
-        'testdata/pristine/posts/2010-02-02-newday.rst',
-        'testdata/pristine/posts/2010-02-02-newday2.rst',
-        'testdata/pristine/tags/bar.rst',
-        'testdata/pristine/tags/baz.rst',
-        'testdata/pristine/tags/foo.rst',
-        'testdata/pristine/tags/quux.rst']
+       ['feeds/bar.rst',
+        'feeds/baz.rst',
+        'feeds/foo.rst',
+        'feeds/quux.rst',
+        'flat/about.rst',
+        'flat/empty.rst',
+        'flat/links.rst',
+        'posts/2009-12-31-party.rst',
+        'posts/2010-01-01-newyear.rst',
+        'posts/2010-02-01-newmonth.rst',
+        'posts/2010-02-02-newday.rst',
+        'posts/2010-02-02-newday2.rst',
+        'tags/bar.rst',
+        'tags/baz.rst',
+        'tags/foo.rst',
+        'tags/quux.rst']
 
     '''
     ret = []
-    for root, dirs, files in os.walk(path):
+    for relroot, dirs, files in os.walk(root):
         if files_only:
             dirs = []
         for ent in dirs + files:
+            path = os.path.join(relroot, ent)
+            if path.startswith(root):
+                path = path[len(root):]
+            else:
+                raise RuntimeError(_('`path` expected to exist under `root`'))
+            if path.startswith('/'):
+                path = path[1:]
             if not matches or re.match(matches, os.path.basename(ent)):
-                ret.append(os.path.join(root, ent))
+                ret.append(path)
     return ret
