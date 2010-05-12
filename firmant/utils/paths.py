@@ -179,6 +179,6 @@ def recursive_listdir(root, matches=None, files_only=True):
                 raise RuntimeError(_('`path` expected to exist under `root`'))
             if path.startswith('/'):
                 path = path[1:]
-            if not matches or re.match(matches, os.path.basename(ent)):
+            if not matches or re.match(matches, path):
                 ret.append(path)
     return ret
