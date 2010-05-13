@@ -74,6 +74,12 @@ URLS = [c.TYPE('post') /c.PAGENO
        ]
 OUTPUT_DIR = 'build/'
 PERMALINK_ROOT = 'http://test'
+PERMALINK_EXTENSIONS = {'post': 'html'
+                       ,'feed': 'atom'
+                       ,'tag': 'html'
+                       ,'static': None
+                       ,'staticrst': 'html'
+                       }
 GLOBALS = ['firmant.globs.URLFor'
           ,'firmant.globs.RecentPosts'
           ,'firmant.globs.DailyArchives'

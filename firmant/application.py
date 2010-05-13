@@ -51,53 +51,19 @@ class Firmant(object):
         >>> s.OUTPUT_DIR = outdir
         >>> f = Firmant(s)
         >>> f.log = Mock('log')
-        >>> pprint(f.parsers) #doctest: +ELLIPSIS
-        {'feeds': <firmant.parsers.feeds.FeedParser object at 0x...>,
-         'posts': <firmant.parsers.posts.PostParser object at 0x...>,
-         'staticrst': <firmant.parsers.staticrst.StaticRstParser object at 0x...>,
-         'tags': <firmant.parsers.tags.TagParser object at 0x...>}
-        >>> f.parse()
-        >>> pprint(f.objs) #doctest: +ELLIPSIS
-        {'feeds': [<firmant.parsers.RstObject object at 0x...>,
-                   <firmant.parsers.RstObject object at 0x...>,
-                   <firmant.parsers.RstObject object at 0x...>,
-                   <firmant.parsers.RstObject object at 0x...>],
-         'posts': [<firmant.parsers.RstObject object at 0x...>,
-                   <firmant.parsers.RstObject object at 0x...>,
-                   <firmant.parsers.RstObject object at 0x...>,
-                   <firmant.parsers.RstObject object at 0x...>,
-                   <firmant.parsers.RstObject object at 0x...>],
-         'staticrst': [<firmant.parsers.RstObject object at 0x...>,
-                       <firmant.parsers.RstObject object at 0x...>,
-                       <firmant.parsers.RstObject object at 0x...>],
-         'tags': [<firmant.parsers.RstObject object at 0x...>,
-                  <firmant.parsers.RstObject object at 0x...>,
-                  <firmant.parsers.RstObject object at 0x...>,
-                  <firmant.parsers.RstObject object at 0x...>]}
-        >>> f.cross_reference() #doctest: +ELLIPSIS
-        >>> f.create_permalinks() #doctest: +ELLIPSIS
-        >>> for post in f.objs['posts']:
-        ...     pprint((post.tags, post.feeds)) #doctest: +ELLIPSIS
-        ([<firmant.parsers.RstObject object at 0x...>],
-         [<firmant.parsers.RstObject object at 0x...>,
-          <firmant.parsers.RstObject object at 0x...>,
-          <firmant.parsers.RstObject object at 0x...>,
-          <firmant.parsers.RstObject object at 0x...>])
-        ([<firmant.parsers.RstObject object at 0x...>],
-         [<firmant.parsers.RstObject object at 0x...>,
-          <firmant.parsers.RstObject object at 0x...>])
-        ([<firmant.parsers.RstObject object at 0x...>],
-         [<firmant.parsers.RstObject object at 0x...>,
-          <firmant.parsers.RstObject object at 0x...>])
-        ([<firmant.parsers.RstObject object at 0x...>,
-          <firmant.parsers.RstObject object at 0x...>],
-         [<firmant.parsers.RstObject object at 0x...>,
-          <firmant.parsers.RstObject object at 0x...>])
-        ([<firmant.parsers.RstObject object at 0x...>,
-          <firmant.parsers.RstObject object at 0x...>],
-         [<firmant.parsers.RstObject object at 0x...>,
-          <firmant.parsers.RstObject object at 0x...>])
         >>> f()
+        >>> pprint(f.objs) #doctest: +ELLIPSIS
+        {'feed': [Feed(bar), Feed(baz), Feed(foo), Feed(quux)],
+         'post': [Post(2009-12-31-party),
+                  Post(2010-01-01-newyear),
+                  Post(2010-02-01-newmonth),
+                  Post(2010-02-02-newday),
+                  Post(2010-02-02-newday2)],
+         'static': [static_obj<testdata/pristine/static/images/88x31.png>],
+         'staticrst': [staticrst_obj<about>,
+                       staticrst_obj<empty>,
+                       staticrst_obj<links>],
+         'tag': [Tag(bar), Tag(baz), Tag(foo), Tag(quux)]}
 
     '''
 
@@ -116,19 +82,20 @@ class Firmant(object):
         self.env['settings'] = self.settings
 
         self.chunks.append(CheckURLConflicts())
+        self.chunks.append(CreatePermalinks())
+        self.chunks.append(CrossReference())
 
         for glob in settings.GLOBALS:
             glob = utils.get_obj(glob)
             self.chunks.append(glob(self.env, self.objs))
 
         # Setup parsers
-        self.parsers = dict()
-        for key, parser in settings.PARSERS.items():
+        for parser in settings.PARSERS.values():
             parser = utils.get_obj(parser)
             if issubclass(parser, AbstractChunk):
                 self.chunks.append(parser(self.env, self.objs))
             else:
-                self.parsers[key] = parser(self.settings)
+                self.log.error(_("'%s' is not a parser.") % str(parser))
 
         # Setup writers
         for writer in self.settings.WRITERS:
@@ -148,26 +115,24 @@ class Firmant(object):
                 else:
                     self.chunks.append(c)
 
-    def parse(self):
-        '''Call parse on each configured parser.
-        '''
-        # Parse documents
-        for key, parser in self.parsers.items():
-            self.objs[key] = parser.parse()
 
-    def cross_reference(self):
+class CrossReference(AbstractChunk):
+    '''A chunk that cross-references posts/tags/feeds.
+    '''
+
+    def __call__(self, environment, objects):
         '''Cross reference tags and feeds
         '''
-        for feed in self.objs.get('feeds', []):
+        for feed in objects.get('feed', []):
             feed.posts = list()
-        for tag in self.objs.get('tags', []):
+        for tag in objects.get('tag', []):
             tag.posts = list()
         # TODO inefficient, notproud
-        for post in self.objs.get('posts', []):
+        for post in objects.get('post', []):
             to_delete = list()
             for i, ptag in enumerate(post.tags):
                 seen = False
-                for tag in self.objs.get('tags', []):
+                for tag in objects.get('tag', []):
                     if tag.slug == ptag:
                         seen = True
                         tag.posts.append(post)
@@ -175,14 +140,14 @@ class Firmant(object):
                 if not seen:
                     warning  = _("Tag '%s' referenced but not defined.")
                     warning %= ptag
-                    self.log.warning(warning)
+                    environment['log'].warning(warning)
                     to_delete.append(i)
             for i in reversed(to_delete):
                 del post.tags[i]
             to_delete = list()
             for i, pfeed in enumerate(post.feeds):
                 seen = False
-                for feed in self.objs.get('feeds', []):
+                for feed in objects.get('feed', []):
                     if feed.slug == pfeed:
                         seen = True
                         feed.posts.append(post)
@@ -190,35 +155,13 @@ class Firmant(object):
                 if not seen:
                     error  = _("Feed '%s' referenced but not defined.")
                     error %= pfeed
-                    self.log.error(error)
+                    environment['log'].error(error)
                     to_delete.append(i)
             for i in reversed(to_delete):
                 del post.feeds[i]
+        return (environment, objects, [])
 
-    def create_permalinks(self):
-        '''Add permalinks to objects.
-        '''
-        # TODO:  Remove prior to 0.2.0
-        url = self.urlmapper.url
-        for post in self.objs.get('posts', []):
-            post.permalink = url('atom', **{'type': 'post'
-                                           ,'year': post.published.year
-                                           ,'month': post.published.month
-                                           ,'day': post.published.day
-                                           ,'slug': post.slug
-                                           })
-        for tag in self.objs.get('tags', []):
-            tag.permalink = url('html', **{'type': 'tag'
-                                          ,'slug': tag.slug
-                                          })
-        for feed in self.objs.get('feeds', []):
-            feed.permalink = url('atom', **{'type': 'feed'
-                                           ,'slug': feed.slug
-                                           })
-        for staticrst in self.objs.get('staticrst', []):
-            staticrst.permalink = url('html', **{'type': 'staticrst'
-                                                ,'path': staticrst.path
-                                                })
+    scheduling_order = 700
 
 
 class CheckURLConflicts(AbstractChunk):
@@ -244,6 +187,35 @@ class CheckURLConflicts(AbstractChunk):
         return (environment, objects, [])
 
     scheduling_order = 600
+
+
+class CreatePermalinks(AbstractChunk):
+    '''For objects that declare attributes, add a permalink.
+
+    Pre-existing permalinks will not be overwritten.
+
+    '''
+
+    def __call__(self, environment, objects):
+        if 'settings' not in environment:
+            environment['log'].error(_('Expected `settings` in environment.'))
+            return
+        if 'urlmapper' not in environment:
+            environment['log'].error(_('Expected `urlmapper` in environment.'))
+            return
+        settings = environment['settings']
+        urlmapper = environment['urlmapper']
+        for typ, objlist in objects.items():
+            for obj in objlist:
+                if hasattr(obj, '__attributes__') \
+                        and not hasattr(obj, 'permalink'):
+                    attrs = obj.__attributes__
+                    attrs['type'] = typ
+                    extension = settings.PERMALINK_EXTENSIONS[typ]
+                    obj.permalink = urlmapper.url(extension, **attrs)
+        return (environment, objects, [])
+
+    scheduling_order = 300
 
 
 def _setup(self):
