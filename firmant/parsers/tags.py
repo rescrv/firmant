@@ -76,6 +76,22 @@ class Tag(parsers.ParsedObject):
     def __repr__(self):
         return 'Tag(%s)' % getattr(self, 'slug', None)
 
+    @property
+    def __attributes__(self):
+        '''Attributes that identify a tag object:
+
+            slug
+               The `slug` attribute of the :class:`Tag` object.
+
+        .. doctest::
+
+           >>> pprint(Tag(slug='firmantstuff', title='Firmant').__attributes__)
+           {'slug': 'firmantstuff'}
+
+        '''
+        # We remove the 'rst' extension
+        return {'slug': self.slug}
+
 
 class TagParser(parsers.RstParser):
     r'''Parse all tags matching ``[-a-zA-Z0-9_.]+``.
@@ -99,30 +115,6 @@ class TagParser(parsers.RstParser):
     type = 'tag'
     paths = '^[-a-zA-Z0-9_.]+\.rst$'
     cls = Tag
-
-    def attributes(self, environment, path):
-        '''Attributes that identify a tag object:
-
-            type
-               This is always ``tag``.
-
-            slug
-               The `slug` attribute of the :class:`Tag` object.
-
-        .. doctest::
-           :hide:
-
-           >>> environment['log'] = get_logger()
-           >>> tp = TagParser(environment, objects)
-
-        .. doctest::
-
-           >>> pprint(tp.attributes(environment, 'firmantstuff.rst'))
-           {'slug': 'firmantstuff', 'type': 'tag'}
-
-        '''
-        # We remove the 'rst' extension
-        return {'type': self.type, 'slug': path[:-4]}
 
     def root(self, environment):
         '''The directory under which all tag objects reside.

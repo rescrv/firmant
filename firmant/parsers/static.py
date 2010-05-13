@@ -64,6 +64,22 @@ class StaticObject(parsers.ParsedObject):
     def __repr__(self):
         return 'static_obj<%s>' % getattr(self, 'fullpath', None)
 
+    @property
+    def __attributes__(self):
+        '''Attributes that identify a static object:
+
+            path
+               A path that describes the object relative to the input/output
+               directories.
+
+        .. doctest::
+
+           >>> pprint(StaticObject(relpath='images/88x31.png').__attributes__)
+           {'path': 'images/88x31.png'}
+
+        '''
+        return {'path': self.relpath}
+
 
 class StaticParser(parsers.Parser):
     '''Create stand-in objects for static files to be published.
@@ -93,30 +109,6 @@ class StaticParser(parsers.Parser):
         '''
         fullpath = os.path.join(self.root(environment), path)
         objects[self.type].append(self.cls(fullpath=fullpath, relpath=path))
-
-    def attributes(self, environment, path):
-        '''Attributes that identify a static object:
-
-            type
-               This is always ``static``.
-
-            path
-               A path that describes the object relative to the input/output
-               directories.
-
-        .. doctest::
-           :hide:
-
-           >>> environment['log'] = get_logger()
-           >>> sp = StaticParser(environment, objects)
-
-        .. doctest::
-
-           >>> pprint(sp.attributes(environment, 'images/88x31.png'))
-           {'path': 'images/88x31.png', 'type': 'static'}
-
-        '''
-        return {'type': self.type, 'path': path}
 
     @staticmethod
     def root(environment):

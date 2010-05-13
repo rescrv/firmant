@@ -81,6 +81,22 @@ class Feed(parsers.ParsedObject):
     def __repr__(self):
         return 'Feed(%s)' % getattr(self, 'slug', None)
 
+    @property
+    def __attributes__(self):
+        '''Attributes that identify a feed object:
+
+            slug
+               The `slug` attribute of the :class:`Feed` object.
+
+        .. doctest::
+
+           >>> Feed(slug='foo', title='Foo').__attributes__
+           {'slug': 'foo'}
+
+        '''
+        # We remove the 'rst' extension
+        return {'slug': self.slug}
+
 
 class FeedParser(parsers.RstParser):
     r'''Parse all feeds matching ``[-a-zA-Z0-9_]+``.
@@ -104,30 +120,6 @@ class FeedParser(parsers.RstParser):
     type = 'feed'
     paths = '^[-a-zA-Z0-9_.]+\.rst$'
     cls = Feed
-
-    def attributes(self, environment, path):
-        '''Attributes that identify a feed object:
-
-            type
-               This is always ``feed``.
-
-            slug
-               The `slug` attribute of the :class:`Feed` object.
-
-        .. doctest::
-           :hide:
-
-           >>> environment['log'] = get_logger()
-           >>> fp = FeedParser(environment, objects)
-
-        .. doctest::
-
-           >>> pprint(fp.attributes(environment, 'firmantstuff.rst'))
-           {'slug': 'firmantstuff', 'type': 'feed'}
-
-        '''
-        # We remove the 'rst' extension
-        return {'type': self.type, 'slug': path[:-4]}
 
     def root(self, environment):
         '''The directory under which all feed objects reside.

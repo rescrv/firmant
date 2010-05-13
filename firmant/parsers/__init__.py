@@ -25,6 +25,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+import abc
 import logging
 import stat
 import tempfile
@@ -50,10 +51,9 @@ class ParsedObject(object):
 
     .. doctest::
 
-       >>> ParsedObject(permalink='http://').permalink
-       'http://'
        >>> class SampleObject(ParsedObject):
        ...     __slots__ = ['someattr']
+       ...     __attributes__ = property(lambda s: {'someattr': s.someattr})
        ...
        >>> SampleObject(someattr='value').someattr
        'value'
@@ -71,6 +71,8 @@ class ParsedObject(object):
 
     '''
 
+    __metaclass__ = abc.ABCMeta
+
     __slots__ = ['permalink']
 
     def __init__(self, **kwargs):
@@ -84,6 +86,14 @@ class ParsedObject(object):
             raise AttributeError(error)
         for attr in kwargs.keys():
             setattr(self, attr, kwargs.get(attr, None))
+
+    @workarounds.abstractproperty
+    def __attributes__(self):
+        '''The dict of attributes that define permalink of the object.
+
+        The permalink will be derived from these attributes by passing them to
+        a :class:`firmant.routing.URLMapper`.
+        '''
 
 
 class Parser(chunks.AbstractChunk):
@@ -262,20 +272,6 @@ class Parser(chunks.AbstractChunk):
         Any new objects that are created during the parsing of the object at
         path should be added directly to the objects dictionary (this includes
         the parsed object itself).
-        '''
-
-    @workarounds.abstractmethod
-    def attributes(self, environment, path):
-        '''The dict of attributes that define permalink of the object at path.
-
-        The permalink will be derived from these attributes by passing them to
-        a :class:`firmant.routing.URLMapper`.
-
-        Passing only `path` and not the parsed object is intended to force
-        objects on the filesystem to be unique.  It's entirely possible to make
-        two paths on the filesystem have the same set of attributes; try to
-        avoid this.
-
         '''
 
     @workarounds.abstractproperty

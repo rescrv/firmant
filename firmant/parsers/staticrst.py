@@ -69,6 +69,23 @@ class StaticRstObject(parsers.ParsedObject):
     def __repr__(self):
         return 'staticrst_obj<%s>' % getattr(self, 'path', None)
 
+    @property
+    def __attributes__(self):
+        '''Attributes that identify a static object:
+
+            path
+               A path that describes the object relative to the input/output
+               directories.
+
+        .. doctest::
+
+           >>> pprint(StaticRstObject(path='about/projects/firmant').__attributes__)
+           {'path': 'about/projects/firmant'}
+
+        '''
+        # We remove the 'rst' extension
+        return {'path': self.path}
+
 
 class StaticRstParser(parsers.RstParser):
     '''Create a static page from reStructured Text.
@@ -94,31 +111,6 @@ class StaticRstParser(parsers.RstParser):
     type = 'staticrst'
     paths = '.*\.rst'
     cls = StaticRstObject
-
-    def attributes(self, environment, path):
-        '''Attributes that identify a static object:
-
-            type
-               This is always ``static``.
-
-            path
-               A path that describes the object relative to the input/output
-               directories.
-
-        .. doctest::
-           :hide:
-
-           >>> environment['log'] = get_logger()
-           >>> srp = StaticRstParser(environment, objects)
-
-        .. doctest::
-
-           >>> pprint(srp.attributes(environment, 'about/projects/firmant.rst'))
-           {'path': 'about/projects/firmant', 'type': 'staticrst'}
-
-        '''
-        # We remove the 'rst' extension
-        return {'type': self.type, 'path': path[:-4]}
 
     def root(self, environment):
         '''The directory under which all staticrst objects reside.

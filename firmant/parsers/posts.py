@@ -102,6 +102,35 @@ class Post(parsers.ParsedObject):
             dt = dt.strftime('%Y-%m-%d')
         return 'Post(%s-%s)' % (dt, getattr(self, 'slug', None))
 
+    @property
+    def __attributes__(self):
+        '''Attributes that identify a post object:
+
+            year
+               The year of publication.
+
+            month
+               The month of publication.
+
+            day
+               The day of publication.
+
+            slug
+               The `slug` attribute of the :class:`Post` object.
+
+        .. doctest::
+
+           >>> from datetime import datetime
+           >>> pprint(Post(published=datetime(2009, 12, 31), slug='party').__attributes__)
+           {'day': 31, 'month': 12, 'slug': 'party', 'year': 2009}
+
+        '''
+        return {'year': self.published.year
+               ,'month': self.published.month
+               ,'day': self.published.day
+               ,'slug': self.slug
+               }
+
 
 class PostParser(parsers.RstParser):
     '''Parse all posts matching ``[0-9]{4}-[0-9]{2}-[0-9]{2}-[-a-zA-Z0-9_]+``.
@@ -129,47 +158,6 @@ class PostParser(parsers.RstParser):
     type = 'post'
     paths = '^[0-9]{4}-[0-9]{2}-[0-9]{2}-[-a-zA-Z0-9_]+\.rst$'
     cls = Post
-
-    def attributes(self, environment, path):
-        '''Attributes that identify a post object:
-
-            type
-               This is always ``post``.
-
-            year
-               The year of publication.
-
-            month
-               The month of publication.
-
-            day
-               The day of publication.
-
-            slug
-               The `slug` attribute of the :class:`Post` object.
-
-        .. doctest::
-           :hide:
-
-           >>> environment['log'] = get_logger()
-           >>> pp = PostParser(environment, objects)
-
-        .. doctest::
-
-           >>> pprint(pp.attributes(environment, '2009-12-31-party.rst'))
-           {'day': 31, 'month': 12, 'slug': 'party', 'type': 'post', 'year': 2009}
-
-        '''
-        year = int(path[:4])
-        month = int(path[5:7])
-        day = int(path[8:10])
-        slug = path[11:-4]
-        return {'type': self.type
-               ,'year': year
-               ,'month': month
-               ,'day': day
-               ,'slug': slug
-               }
 
     def root(self, environment):
         '''The directory under which all post objects reside.
