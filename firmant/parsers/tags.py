@@ -77,7 +77,7 @@ class Tag(parsers.ParsedObject):
         return 'Tag(%s)' % getattr(self, 'slug', None)
 
 
-class TagParser(parsers.ChunkedRstParser):
+class TagParser(parsers.RstParser):
     r'''Parse all tags matching ``[-a-zA-Z0-9_.]+``.
 
     .. doctest::

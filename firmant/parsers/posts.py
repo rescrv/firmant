@@ -103,7 +103,7 @@ class Post(parsers.ParsedObject):
         return 'Post(%s-%s)' % (dt, getattr(self, 'slug', None))
 
 
-class PostParser(parsers.ChunkedRstParser):
+class PostParser(parsers.RstParser):
     '''Parse all posts matching ``[0-9]{4}-[0-9]{2}-[0-9]{2}-[-a-zA-Z0-9_]+``.
 
     .. doctest::

@@ -86,7 +86,7 @@ class ParsedObject(object):
             setattr(self, attr, kwargs.get(attr, None))
 
 
-class ChunkedParser(chunks.AbstractChunk):
+class Parser(chunks.AbstractChunk):
     '''The base class of all chunks.
 
     This class defines an abstract base class that all parsers are required to
@@ -108,7 +108,7 @@ class ChunkedParser(chunks.AbstractChunk):
 
     .. doctest::
 
-       >>> class SampleParser(ChunkedParser):
+       >>> class SampleParser(Parser):
        ...     type = 'objs'
        ...     paths = '^numbers/[0-9]$'
        ...     cls = ParsedObject
@@ -126,7 +126,7 @@ class ChunkedParser(chunks.AbstractChunk):
        >>> import firmant.chunks
        >>> issubclass(SampleParser, firmant.chunks.AbstractChunk)
        True
-       >>> issubclass(SampleParser, ChunkedParser)
+       >>> issubclass(SampleParser, Parser)
        True
 
     .. warning::
@@ -150,10 +150,10 @@ class ChunkedParser(chunks.AbstractChunk):
        This is because of the split between path selection and parsing.
 
     The remainder of this section is devoted to describing the implementation
-    details of :class:`ChunkedParser`'s template methods.
+    details of :class:`Parser`'s template methods.
 
     Chunks are passed environment and object dictionaries.  While it is not
-    technically a chunk, the :class:`ChunkedParser` interface follows the same
+    technically a chunk, the :class:`Parser` interface follows the same
     pattern.  When called with an environment and set of objects, a parser will
     return one more chunk (in addition to the environment and object
     dictionaries).
@@ -173,7 +173,7 @@ class ChunkedParser(chunks.AbstractChunk):
 
     .. note::
 
-       The chunks returned do not share any state with the :class:`ChunkedParser` that
+       The chunks returned do not share any state with the :class:`Parser` that
        created them.  The fact that the class name is the same is an
        implementation detail that may change in the future.
 
@@ -208,7 +208,7 @@ class ChunkedParser(chunks.AbstractChunk):
 
     def __init__(self, environment, objects, action=None):
         # pylint: disable-msg=W0613
-        super(ChunkedParser, self).__init__()
+        super(Parser, self).__init__()
         if action not in (None, 'parse'):
             raise ValueError('`action` is invalid')
         self.__action__ = self.__default__
@@ -299,7 +299,7 @@ class ChunkedParser(chunks.AbstractChunk):
         '''
 
 
-class ChunkedRstParser(ChunkedParser):
+class RstParser(Parser):
     '''A parser containing common functionality for parsing reStructuredTest.
     '''
 

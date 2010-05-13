@@ -70,7 +70,7 @@ class StaticRstObject(parsers.ParsedObject):
         return 'staticrst_obj<%s>' % getattr(self, 'path', None)
 
 
-class StaticRstParser(parsers.ChunkedRstParser):
+class StaticRstParser(parsers.RstParser):
     '''Create a static page from reStructured Text.
 
     .. doctest::

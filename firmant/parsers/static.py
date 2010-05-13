@@ -65,7 +65,7 @@ class StaticObject(parsers.ParsedObject):
         return 'static_obj<%s>' % getattr(self, 'fullpath', None)
 
 
-class StaticParser(parsers.ChunkedParser):
+class StaticParser(parsers.Parser):
     '''Create stand-in objects for static files to be published.
 
     .. doctest::

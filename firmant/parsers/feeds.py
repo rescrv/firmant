@@ -82,7 +82,7 @@ class Feed(parsers.ParsedObject):
         return 'Feed(%s)' % getattr(self, 'slug', None)
 
 
-class FeedParser(parsers.ChunkedRstParser):
+class FeedParser(parsers.RstParser):
     r'''Parse all feeds matching ``[-a-zA-Z0-9_]+``.
 
     .. doctest::
