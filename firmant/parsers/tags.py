@@ -125,7 +125,7 @@ class TagParser(parsers.ChunkedRstParser):
         return {'type': self.type, 'slug': path[:-4]}
 
     def root(self, environment):
-        '''The directory under which all staticrst objects reside.
+        '''The directory under which all tag objects reside.
         '''
         settings = environment['settings']
         return os.path.join(settings.CONTENT_ROOT, settings.TAGS_SUBDIR)
