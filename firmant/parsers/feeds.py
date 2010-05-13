@@ -82,112 +82,78 @@ class Feed(parsers.ParsedObject):
         return 'Feed(%s)' % getattr(self, 'slug', None)
 
 
-class FeedParser(parsers.RstParser):
-    '''Interpret *.rst for a given feed directory.
+class FeedParser(parsers.ChunkedRstParser):
+    r'''Parse all feeds matching ``[-a-zA-Z0-9_]+``.
 
-    For each reSt document, parse it to a feed and extract its metadata.
+    .. doctest::
+       :hide:
 
-        >>> f = FeedParser()
-        >>> f = f.parse_one('content/feeds/rcos.rst')
-        >>> f.slug
-        u'rcos'
-        >>> f.title
-        u'The feed should be titled RCOS'
-        >>> f.subtitle
-        u'Information pertaining to RCOS'
-        >>> f.copyright
-        u'Feeds can have explicit copyright too.'
-        >>> f.body
-        u'<p>The body of the feed displayed on html pages.</p>\\n'
+       >>> environment['log'] = get_logger()
 
-    Default values (except slug)::
+    .. doctest::
 
-        >>> # Test the empty-file case.
-        >>> f = FeedParser()
-        >>> f = f.parse_one('content/feeds/empty.rst')
-        >>> f.slug
-        u'empty'
-        >>> f.title
-        u''
-        >>> f.subtitle
-        u''
-        >>> f.copyright
-        u''
-        >>> f.body
-        u''
-
-    Note that posts are not cross-referenced at this point.  This also implies
-    that the update time is not set::
-
-        >>> f.posts
-        Traceback (most recent call last):
-        AttributeError: 'RstObject' object has no attribute 'posts'
-        >>> f.updated
-        Traceback (most recent call last):
-        AttributeError: 'RstObject' object has no attribute 'updated'
-
-    All feeds may be retrieved with::
-
-        >>> from pysettings.settings import Settings
-        >>> s = {'CONTENT_ROOT': 'content'
-        ...     ,'FEEDS_SUBDIR': 'feeds'
-        ...     ,'REST_EXTENSION': 'rst'
-        ...     }
-        >>> s = Settings(s)
-        >>> f = FeedParser(s)
-        >>> f.log = Mock('log')
-        >>> map(lambda f: f.slug, f.parse())
-        Called log.info('parsed content/feeds/empty.rst')
-        Called log.info('parsed content/feeds/rcos.rst')
-        [u'empty', u'rcos']
+       >>> fp = FeedParser(environment, objects)
+       >>> environment, objects, (parser,) = fp(environment, objects)
+       >>> pprint(parser(environment, objects)) #doctest: +ELLIPSIS
+       ({...},
+        {'feed': [Feed(bar), Feed(baz), Feed(foo), Feed(quux)]},
+        [])
 
     '''
 
-    auto_metadata = [('copyright', 'copyright')
-                    ]
+    type = 'feed'
+    paths = '^[-a-zA-Z0-9_.]+\.rst$'
+    cls = Feed
 
-    auto_pubparts = [('title', 'title')
-                    ,('subtitle', 'subtitle')
-                    ,('body', 'fragment')
-                    ]
+    def attributes(self, environment, path):
+        '''Attributes that identify a feed object:
 
-    def paths(self):
-        '''Return a list of paths to feed objects on the filesystem.
+            type
+               This is always ``feed``.
 
-        Consider all the contents of the feeds directory (by default this is
-        ``content_root/feeds``).  Only files ending in ``suffix`` are considered.
+            slug
+               The `slug` attribute of the :class:`Feed` object.
 
-        Directory entries that are not files are ignored.
+        .. doctest::
+           :hide:
 
-            >>> from pysettings.settings import Settings
-            >>> s = {'CONTENT_ROOT': 'content'
-            ...     ,'FEEDS_SUBDIR': 'feeds'
-            ...     ,'REST_EXTENSION': 'rst'
-            ...     }
-            >>> s = Settings(s)
-            >>> f = FeedParser(s)
-            >>> f.paths()
-            ['content/feeds/empty.rst', 'content/feeds/rcos.rst']
+           >>> environment['log'] = get_logger()
+           >>> fp = FeedParser(environment, objects)
+
+        .. doctest::
+
+           >>> pprint(fp.attributes(environment, 'firmantstuff.rst'))
+           {'slug': 'firmantstuff', 'type': 'feed'}
 
         '''
-        # TODO add above settings to global settings.
-        settings = self.settings
-        path  = os.path.join(settings.CONTENT_ROOT, settings.FEEDS_SUBDIR)
-        files = os.listdir(path)
-        files = map(lambda p: os.path.join(path, p), files)
-        files = filter(lambda f: f.endswith(settings.REST_EXTENSION), files)
-        files = filter(lambda f: os.path.isfile(f), files)
-        files.sort()
-        return files
+        # We remove the 'rst' extension
+        return {'type': self.type, 'slug': path[:-4]}
 
-    def new_object(self, path, d, pub):
-        '''Return an instance of the object to which rst documents are parsed.
+    def root(self, environment):
+        '''The directory under which all feed objects reside.
         '''
-        f = RstObject()
-        f.slug = unicode(os.path.basename(path).rsplit('.', 1)[0])
-        return f
+        settings = environment['settings']
+        return os.path.join(settings.CONTENT_ROOT, settings.FEEDS_SUBDIR)
 
-    def default(self, attr):
-        '''Return the default value of an attribute.
+    def rstparse(self, environment, objects, path, pieces):
+        '''Use the parsed rst document to construct the necessary objects.
         '''
-        return u''
+        attrs = {}
+        attrs['slug'] = unicode(path[:-4])
+        attrs['copyright'] = pieces['metadata'].get('copyright', '')
+        attrs['content'] = pieces['pub_parts']['fragment']
+        attrs['title'] = pieces['pub_parts']['title']
+        attrs['subtitle'] = pieces['pub_parts']['subtitle']
+        objects[self.type].append(self.cls(**attrs))
+
+
+def _setup(test):
+    '''Setup the tests.
+    '''
+    from pysettings.settings import Settings
+    test.globs['settings'] = Settings({'CONTENT_ROOT': 'testdata/pristine'
+                                      ,'FEEDS_SUBDIR': 'feeds'
+                                      })
+    test.globs['environment'] = {'settings': test.globs['settings']
+                                }
+    test.globs['objects'] = {}
