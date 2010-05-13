@@ -226,7 +226,7 @@ def _setup(self):
                                 ,Jinja2Base: {'globals':
                                               {'urlfor': urlmapper.url}}
                                 }
-    self.globs['objects'] = {'posts': c900.posts, 'staticrst': c900.staticrst}
+    self.globs['objects'] = {'post': c900.posts, 'staticrst': c900.staticrst}
     self.globs['os'] = os
     self.globs['tempfile'] = os
     self.globs['path'] = tempfile.NamedTemporaryFile(delete=False).name
