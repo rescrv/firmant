@@ -31,119 +31,123 @@
 
 import os
 
-from firmant.parsers import RstParser
-from firmant.parsers import RstObject
+from firmant import parsers
 
 
-__all__ = ['TagParser']
+class Tag(parsers.ParsedObject):
+    '''A tag is a means of categorizing objects.
 
+    Attributes of :class:`Tag`:
 
-class TagParser(RstParser):
-    r'''Interpret *.rst for a given tag directory.
+        slug
+           A unique string that identifies the tag.
 
-    For each reSt document, parse it to a tag and extract its metadata.
+        title
+           A longer title used for identifying the tag to the user.
 
-        >>> t = TagParser()
-        >>> t = t.parse_one('content/tags/rcos.rst')
-        >>> t.slug
-        u'rcos'
-        >>> t.title
-        u'Rensselaer Center for Open Source'
-        >>> t.subtitle
-        u'Helping to make the world a better place:  One project at a time'
-        >>> t.copyright
-        u'This document is public domain'
-        >>> t.body
-        u'<p>The body of the tag document.</p>\n'
+        subtitle
+           An even longer description of the tag that may be displayed to the
+           user in combination with `title`.
 
-    Default values (except slug)::
+        content
+           The content of the restructured text document.  This does not include
+           the title information.
 
-        >>> # Test the empty-file case.
-        >>> t = TagParser()
-        >>> t = t.parse_one('content/tags/empty.rst')
-        >>> t.slug
-        u'empty'
-        >>> t.title
-        u''
-        >>> t.subtitle
-        u''
-        >>> t.copyright
-        u''
-        >>> t.body
-        u''
+        posts
+           A list of cross-referenced posts.  This will be blank until
+           cross-referencing happens at a later point in time.
 
-    Note that posts are not cross-referenced at this point.  This also implies
-    that the update time is not set::
+    .. note::
 
-        >>> t.posts
-        Traceback (most recent call last):
-        AttributeError: 'RstObject' object has no attribute 'posts'
-        >>> t.updated
-        Traceback (most recent call last):
-        AttributeError: 'RstObject' object has no attribute 'updated'
+       All string attributes except `slug` may be ``''``.  Posts will be ``[]``
+       until the cross-referencing chunk happens.
 
-    All tags may be retrieved with::
+    .. doctest::
 
-        >>> from pysettings.settings import Settings
-        >>> s = {'CONTENT_ROOT': 'content'
-        ...     ,'TAGS_SUBDIR': 'tags'
-        ...     ,'REST_EXTENSION': 'rst'
-        ...     }
-        >>> s = Settings(s)
-        >>> t = TagParser(s)
-        >>> t.log = Mock('log')
-        >>> map(lambda t: t.slug, t.parse())
-        Called log.info('parsed content/tags/empty.rst')
-        Called log.info('parsed content/tags/rcos.rst')
-        [u'empty', u'rcos']
+       >>> Tag(slug='foo', title='Foo', content='all about foo')
+       Tag(foo)
 
     '''
 
-    auto_metadata = [('copyright', 'copyright')
-                    ]
+    # pylint: disable-msg=R0903
 
-    auto_pubparts = [('title', 'title')
-                    ,('subtitle', 'subtitle')
-                    ,('body', 'fragment')
-                    ]
+    __slots__ = ['slug', 'title', 'subtitle', 'content', 'posts']
 
-    def paths(self):
-        '''Return a list of paths to tag objects on the filesystem.
+    def __repr__(self):
+        return 'Tag(%s)' % getattr(self, 'slug', None)
 
-        Consider all the contents of the tags directory (by default this is
-        ``content_root/tags``).  Only files ending in ``suffix`` are considered.
 
-        Directory entries that are not files are ignored.
+class TagParser(parsers.RstParser):
+    r'''Parse all tags matching ``[-a-zA-Z0-9_.]+``.
 
-            >>> from pysettings.settings import Settings
-            >>> s = {'CONTENT_ROOT': 'content'
-            ...     ,'TAGS_SUBDIR': 'tags'
-            ...     ,'REST_EXTENSION': 'rst'
-            ...     }
-            >>> s = Settings(s)
-            >>> t = TagParser(s)
-            >>> t.paths()
-            ['content/tags/empty.rst', 'content/tags/rcos.rst']
+    .. doctest::
+       :hide:
+
+       >>> environment['log'] = get_logger()
+
+    .. doctest::
+
+       >>> tp = TagParser(environment, objects)
+       >>> environment, objects, (parser,) = tp(environment, objects)
+       >>> pprint(parser(environment, objects)) #doctest: +ELLIPSIS
+       ({...},
+        {'tag': [Tag(bar), Tag(baz), Tag(foo), Tag(quux)]},
+        [])
+
+    '''
+
+    type = 'tag'
+    paths = '^[-a-zA-Z0-9_.]+\.rst$'
+    cls = Tag
+
+    def attributes(self, environment, path):
+        '''Attributes that identify a tag object:
+
+            type
+               This is always ``tag``.
+
+            slug
+               The `slug` attribute of the :class:`Tag` object.
+
+        .. doctest::
+           :hide:
+
+           >>> environment['log'] = get_logger()
+           >>> tp = TagParser(environment, objects)
+
+        .. doctest::
+
+           >>> pprint(tp.attributes(environment, 'firmantstuff.rst'))
+           {'slug': 'firmantstuff', 'type': 'tag'}
 
         '''
-        # TODO add above settings to global settings.
-        settings = self.settings
-        path  = os.path.join(settings.CONTENT_ROOT, settings.TAGS_SUBDIR)
-        files = os.listdir(path)
-        files = map(lambda p: os.path.join(path, p), files)
-        files = filter(lambda f: f.endswith(settings.REST_EXTENSION), files)
-        files = filter(lambda f: os.path.isfile(f), files)
-        files.sort()
-        return files
+        # We remove the 'rst' extension
+        return {'type': self.type, 'slug': path[:-4]}
 
-    def new_object(self, path, d, pub):
-        '''Return an instance of the object to which rst documents are parsed.
+    def root(self, environment):
+        '''The directory under which all tag objects reside.
         '''
-        f = RstObject()
-        f.slug = unicode(os.path.basename(path).rsplit('.', 1)[0])
-        return f
+        settings = environment['settings']
+        return os.path.join(settings.CONTENT_ROOT, settings.TAGS_SUBDIR)
 
-    def default(self, attr):
-        '''Return the default value of an attribute.
+    def rstparse(self, environment, objects, path, pieces):
+        '''Use the parsed rst document to construct the necessary objects.
         '''
-        return u''
+        attrs = {}
+        attrs['slug'] = unicode(path[:-4])
+        attrs['content'] = pieces['pub_parts']['fragment']
+        attrs['title'] = pieces['pub_parts']['title']
+        attrs['subtitle'] = pieces['pub_parts']['subtitle']
+        objects[self.type].append(self.cls(**attrs))
+
+
+def _setup(test):
+    '''Setup the tests.
+    '''
+    from pysettings.settings import Settings
+    test.globs['settings'] = Settings({'CONTENT_ROOT': 'testdata/pristine'
+                                      ,'TAGS_SUBDIR': 'tags'
+                                      })
+    test.globs['environment'] = {'settings': test.globs['settings']
+                                }
+    test.globs['objects'] = {}

@@ -32,159 +32,180 @@
 import datetime
 import os
 
-from firmant.parsers import RstParser
-from firmant.parsers import RstObject
+import pytz
+
+from firmant import parsers
 from firmant.utils import strptime
 
 
-__all__ = ['PostParser']
+class Post(parsers.ParsedObject):
+    '''A post is piece of content identified by a date of publication and a
+    slug.
 
+    Attributes of :class:`Post`:
 
-class PostParser(RstParser):
-    '''Interpret *.rst for a given directory.
+        slug
+           A unique string that identifies the post.
 
-    For each reSt document, parse it to a post and extract its metadata.
+        published
+           The date and time of publication of the post.
 
-        >>> p = PostParser()
-        >>> p = p.parse_one('content/posts/1975-03-23-give-me-liberty.rst')
-        >>> p.slug
-        u'give-me-liberty'
-        >>> p.published
-        datetime.datetime(1975, 3, 23, 13, 1)
-        >>> p.author
-        u'Patrick Henry'
-        >>> p.tags
-        [u'speech', u'patriotism']
-        >>> p.feeds
-        [u'patriotic-things']
-        >>> p.copyright
-        u'This document is part of the public domain.'
-        >>> p.updated
-        datetime.datetime(2009, 2, 17, 11, 31)
-        >>> p.title
-        u'Give Me Liberty or Give Me Death'
-        >>> p.content #doctest: +ELLIPSIS
-        u"<p>Two hundred years ago people ... or give me death.</p>\\n"
-        >>> p.tz
-        u'US/Eastern'
+        title
+           A longer title used for identifying the post to the user.
 
-    Default values (except published/updated/slug)::
+        author
+           The person who authored the post.
 
-        >>> p = PostParser()
-        >>> p = p.parse_one('content/posts/2010-02-15-empty.rst')
-        >>> p.slug
-        u'empty'
-        >>> p.published
-        datetime.datetime(2010, 2, 15, 0, 0)
-        >>> p.author
-        u''
-        >>> p.tags
-        []
-        >>> p.feeds
-        []
-        >>> p.copyright
-        u''
-        >>> p.updated
-        datetime.datetime(2010, 2, 15, 0, 0)
-        >>> p.title
-        u''
-        >>> p.content #doctest: +ELLIPSIS
-        u''
-        >>> p.tz
-        u''
+        copyright
+           The copyright of the post.  Absence of a copyright implies all rights
+           are reserved (except in the case that a post without a copyright
+           belongs to a feed with a copyright).
 
-    All posts may be retrieved with::
+        content
+           The content of the restructured text document.  This does not include
+           the title information.
 
-        >>> from pysettings.settings import Settings
-        >>> s = {'CONTENT_ROOT': 'content'
-        ...     ,'POSTS_SUBDIR': 'posts'
-        ...     ,'REST_EXTENSION': 'rst'
-        ...     }
-        >>> s = Settings(s)
-        >>> p = PostParser(s)
-        >>> p.log = Mock('log')
-        >>> pprint(map(lambda p: (p.published.date(), p.slug), p.parse()))
-        Called log.info('parsed content/posts/1975-03-23-give-me-liberty.rst')
-        Called log.info('parsed content/posts/2009-02-17-loren-ipsum.rst')
-        Called log.info('parsed content/posts/2010-02-13-sample-code.rst')
-        Called log.info('parsed content/posts/2010-02-15-empty.rst')
-        [(datetime.date(1975, 3, 23), u'give-me-liberty'),
-         (datetime.date(2009, 2, 17), u'loren-ipsum'),
-         (datetime.date(2010, 2, 13), u'sample-code'),
-         (datetime.date(2010, 2, 15), u'empty')]
+        updated
+           The time at which the post was last updated (defaults to the time of
+           publication).
+
+        tags
+           A list of cross-referenced tags.  This will contain only slugs until
+           cross-referencing happens at a later point in time.
+
+        feeds
+           A list of cross-referenced feeds.  This will contain only slugs until
+           cross-referencing happens at a later point in time.
+
+    .. note::
+
+       All string attributes except `slug` may be ``''``.  Posts will be ``[]``
+       until the cross-referencing chunk happens.
+
+    .. doctest::
+
+       >>> from pytz import utc
+       >>> from datetime import datetime
+       >>> Post(published=utc.localize(datetime(2010, 1, 1)), slug='foopost')
+       Post(2010-01-01-foopost)
 
     '''
 
-    auto_metadata = [('author', 'author')
-                    ,('tags', 'tags')
-                    ,('feeds', 'feeds')
-                    ,('copyright', 'copyright')
-                    ,('updated', 'updated')
-                    ,('tz', 'timezone')
-                    ]
+    # pylint: disable-msg=R0903
 
-    auto_pubparts = [('title', 'title')
-                    ,('content', 'fragment')
-                    ]
+    __slots__ = ['slug', 'published', 'title', 'author', 'copyright', 'content',
+            'updated', 'tags', 'feeds']
 
-    def paths(self):
-        '''Return a list of paths to objects on the file system.
+    def __repr__(self):
+        dt = getattr(self, 'published', None)
+        if dt is not None:
+            dt = dt.strftime('%Y-%m-%d')
+        return 'Post(%s-%s)' % (dt, getattr(self, 'slug', None))
 
-        Consider all the contents of the posts directory (by default this is
-        ``content_root/posts``).  Only files ending in ``suffix`` are
-        considered.
 
-        Directory entries that are not files are ignored.
+class PostParser(parsers.RstParser):
+    '''Parse all posts matching ``[0-9]{4}-[0-9]{2}-[0-9]{2}-[-a-zA-Z0-9_]+``.
 
-            >>> from pysettings.settings import Settings
-            >>> s = {'CONTENT_ROOT': 'content'
-            ...     ,'POSTS_SUBDIR': 'posts'
-            ...     ,'REST_EXTENSION': 'rst'
-            ...     }
-            >>> s = Settings(s)
-            >>> p = PostParser(s)
-            >>> pprint(p.paths())
-            ['content/posts/1975-03-23-give-me-liberty.rst',
-             'content/posts/2009-02-17-loren-ipsum.rst',
-             'content/posts/2010-02-13-sample-code.rst',
-             'content/posts/2010-02-15-empty.rst']
+    .. doctest::
+       :hide:
+
+       >>> environment['log'] = get_logger()
+
+    .. doctest::
+
+       >>> pp = PostParser(environment, objects)
+       >>> environment, objects, (parser,) = pp(environment, objects)
+       >>> pprint(parser(environment, objects)) #doctest: +ELLIPSIS
+       ({...},
+        {'post': [Post(2009-12-31-party),
+                  Post(2010-01-01-newyear),
+                  Post(2010-02-01-newmonth),
+                  Post(2010-02-02-newday),
+                  Post(2010-02-02-newday2)]},
+        [])
+
+    '''
+
+    type = 'post'
+    paths = '^[0-9]{4}-[0-9]{2}-[0-9]{2}-[-a-zA-Z0-9_]+\.rst$'
+    cls = Post
+
+    def attributes(self, environment, path):
+        '''Attributes that identify a post object:
+
+            type
+               This is always ``post``.
+
+            year
+               The year of publication.
+
+            month
+               The month of publication.
+
+            day
+               The day of publication.
+
+            slug
+               The `slug` attribute of the :class:`Post` object.
+
+        .. doctest::
+           :hide:
+
+           >>> environment['log'] = get_logger()
+           >>> pp = PostParser(environment, objects)
+
+        .. doctest::
+
+           >>> pprint(pp.attributes(environment, '2009-12-31-party.rst'))
+           {'day': 31, 'month': 12, 'slug': 'party', 'type': 'post', 'year': 2009}
 
         '''
-        # TODO add above settings to global settings.
-        settings = self.settings
-        path  = os.path.join(settings.CONTENT_ROOT, settings.POSTS_SUBDIR)
-        files = os.listdir(path)
-        files = map(lambda p: os.path.join(path, p), files)
-        files = filter(lambda f: f.endswith(settings.REST_EXTENSION), files)
-        files = filter(lambda f: os.path.isfile(f), files)
-        files.sort()
-        return files
+        year = int(path[:4])
+        month = int(path[5:7])
+        day = int(path[8:10])
+        slug = path[11:-4]
+        return {'type': self.type
+               ,'year': year
+               ,'month': month
+               ,'day': day
+               ,'slug': slug
+               }
 
-    def new_object(self, path, d, pub):
-        '''Return an instance of the object to which rst documents are parsed.
+    def root(self, environment):
+        '''The directory under which all post objects reside.
         '''
-        p = RstObject()
-        p.slug, null = os.path.basename(path)[11:].rsplit('.', 1)
-        p.slug = unicode(p.slug)
-        dt = strptime(os.path.basename(path)[:10], ['%Y-%m-%d'])
-        if 'time' in d:
-            t = d['time']
-        else:
-            t = datetime.time(0, 0, 0)
-        p.published = datetime.datetime.combine(dt.date(), t)
-        p.updated = p.published
-        return p
+        settings = environment['settings']
+        return os.path.join(settings.CONTENT_ROOT, settings.POSTS_SUBDIR)
 
-    def default(self, attr):
-        '''Return the default value of an attribute.
+    def rstparse(self, environment, objects, path, pieces):
+        '''Use the parsed rst document to construct the necessary objects.
         '''
-        d = {'tags': list()
-            ,'feeds': list()
-            }
-        return d.get(attr, u'')
+        tz = pytz.timezone(pieces['metadata'].get('timezone', 'UTC'))
+        # Set times
+        time = pieces['metadata'].get('time', datetime.time(0, 0, 0))
+        pubdate = strptime(os.path.basename(path)[:10], ['%Y-%m-%d'])
+        published = datetime.datetime.combine(pubdate.date(), time)
+        # Other attrs
+        attrs = {}
+        attrs['slug'] = unicode(path[11:-4])
+        attrs['author'] = pieces['metadata'].get('author', '')
+        attrs['copyright'] = pieces['metadata'].get('copyright', '')
+        attrs['tags'] = pieces['metadata'].get('tags', [])
+        attrs['feeds'] = pieces['metadata'].get('feeds', [])
+        attrs['published'] = published
+        attrs['updated'] = pieces['metadata'].get('updated', published)
+        attrs['content'] = pieces['pub_parts']['fragment']
+        attrs['title'] = pieces['pub_parts']['title']
+        objects[self.type].append(self.cls(**attrs))
 
-    def post_process(self, doc):
-        '''Cleanup the update timestamp.
-        '''
-        if doc.updated == u'':
-            doc.updated = doc.published
+
+def _setup(test):
+    '''Setup the tests.
+    '''
+    from pysettings.settings import Settings
+    test.globs['settings'] = Settings({'CONTENT_ROOT': 'testdata/pristine'
+                                      ,'POSTS_SUBDIR': 'posts'
+                                      })
+    test.globs['environment'] = {'settings': test.globs['settings']
+                                }
+    test.globs['objects'] = {}

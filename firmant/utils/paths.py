@@ -30,6 +30,7 @@
 
 
 import os
+import re
 import sys
 
 
@@ -127,3 +128,57 @@ def create_or_truncate(path):
             if ex.errno != 17:
                 raise
     return open(path, 'w+')
+
+
+def recursive_listdir(root, matches=None, files_only=True):
+    '''Provide a list of all files in a directory and its subdirectories.
+
+    .. doctest::
+
+       >>> pprint(sorted(recursive_listdir('testdata/pristine/posts')))
+       ['2009-12-31-party.rst',
+        '2010-01-01-newyear.rst',
+        '2010-02-01-newmonth.rst',
+        '2010-02-02-newday.rst',
+        '2010-02-02-newday2.rst']
+
+    An optional regex string `matches` may be specified and will be compared to
+    the :func:`os.path.basename` of each entry under path.
+
+    .. doctest::
+
+       >>> pprint(sorted(recursive_listdir('testdata/pristine',
+       ...                                 matches='.*\.rst$')))
+       ['feeds/bar.rst',
+        'feeds/baz.rst',
+        'feeds/foo.rst',
+        'feeds/quux.rst',
+        'flat/about.rst',
+        'flat/empty.rst',
+        'flat/links.rst',
+        'posts/2009-12-31-party.rst',
+        'posts/2010-01-01-newyear.rst',
+        'posts/2010-02-01-newmonth.rst',
+        'posts/2010-02-02-newday.rst',
+        'posts/2010-02-02-newday2.rst',
+        'tags/bar.rst',
+        'tags/baz.rst',
+        'tags/foo.rst',
+        'tags/quux.rst']
+
+    '''
+    ret = []
+    for relroot, dirs, files in os.walk(root):
+        if files_only:
+            dirs = []
+        for ent in dirs + files:
+            path = os.path.join(relroot, ent)
+            if path.startswith(root):
+                path = path[len(root):]
+            else:
+                raise RuntimeError(_('`path` expected to exist under `root`'))
+            if path.startswith('/'):
+                path = path[1:]
+            if not matches or re.match(matches, path):
+                ret.append(path)
+    return ret

@@ -25,7 +25,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-'''Manipulate feed objects for Firmant.
+'''StaticRst objects (also known as "flatpages")  provide for free-form page
+layouts.
 '''
 
 
@@ -34,56 +35,43 @@ import os
 from firmant import parsers
 
 
-class Feed(parsers.ParsedObject):
-    '''A feed is a means of categorizing objects.
+class StaticRstObject(parsers.ParsedObject):
+    '''A static object that contains title, content, and path information.
 
-    Attributes of :class:`Feed`:
+    The difference between this class and
+    :class:`firmant.parsers.static.StaticObject` is this class is parsed from
+    a restructured text document while the other is only from filesystem
+    information.
 
-        slug
-           A unique string that identifies the feed.
+    Attributes of :class:`StaticRstObject`:
 
         title
-           A longer title used for identifying the feed to the user.
+           The title from the parsed restructured text document.
 
-        subtitle
-           An even longer description of the feed that may be displayed to the
-           user in combination with `title`.
-
-        copyright
-           The copyright of the feed for all posts without an explicit
-           copyright.
+        path
+           The path relative to the root where the static objects are stored.
 
         content
-           The content of the restructured text document.  This does not include
-           the title information.
-
-        posts
-           A list of cross-referenced posts.  This will be blank until
-           cross-referencing happens at a later point in time.
-
-    .. note::
-
-       All string attributes except `slug` may be ``''``.  Posts will be ``[]``
-       until the cross-referencing chunk happens.
+           The content of the restructured text document.  This includes the
+           title and subtitle components from the docutils writer.
 
     .. doctest::
 
-       >>> Feed(slug='foo', title='Foo', content='all about foo')
-       Feed(foo)
+       >>> StaticRstObject(path='projects/firmant', title='Firmant')
+       staticrst_obj<projects/firmant>
 
     '''
 
     # pylint: disable-msg=R0903
 
-    __slots__ = ['slug', 'title', 'subtitle', 'copyright', 'content', 'posts',
-            'updated']
+    __slots__ = ['title', 'path', 'content']
 
     def __repr__(self):
-        return 'Feed(%s)' % getattr(self, 'slug', None)
+        return 'staticrst_obj<%s>' % getattr(self, 'path', None)
 
 
-class FeedParser(parsers.RstParser):
-    r'''Parse all feeds matching ``[-a-zA-Z0-9_]+``.
+class StaticRstParser(parsers.RstParser):
+    '''Create a static page from reStructured Text.
 
     .. doctest::
        :hide:
@@ -92,58 +80,59 @@ class FeedParser(parsers.RstParser):
 
     .. doctest::
 
-       >>> fp = FeedParser(environment, objects)
-       >>> environment, objects, (parser,) = fp(environment, objects)
+       >>> srp = StaticRstParser(environment, objects)
+       >>> environment, objects, (parser,) = srp(environment, objects)
        >>> pprint(parser(environment, objects)) #doctest: +ELLIPSIS
        ({...},
-        {'feed': [Feed(bar), Feed(baz), Feed(foo), Feed(quux)]},
+        {'staticrst': [staticrst_obj<about>,
+                       staticrst_obj<empty>,
+                       staticrst_obj<links>]},
         [])
 
     '''
 
-    type = 'feed'
-    paths = '^[-a-zA-Z0-9_.]+\.rst$'
-    cls = Feed
+    type = 'staticrst'
+    paths = '.*\.rst'
+    cls = StaticRstObject
 
     def attributes(self, environment, path):
-        '''Attributes that identify a feed object:
+        '''Attributes that identify a static object:
 
             type
-               This is always ``feed``.
+               This is always ``static``.
 
-            slug
-               The `slug` attribute of the :class:`Feed` object.
+            path
+               A path that describes the object relative to the input/output
+               directories.
 
         .. doctest::
            :hide:
 
            >>> environment['log'] = get_logger()
-           >>> fp = FeedParser(environment, objects)
+           >>> srp = StaticRstParser(environment, objects)
 
         .. doctest::
 
-           >>> pprint(fp.attributes(environment, 'firmantstuff.rst'))
-           {'slug': 'firmantstuff', 'type': 'feed'}
+           >>> pprint(srp.attributes(environment, 'about/projects/firmant.rst'))
+           {'path': 'about/projects/firmant', 'type': 'staticrst'}
 
         '''
         # We remove the 'rst' extension
-        return {'type': self.type, 'slug': path[:-4]}
+        return {'type': self.type, 'path': path[:-4]}
 
     def root(self, environment):
-        '''The directory under which all feed objects reside.
+        '''The directory under which all staticrst objects reside.
         '''
         settings = environment['settings']
-        return os.path.join(settings.CONTENT_ROOT, settings.FEEDS_SUBDIR)
+        return os.path.join(settings.CONTENT_ROOT, settings.STATIC_RST_SUBDIR)
 
     def rstparse(self, environment, objects, path, pieces):
         '''Use the parsed rst document to construct the necessary objects.
         '''
         attrs = {}
-        attrs['slug'] = unicode(path[:-4])
-        attrs['copyright'] = pieces['metadata'].get('copyright', '')
-        attrs['content'] = pieces['pub_parts']['fragment']
+        attrs['path'] = unicode(path[:-4])
+        attrs['content'] = pieces['pub_parts']['html_body']
         attrs['title'] = pieces['pub_parts']['title']
-        attrs['subtitle'] = pieces['pub_parts']['subtitle']
         objects[self.type].append(self.cls(**attrs))
 
 
@@ -152,7 +141,7 @@ def _setup(test):
     '''
     from pysettings.settings import Settings
     test.globs['settings'] = Settings({'CONTENT_ROOT': 'testdata/pristine'
-                                      ,'FEEDS_SUBDIR': 'feeds'
+                                      ,'STATIC_RST_SUBDIR': 'flat'
                                       })
     test.globs['environment'] = {'settings': test.globs['settings']
                                 }

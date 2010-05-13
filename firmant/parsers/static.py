@@ -25,170 +25,112 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import logging
-import stat
-import tempfile
+'''Static objects are simply references to files.
+
+The most common use for static objects is copying images and css into the proper
+location in the output hierarchy.
+'''
+
+
 import os
 
-from docutils import io
-from docutils.core import publish_programmatically
-
-from firmant.parsers import Parser
-from firmant.parsers import RstObject
-from firmant.parsers import RstParser
-from firmant.du import MetaDataStandaloneReader
-from firmant.utils import class_name
-from firmant.utils.exceptions import log_uncaught_exceptions
+from firmant import parsers
+from firmant.utils import paths
 
 
-__all__ = ['StaticParser', 'StaticRstParser']
-
-
-class StaticObject(object):
+class StaticObject(parsers.ParsedObject):
     '''An object that serves as a placeholder for a file on the filesystem.
+
+    Attributes of :class:`StaticObject`:
+
+        fullpath
+           A path that points to the object on the filesystem.  It is possible
+           to `open` or copy using `fullpath`.
+
+        relpath
+           The path relative to the root where the static objects are stored.
+
+    .. doctest::
+
+       >>> StaticObject(fullpath='/tmp/path/to/static/object')
+       static_obj</tmp/path/to/static/object>
+
     '''
 
-    __slots__ = ['fullpath', 'relpath', 'permalink']
+    # pylint: disable-msg=R0903
+
+    __slots__ = ['fullpath', 'relpath']
 
     def __repr__(self):
-        return 'static_obj<%s>' % self.fullpath
+        return 'static_obj<%s>' % getattr(self, 'fullpath', None)
 
 
-class StaticParser(Parser):
+class StaticParser(parsers.Parser):
     '''Create stand-in objects for static files to be published.
 
-    '''
+    .. doctest::
+       :hide:
 
-    def paths(self):
-        '''Return a list of paths to objects on the file system.
-        '''
-        settings = self.settings
-        path  = os.path.join(settings.CONTENT_ROOT, settings.STATIC_SUBDIR)
-        all_files = []
-        for root, dirs, files in os.walk(path):
-            for file in files:
-                s = StaticObject()
-                s.fullpath = os.path.join(root, file)
-                if s.fullpath.startswith(path):
-                    s.relpath = s.fullpath[len(path):]
-                else:
-                    raise RuntimeError('Funky paths in StaticParser')
-                if s.relpath.startswith('/'):
-                    s.relpath = s.relpath[1:]
-                all_files.append(s)
-        all_files.sort(key=lambda s: s.relpath)
-        return all_files
+       >>> environment['log'] = get_logger()
 
-    def parse_one(self, path):
-        '''We use the identity function simply because we are copying files.
-        '''
-        return path
+    .. doctest::
 
-
-class StaticRstParser(RstParser):
-    '''Create a static page from reStructured Text.
-
-    For each reSt document, parse it to a page and extract its metadata.
-
-        >>> from pysettings.settings import Settings
-        >>> s = {'CONTENT_ROOT': 'content'
-        ...     ,'STATIC_RST_SUBDIR': 'flat'
-        ...     ,'REST_EXTENSION': 'rst'
-        ...     }
-        >>> s = Settings(s)
-        >>> p = StaticRstParser(s)
-        >>> p = p.parse_one('content/flat/links.rst')
-        >>> p.copyright
-        u'This document is part of the public domain.'
-        >>> p.title
-        u'Links'
-        >>> p.content #doctest: +ELLIPSIS
-        u'<ul class="simple">...</ul>\\n'
-
-    Default values::
-
-        >>> from pysettings.settings import Settings
-        >>> s = {'CONTENT_ROOT': 'content'
-        ...     ,'STATIC_RST_SUBDIR': 'flat'
-        ...     ,'REST_EXTENSION': 'rst'
-        ...     }
-        >>> s = Settings(s)
-        >>> p = StaticRstParser(s)
-        >>> p = p.parse_one('content/flat/empty.rst')
-        >>> p.title
-        u''
-        >>> p.content #doctest: +ELLIPSIS
-        u''
-
-    All static pages may be retrieved with::
-
-        >>> from pysettings.settings import Settings
-        >>> s = {'CONTENT_ROOT': 'content'
-        ...     ,'STATIC_RST_SUBDIR': 'flat'
-        ...     ,'REST_EXTENSION': 'rst'
-        ...     }
-        >>> s = Settings(s)
-        >>> p = StaticRstParser(s)
-        >>> p.log = Mock('log')
-        >>> pprint(map(lambda p: p.title, p.parse()))
-        Called log.info('parsed content/flat/about.rst')
-        Called log.info('parsed content/flat/empty.rst')
-        Called log.info('parsed content/flat/links.rst')
-        [u'About', u'', u'Links']
+       >>> sp = StaticParser(environment, objects)
+       >>> environment, objects, (parser,) = sp(environment, objects)
+       >>> pprint(parser(environment, objects)) #doctest: +ELLIPSIS
+       ({...},
+        {'static': [static_obj<testdata/pristine/static/images/88x31.png>]},
+        [])
 
     '''
 
-    auto_metadata = [('copyright', 'copyright')]
+    type = 'static'
+    paths = '.*'
+    cls = StaticObject
 
-    auto_pubparts = [('title', 'title')
-                    ,('content', 'fragment')
-                    ]
+    def parse(self, environment, objects, path):
+        '''Parse the object at `path` and save it under ``objects[self.type]``
+        '''
+        fullpath = os.path.join(self.root(environment), path)
+        objects[self.type].append(self.cls(fullpath=fullpath, relpath=path))
 
-    def paths(self):
-        '''Return a list of paths to tag objects on the filesystem.
+    def attributes(self, environment, path):
+        '''Attributes that identify a static object:
 
-        Consider all the contents of the tags directory (by default this is
-        ``content_root/flat``).  Only files ending in ``suffix`` are considered.
+            type
+               This is always ``static``.
 
-        Directory entries that are not files are ignored.
+            path
+               A path that describes the object relative to the input/output
+               directories.
 
-            >>> from pysettings.settings import Settings
-            >>> s = {'CONTENT_ROOT': 'content'
-            ...     ,'STATIC_RST_SUBDIR': 'flat'
-            ...     ,'REST_EXTENSION': 'rst'
-            ...     }
-            >>> s = Settings(s)
-            >>> p = StaticRstParser(s)
-            >>> p.paths()
-            ['content/flat/about.rst', 'content/flat/empty.rst', 'content/flat/links.rst']
+        .. doctest::
+           :hide:
+
+           >>> environment['log'] = get_logger()
+           >>> sp = StaticParser(environment, objects)
+
+        .. doctest::
+
+           >>> pprint(sp.attributes(environment, 'images/88x31.png'))
+           {'path': 'images/88x31.png', 'type': 'static'}
 
         '''
-        settings = self.settings
-        path = os.path.join(settings.CONTENT_ROOT, settings.STATIC_RST_SUBDIR)
-        all_files = []
-        for root, dirs, files in os.walk(path):
-            files = filter(lambda f: f.endswith(settings.REST_EXTENSION), files)
-            files = map(lambda f: os.path.join(root, f), files)
-            files = filter(lambda f: os.path.isfile(f), files)
-            all_files += files
-        all_files.sort()
-        return all_files
+        return {'type': self.type, 'path': path}
 
-    def new_object(self, path, d, pub):
-        '''Return an instance of the object to which rst documents are parsed.
+    @staticmethod
+    def root(environment):
+        '''The directory under which all static objects reside.
         '''
-        settings = self.settings
-        root = os.path.join(settings.CONTENT_ROOT, settings.STATIC_RST_SUBDIR)
-        if path.startswith(root):
-            path = path[len(root):]
-        if path.startswith('/'):
-            path = path[1:]
-        p = RstObject()
-        p.path = unicode(path.rsplit('.', 1)[0])
-        return p
+        settings = environment['settings']
+        return os.path.join(settings.CONTENT_ROOT, settings.STATIC_SUBDIR)
 
-    def default(self, attr):
-        '''Return the default value of an attribute.
-        '''
-        d = {}
-        return d.get(attr, u'')
+
+def _setup(test):
+    from pysettings.settings import Settings
+    test.globs['settings'] = Settings({'CONTENT_ROOT': 'testdata/pristine'
+                                      ,'STATIC_SUBDIR': 'static'
+                                      })
+    test.globs['environment'] = {'settings': test.globs['settings']
+                                }
+    test.globs['objects'] = {}

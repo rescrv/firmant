@@ -54,8 +54,7 @@ class Firmant(object):
         >>> pprint(f.parsers) #doctest: +ELLIPSIS
         {'feeds': <firmant.parsers.feeds.FeedParser object at 0x...>,
          'posts': <firmant.parsers.posts.PostParser object at 0x...>,
-         'static': <firmant.parsers.static.StaticParser object at 0x...>,
-         'staticrst': <firmant.parsers.static.StaticRstParser object at 0x...>,
+         'staticrst': <firmant.parsers.staticrst.StaticRstParser object at 0x...>,
          'tags': <firmant.parsers.tags.TagParser object at 0x...>}
         >>> f.parse()
         >>> pprint(f.objs) #doctest: +ELLIPSIS
@@ -68,7 +67,6 @@ class Firmant(object):
                    <firmant.parsers.RstObject object at 0x...>,
                    <firmant.parsers.RstObject object at 0x...>,
                    <firmant.parsers.RstObject object at 0x...>],
-         'static': [static_obj<testdata/pristine/static/images/88x31.png>],
          'staticrst': [<firmant.parsers.RstObject object at 0x...>,
                        <firmant.parsers.RstObject object at 0x...>,
                        <firmant.parsers.RstObject object at 0x...>],
@@ -127,7 +125,10 @@ class Firmant(object):
         self.parsers = dict()
         for key, parser in settings.PARSERS.items():
             parser = utils.get_obj(parser)
-            self.parsers[key] = parser(self.settings)
+            if issubclass(parser, AbstractChunk):
+                self.chunks.append(parser(self.env, self.objs))
+            else:
+                self.parsers[key] = parser(self.settings)
 
         # Setup writers
         for writer in self.settings.WRITERS:

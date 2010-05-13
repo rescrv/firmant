@@ -37,7 +37,8 @@ def get_logger():
 if __name__ == '__main__':
     suite = unittest.TestSuite()
 
-    modules = ['firmant.application',
+    #modules = ['firmant.application',
+    modules = [
                'firmant.chunks',
                'firmant.du',
                'firmant.paginate',
@@ -46,6 +47,7 @@ if __name__ == '__main__':
                'firmant.parsers.posts',
                'firmant.parsers.tags',
                'firmant.parsers.static',
+               'firmant.parsers.staticrst',
                'firmant.routing',
                'firmant.routing.components',
                'firmant.utils',

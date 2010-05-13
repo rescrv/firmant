@@ -162,9 +162,7 @@ class PostArchiveAll(writers.Writer):
            >>> obj = spaa.obj_list({'settings': settings},
            ...                     {'posts': objects.posts})[0]
            >>> pprint(obj) #doctest: +ELLIPSIS
-           ([<firmant.parsers.RstObject object at 0x...>,
-             <firmant.parsers.RstObject object at 0x...>],
-            Paginated(None, 1, 2))
+           ([Post(2010-02-02-newday2), Post(2010-02-02-newday)], Paginated(None, 1, 2))
 
            >>> pprint(spaa.key(obj))
            {'page': 1, 'type': u'post'}
@@ -197,13 +195,9 @@ class PostArchiveAll(writers.Writer):
            []
            >>> pprint(spaa.obj_list({'settings': settings},
            ...                      {'posts': objects.posts})) #doctest: +ELLIPSIS
-           [([<firmant.parsers.RstObject object at 0x...>,
-              <firmant.parsers.RstObject object at 0x...>],
-             Paginated(None, 1, 2)),
-            ([<firmant.parsers.RstObject object at 0x...>,
-              <firmant.parsers.RstObject object at 0x...>],
-             Paginated(1, 2, 3)),
-            ([<firmant.parsers.RstObject object at 0x...>], Paginated(2, 3, None))]
+           [([Post(2010-02-02-newday2), Post(2010-02-02-newday)], Paginated(None, 1, 2)),
+            ([Post(2010-02-01-newmonth), Post(2010-01-01-newyear)], Paginated(1, 2, 3)),
+            ([Post(2009-12-31-party)], Paginated(2, 3, None))]
 
         '''
         num_per_page = environment['settings'].POSTS_PER_PAGE
@@ -251,7 +245,7 @@ class PostArchiveYearly(writers.Writer):
            >>> obj = spay.obj_list({'settings': settings},
            ...                     {'posts': objects.posts})[0]
            >>> pprint(obj) #doctest: +ELLIPSIS
-           ([<firmant.parsers.RstObject object at 0x...>],
+           ([Post(2010-02-02-newday2), Post(2010-02-02-newday)],
             Paginated(None, (2010,), (2009,)),
             Paginated(None, 1, 2))
            >>> pprint(spay.key(obj))
@@ -285,16 +279,14 @@ class PostArchiveYearly(writers.Writer):
            >>> spay.obj_list({'settings': settings}, {'posts': []})
            []
            >>> pprint(spay.obj_list({'settings': settings},
-           ...                      {'posts': objects.posts})) #doctest: +ELLIPSIS
-           [([<firmant.parsers.RstObject object at 0x...>,
-              <firmant.parsers.RstObject object at 0x...>],
+           ...                      {'posts': objects.posts}))
+           [([Post(2010-02-02-newday2), Post(2010-02-02-newday)],
              Paginated(None, (2010,), (2009,)),
              Paginated(None, 1, 2)),
-            ([<firmant.parsers.RstObject object at 0x...>,
-              <firmant.parsers.RstObject object at 0x...>],
+            ([Post(2010-02-01-newmonth), Post(2010-01-01-newyear)],
              Paginated(None, (2010,), (2009,)),
              Paginated(1, 2, None)),
-            ([<firmant.parsers.RstObject object at 0x...>],
+            ([Post(2009-12-31-party)],
              Paginated((2010,), (2009,), None),
              Paginated(None, 1, None))]
 
@@ -350,9 +342,8 @@ class PostArchiveMonthly(writers.Writer):
 
            >>> obj = spam.obj_list({'settings': settings},
            ...                     {'posts': objects.posts})[0]
-           >>> pprint(obj) #doctest: +ELLIPSIS
-           ([<firmant.parsers.RstObject object at 0x...>,
-             <firmant.parsers.RstObject object at 0x...>],
+           >>> pprint(obj)
+           ([Post(2010-02-02-newday2), Post(2010-02-02-newday)],
             Paginated(None, (2010, 2), (2010, 1)),
             Paginated(None, 1, 2))
            >>> pprint(spam.key(obj))
@@ -388,17 +379,16 @@ class PostArchiveMonthly(writers.Writer):
            []
            >>> pprint(spam.obj_list({'settings': settings},
            ...                      {'posts': objects.posts})) #doctest: +ELLIPSIS
-           [([<firmant.parsers.RstObject object at 0x...>,
-              <firmant.parsers.RstObject object at 0x...>],
+           [([Post(2010-02-02-newday2), Post(2010-02-02-newday)],
              Paginated(None, (2010, 2), (2010, 1)),
              Paginated(None, 1, 2)),
-            ([<firmant.parsers.RstObject object at 0x...>],
+            ([Post(2010-02-01-newmonth)],
              Paginated(None, (2010, 2), (2010, 1)),
              Paginated(1, 2, None)),
-            ([<firmant.parsers.RstObject object at 0x...>],
+            ([Post(2010-01-01-newyear)],
              Paginated((2010, 2), (2010, 1), (2009, 12)),
              Paginated(None, 1, None)),
-            ([<firmant.parsers.RstObject object at 0x...>],
+            ([Post(2009-12-31-party)],
              Paginated((2010, 1), (2009, 12), None),
              Paginated(None, 1, None))]
 
@@ -458,8 +448,7 @@ class PostArchiveDaily(writers.Writer):
            >>> obj = spad.obj_list({'settings': settings},
            ...                     {'posts': objects.posts})[0]
            >>> pprint(obj) #doctest: +ELLIPSIS
-           ([<firmant.parsers.RstObject object at 0x...>,
-             <firmant.parsers.RstObject object at 0x...>],
+           ([Post(2010-02-02-newday2), Post(2010-02-02-newday)],
             Paginated(None, (2010, 2, 2), (2010, 2, 1)),
             Paginated(None, 1, None))
            >>> pprint(spad.key(obj))
@@ -496,17 +485,16 @@ class PostArchiveDaily(writers.Writer):
            []
            >>> pprint(spad.obj_list({'settings': settings},
            ...                      {'posts': objects.posts})) #doctest: +ELLIPSIS
-           [([<firmant.parsers.RstObject object at 0x...>,
-              <firmant.parsers.RstObject object at 0x...>],
+           [([Post(2010-02-02-newday2), Post(2010-02-02-newday)],
              Paginated(None, (2010, 2, 2), (2010, 2, 1)),
              Paginated(None, 1, None)),
-            ([<firmant.parsers.RstObject object at 0x...>],
+            ([Post(2010-02-01-newmonth)],
              Paginated((2010, 2, 2), (2010, 2, 1), (2010, 1, 1)),
              Paginated(None, 1, None)),
-            ([<firmant.parsers.RstObject object at 0x...>],
+            ([Post(2010-01-01-newyear)],
              Paginated((2010, 2, 1), (2010, 1, 1), (2009, 12, 31)),
              Paginated(None, 1, None)),
-            ([<firmant.parsers.RstObject object at 0x...>],
+            ([Post(2009-12-31-party)],
              Paginated((2010, 1, 1), (2009, 12, 31), None),
              Paginated(None, 1, None))]
 

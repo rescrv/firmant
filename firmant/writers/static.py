@@ -50,14 +50,10 @@ class StaticWriter(writers.Writer):
     def key(self, static):
         '''Return the set of attributes suitable as input for url mapping.
 
-        Attributes that identify a static object:
+        .. seealso::
 
-            type
-               This is always ``static``.
-
-            path
-               A path that describes the object relative to the input/output
-               directories.
+           :meth:`firmant.parsers.static.StaticParser.attributes` for attributes
+           that identify a static object.
 
         .. doctest::
            :hide:
