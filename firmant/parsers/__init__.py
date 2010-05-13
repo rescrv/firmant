@@ -159,6 +159,7 @@ class ChunkedParser(chunks.AbstractChunk):
        >>> class SampleParser(ChunkedParser):
        ...     type = 'objs'
        ...     paths = '^numbers/[0-9]$'
+       ...     cls = ParsedObject
        ...     def parse(self, environment, objects, path):
        ...         objects[self.type].append(str(path))
        ...     def attributes(self, environment, path):
@@ -335,6 +336,11 @@ class ChunkedParser(chunks.AbstractChunk):
         objects that are created from embedded LaTeX equations).
         '''
 
+    @workarounds.abstractproperty
+    def cls(self):
+        '''The class object that should be used for new parsed objects.
+        '''
+
     @workarounds.abstractmethod
     def root(self, environment):
         '''The root under which all objects to be parsed by this parser reside.
@@ -357,11 +363,6 @@ class ChunkedRstParser(ChunkedParser):
         pieces['document'] = pub.document
         pieces['pub_parts'] = pub.writer.parts
         self.rstparse(environment, objects, path, pieces)
-
-    @workarounds.abstractproperty
-    def cls(self):
-        '''The class object that should be used for new parsed objects.
-        '''
 
     @workarounds.abstractmethod
     def rstparse(self, environment, objects, path, pieces):

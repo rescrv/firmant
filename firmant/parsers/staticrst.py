@@ -126,5 +126,4 @@ def _setup(test):
     from pysettings.settings import Settings
     test.globs['settings'] = Settings({'CONTENT_ROOT': 'content'
                                       ,'STATIC_RST_SUBDIR': 'flat'
-                                      ,'REST_EXTENSION': 'rst'
                                       })

@@ -86,12 +86,13 @@ class StaticParser(parsers.ChunkedParser):
 
     type = 'static'
     paths = '.*'
+    cls = StaticObject
 
     def parse(self, environment, objects, path):
         '''Parse the object at `path` and save it under ``objects[self.type]``
         '''
         fullpath = os.path.join(self.root(environment), path)
-        objects[self.type].append(StaticObject(fullpath=path, relpath=path))
+        objects[self.type].append(self.cls(fullpath=path, relpath=path))
 
     def attributes(self, environment, path):
         '''Attributes that identify a static object:
