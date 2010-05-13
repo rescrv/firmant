@@ -35,8 +35,6 @@ import os
 import pytz
 
 from firmant import parsers
-from firmant.parsers import RstParser
-from firmant.parsers import RstObject
 from firmant.utils import strptime
 
 
