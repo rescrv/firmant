@@ -138,7 +138,7 @@ class DailyArchives(Global):
                         for p in posts])
         globs['daily_archives'] = [(datetime.date(y, m, d),
                                      url('html', type='post', year=y, month=m,
-                                         day=d))
+                                         day=d, page=1))
                                      for y, m, d in
                                      sorted(archives, reverse=True)][:offset]
 
@@ -162,7 +162,8 @@ class MonthlyArchives(Global):
         posts = __sorted_posts__(objects)
         archives = set([(p.published.year, p.published.month) for p in posts])
         globs['monthly_archives'] = [(datetime.date(y, m, 1),
-                                     url('html', type='post', year=y, month=m))
+                                     url('html', type='post', year=y, month=m,
+                                         page=1))
                                      for y, m in
                                      sorted(archives, reverse=True)][:offset]
 
@@ -186,7 +187,7 @@ class YearlyArchives(Global):
         posts = __sorted_posts__(objects)
         archives = set([(p.published.year) for p in posts])
         globs['yearly_archives'] = [(datetime.date(y, 1, 1),
-                                     url('html', type='post', year=y))
+                                     url('html', type='post', year=y, page=1))
                                      for y in
                                      sorted(archives, reverse=True)][:offset]
 
