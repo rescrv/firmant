@@ -208,7 +208,8 @@ class CreatePermalinks(AbstractChunk):
         for typ, objlist in objects.items():
             for obj in objlist:
                 if hasattr(obj, '__attributes__') \
-                        and not hasattr(obj, 'permalink'):
+                        and (not hasattr(obj, 'permalink')
+                             or obj.permalink is None):
                     attrs = obj.__attributes__
                     attrs['type'] = typ
                     extension = settings.PERMALINK_EXTENSIONS[typ]
