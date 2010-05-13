@@ -98,7 +98,7 @@ class URLFor(Global):
 def __sorted_posts__(objects, newest_first=True):
     '''Return a list of sorted posts from objects
     '''
-    return sorted(objects.get('posts', []), reverse=newest_first,
+    return sorted(objects.get('post', []), reverse=newest_first,
                   key=lambda p: (p.published, p.slug))
 
 
