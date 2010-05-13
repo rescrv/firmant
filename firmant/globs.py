@@ -210,4 +210,4 @@ class AtomFeeds(Global):
         '''Put a list of all static pages under the key ``atom_feeds``.
         '''
         globs['atom_feeds'] = [(f.slug, f.permalink) for f in
-                sorted(objects.get('feeds', []) , key=lambda f: f.slug)]
+                sorted(objects.get('feed', []) , key=lambda f: f.slug)]

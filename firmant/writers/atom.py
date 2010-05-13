@@ -85,7 +85,7 @@ class AtomFeed(FeedWriter):
 
     .. doctest::
 
-       >>> AtomFeed({}, {'feeds': objects.feeds}) #doctest: +ELLIPSIS
+       >>> AtomFeed({}, {'feed': objects.feeds}) #doctest: +ELLIPSIS
        <firmant.writers.atom.AtomFeed object at 0x...>
 
     '''

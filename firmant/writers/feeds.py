@@ -73,7 +73,7 @@ class FeedWriter(writers.Writer):
            ...     def render(self, environment, path, obj):
            ...         print 'Save feed "%s" to "%s"' % (obj.slug, path)
            ...
-           >>> sf = SampleFeed({}, {'feeds': objects.feeds})
+           >>> sf = SampleFeed({}, {'feed': objects.feeds})
 
         .. doctest::
 
@@ -86,7 +86,7 @@ class FeedWriter(writers.Writer):
         return {'type': u'feed', 'slug': feed.slug}
 
     def obj_list(self, environment, objects):
-        '''Return all objects stored under the key ``feeds``.
+        '''Return all objects stored under the key ``feed``.
 
         .. doctest::
            :hide:
@@ -96,19 +96,19 @@ class FeedWriter(writers.Writer):
            ...     def render(self, environment, path, obj):
            ...         print 'Save feed "%s" to "%s"' % (obj.slug, path)
            ...
-           >>> sf = SampleFeed({}, {'feeds': objects.feeds})
+           >>> sf = SampleFeed({}, {'feed': objects.feeds})
 
         .. doctest::
 
            >>> sf.obj_list(None, {})
            []
-           >>> sf.obj_list(None, {'feeds': []})
+           >>> sf.obj_list(None, {'feed': []})
            []
-           >>> sf.obj_list(None, {'feeds': ['feedobj']})
+           >>> sf.obj_list(None, {'feed': ['feedobj']})
            ['feedobj']
 
         '''
-        return objects.get('feeds', [])
+        return objects.get('feed', [])
 
 
 def _setup(test):
