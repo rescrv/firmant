@@ -79,7 +79,7 @@ class StaticParser(parsers.ChunkedParser):
        >>> environment, objects, (parser,) = sp(environment, objects)
        >>> pprint(parser(environment, objects)) #doctest: +ELLIPSIS
        ({...},
-        {'static': [static_obj<images/88x31.png>]},
+        {'static': [static_obj<testdata/pristine/static/images/88x31.png>]},
         [])
 
     '''
@@ -92,7 +92,7 @@ class StaticParser(parsers.ChunkedParser):
         '''Parse the object at `path` and save it under ``objects[self.type]``
         '''
         fullpath = os.path.join(self.root(environment), path)
-        objects[self.type].append(self.cls(fullpath=path, relpath=path))
+        objects[self.type].append(self.cls(fullpath=fullpath, relpath=path))
 
     def attributes(self, environment, path):
         '''Attributes that identify a static object:
