@@ -31,14 +31,58 @@
 
 import os
 
-from firmant.parsers import RstParser
-from firmant.parsers import RstObject
+from firmant import parsers
 
 
-__all__ = ['FeedParser']
+class Feed(parsers.ParsedObject):
+    '''A feed is a means of categorizing objects.
+
+    Attributes of :class:`Feed`:
+
+        slug
+           A unique string that identifies the feed.
+
+        title
+           A longer title used for identifying the feed to the user.
+
+        subtitle
+           An even longer description of the feed that may be displayed to the
+           user in combination with `title`.
+
+        copyright
+           The copyright of the feed for all posts without an explicit
+           copyright.
+
+        content
+           The content of the restructured text document.  This does not include
+           the title information.
+
+        posts
+           A list of cross-referenced posts.  This will be blank until
+           cross-referencing happens at a later point in time.
+
+    .. note::
+
+       All string attributes except `slug` may be ``''``.  Posts will be ``[]``
+       until the cross-referencing chunk happens.
+
+    .. doctest::
+
+       >>> Feed(slug='foo', title='Foo', content='all about foo')
+       Feed(foo)
+
+    '''
+
+    # pylint: disable-msg=R0903
+
+    __slots__ = ['slug', 'title', 'subtitle', 'copyright', 'content', 'posts',
+            'updated']
+
+    def __repr__(self):
+        return 'Feed(%s)' % getattr(self, 'slug', None)
 
 
-class FeedParser(RstParser):
+class FeedParser(parsers.RstParser):
     '''Interpret *.rst for a given feed directory.
 
     For each reSt document, parse it to a feed and extract its metadata.
