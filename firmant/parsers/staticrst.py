@@ -32,98 +32,117 @@ layouts.
 
 import os
 
-from firmant.parsers import RstObject
-from firmant.parsers import RstParser
-from firmant.utils import paths
+from firmant import parsers
 
 
-class StaticRstParser(RstParser):
-    '''Create a static page from reStructured Text.
+class StaticRstObject(parsers.ParsedObject):
+    '''A static object that contains title, content, and path information.
 
-    For each reSt document, parse it to a page and extract its metadata.
+    The difference between this class and
+    :class:`firmant.parsers.static.StaticObject` is this class is parsed from
+    a restructured text document while the other is only from filesystem
+    information.
 
-        >>> p = StaticRstParser(settings)
-        >>> p = p.parse_one('content/flat/links.rst')
-        >>> p.copyright
-        u'This document is part of the public domain.'
-        >>> p.title
-        u'Links'
-        >>> p.content #doctest: +ELLIPSIS
-        u'<ul class="simple">...</ul>\\n'
+    Attributes of :class:`StaticRstObject`:
 
-    Default values::
+        title
+           The title from the parsed restructured text document.
 
-        >>> p = StaticRstParser(settings)
-        >>> p = p.parse_one('content/flat/empty.rst')
-        >>> p.title
-        u''
-        >>> p.content #doctest: +ELLIPSIS
-        u''
+        path
+           The path relative to the root where the static objects are stored.
 
-    All static pages may be retrieved with::
+        content
+           The content of the restructured text document.  This includes the
+           title and subtitle components from the docutils writer.
 
-        >>> p = StaticRstParser(settings)
-        >>> p.log = Mock('log')
-        >>> pprint(map(lambda p: p.title, p.parse()))
-        Called log.info('parsed content/flat/about.rst')
-        Called log.info('parsed content/flat/empty.rst')
-        Called log.info('parsed content/flat/links.rst')
-        [u'About', u'', u'Links']
+    .. doctest::
+
+       >>> StaticRstObject(path='projects/firmant', title='Firmant')
+       staticrst_obj<projects/firmant>
 
     '''
 
-    auto_metadata = [('copyright', 'copyright')]
+    # pylint: disable-msg=R0903
 
-    auto_pubparts = [('title', 'title')
-                    ,('content', 'fragment')
-                    ]
+    __slots__ = ['title', 'path', 'content']
 
-    def paths(self):
-        '''A list of files to parse.
+    def __repr__(self):
+        return 'staticrst_obj<%s>' % getattr(self, 'path', None)
+
+
+class StaticRstParser(parsers.ChunkedRstParser):
+    '''Create a static page from reStructured Text.
+
+    .. doctest::
+       :hide:
+
+       >>> environment['log'] = get_logger()
+
+    .. doctest::
+
+       >>> srp = StaticRstParser(environment, objects)
+       >>> environment, objects, (parser,) = srp(environment, objects)
+       >>> pprint(parser(environment, objects)) #doctest: +ELLIPSIS
+       ({...},
+        {'staticrst': [staticrst_obj<about>,
+                       staticrst_obj<empty>,
+                       staticrst_obj<links>]},
+        [])
+
+    '''
+
+    type = 'staticrst'
+    paths = '.*\.rst'
+    cls = StaticRstObject
+
+    def attributes(self, environment, path):
+        '''Attributes that identify a static object:
+
+            type
+               This is always ``static``.
+
+            path
+               A path that describes the object relative to the input/output
+               directories.
 
         .. doctest::
            :hide:
 
-           >>> srp = StaticRstParser(settings)
+           >>> environment['log'] = get_logger()
+           >>> srp = StaticRstParser(environment, objects)
 
         .. doctest::
 
-           >>> pprint(srp.paths())
-           ['content/flat/about.rst', 'content/flat/empty.rst', 'content/flat/links.rst']
+           >>> pprint(srp.attributes(environment, 'about/projects/firmant.rst'))
+           {'path': 'about/projects/firmant', 'type': 'staticrst'}
 
         '''
-        path = self.root_path({'settings': self.settings})
-        return sorted(paths.recursive_listdir(path, matches='.*\.rst'))
+        # We remove the 'rst' extension
+        return {'type': self.type, 'path': path[:-4]}
 
-    def new_object(self, path, d, pub):
-        '''Return an instance of the object to which rst documents are parsed.
-        '''
-        settings = self.settings
-        root = os.path.join(settings.CONTENT_ROOT, settings.STATIC_RST_SUBDIR)
-        if path.startswith(root):
-            path = path[len(root):]
-        if path.startswith('/'):
-            path = path[1:]
-        p = RstObject()
-        p.path = unicode(path.rsplit('.', 1)[0])
-        return p
-
-    def default(self, attr):
-        '''Return the default value of an attribute.
-        '''
-        d = {}
-        return d.get(attr, u'')
-
-    @staticmethod
-    def root_path(environment):
-        '''The directory under which all static objects reside.
+    def root(self, environment):
+        '''The directory under which all staticrst objects reside.
         '''
         settings = environment['settings']
         return os.path.join(settings.CONTENT_ROOT, settings.STATIC_RST_SUBDIR)
 
+    def rstparse(self, environment, objects, path, pieces):
+        '''Use the parsed rst document to construct the necessary objects.
+        '''
+        attrs = {}
+        attrs['path'] = unicode(path[:-4])
+        attrs['content'] = pieces['pub_parts']['html_body']
+        attrs['title'] = pieces['pub_parts']['title']
+        objects[self.type].append(self.cls(**attrs))
+
 
 def _setup(test):
+    '''Setup the tests.
+    '''
     from pysettings.settings import Settings
-    test.globs['settings'] = Settings({'CONTENT_ROOT': 'content'
+    test.globs['settings'] = Settings({'CONTENT_ROOT': 'testdata/pristine'
                                       ,'STATIC_RST_SUBDIR': 'flat'
                                       })
+    test.globs['environment'] = {'settings': test.globs['settings']
+                                }
+    test.globs['objects'] = {}

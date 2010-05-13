@@ -357,7 +357,7 @@ class ChunkedRstParser(ChunkedParser):
         '''
         metadata = {}
         transforms = [du.meta_data_transform(metadata)]
-        pub = du.publish(path, transforms)
+        pub = du.publish(os.path.join(self.root(environment), path), transforms)
         pieces = {}
         pieces['metadata'] = metadata
         pieces['document'] = pub.document
