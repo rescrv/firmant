@@ -34,7 +34,6 @@ if necessary.
 
 import jinja2
 
-from firmant import routing as r
 from firmant.routing import components as c
 
 

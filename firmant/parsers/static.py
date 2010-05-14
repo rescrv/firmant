@@ -35,7 +35,6 @@ location in the output hierarchy.
 import os
 
 from firmant import parsers
-from firmant.utils import paths
 
 
 class StaticObject(parsers.ParsedObject):
