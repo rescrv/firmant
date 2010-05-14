@@ -34,6 +34,7 @@
 import datetime
 
 from lxml import etree
+import pytz
 
 from firmant.utils import paths
 from firmant.writers.feeds import FeedWriter
@@ -102,7 +103,7 @@ class AtomFeed(FeedWriter):
         add_text_subelement(feed, 'title', feed_obj.title)
         add_text_subelement(feed, 'rights', feed_obj.copyright)
         updated = max([post.published for post in feed_obj.posts] +
-                [datetime.datetime(1900, 01, 01)])
+                [pytz.utc.localize(datetime.datetime(1900, 01, 01))])
         add_text_subelement(feed, 'updated', rfc3339(updated))
         add_text_subelement(feed, 'id', feed_obj.permalink)
         link = etree.SubElement(feed, 'link')

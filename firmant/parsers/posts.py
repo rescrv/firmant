@@ -173,6 +173,9 @@ class PostParser(parsers.RstParser):
         time = pieces['metadata'].get('time', datetime.time(0, 0, 0))
         pubdate = strptime(os.path.basename(path)[:10], ['%Y-%m-%d'])
         published = datetime.datetime.combine(pubdate.date(), time)
+        updated = pieces['metadata'].get('updated', published)
+        published = tz.localize(published)
+        updated = tz.localize(updated)
         # Other attrs
         attrs = {}
         attrs['slug'] = unicode(path[11:-4])
