@@ -170,32 +170,24 @@ posts[4].feeds = [feeds[2], feeds[0]]
 tags = []
 
 tags.append(parsers.tags.Tag())
-tags[-1].content   = u''
 tags[-1].slug      = u'foo'
-tags[-1].subtitle  = u''
-tags[-1].title     = u'Foo'
 tags[-1].posts     = [posts[0], posts[3], posts[4]]
+tags[-1].__pub__   = __mockpub__(fragment=u'', title=u'Foo', subtitle=u'')
 
 tags.append(parsers.tags.Tag())
-tags[-1].content   = u''
 tags[-1].slug      = u'bar'
-tags[-1].subtitle  = u''
-tags[-1].title     = u'Bar'
 tags[-1].posts     = [posts[1]]
+tags[-1].__pub__   = __mockpub__(fragment=u'', title=u'Bar', subtitle=u'')
 
 tags.append(parsers.tags.Tag())
-tags[-1].content   = u''
 tags[-1].slug      = u'baz'
-tags[-1].subtitle  = u''
-tags[-1].title     = u'Baz'
 tags[-1].posts     = [posts[3], posts[4]]
+tags[-1].__pub__   = __mockpub__(fragment=u'', title=u'Baz', subtitle=u'')
 
 tags.append(parsers.tags.Tag())
-tags[-1].content   = u''
 tags[-1].slug      = u'quux'
-tags[-1].subtitle  = u''
-tags[-1].title     = u'Quux'
 tags[-1].posts     = [posts[2]]
+tags[-1].__pub__   = __mockpub__(fragment=u'', title=u'Baz', subtitle=u'')
 
 
 posts[0].tags = [tags[0]]

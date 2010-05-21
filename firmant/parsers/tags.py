@@ -34,7 +34,7 @@ import os
 from firmant import parsers
 
 
-class Tag(parsers.ParsedObject):
+class Tag(parsers.RstParsedObject):
     '''A tag is a means of categorizing objects.
 
     Attributes of :class:`Tag`:
@@ -64,14 +64,19 @@ class Tag(parsers.ParsedObject):
 
     .. doctest::
 
-       >>> Tag(slug='foo', title='Foo', content='all about foo')
+       >>> Tag(slug='foo')
        Tag(foo)
 
     '''
 
     # pylint: disable-msg=R0903
 
-    __slots__ = ['slug', 'title', 'subtitle', 'content', 'posts']
+    __slots__ = ['slug', 'posts']
+
+    __pubparts__ = [('content', 'fragment')
+                   ,('title', 'title')
+                   ,('subtitle', 'subtitle')
+                   ]
 
     def __repr__(self):
         return 'Tag(%s)' % getattr(self, 'slug', None)
@@ -85,7 +90,7 @@ class Tag(parsers.ParsedObject):
 
         .. doctest::
 
-           >>> pprint(Tag(slug='firmantstuff', title='Firmant').__attributes__)
+           >>> pprint(Tag(slug='firmantstuff').__attributes__)
            {'slug': 'firmantstuff'}
 
         '''
@@ -127,9 +132,7 @@ class TagParser(parsers.RstParser):
         '''
         attrs = {}
         attrs['slug'] = unicode(path[:-4])
-        attrs['content'] = pieces['pub_parts']['fragment']
-        attrs['title'] = pieces['pub_parts']['title']
-        attrs['subtitle'] = pieces['pub_parts']['subtitle']
+        attrs['__pub__'] = pieces['pub']
         objects[self.type].append(self.cls(**attrs))
 
 
