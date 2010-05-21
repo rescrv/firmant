@@ -35,7 +35,7 @@ import os
 from firmant import parsers
 
 
-class StaticRstObject(parsers.ParsedObject):
+class StaticRstObject(parsers.RstParsedObject):
     '''A static object that contains title, content, and path information.
 
     The difference between this class and
@@ -57,14 +57,18 @@ class StaticRstObject(parsers.ParsedObject):
 
     .. doctest::
 
-       >>> StaticRstObject(path='projects/firmant', title='Firmant')
+       >>> StaticRstObject(path='projects/firmant')
        staticrst_obj<projects/firmant>
 
     '''
 
     # pylint: disable-msg=R0903
 
-    __slots__ = ['title', 'path', 'content']
+    __slots__ = ['path']
+
+    __pubparts__ = [('content', 'html_body')
+                   ,('title', 'title')
+                   ]
 
     def __repr__(self):
         return 'staticrst_obj<%s>' % getattr(self, 'path', None)
@@ -123,8 +127,7 @@ class StaticRstParser(parsers.RstParser):
         '''
         attrs = {}
         attrs['path'] = unicode(path[:-4])
-        attrs['content'] = pieces['pub_parts']['html_body']
-        attrs['title'] = pieces['pub_parts']['title']
+        attrs['__pub__'] = pieces['pub']
         objects[self.type].append(self.cls(**attrs))
 
 

@@ -116,22 +116,21 @@ static[-1].fullpath = 'testdata/pristine/static/images/88x31.png'
 staticrst = []
 
 staticrst.append(parsers.staticrst.StaticRstObject())
-staticrst[-1].content   = u'<p>Firmant is an awesome content management system.</p>\n'
 staticrst[-1].path      = u'about'
-staticrst[-1].title     = u'About'
+staticrst[-1].__pub__   = __mockpub__(title=u'About',
+        html_body=u'<p>Firmant is an awesome content management system.</p>\n')
 
 staticrst.append(parsers.staticrst.StaticRstObject())
-staticrst[-1].content   = u''
 staticrst[-1].path      = u'empty'
-staticrst[-1].title     = u''
+staticrst[-1].__pub__   = __mockpub__(title=u'About', html_body=u'')
 
 staticrst.append(parsers.staticrst.StaticRstObject())
-staticrst[-1].content   = u'<ul class="simple">\n<li><a class="reference e' + \
+staticrst[-1].path      = u'links'
+staticrst[-1].__pub__   = __mockpub__(title=u'About', html_body=
+                          u'<ul class="simple">\n<li><a class="reference e' + \
                           u'xternal" href="http://firmant.org">Firmant</a>' + \
                           u'</li>\n<li><a class="reference external" href=' + \
-                          u'"http://chasmd.org">CHASM</a></li>\n</ul>\n'
-staticrst[-1].path      = u'links'
-staticrst[-1].title     = u'Links'
+                          u'"http://chasmd.org">CHASM</a></li>\n</ul>\n')
 
 
 feeds = []
