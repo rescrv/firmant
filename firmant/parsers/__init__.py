@@ -295,6 +295,30 @@ class Parser(chunks.AbstractChunk):
         '''
 
 
+class RstMetaclass(abc.ABCMeta):
+    '''A metaclass for dealing with :class:`RstParsedObject`.
+
+    This class prvoides the magic that allows the document tree to be mutated
+    and have the attributes of a :class:`RstParsedObject` update.
+
+    '''
+
+    def __init__(cls, name, bases, dct):
+        for attr, part in dct.get('__pubparts__', []):
+            @property
+            def pubproperty(self):
+                return self.__pub__.writer.parts[part]
+            setattr(cls, attr, pubproperty)
+        super(RstMetaclass, cls).__init__(name, bases, dct)
+
+
+class RstParsedObject(ParsedObject):
+
+    __metaclass__ = RstMetaclass
+
+    __slots__ = ['__pub__', '__pubparts__']
+
+
 class RstParser(Parser):
     '''A parser containing common functionality for parsing reStructuredTest.
     '''
@@ -309,6 +333,7 @@ class RstParser(Parser):
         pieces = {}
         pieces['metadata'] = metadata
         pieces['document'] = pub.document
+        pieces['pub'] = pub
         pieces['pub_parts'] = pub.writer.parts
         self.rstparse(environment, objects, path, pieces)
 
