@@ -32,12 +32,20 @@ including, 900
 
 import datetime
 
+import minimock
 import pytz
 
 from firmant import parsers
 
 
 tz = pytz.timezone('America/New_York')
+
+
+def __mockpub__(**kwargs):
+    pub = minimock.Mock('__pub__')
+    pub.writer = minimock.Mock('writer')
+    pub.writer.parts = kwargs
+    return pub
 
 
 posts = []
@@ -129,36 +137,28 @@ staticrst[-1].title     = u'Links'
 feeds = []
 
 feeds.append(parsers.feeds.Feed())
-feeds[-1].content   = u''
 feeds[-1].copyright = u''
 feeds[-1].slug      = u'foo'
-feeds[-1].subtitle  = u''
-feeds[-1].title     = u'Foo'
 feeds[-1].posts     = [posts[0], posts[1], posts[3], posts[4]]
+feeds[-1].__pub__   = __mockpub__(fragment=u'', title=u'Foo', subtitle=u'')
 
 feeds.append(parsers.feeds.Feed())
-feeds[-1].content   = u''
 feeds[-1].copyright = u''
 feeds[-1].slug      = u'bar'
-feeds[-1].subtitle  = u''
-feeds[-1].title     = u'Bar'
 feeds[-1].posts     = [posts[0], posts[1]]
+feeds[-1].__pub__   = __mockpub__(fragment=u'', title=u'Bar', subtitle=u'')
 
 feeds.append(parsers.feeds.Feed())
-feeds[-1].content   = u''
 feeds[-1].copyright = u''
 feeds[-1].slug      = u'baz'
-feeds[-1].subtitle  = u''
-feeds[-1].title     = u'Baz'
 feeds[-1].posts     = [posts[0], posts[2], posts[3], posts[4]]
+feeds[-1].__pub__   = __mockpub__(fragment=u'', title=u'Baz', subtitle=u'')
 
 feeds.append(parsers.feeds.Feed())
-feeds[-1].content   = u''
 feeds[-1].copyright = u''
 feeds[-1].slug      = u'quux'
-feeds[-1].subtitle  = u''
-feeds[-1].title     = u'Quux'
 feeds[-1].posts     = [posts[0], posts[2]]
+feeds[-1].__pub__   = __mockpub__(fragment=u'', title=u'Baz', subtitle=u'')
 
 posts[0].feeds = [feeds[0], feeds[1], feeds[2], feeds[3]]
 posts[1].feeds = [feeds[0], feeds[1]]

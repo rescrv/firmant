@@ -34,7 +34,7 @@ import os
 from firmant import parsers
 
 
-class Feed(parsers.ParsedObject):
+class Feed(parsers.RstParsedObject):
     '''A feed is a means of categorizing objects.
 
     Attributes of :class:`Feed`:
@@ -68,15 +68,19 @@ class Feed(parsers.ParsedObject):
 
     .. doctest::
 
-       >>> Feed(slug='foo', title='Foo', content='all about foo')
+       >>> Feed(slug='foo')
        Feed(foo)
 
     '''
 
     # pylint: disable-msg=R0903
 
-    __slots__ = ['slug', 'title', 'subtitle', 'copyright', 'content', 'posts',
-            'updated']
+    __slots__ = ['slug', 'copyright', 'posts', 'updated']
+
+    __pubparts__ = [('content', 'fragment')
+                   ,('title', 'title')
+                   ,('subtitle', 'subtitle')
+                   ]
 
     def __repr__(self):
         return 'Feed(%s)' % getattr(self, 'slug', None)
@@ -90,7 +94,7 @@ class Feed(parsers.ParsedObject):
 
         .. doctest::
 
-           >>> Feed(slug='foo', title='Foo').__attributes__
+           >>> Feed(slug='foo').__attributes__
            {'slug': 'foo'}
 
         '''
@@ -133,9 +137,7 @@ class FeedParser(parsers.RstParser):
         attrs = {}
         attrs['slug'] = unicode(path[:-4])
         attrs['copyright'] = pieces['metadata'].get('copyright', '')
-        attrs['content'] = pieces['pub_parts']['fragment']
-        attrs['title'] = pieces['pub_parts']['title']
-        attrs['subtitle'] = pieces['pub_parts']['subtitle']
+        attrs['__pub__'] = pieces['pub']
         objects[self.type].append(self.cls(**attrs))
 
 
