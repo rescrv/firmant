@@ -29,7 +29,10 @@
 '''
 
 
+import datetime
 import os
+
+import pytz
 
 from firmant import parsers
 
@@ -75,7 +78,7 @@ class Feed(parsers.RstParsedObject):
 
     # pylint: disable-msg=R0903
 
-    __slots__ = ['slug', 'copyright', 'posts', 'updated']
+    __slots__ = ['slug', 'copyright', 'posts']
 
     __pubparts__ = [('content', 'fragment')
                    ,('title', 'title')
@@ -100,6 +103,11 @@ class Feed(parsers.RstParsedObject):
         '''
         # We remove the 'rst' extension
         return {'slug': self.slug}
+
+    @property
+    def updated(self):
+        return max([post.published for post in self.posts or []] +
+                   [pytz.utc.localize(datetime.datetime(1900, 01, 01))])
 
 
 class FeedParser(parsers.RstParser):
