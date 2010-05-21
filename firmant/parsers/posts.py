@@ -174,8 +174,6 @@ class PostParser(parsers.RstParser):
         pubdate = strptime(os.path.basename(path)[:10], ['%Y-%m-%d'])
         published = datetime.datetime.combine(pubdate.date(), time)
         updated = pieces['metadata'].get('updated', published)
-        published = tz.localize(published)
-        updated = tz.localize(updated)
         # Other attrs
         attrs = {}
         attrs['slug'] = unicode(path[11:-4])
@@ -183,8 +181,8 @@ class PostParser(parsers.RstParser):
         attrs['copyright'] = pieces['metadata'].get('copyright', '')
         attrs['tags'] = pieces['metadata'].get('tags', [])
         attrs['feeds'] = pieces['metadata'].get('feeds', [])
-        attrs['published'] = published
-        attrs['updated'] = pieces['metadata'].get('updated', published)
+        attrs['published'] = tz.localize(published)
+        attrs['updated'] = tz.localize(updated)
         attrs['content'] = pieces['pub_parts']['fragment']
         attrs['title'] = pieces['pub_parts']['title']
         objects[self.type].append(self.cls(**attrs))
