@@ -52,58 +52,58 @@ posts = []
 
 posts.append(parsers.posts.Post())
 posts[-1].author    = u'John Doe'
-posts[-1].content   = u'<p>This is the content.</p>\n'
 posts[-1].copyright = u'Same as source.'
 posts[-1].feeds     = [u'foo', u'bar', u'baz', u'quux']
 posts[-1].published = tz.localize(datetime.datetime(2009, 12, 31, 23, 59))
 posts[-1].slug      = u'party'
 posts[-1].tags      = [u'foo']
-posts[-1].title     = u'Here Comes the New Year!'
 posts[-1].updated   = tz.localize(datetime.datetime(2009, 12, 31, 23, 59))
+posts[-1].__pub__   = __mockpub__(fragment=u'<p>This is the content.</p>\n',
+                                  title=u'Here Comes the New Year!')
 
 posts.append(parsers.posts.Post())
 posts[-1].author    = u'John Doe'
-posts[-1].content   = u'<p>This is the content.</p>\n'
 posts[-1].copyright = u'Same as source.'
 posts[-1].feeds     = [u'foo', u'bar']
 posts[-1].published = tz.localize(datetime.datetime(2010, 1, 1, 0, 0))
 posts[-1].slug      = u'newyear'
 posts[-1].tags      = [u'bar']
-posts[-1].title     = u'Here Is the New Year!'
 posts[-1].updated   = tz.localize(datetime.datetime(2010, 1, 1, 0, 0))
+posts[-1].__pub__   = __mockpub__(fragment=u'<p>This is the content.</p>\n',
+                                  title=u'Here Is the New Year!')
 
 posts.append(parsers.posts.Post())
 posts[-1].author    = u'John Doe'
-posts[-1].content   = u'<p>This is the content of the new month.</p>\n'
 posts[-1].copyright = u'Same as source.'
 posts[-1].feeds     = [u'baz', u'quux']
 posts[-1].published = tz.localize(datetime.datetime(2010, 2, 1, 0, 10))
 posts[-1].slug      = u'newmonth'
 posts[-1].tags      = [u'quux']
-posts[-1].title     = u'Here Is a New Month!'
 posts[-1].updated   = tz.localize(datetime.datetime(2010, 2, 1, 0, 10))
+posts[-1].__pub__   = __mockpub__(title=u'Here Is a New Month!',
+                    fragment=u'<p>This is the content of the new month.</p>\n')
 
 posts.append(parsers.posts.Post())
 posts[-1].author    = u'John Doe'
-posts[-1].content   = u'<p>This is the content of the new day.</p>\n'
 posts[-1].copyright = u'Same as source.'
 posts[-1].feeds     = [u'baz', u'foo']
 posts[-1].published = tz.localize(datetime.datetime(2010, 2, 2, 0, 10))
 posts[-1].slug      = u'newday'
 posts[-1].tags      = [u'baz', u'foo']
-posts[-1].title     = u'Here Is a New Day!'
 posts[-1].updated   = tz.localize(datetime.datetime(2010, 2, 2, 0, 10))
+posts[-1].__pub__   = __mockpub__(title=u'Here Is a New Day!',
+                    fragment=u'<p>This is the content of the new day.</p>\n')
 
 posts.append(parsers.posts.Post())
 posts[-1].author    = u'John Doe'
-posts[-1].content   = u'<p>This is the content of the new day (again).</p>\n'
 posts[-1].copyright = u'Same as source.'
 posts[-1].feeds     = [u'baz', u'foo']
 posts[-1].published = tz.localize(datetime.datetime(2010, 2, 2, 0, 10))
 posts[-1].slug      = u'newday2'
 posts[-1].tags      = [u'baz', u'foo']
-posts[-1].title     = u'Here Is a New Day!'
 posts[-1].updated   = tz.localize(datetime.datetime(2010, 2, 2, 0, 10))
+posts[-1].__pub__   = __mockpub__(title=u'Here Is a New Day!',
+            fragment=u'<p>This is the content of the new day (again).</p>\n')
 
 
 static = []

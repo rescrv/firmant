@@ -38,7 +38,7 @@ from firmant import parsers
 from firmant.utils import strptime
 
 
-class Post(parsers.ParsedObject):
+class Post(parsers.RstParsedObject):
     '''A post is piece of content identified by a date of publication and a
     slug.
 
@@ -93,8 +93,12 @@ class Post(parsers.ParsedObject):
 
     # pylint: disable-msg=R0903
 
-    __slots__ = ['slug', 'published', 'title', 'author', 'copyright', 'content',
+    __slots__ = ['slug', 'published', 'author', 'copyright',
             'updated', 'tags', 'feeds']
+
+    __pubparts__ = [('content', 'fragment')
+                   ,('title', 'title')
+                   ]
 
     def __repr__(self):
         dt = getattr(self, 'published', None)
@@ -183,8 +187,7 @@ class PostParser(parsers.RstParser):
         attrs['feeds'] = pieces['metadata'].get('feeds', [])
         attrs['published'] = tz.localize(published)
         attrs['updated'] = tz.localize(updated)
-        attrs['content'] = pieces['pub_parts']['fragment']
-        attrs['title'] = pieces['pub_parts']['title']
+        attrs['__pub__'] = pieces['pub']
         objects[self.type].append(self.cls(**attrs))
 
 
