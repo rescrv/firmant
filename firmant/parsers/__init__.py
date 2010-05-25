@@ -304,12 +304,12 @@ class RstMetaclass(abc.ABCMeta):
     '''
 
     def __init__(cls, name, bases, dct):
+        super(RstMetaclass, cls).__init__(name, bases, dct)
         for attr, part in dct.get('__pubparts__', []):
             @property
-            def pubproperty(self):
+            def pubproperty(self, part=part):
                 return self.__pub__.writer.parts[part]
             setattr(cls, attr, pubproperty)
-        super(RstMetaclass, cls).__init__(name, bases, dct)
 
 
 class RstParsedObject(ParsedObject):
