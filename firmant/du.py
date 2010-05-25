@@ -44,10 +44,13 @@ tree, and the metadata they store is added to the dictionary that the
 '''
 
 
+import re
+
 from docutils import io
 from docutils import core
 from docutils.parsers.rst import Directive
 from docutils.parsers.rst import directives
+from docutils.parsers.rst import roles
 from docutils.transforms import Transform
 from docutils.readers import standalone
 from docutils import nodes
@@ -65,6 +68,43 @@ class MetaDataNode(nodes.Element, nodes.Invisible, nodes.Special):
         nodes.Element.__init__(self, rawsource, *children, **attributes)
 
         self.details = details or dict()
+
+
+class URLAttributeNode(nodes.Element, nodes.Invisible, nodes.Special):
+    '''The URLAttributeNode is a node that url attributes for a later transform.
+    '''
+
+    # pylint: disable-msg=R0904
+
+    def __init__(self, extension, urlattributes, urltext, rawsource='',
+                 *children, **attributes):
+        nodes.Element.__init__(self, rawsource, *children, **attributes)
+
+        self.extension = extension
+        self.attributes = urlattributes
+        self.urltext = urltext
+
+
+def post_reference_role(role, rawtext, text, lineno, inliner,
+        options={}, content=[]):
+    m = re.match(r'^(?P<extension>\w{0,6}): (?P<year>[0-9]{4})-' +
+                 r'(?P<month>[0-9]{2})-(?P<day>[0-9]{2})\s' +
+                 r'(?P<slug>(?:\||\-|\w)+)\s(?P<text>.+)$', text)
+    if m is None:
+        msg = inliner.reporter.error(_('Improper format for `post` reference.'),
+                line = lineno)
+        prb = inliner.problematic(rawtext, rawtext, msg)
+        return [prb], [msg]
+    attributes = m.groupdict()
+    for val in ('year', 'month', 'day'):
+        attributes[val] = int(attributes[val], 10)
+    attributes['type'] = 'post'
+    extension = attributes['extension']
+    del attributes['extension']
+    urltext = attributes['text']
+    del attributes['text']
+    return [URLAttributeNode(extension, attributes, urltext)], []
+roles.register_local_role('post', post_reference_role)
 
 
 def meta_data_directive(func, whitespace=False):
@@ -336,6 +376,29 @@ def meta_data_transform(data):
                 node.parent.remove(node)
 
     return MetaDataTransform
+
+
+def url_node_transform(urlmapper):
+    '''Create a docutils Transform that is a closure around the `urlmapper`
+    object.
+    '''
+
+    class URLNodeTransform(Transform):
+        '''Transform :class:`URLAttributeNode` into docutils references.
+        '''
+
+        default_priority = 600
+
+        def apply(self):
+            '''This will be called by the docutils parsing process.
+            '''
+            for node in self.document.traverse(URLAttributeNode):
+                refuri  = urlmapper.url(node.extension, **node.attributes)
+                newnode = nodes.reference(node.urltext, node.urltext,
+                                          refuri=refuri)
+                node.replace_self(newnode)
+
+    return URLNodeTransform
 
 
 class CustomTransformsReader(standalone.Reader):

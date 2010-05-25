@@ -308,6 +308,7 @@ class RstMetaclass(abc.ABCMeta):
         for attr, part in dct.get('__pubparts__', []):
             @property
             def pubproperty(self, part=part):
+                self.__pub__.writer.assemble_parts()
                 return self.__pub__.writer.parts[part]
             setattr(cls, attr, pubproperty)
 
@@ -327,8 +328,10 @@ class RstParser(Parser):
         '''Parse the reStructuredText doc at `path` and pass the relevant pieces
         to :meth:`rstparse`.
         '''
+        # TODO check for urlmapper in environment.
         metadata = {}
-        transforms = [du.meta_data_transform(metadata)]
+        transforms = [du.meta_data_transform(metadata),
+                      du.url_node_transform(environment['urlmapper'])]
         pub = du.publish(os.path.join(self.root(environment), path), transforms)
         pieces = {}
         pieces['metadata'] = metadata
