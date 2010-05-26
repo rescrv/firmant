@@ -63,6 +63,8 @@ class Firmant(object):
 
     '''
 
+    # pylint: disable-msg=R0903
+
     def __init__(self, settings):
         self.settings = settings
         self.urlmapper = URLMapper(settings.OUTPUT_DIR, settings.PERMALINK_ROOT,
@@ -104,26 +106,29 @@ class Firmant(object):
             chunk = self.chunks[0]
             self.env, self.objs, newchunks = chunk(self.env, self.objs)
             self.chunks = self.chunks[1:]
-            for c in newchunks:
-                if c.scheduling_order <= chunk.scheduling_order:
+            for newchunk in newchunks:
+                if newchunk.scheduling_order <= chunk.scheduling_order:
                     error = _('New chunk violates scheduling_order constraint')
                     self.log.error(error)
                 else:
-                    self.chunks.append(c)
+                    self.chunks.append(newchunk)
 
 
 class CrossReference(AbstractChunk):
     '''A chunk that cross-references posts/tags/feeds.
     '''
 
+    # TODO improve this to do arbitrary cross-references.
+    # pylint: disable-msg=R0903
+
     def __call__(self, environment, objects):
         '''Cross reference tags and feeds
         '''
+        # pylint: disable-msg=R0912
         for feed in objects.get('feed', []):
             feed.posts = list()
         for tag in objects.get('tag', []):
             tag.posts = list()
-        # TODO inefficient, notproud
         for post in objects.get('post', []):
             to_delete = list()
             for i, ptag in enumerate(post.tags):
@@ -164,6 +169,8 @@ class CheckURLConflicts(AbstractChunk):
     '''A chunk that warns of writers with conflicting URLs.
     '''
 
+    # pylint: disable-msg=R0903
+
     def __call__(self, environment, objects):
         '''Ensure that the sets of URLs are disjoint.
         '''
@@ -192,6 +199,8 @@ class CreatePermalinks(AbstractChunk):
 
     '''
 
+    # pylint: disable-msg=R0903
+
     def __call__(self, environment, objects):
         if 'settings' not in environment:
             environment['log'].error(_('Expected `settings` in environment.'))
@@ -206,6 +215,7 @@ class CreatePermalinks(AbstractChunk):
                 if hasattr(obj, '_attributes') \
                         and (not hasattr(obj, 'permalink')
                              or obj.permalink is None):
+                    # pylint: disable-msg=W0212
                     attrs = obj._attributes
                     attrs['type'] = typ
                     extension = settings.PERMALINK_EXTENSIONS[typ]
