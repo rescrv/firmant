@@ -29,8 +29,6 @@
 '''
 
 
-import abc
-
 import jinja2
 
 from firmant import decorators
@@ -43,6 +41,8 @@ from firmant.utils import workarounds
 class Jinja2Base(object):
     '''Base class used for functionality common to all J2 writers.
     '''
+
+    # pylint: disable-msg=R0903
 
     @staticmethod
     @decorators.in_environment('settings')
@@ -122,15 +122,21 @@ class Jinja2PostArchiveBase(Jinja2Base):
     '''Common functionality for rendering Jinja2 archive views.
     '''
 
-    __metaclass__ = abc.ABCMeta
+    # It complains about not having the key attribute (provided by children)
+    # pylint: disable-msg=E1101
 
     extension = 'html'
 
     @workarounds.abstractproperty
-    def template(self): pass
+    def template(self):
+        '''The template to use for rendering.
+        '''
 
     @decorators.in_environment('urlmapper')
     def render(self, environment, path, obj):
+        '''Render the archive view.
+        '''
+        # pylint: disable-msg=R0912
         key = self.key(obj)
         context = dict()
         context['posts'] = obj[0]
