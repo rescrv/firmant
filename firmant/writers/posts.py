@@ -301,6 +301,8 @@ class PostArchiveYearly(writers.Writer):
 
     @staticmethod
     def _splitfunc(post):
+        '''Split the posts at the year boundaries.
+        '''
         return (post.published.year,)
 
 
@@ -404,6 +406,8 @@ class PostArchiveMonthly(writers.Writer):
 
     @staticmethod
     def _splitfunc(post):
+        '''Split the posts at the month boundaries.
+        '''
         return (post.published.year, post.published.month)
 
 
@@ -511,6 +515,8 @@ class PostArchiveDaily(writers.Writer):
 
     @staticmethod
     def _splitfunc(post):
+        '''Split the posts at the day boundaries.
+        '''
         return (post.published.year, post.published.month, post.published.day)
 
 
