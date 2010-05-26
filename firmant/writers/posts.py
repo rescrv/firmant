@@ -297,10 +297,10 @@ class PostArchiveYearly(writers.Writer):
         num_per_page = environment['settings'].POSTS_PER_PAGE
         posts = [p for p in reversed(sorted(objects.get('post', []),
                        key=lambda p: (p.published, p.slug)))]
-        return paginate.split_paginate(num_per_page, self.__splitfunc__, posts)
+        return paginate.split_paginate(num_per_page, self._splitfunc, posts)
 
     @staticmethod
-    def __splitfunc__(post):
+    def _splitfunc(post):
         return (post.published.year,)
 
 
@@ -400,10 +400,10 @@ class PostArchiveMonthly(writers.Writer):
         num_per_page = environment['settings'].POSTS_PER_PAGE
         posts = [p for p in reversed(sorted(objects.get('post', []),
                        key=lambda p: (p.published, p.slug)))]
-        return paginate.split_paginate(num_per_page, self.__splitfunc__, posts)
+        return paginate.split_paginate(num_per_page, self._splitfunc, posts)
 
     @staticmethod
-    def __splitfunc__(post):
+    def _splitfunc(post):
         return (post.published.year, post.published.month)
 
 
@@ -507,10 +507,10 @@ class PostArchiveDaily(writers.Writer):
         num_per_page = environment['settings'].POSTS_PER_PAGE
         posts = [p for p in reversed(sorted(objects.get('post', []),
                        key=lambda p: (p.published, p.slug)))]
-        return paginate.split_paginate(num_per_page, self.__splitfunc__, posts)
+        return paginate.split_paginate(num_per_page, self._splitfunc, posts)
 
     @staticmethod
-    def __splitfunc__(post):
+    def _splitfunc(post):
         return (post.published.year, post.published.month, post.published.day)
 
 
