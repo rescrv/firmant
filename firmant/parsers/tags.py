@@ -96,6 +96,7 @@ class Tag(parsers.RstParsedObject):
 
         '''
         # We remove the 'rst' extension
+        # pylint: disable-msg=E1101
         return {'slug': self.slug}
 
 
