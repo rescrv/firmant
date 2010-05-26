@@ -89,6 +89,8 @@ class ParsedObject(object):
 
     '''
 
+    # pylint: disable-msg=R0903
+
     __metaclass__ = abc.ABCMeta
 
     __slots__ = ['permalink']
@@ -321,17 +323,26 @@ class RstMetaclass(abc.ABCMeta):
 
     '''
 
+    # pylint: disable-msg=C0203
+
     def __init__(cls, name, bases, dct):
         super(RstMetaclass, cls).__init__(name, bases, dct)
         for attr, part in dct.get('_pubparts', []):
             @property
             def pubproperty(self, part=part):
+                '''Property created by metaclass'''
+                # pylint: disable-msg=W0212
                 self._pub.writer.assemble_parts()
                 return self._pub.writer.parts[part]
             setattr(cls, attr, pubproperty)
 
 
 class RstParsedObject(ParsedObject):
+    '''The base class of all objects parsed from reSt documents.
+    '''
+
+    # pylint: disable-msg=C0111
+    # pylint: disable-msg=R0903
 
     __metaclass__ = RstMetaclass
 
