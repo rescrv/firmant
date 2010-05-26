@@ -233,7 +233,7 @@ def _setup(self):
     self.globs['os'] = os
     self.globs['tempfile'] = os
     self.globs['path'] = tempfile.NamedTemporaryFile(delete=False).name
-    self.globs['__path__'] = self.globs['path']
+    self.globs['_path'] = self.globs['path']
 
 
 def _teardown(test):
@@ -241,5 +241,5 @@ def _teardown(test):
     '''
     import os
     import shutil
-    os.unlink(test.globs['__path__'])
+    os.unlink(test.globs['_path'])
     shutil.rmtree(test.globs['settings'].OUTPUT_DIR)
