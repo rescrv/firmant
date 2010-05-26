@@ -25,6 +25,23 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+'''Parsers create objects that can be manipulated and rendered into the final
+webpage.
+
+Modules in this package:
+
+.. autosummary::
+   :toctree: ../generated
+
+   feeds
+   posts
+   static
+   staticrst
+   tags
+
+'''
+
+
 import abc
 import logging
 import stat

@@ -39,6 +39,10 @@ Modules in this package:
 .. autosummary::
    :toctree: ../generated
 
+   atom
+   feeds
+   j2
+   posts
    static
    staticrst
 

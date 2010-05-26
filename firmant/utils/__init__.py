@@ -34,6 +34,7 @@ Modules in this package:
 
    exceptions
    paths
+   workarounds
 
 '''
 
