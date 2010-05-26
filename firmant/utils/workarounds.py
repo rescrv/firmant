@@ -36,17 +36,17 @@ import abc
 def abstractmethod(func):
     '''Replacement for broken upstream :func:`abc.abstractmethod`.
     '''
-    __old_doc__ = func.__doc__
+    _old_doc = func.__doc__
     func = abc.abstractmethod(func)
     # pylint: disable-msg=W0622
-    func.__doc__ = __old_doc__
+    func.__doc__ = _old_doc
     return func
 
 
 def abstractproperty(prop):
     '''Replacement for broken upstream :func:`abc.abstractproperty`.
     '''
-    __old_doc__ = prop.__doc__
+    _old_doc = prop.__doc__
     prop = abc.abstractproperty(prop)
-    prop.__doc__ = __old_doc__
+    prop.__doc__ = _old_doc
     return prop
