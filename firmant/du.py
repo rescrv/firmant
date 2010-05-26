@@ -86,16 +86,22 @@ class URLAttributeNode(nodes.Element, nodes.Invisible, nodes.Special):
 
 
 def post_reference_role(role, rawtext, text, lineno, inliner,
-        options={}, content=[]):
-    m = re.match(r'^(?P<extension>\w{0,6}): (?P<year>[0-9]{4})-' +
+        options=None, content=None):
+    '''Interpret the `post` role as a :class:`URLAttributeNode`.
+    '''
+    # pylint: disable-msg=W0613
+    # pylint: disable-msg=R0913
+    options = options or {}
+    content = content or []
+    match = re.match(r'^(?P<extension>\w{0,6}): (?P<year>[0-9]{4})-' +
                  r'(?P<month>[0-9]{2})-(?P<day>[0-9]{2})\s' +
                  r'(?P<slug>(?:\||\-|\w)+)\s(?P<text>.+)$', text)
-    if m is None:
+    if match is None:
         msg = inliner.reporter.error(_('Improper format for `post` reference.'),
                 line = lineno)
         prb = inliner.problematic(rawtext, rawtext, msg)
         return [prb], [msg]
-    attributes = m.groupdict()
+    attributes = match.groupdict()
     for val in ('year', 'month', 'day'):
         attributes[val] = int(attributes[val], 10)
     attributes['type'] = 'post'
@@ -108,15 +114,21 @@ roles.register_local_role('post', post_reference_role)
 
 
 def staticrst_reference_role(role, rawtext, text, lineno, inliner,
-        options={}, content=[]):
-    m = re.match(r'^(?P<extension>\w{0,6}): (?P<path>[-_?%/a-zA-Z0-9]+)\s' +
+        options=None, content=None):
+    '''Interpret the `staticrst` role as a :class:`URLAttributeNode`.
+    '''
+    # pylint: disable-msg=W0613
+    # pylint: disable-msg=R0913
+    options = options or {}
+    content = content or []
+    match = re.match(r'^(?P<extension>\w{0,6}): (?P<path>[-_?%/a-zA-Z0-9]+)\s' +
                  r'(?P<text>.+)$', text)
-    if m is None:
-        msg = inliner.reporter.error(_('Improper format for `staticrst` reference.'),
-                line = lineno)
+    if match is None:
+        error = _('Improper format for `staticrst` reference.')
+        msg = inliner.reporter.error(error, line=lineno)
         prb = inliner.problematic(rawtext, rawtext, msg)
         return [prb], [msg]
-    attributes = m.groupdict()
+    attributes = match.groupdict()
     attributes['type'] = 'staticrst'
     extension = attributes['extension']
     del attributes['extension']
@@ -406,6 +418,9 @@ def url_node_transform(urlmapper):
         '''Transform :class:`URLAttributeNode` into docutils references.
         '''
 
+        # pylint: disable-msg=R0903
+        # pylint: disable-msg=R0913
+
         default_priority = 600
 
         def apply(self):
@@ -424,9 +439,9 @@ class CustomTransformsReader(standalone.Reader):
     '''Add transformations to read MetaData from doctree.
     '''
 
-    def __init__(self, parser=None, parser_name=None, transforms=[]):
+    def __init__(self, parser=None, parser_name=None, transforms=None):
         standalone.Reader.__init__(self, parser, parser_name)
-        self.transforms = transforms
+        self.transforms = transforms or []
 
     def get_transforms(self):
         '''Add a transform for moving the meta data into the data dictionary.
@@ -434,7 +449,7 @@ class CustomTransformsReader(standalone.Reader):
         return standalone.Reader.get_transforms(self) + self.transforms
 
 
-def publish(path, transforms=[]):
+def publish(path, transforms=None):
     '''Publish the rst document that resides at `path` on the filesystem.
 
     This function returns a :class:`docutils.core.Publisher` object.  The
@@ -448,7 +463,8 @@ def publish(path, transforms=[]):
            ,'destination_class': io.StringOutput
            ,'destination': None
            ,'destination_path': None
-           ,'reader': CustomTransformsReader(transforms=transforms), 'reader_name': None
+           ,'reader': CustomTransformsReader(transforms=transforms or [])
+           ,'reader_name': None
            ,'parser': None, 'parser_name': 'restructuredtext'
            ,'writer': None, 'writer_name': 'html'
            ,'settings': None, 'settings_spec': None
