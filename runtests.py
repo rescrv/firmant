@@ -39,6 +39,7 @@ if __name__ == '__main__':
 
     modules = ['firmant.application',
                'firmant.chunks',
+               'firmant.decorators',
                'firmant.du',
                'firmant.paginate',
                'firmant.parsers',
