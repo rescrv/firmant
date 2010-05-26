@@ -130,6 +130,7 @@ class Post(parsers.RstParsedObject):
            {'day': 31, 'month': 12, 'slug': 'party', 'year': 2009}
 
         '''
+        # pylint: disable-msg=E1101
         return {'year': self.published.year
                ,'month': self.published.month
                ,'day': self.published.day
@@ -174,7 +175,7 @@ class PostParser(parsers.RstParser):
     def rstparse(self, environment, objects, path, pieces):
         '''Use the parsed rst document to construct the necessary objects.
         '''
-        tz = pytz.timezone(pieces['metadata'].get('timezone', 'UTC'))
+        timezone = pytz.timezone(pieces['metadata'].get('timezone', 'UTC'))
         # Set times
         time = pieces['metadata'].get('time', datetime.time(0, 0, 0))
         pubdate = strptime(os.path.basename(path)[:10], ['%Y-%m-%d'])
@@ -187,8 +188,8 @@ class PostParser(parsers.RstParser):
         attrs['copyright'] = pieces['metadata'].get('copyright', '')
         attrs['tags'] = pieces['metadata'].get('tags', [])
         attrs['feeds'] = pieces['metadata'].get('feeds', [])
-        attrs['published'] = tz.localize(published)
-        attrs['updated'] = tz.localize(updated)
+        attrs['published'] = timezone.localize(published)
+        attrs['updated'] = timezone.localize(updated)
         attrs['_pub'] = pieces['pub']
         objects[self.type].append(self.cls(**attrs))
 
