@@ -102,12 +102,19 @@ class Feed(parsers.RstParsedObject):
            {'slug': 'foo'}
 
         '''
-        # We remove the 'rst' extension
+        # pylint: disable-msg=E1101
         return {'slug': self.slug}
 
     @property
     def updated(self):
-        return max([post.published for post in self.posts or []] +
+        '''Return the update time of the feed.
+
+        If there are no posts, it is 1900-01-01 UTC, otherwise it will be the
+        maximum update time across all posts.
+
+        '''
+        # pylint: disable-msg=E1101
+        return max([post.updated for post in self.posts or []] +
                    [pytz.utc.localize(datetime.datetime(1900, 01, 01))])
 
 
