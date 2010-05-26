@@ -88,7 +88,7 @@ class StaticRstObject(parsers.RstParsedObject):
            {'path': 'about/projects/firmant'}
 
         '''
-        # We remove the 'rst' extension
+        # pylint: disable-msg=E1101
         return {'path': self.path}
 
 
