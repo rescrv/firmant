@@ -74,7 +74,7 @@ class Tag(parsers.RstParsedObject):
 
     __slots__ = ['slug', 'posts']
 
-    __pubparts__ = [('content', 'fragment')
+    _pubparts = [('content', 'fragment')
                    ,('title', 'title')
                    ,('subtitle', 'subtitle')
                    ]

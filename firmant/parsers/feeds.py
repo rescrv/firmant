@@ -81,7 +81,7 @@ class Feed(parsers.RstParsedObject):
 
     __slots__ = ['slug', 'copyright', 'posts']
 
-    __pubparts__ = [('content', 'fragment')
+    _pubparts = [('content', 'fragment')
                    ,('title', 'title')
                    ,('subtitle', 'subtitle')
                    ]

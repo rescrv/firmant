@@ -97,7 +97,7 @@ class Post(parsers.RstParsedObject):
     __slots__ = ['slug', 'published', 'author', 'copyright',
             'updated', 'tags', 'feeds']
 
-    __pubparts__ = [('content', 'fragment')
+    _pubparts = [('content', 'fragment')
                    ,('title', 'title')
                    ]
 

@@ -306,7 +306,7 @@ class RstMetaclass(abc.ABCMeta):
 
     def __init__(cls, name, bases, dct):
         super(RstMetaclass, cls).__init__(name, bases, dct)
-        for attr, part in dct.get('__pubparts__', []):
+        for attr, part in dct.get('_pubparts', []):
             @property
             def pubproperty(self, part=part):
                 self._pub.writer.assemble_parts()
@@ -318,7 +318,7 @@ class RstParsedObject(ParsedObject):
 
     __metaclass__ = RstMetaclass
 
-    __slots__ = ['_pub', '__pubparts__']
+    __slots__ = ['_pub', '_pubparts']
 
 
 class RstParser(Parser):

@@ -67,7 +67,7 @@ class StaticRstObject(parsers.RstParsedObject):
 
     __slots__ = ['path']
 
-    __pubparts__ = [('content', 'html_body')
+    _pubparts = [('content', 'html_body')
                    ,('title', 'title')
                    ]
 
