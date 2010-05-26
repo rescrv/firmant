@@ -188,19 +188,6 @@ class Writer(chunks.AbstractChunk):
        Traceback (most recent call last):
        ValueError: `action` is invalid
 
-    ..
-       Test the failure case for verifying that a urlmapper exists in the
-       environment.
-
-    .. doctest::
-
-       >>> SampleWriter({}, {}, action='urls')({}, {})
-       Traceback (most recent call last):
-       ValueError: `urlmapper` expected in `environment`
-       >>> SampleWriter({}, {}, action='renderer')({}, {})
-       Traceback (most recent call last):
-       ValueError: `urlmapper` expected in `environment`
-
     '''
 
     def __init__(self, environment, objects, action=None):
