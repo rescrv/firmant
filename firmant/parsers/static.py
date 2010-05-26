@@ -78,6 +78,7 @@ class StaticObject(parsers.ParsedObject):
            {'path': 'images/88x31.png'}
 
         '''
+        # pylint: disable-msg=E1101
         return {'path': self.relpath}
 
 
@@ -110,9 +111,8 @@ class StaticParser(parsers.Parser):
         fullpath = os.path.join(self.root(environment), path)
         objects[self.type].append(self.cls(fullpath=fullpath, relpath=path))
 
-    @staticmethod
     @decorators.in_environment('settings')
-    def root(environment):
+    def root(self, environment):
         '''The directory under which all static objects reside.
         '''
         settings = environment['settings']
@@ -120,6 +120,8 @@ class StaticParser(parsers.Parser):
 
 
 def _setup(test):
+    '''Setup a test environment and test set of objects.
+    '''
     from pysettings.settings import Settings
     test.globs['settings'] = Settings({'CONTENT_ROOT': 'testdata/pristine'
                                       ,'STATIC_SUBDIR': 'static'
