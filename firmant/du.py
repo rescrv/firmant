@@ -107,6 +107,25 @@ def post_reference_role(role, rawtext, text, lineno, inliner,
 roles.register_local_role('post', post_reference_role)
 
 
+def staticrst_reference_role(role, rawtext, text, lineno, inliner,
+        options={}, content=[]):
+    m = re.match(r'^(?P<extension>\w{0,6}): (?P<path>[-_?%/a-zA-Z0-9]+)\s' +
+                 r'(?P<text>.+)$', text)
+    if m is None:
+        msg = inliner.reporter.error(_('Improper format for `staticrst` reference.'),
+                line = lineno)
+        prb = inliner.problematic(rawtext, rawtext, msg)
+        return [prb], [msg]
+    attributes = m.groupdict()
+    attributes['type'] = 'staticrst'
+    extension = attributes['extension']
+    del attributes['extension']
+    urltext = attributes['text']
+    del attributes['text']
+    return [URLAttributeNode(extension, attributes, urltext)], []
+roles.register_local_role('staticrst', staticrst_reference_role)
+
+
 def meta_data_directive(func, whitespace=False):
     '''Create a Directive class to store data to a MetaDataNode.
 
