@@ -166,6 +166,8 @@ PATH  = routing.SinglePathComponent('path', str)
 
 
 def _page_conv(value):
+    '''Conversion function for page numbers.
+    '''
     if value == 1:
         return None
     return 'page%i' % value
