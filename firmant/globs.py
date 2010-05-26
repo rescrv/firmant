@@ -50,7 +50,9 @@ class Global(chunks.AbstractChunk):
     environment and the objects.  The dictionary should be modified directly.
     '''
 
-    def __init__(self, environment, objects): pass
+    def __init__(self, environment, objects):
+        # pylint: disable-msg=W0613
+        super(Global, self).__init__()
 
     def __call__(self, environment, objects):
         globs = self._get_globals_dict(environment)
