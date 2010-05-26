@@ -165,8 +165,8 @@ SLUG  = routing.SinglePathComponent('slug', str)
 PATH  = routing.SinglePathComponent('path', str)
 
 
-def __page_conv__(value):
+def _page_conv(value):
     if value == 1:
         return None
     return 'page%i' % value
-PAGENO = routing.SinglePathComponent('page', __page_conv__)
+PAGENO = routing.SinglePathComponent('page', _page_conv)
