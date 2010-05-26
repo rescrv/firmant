@@ -83,7 +83,7 @@ class Tag(parsers.RstParsedObject):
         return 'Tag(%s)' % getattr(self, 'slug', None)
 
     @property
-    def __attributes__(self):
+    def _attributes(self):
         '''Attributes that identify a tag object:
 
             slug
@@ -91,7 +91,7 @@ class Tag(parsers.RstParsedObject):
 
         .. doctest::
 
-           >>> pprint(Tag(slug='firmantstuff').__attributes__)
+           >>> pprint(Tag(slug='firmantstuff')._attributes)
            {'slug': 'firmantstuff'}
 
         '''

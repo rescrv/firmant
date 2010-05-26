@@ -203,10 +203,10 @@ class CreatePermalinks(AbstractChunk):
         urlmapper = environment['urlmapper']
         for typ, objlist in objects.items():
             for obj in objlist:
-                if hasattr(obj, '__attributes__') \
+                if hasattr(obj, '_attributes') \
                         and (not hasattr(obj, 'permalink')
                              or obj.permalink is None):
-                    attrs = obj.__attributes__
+                    attrs = obj._attributes
                     attrs['type'] = typ
                     extension = settings.PERMALINK_EXTENSIONS[typ]
                     obj.permalink = urlmapper.url(extension, **attrs)

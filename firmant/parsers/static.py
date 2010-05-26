@@ -65,7 +65,7 @@ class StaticObject(parsers.ParsedObject):
         return 'static_obj<%s>' % getattr(self, 'fullpath', None)
 
     @property
-    def __attributes__(self):
+    def _attributes(self):
         '''Attributes that identify a static object:
 
             path
@@ -74,7 +74,7 @@ class StaticObject(parsers.ParsedObject):
 
         .. doctest::
 
-           >>> pprint(StaticObject(relpath='images/88x31.png').__attributes__)
+           >>> pprint(StaticObject(relpath='images/88x31.png')._attributes)
            {'path': 'images/88x31.png'}
 
         '''

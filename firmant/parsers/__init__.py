@@ -54,7 +54,7 @@ class ParsedObject(object):
 
        >>> class SampleObject(ParsedObject):
        ...     __slots__ = ['someattr']
-       ...     __attributes__ = property(lambda s: {'someattr': s.someattr})
+       ...     _attributes = property(lambda s: {'someattr': s.someattr})
        ...
        >>> SampleObject(someattr='value').someattr
        'value'
@@ -89,7 +89,7 @@ class ParsedObject(object):
             setattr(self, attr, kwargs.get(attr, None))
 
     @workarounds.abstractproperty
-    def __attributes__(self):
+    def _attributes(self):
         '''The dict of attributes that define permalink of the object.
 
         The permalink will be derived from these attributes by passing them to

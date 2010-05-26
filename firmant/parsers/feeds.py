@@ -90,7 +90,7 @@ class Feed(parsers.RstParsedObject):
         return 'Feed(%s)' % getattr(self, 'slug', None)
 
     @property
-    def __attributes__(self):
+    def _attributes(self):
         '''Attributes that identify a feed object:
 
             slug
@@ -98,7 +98,7 @@ class Feed(parsers.RstParsedObject):
 
         .. doctest::
 
-           >>> Feed(slug='foo').__attributes__
+           >>> Feed(slug='foo')._attributes
            {'slug': 'foo'}
 
         '''

@@ -75,7 +75,7 @@ class StaticRstObject(parsers.RstParsedObject):
         return 'staticrst_obj<%s>' % getattr(self, 'path', None)
 
     @property
-    def __attributes__(self):
+    def _attributes(self):
         '''Attributes that identify a static object:
 
             path
@@ -84,7 +84,7 @@ class StaticRstObject(parsers.RstParsedObject):
 
         .. doctest::
 
-           >>> pprint(StaticRstObject(path='about/projects/firmant').__attributes__)
+           >>> pprint(StaticRstObject(path='about/projects/firmant')._attributes)
            {'path': 'about/projects/firmant'}
 
         '''

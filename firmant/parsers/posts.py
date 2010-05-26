@@ -108,7 +108,7 @@ class Post(parsers.RstParsedObject):
         return 'Post(%s-%s)' % (dt, getattr(self, 'slug', None))
 
     @property
-    def __attributes__(self):
+    def _attributes(self):
         '''Attributes that identify a post object:
 
             year
@@ -126,7 +126,7 @@ class Post(parsers.RstParsedObject):
         .. doctest::
 
            >>> from datetime import datetime
-           >>> pprint(Post(published=datetime(2009, 12, 31), slug='party').__attributes__)
+           >>> pprint(Post(published=datetime(2009, 12, 31), slug='party')._attributes)
            {'day': 31, 'month': 12, 'slug': 'party', 'year': 2009}
 
         '''
