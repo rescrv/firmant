@@ -31,10 +31,7 @@
 '''
 
 
-import datetime
-
 from lxml import etree
-import pytz
 
 from firmant.utils import paths
 from firmant.writers.feeds import FeedWriter
@@ -142,5 +139,7 @@ class AtomFeed(FeedWriter):
 def _setup(test):
     '''Setup the environment for tests.
     '''
+    import datetime
     from testdata.chunks import c900
     test.globs['objects'] = c900
+    test.globs['datetime'] = datetime
