@@ -94,7 +94,7 @@ class URLFor(Global):
         globs['urlfor'] = environment['urlmapper'].url
 
 
-def __sorted_posts__(objects, newest_first=True):
+def _sorted_posts(objects, newest_first=True):
     '''Return a list of sorted posts from objects
     '''
     return sorted(objects.get('post', []), reverse=newest_first,
@@ -110,7 +110,7 @@ class RecentPosts(Global):
         '''Put the list of posts under the key ``recent_posts``.
         '''
         offset = environment['settings'].SIDEBAR_POSTS_LEN
-        posts = __sorted_posts__(objects)[:offset]
+        posts = _sorted_posts(objects)[:offset]
         globs['recent_posts'] = [(p.title, p.permalink) for p in posts]
 
 
@@ -126,7 +126,7 @@ class DailyArchives(Global):
         '''
         url = environment['urlmapper'].url
         offset = environment['settings'].SIDEBAR_POSTS_LEN
-        posts = __sorted_posts__(objects)
+        posts = _sorted_posts(objects)
         archives = set([(p.published.year, p.published.month, p.published.day)
                         for p in posts])
         globs['daily_archives'] = [(datetime.date(y, m, d),
@@ -148,7 +148,7 @@ class MonthlyArchives(Global):
         '''
         url = environment['urlmapper'].url
         offset = environment['settings'].SIDEBAR_POSTS_LEN
-        posts = __sorted_posts__(objects)
+        posts = _sorted_posts(objects)
         archives = set([(p.published.year, p.published.month) for p in posts])
         globs['monthly_archives'] = [(datetime.date(y, m, 1),
                                      url('html', type='post', year=y, month=m,
@@ -169,7 +169,7 @@ class YearlyArchives(Global):
         '''
         url = environment['urlmapper'].url
         offset = environment['settings'].SIDEBAR_POSTS_LEN
-        posts = __sorted_posts__(objects)
+        posts = _sorted_posts(objects)
         archives = set([(p.published.year) for p in posts])
         globs['yearly_archives'] = [(datetime.date(y, 1, 1),
                                      url('html', type='post', year=y, page=1))
