@@ -93,7 +93,7 @@ def in_environment(key):
                       "for 'environment'")
             raise AttributeError(error)
 
-        def _wrapper_(f, *args, **kwargs):
+        def _wrapper_(_func, *args, **kwargs):
             '''The actual wrapped function.
 
             The signature is updated to match `func`
@@ -107,6 +107,6 @@ def in_environment(key):
                 error = _("Expected '%s' in 'environment'") % key
                 raise ValueError(error)
 
-            return f(*args, **kwargs)
+            return _func(*args, **kwargs)
         return decorator.decorator(_wrapper_, func)
     return internal
