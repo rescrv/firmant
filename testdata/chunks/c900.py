@@ -42,7 +42,7 @@ tz = pytz.timezone('America/New_York')
 
 
 def __mockpub__(**kwargs):
-    pub = minimock.Mock('__pub__')
+    pub = minimock.Mock('_pub')
     pub.writer = minimock.Mock('writer')
     pub.writer.parts = kwargs
     return pub
@@ -58,7 +58,7 @@ posts[-1].published = tz.localize(datetime.datetime(2009, 12, 31, 23, 59))
 posts[-1].slug      = u'party'
 posts[-1].tags      = [u'foo']
 posts[-1].updated   = tz.localize(datetime.datetime(2009, 12, 31, 23, 59))
-posts[-1].__pub__   = __mockpub__(fragment=u'<p>This is the content.</p>\n',
+posts[-1]._pub   = __mockpub__(fragment=u'<p>This is the content.</p>\n',
                                   title=u'Here Comes the New Year!')
 
 posts.append(parsers.posts.Post())
@@ -69,7 +69,7 @@ posts[-1].published = tz.localize(datetime.datetime(2010, 1, 1, 0, 0))
 posts[-1].slug      = u'newyear'
 posts[-1].tags      = [u'bar']
 posts[-1].updated   = tz.localize(datetime.datetime(2010, 1, 1, 0, 0))
-posts[-1].__pub__   = __mockpub__(fragment=u'<p>This is the content.</p>\n',
+posts[-1]._pub   = __mockpub__(fragment=u'<p>This is the content.</p>\n',
                                   title=u'Here Is the New Year!')
 
 posts.append(parsers.posts.Post())
@@ -80,7 +80,7 @@ posts[-1].published = tz.localize(datetime.datetime(2010, 2, 1, 0, 10))
 posts[-1].slug      = u'newmonth'
 posts[-1].tags      = [u'quux']
 posts[-1].updated   = tz.localize(datetime.datetime(2010, 2, 1, 0, 10))
-posts[-1].__pub__   = __mockpub__(title=u'Here Is a New Month!',
+posts[-1]._pub   = __mockpub__(title=u'Here Is a New Month!',
                     fragment=u'<p>This is the content of the new month.</p>\n')
 
 posts.append(parsers.posts.Post())
@@ -91,7 +91,7 @@ posts[-1].published = tz.localize(datetime.datetime(2010, 2, 2, 0, 10))
 posts[-1].slug      = u'newday'
 posts[-1].tags      = [u'baz', u'foo']
 posts[-1].updated   = tz.localize(datetime.datetime(2010, 2, 2, 0, 10))
-posts[-1].__pub__   = __mockpub__(title=u'Here Is a New Day!',
+posts[-1]._pub   = __mockpub__(title=u'Here Is a New Day!',
                     fragment=u'<p>This is the content of the new day.</p>\n')
 
 posts.append(parsers.posts.Post())
@@ -102,7 +102,7 @@ posts[-1].published = tz.localize(datetime.datetime(2010, 2, 2, 0, 10))
 posts[-1].slug      = u'newday2'
 posts[-1].tags      = [u'baz', u'foo']
 posts[-1].updated   = tz.localize(datetime.datetime(2010, 2, 2, 0, 10))
-posts[-1].__pub__   = __mockpub__(title=u'Here Is a New Day!',
+posts[-1]._pub   = __mockpub__(title=u'Here Is a New Day!',
             fragment=u'<p>This is the content of the new day (again).</p>\n')
 
 
@@ -117,16 +117,16 @@ staticrst = []
 
 staticrst.append(parsers.staticrst.StaticRstObject())
 staticrst[-1].path      = u'about'
-staticrst[-1].__pub__   = __mockpub__(title=u'About',
+staticrst[-1]._pub   = __mockpub__(title=u'About',
         html_body=u'<p>Firmant is an awesome content management system.</p>\n')
 
 staticrst.append(parsers.staticrst.StaticRstObject())
 staticrst[-1].path      = u'empty'
-staticrst[-1].__pub__   = __mockpub__(title=u'About', html_body=u'')
+staticrst[-1]._pub   = __mockpub__(title=u'About', html_body=u'')
 
 staticrst.append(parsers.staticrst.StaticRstObject())
 staticrst[-1].path      = u'links'
-staticrst[-1].__pub__   = __mockpub__(title=u'About', html_body=
+staticrst[-1]._pub   = __mockpub__(title=u'About', html_body=
                           u'<ul class="simple">\n<li><a class="reference e' + \
                           u'xternal" href="http://firmant.org">Firmant</a>' + \
                           u'</li>\n<li><a class="reference external" href=' + \
@@ -139,25 +139,25 @@ feeds.append(parsers.feeds.Feed())
 feeds[-1].copyright = u''
 feeds[-1].slug      = u'foo'
 feeds[-1].posts     = [posts[0], posts[1], posts[3], posts[4]]
-feeds[-1].__pub__   = __mockpub__(fragment=u'', title=u'Foo', subtitle=u'')
+feeds[-1]._pub   = __mockpub__(fragment=u'', title=u'Foo', subtitle=u'')
 
 feeds.append(parsers.feeds.Feed())
 feeds[-1].copyright = u''
 feeds[-1].slug      = u'bar'
 feeds[-1].posts     = [posts[0], posts[1]]
-feeds[-1].__pub__   = __mockpub__(fragment=u'', title=u'Bar', subtitle=u'')
+feeds[-1]._pub   = __mockpub__(fragment=u'', title=u'Bar', subtitle=u'')
 
 feeds.append(parsers.feeds.Feed())
 feeds[-1].copyright = u''
 feeds[-1].slug      = u'baz'
 feeds[-1].posts     = [posts[0], posts[2], posts[3], posts[4]]
-feeds[-1].__pub__   = __mockpub__(fragment=u'', title=u'Baz', subtitle=u'')
+feeds[-1]._pub   = __mockpub__(fragment=u'', title=u'Baz', subtitle=u'')
 
 feeds.append(parsers.feeds.Feed())
 feeds[-1].copyright = u''
 feeds[-1].slug      = u'quux'
 feeds[-1].posts     = [posts[0], posts[2]]
-feeds[-1].__pub__   = __mockpub__(fragment=u'', title=u'Baz', subtitle=u'')
+feeds[-1]._pub   = __mockpub__(fragment=u'', title=u'Baz', subtitle=u'')
 
 posts[0].feeds = [feeds[0], feeds[1], feeds[2], feeds[3]]
 posts[1].feeds = [feeds[0], feeds[1]]
@@ -171,22 +171,22 @@ tags = []
 tags.append(parsers.tags.Tag())
 tags[-1].slug      = u'foo'
 tags[-1].posts     = [posts[0], posts[3], posts[4]]
-tags[-1].__pub__   = __mockpub__(fragment=u'', title=u'Foo', subtitle=u'')
+tags[-1]._pub   = __mockpub__(fragment=u'', title=u'Foo', subtitle=u'')
 
 tags.append(parsers.tags.Tag())
 tags[-1].slug      = u'bar'
 tags[-1].posts     = [posts[1]]
-tags[-1].__pub__   = __mockpub__(fragment=u'', title=u'Bar', subtitle=u'')
+tags[-1]._pub   = __mockpub__(fragment=u'', title=u'Bar', subtitle=u'')
 
 tags.append(parsers.tags.Tag())
 tags[-1].slug      = u'baz'
 tags[-1].posts     = [posts[3], posts[4]]
-tags[-1].__pub__   = __mockpub__(fragment=u'', title=u'Baz', subtitle=u'')
+tags[-1]._pub   = __mockpub__(fragment=u'', title=u'Baz', subtitle=u'')
 
 tags.append(parsers.tags.Tag())
 tags[-1].slug      = u'quux'
 tags[-1].posts     = [posts[2]]
-tags[-1].__pub__   = __mockpub__(fragment=u'', title=u'Baz', subtitle=u'')
+tags[-1]._pub   = __mockpub__(fragment=u'', title=u'Baz', subtitle=u'')
 
 
 posts[0].tags = [tags[0]]

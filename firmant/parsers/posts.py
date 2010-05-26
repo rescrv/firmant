@@ -189,7 +189,7 @@ class PostParser(parsers.RstParser):
         attrs['feeds'] = pieces['metadata'].get('feeds', [])
         attrs['published'] = tz.localize(published)
         attrs['updated'] = tz.localize(updated)
-        attrs['__pub__'] = pieces['pub']
+        attrs['_pub'] = pieces['pub']
         objects[self.type].append(self.cls(**attrs))
 
 

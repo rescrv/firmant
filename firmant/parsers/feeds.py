@@ -147,7 +147,7 @@ class FeedParser(parsers.RstParser):
         attrs = {}
         attrs['slug'] = unicode(path[:-4])
         attrs['copyright'] = pieces['metadata'].get('copyright', '')
-        attrs['__pub__'] = pieces['pub']
+        attrs['_pub'] = pieces['pub']
         objects[self.type].append(self.cls(**attrs))
 
 
