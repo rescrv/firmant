@@ -37,29 +37,33 @@ def get_logger():
 if __name__ == '__main__':
     suite = unittest.TestSuite()
 
-    modules = ['firmant.application',
-               'firmant.chunks',
-               'firmant.decorators',
-               'firmant.du',
-               'firmant.paginate',
-               'firmant.parsers',
-               'firmant.parsers.feeds',
-               'firmant.parsers.posts',
-               'firmant.parsers.tags',
-               'firmant.parsers.static',
-               'firmant.parsers.staticrst',
-               'firmant.routing',
-               'firmant.routing.components',
-               'firmant.utils',
-               'firmant.utils.exceptions',
-               'firmant.utils.paths',
-               'firmant.writers',
-               'firmant.writers.atom',
-               'firmant.writers.feeds',
-               'firmant.writers.posts',
-               'firmant.writers.static',
-               'firmant.writers.staticrst',
-               'firmant.writers.j2'
+    modules = ['firmant'
+              ,'firmant.application'
+              ,'firmant.chunks'
+              ,'firmant.decorators'
+              ,'firmant.du'
+              ,'firmant.globs'
+              ,'firmant.paginate'
+              ,'firmant.parsers'
+              ,'firmant.parsers.feeds'
+              ,'firmant.parsers.posts'
+              ,'firmant.parsers.static'
+              ,'firmant.parsers.staticrst'
+              ,'firmant.parsers.tags'
+              ,'firmant.routing'
+              ,'firmant.routing.components'
+              ,'firmant.settings'
+              ,'firmant.utils'
+              ,'firmant.utils.exceptions'
+              ,'firmant.utils.paths'
+              ,'firmant.utils.workarounds'
+              ,'firmant.writers'
+              ,'firmant.writers.atom'
+              ,'firmant.writers.feeds'
+              ,'firmant.writers.j2'
+              ,'firmant.writers.posts'
+              ,'firmant.writers.static'
+              ,'firmant.writers.staticrst'
               ]
 
     if len(sys.argv[1:]) > 0:
