@@ -53,7 +53,7 @@ class Global(chunks.AbstractChunk):
     def __init__(self, environment, objects): pass
 
     def __call__(self, environment, objects):
-        globs = self.__get_globals_dict__(environment)
+        globs = self._get_globals_dict(environment)
         self.add_glob(globs, environment, objects)
         return environment, objects, []
 
@@ -65,7 +65,7 @@ class Global(chunks.AbstractChunk):
         '''
 
     @staticmethod
-    def __get_globals_dict__(environment):
+    def _get_globals_dict(environment):
         '''Return a the globals dictionary, creating it and the Jinja2
         environment if necessary.
         '''
