@@ -31,6 +31,7 @@
 
 import os
 
+from firmant import decorators
 from firmant import parsers
 
 
@@ -121,6 +122,7 @@ class TagParser(parsers.RstParser):
     paths = '^[-a-zA-Z0-9_.]+\.rst$'
     cls = Tag
 
+    @decorators.in_environment('settings')
     def root(self, environment):
         '''The directory under which all tag objects reside.
         '''

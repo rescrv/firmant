@@ -34,6 +34,7 @@ import os
 
 import pytz
 
+from firmant import decorators
 from firmant import parsers
 
 
@@ -133,6 +134,7 @@ class FeedParser(parsers.RstParser):
     paths = '^[-a-zA-Z0-9_.]+\.rst$'
     cls = Feed
 
+    @decorators.in_environment('settings')
     def root(self, environment):
         '''The directory under which all feed objects reside.
         '''

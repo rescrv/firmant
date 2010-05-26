@@ -32,6 +32,7 @@ layouts.
 
 import os
 
+from firmant import decorators
 from firmant import parsers
 
 
@@ -116,6 +117,7 @@ class StaticRstParser(parsers.RstParser):
     paths = '.*\.rst'
     cls = StaticRstObject
 
+    @decorators.in_environment('settings')
     def root(self, environment):
         '''The directory under which all staticrst objects reside.
         '''

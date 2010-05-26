@@ -35,6 +35,7 @@ templates.
 import datetime
 
 from firmant import chunks
+from firmant import decorators
 from firmant.utils import workarounds
 from firmant.writers import j2
 
@@ -86,13 +87,11 @@ class URLFor(Global):
     :class:`firmant.routingURLMapper` object.
     '''
 
+    @decorators.in_environment('urlmapper')
     def add_glob(self, globs, environment, objects):
         '''Create the ``urlfor`` global.
         '''
-        if 'urlmapper' in environment:
-            globs['urlfor'] = environment['urlmapper'].url
-        else:
-            environment['log'].error(_('Expected `urlmapper` in environment.'))
+        globs['urlfor'] = environment['urlmapper'].url
 
 
 def __sorted_posts__(objects, newest_first=True):
@@ -106,12 +105,10 @@ class RecentPosts(Global):
     '''Add a list of the `SIDEBAR_POSTS_LEN` most recent posts to globals.
     '''
 
+    @decorators.in_environment('settings')
     def add_glob(self, globs, environment, objects):
         '''Put the list of posts under the key ``recent_posts``.
         '''
-        if 'settings' not in environment:
-            environment['log'].error(_('Expected `settings` in environment.'))
-            return
         offset = environment['settings'].SIDEBAR_POSTS_LEN
         posts = __sorted_posts__(objects)[:offset]
         globs['recent_posts'] = [(p.title, p.permalink) for p in posts]
@@ -122,15 +119,11 @@ class DailyArchives(Global):
     globals.
     '''
 
+    @decorators.in_environment('settings')
+    @decorators.in_environment('urlmapper')
     def add_glob(self, globs, environment, objects):
         '''Put the list of daily archives under the key ``daily_archives``.
         '''
-        if 'settings' not in environment:
-            environment['log'].error(_('Expected `settings` in environment.'))
-            return
-        if 'urlmapper' not in environment:
-            environment['log'].error(_('Expected `urlmapper` in environment.'))
-            return
         url = environment['urlmapper'].url
         offset = environment['settings'].SIDEBAR_POSTS_LEN
         posts = __sorted_posts__(objects)
@@ -148,15 +141,11 @@ class MonthlyArchives(Global):
     globals.
     '''
 
+    @decorators.in_environment('settings')
+    @decorators.in_environment('urlmapper')
     def add_glob(self, globs, environment, objects):
         '''Put the list of monthly archives under the key ``monthly_archives``.
         '''
-        if 'settings' not in environment:
-            environment['log'].error(_('Expected `settings` in environment.'))
-            return
-        if 'urlmapper' not in environment:
-            environment['log'].error(_('Expected `urlmapper` in environment.'))
-            return
         url = environment['urlmapper'].url
         offset = environment['settings'].SIDEBAR_POSTS_LEN
         posts = __sorted_posts__(objects)
@@ -173,15 +162,11 @@ class YearlyArchives(Global):
     globals.
     '''
 
+    @decorators.in_environment('settings')
+    @decorators.in_environment('urlmapper')
     def add_glob(self, globs, environment, objects):
         '''Put the list of yearly archives under the key ``yearly_archives``.
         '''
-        if 'settings' not in environment:
-            environment['log'].error(_('Expected `settings` in environment.'))
-            return
-        if 'urlmapper' not in environment:
-            environment['log'].error(_('Expected `urlmapper` in environment.'))
-            return
         url = environment['urlmapper'].url
         offset = environment['settings'].SIDEBAR_POSTS_LEN
         posts = __sorted_posts__(objects)

@@ -34,6 +34,7 @@ location in the output hierarchy.
 
 import os
 
+from firmant import decorators
 from firmant import parsers
 
 
@@ -110,6 +111,7 @@ class StaticParser(parsers.Parser):
         objects[self.type].append(self.cls(fullpath=fullpath, relpath=path))
 
     @staticmethod
+    @decorators.in_environment('settings')
     def root(environment):
         '''The directory under which all static objects reside.
         '''

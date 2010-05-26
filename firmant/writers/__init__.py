@@ -46,6 +46,7 @@ Modules in this package:
 
 
 from firmant import chunks
+from firmant import decorators
 from firmant import utils
 from firmant.utils import workarounds
 
@@ -239,10 +240,8 @@ class Writer(chunks.AbstractChunk):
                 [self.__class__(environment, objects, 'urls'),
                  self.__class__(environment, objects, 'renderer')])
 
+    @decorators.in_environment('urlmapper')
     def __urls__(self, environment, objects):
-        if 'urlmapper' not in environment:
-            error = _('`urlmapper` expected in `environment`')
-            raise ValueError(error)
         urlmapper = environment['urlmapper']
         newenv = environment.copy()
         if 'urls' not in newenv:
@@ -254,6 +253,7 @@ class Writer(chunks.AbstractChunk):
         ret.sort()
         return (newenv, objects, [])
 
+    @decorators.in_environment('urlmapper')
     def __renderer__(self, environment, objects):
         if 'urlmapper' not in environment:
             error = _('`urlmapper` expected in `environment`')

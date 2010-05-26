@@ -29,6 +29,7 @@
 '''
 
 
+from firmant import decorators
 from firmant import paginate
 from firmant import writers
 
@@ -172,6 +173,7 @@ class PostArchiveAll(writers.Writer):
                ,'page': obj[1].cur
                }
 
+    @decorators.in_environment('settings')
     def obj_list(self, environment, objects):
         '''Return 3-tuples with the list of objects and prev/next information.
 
@@ -257,6 +259,7 @@ class PostArchiveYearly(writers.Writer):
                ,'page': obj[2].cur
                }
 
+    @decorators.in_environment('settings')
     def obj_list(self, environment, objects):
         '''Return 3-tuples with the list of objects and prev/next information.
 
@@ -356,6 +359,7 @@ class PostArchiveMonthly(writers.Writer):
                ,'page': obj[2].cur
                }
 
+    @decorators.in_environment('settings')
     def obj_list(self, environment, objects):
         '''Return 3-tuples with the list of objects and prev/next information.
 
@@ -462,6 +466,7 @@ class PostArchiveDaily(writers.Writer):
                ,'page': obj[2].cur
                }
 
+    @decorators.in_environment('settings')
     def obj_list(self, environment, objects):
         '''Return 3-tuples with the list of objects and prev/next information.
 

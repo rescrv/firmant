@@ -36,6 +36,7 @@ from docutils.core import publish_programmatically
 from docutils.core import Publisher
 
 from firmant import chunks
+from firmant import decorators
 from firmant import du
 from firmant.utils import class_name
 from firmant.utils import paths
@@ -324,11 +325,11 @@ class RstParser(Parser):
     '''A parser containing common functionality for parsing reStructuredTest.
     '''
 
+    @decorators.in_environment('urlmapper')
     def parse(self, environment, objects, path):
         '''Parse the reStructuredText doc at `path` and pass the relevant pieces
         to :meth:`rstparse`.
         '''
-        # TODO check for urlmapper in environment.
         metadata = {}
         transforms = [du.meta_data_transform(metadata),
                       du.url_node_transform(environment['urlmapper'])]

@@ -33,6 +33,7 @@ import abc
 
 import jinja2
 
+from firmant import decorators
 from firmant.writers import staticrst
 from firmant.writers import posts
 from firmant.utils import paths
@@ -44,6 +45,7 @@ class Jinja2Base(object):
     '''
 
     @staticmethod
+    @decorators.in_environment('settings')
     def render_to_file(environment, path, template, context):
         '''Render template with context and save to path.
         '''
@@ -127,6 +129,7 @@ class Jinja2PostArchiveBase(Jinja2Base):
     @workarounds.abstractproperty
     def template(self): pass
 
+    @decorators.in_environment('urlmapper')
     def render(self, environment, path, obj):
         key = self.key(obj)
         context = dict()

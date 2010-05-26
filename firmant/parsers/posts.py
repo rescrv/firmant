@@ -34,6 +34,7 @@ import os
 
 import pytz
 
+from firmant import decorators
 from firmant import parsers
 from firmant.utils import strptime
 
@@ -163,6 +164,7 @@ class PostParser(parsers.RstParser):
     paths = '^[0-9]{4}-[0-9]{2}-[0-9]{2}-[-a-zA-Z0-9_]+\.rst$'
     cls = Post
 
+    @decorators.in_environment('settings')
     def root(self, environment):
         '''The directory under which all post objects reside.
         '''
