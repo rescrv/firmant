@@ -27,28 +27,39 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-'''Adapt this module for your own use in building Firmant blogs.
+'''Command-line tool for compilation of Firmant-powered websites.
 '''
 
 
+import gettext
 import logging
 import os
+import sys
 
-from firmant.application import Firmant
-from pysettings.loaders import mod_to_settings
+from pysettings import loaders
 
-logging.basicConfig(level=logging.INFO)
+from firmant import application
 
-def build(output, root):
-    settings = mod_to_settings('firmant.settings')
-    settings.OUTPUT_DIR     = output
-    settings.TEMPLATE_DIR   = 'templates/simple'
-    settings.PERMALINK_ROOT = root
 
-    f = Firmant(settings)
-    f.parse()
-    f.cross_reference()
-    f.write()
+USAGE = '''%s <settings-module-name>
 
-build('preview', os.path.abspath('preview'))
-build('live', 'http://example.org/')
+The settings module will be parsed using PySettings.  All environment variables
+matching FIRMANT_* will be stripped of the FIRMANT_ prefix and added to the
+settings.  The type of these values will always be a string.
+
+The website will the be compiled according to the settings.
+'''
+
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print >>sys.stderr, USAGE % sys.argv[0],
+        sys.exit(2)
+    gettext.install('firmant')
+    logging.basicConfig(level=logging.INFO)
+    settings = loaders.mod_to_settings(sys.argv[1])
+    for key, value in os.environ.items():
+        if key.startswith('FIRMANT_'):
+            setattr(settings, key[8:], value)
+    firmant_app = application.Firmant(settings)
+    firmant_app()

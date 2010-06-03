@@ -10,6 +10,7 @@ setup(name='Firmant',
                ,'firmant.utils'
                ,'firmant.writers'
                ],
+      scripts=['bin/firmant'],
       url='http://projects.robescriva.com/projects/show/firmant',
       license='LICENSE',
       description='A framework for developing static web applications.',
