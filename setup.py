@@ -7,9 +7,13 @@ setup(name='Firmant',
       packages=['firmant'
                ,'firmant.parsers'
                ,'firmant.routing'
+               ,'firmant.templates'
                ,'firmant.utils'
                ,'firmant.writers'
                ],
+      package_dir={'firmant': 'firmant'},
+      package_data={'firmant': ['templates/*.html',
+                                'templates/*/*.html']},
       scripts=['bin/firmant'],
       url='http://projects.robescriva.com/projects/show/firmant',
       license='LICENSE',
