@@ -1,10 +1,17 @@
 from distutils.core import setup
 
 setup(name='Firmant',
-        version='0.2a',
-        description='Static Blog Generator',
-        author='Robert Escriva',
-        author_email='projects@mail.robescriva.com',
-        url='http://projects.robescriva.com/projects/show/firmant',
-        packages=['firmant'],
-        )
+      version='0.2dev',
+      author='Robert Escriva (rescrv)',
+      author_email='firmant@mail.robescriva.com',
+      packages=['firmant'
+               ,'firmant.parsers'
+               ,'firmant.routing'
+               ,'firmant.utils'
+               ,'firmant.writers'
+               ],
+      url='http://projects.robescriva.com/projects/show/firmant',
+      license='LICENSE',
+      description='A framework for developing static web applications.',
+      long_description=open('doc/README.rst').read(),
+      )
