@@ -6,7 +6,7 @@
 Welcome to Firmant's documentation!
 ===================================
 
-Contents:
+.. include:: README.rst
 
 .. automodule:: firmant
 
