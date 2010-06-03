@@ -231,6 +231,7 @@ class Writer(chunks.AbstractChunk):
                 [self.__class__(environment, objects, 'urls'),
                  self.__class__(environment, objects, 'renderer')])
 
+    @decorators.in_environment('log')
     @decorators.in_environment('urlmapper')
     def __urls__(self, environment, objects):
         urlmapper = environment['urlmapper']
@@ -240,6 +241,8 @@ class Writer(chunks.AbstractChunk):
         newenv['urls'][self.writername] = ret = []
         for obj in self.obj_list(environment, objects):
             url = urlmapper.url(self.extension, **self.key(obj))
+            environment['log'].info(_("%s declared '%s'") %
+                    (utils.class_name(self.__class__), url))
             ret.append(url)
         ret.sort()
         return (newenv, objects, [])
@@ -252,6 +255,8 @@ class Writer(chunks.AbstractChunk):
         urlmapper = environment['urlmapper']
         for obj in self.obj_list(environment, objects):
             path = urlmapper.path(self.extension, **self.key(obj))
+            environment['log'].info(_("%s rendered '%s'") %
+                    (utils.class_name(self.__class__), path))
             self.render(environment, path, obj)
         return (environment, objects, [])
 

@@ -269,11 +269,14 @@ class Parser(chunks.AbstractChunk):
         return (environment, objects,
                 [self.__class__(environment, objects, 'parse')])
 
+    @decorators.in_environment('log')
     def __parse__(self, environment, objects):
         for path in sorted(paths.recursive_listdir(self.root(environment),
             matches=self.paths)):
             if self.type not in objects:
                 objects[self.type] = []
+            environment['log'].info(_("%s parsing '%s'") %
+                    (class_name(self.__class__), path))
             self.parse(environment, objects, path)
         return environment, objects, []
 

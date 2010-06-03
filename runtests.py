@@ -26,7 +26,7 @@ sys.displayhook = safe_displayhook
 
 def get_logger():
     logger = logging.getLogger('logger')
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.WARN)
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
     handler.setLevel(logging.DEBUG)
