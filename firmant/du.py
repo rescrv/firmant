@@ -127,6 +127,21 @@ post_reference_role = functools.partial(generic_reference_role,
 roles.register_local_role('post', post_reference_role)
 
 
+_static_reference_role_re = r'(?P<path>[-_?%/a-zA-Z0-9.]+)\s(?P<text>.+)$'
+def _static_reference_role_convert(attributes):
+    '''Pull the necessary data from the attributes.
+    '''
+    ret = attributes.copy()
+    ret['type'] = 'static'
+    urltext = ret['text']
+    del ret['text']
+    return None, ret, urltext
+static_reference_role = functools.partial(generic_reference_role,
+        _static_reference_role_re, 'static',
+        _static_reference_role_convert)
+roles.register_local_role('static', static_reference_role)
+
+
 _staticrst_reference_role_re = r'^(?P<extension>\w{0,6}): ' + \
                                r'(?P<path>[-_?%/a-zA-Z0-9]+)\s(?P<text>.+)$'
 def _staticrst_reference_role_convert(attributes):
