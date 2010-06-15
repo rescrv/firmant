@@ -44,6 +44,7 @@ tree, and the metadata they store is added to the dictionary that the
 '''
 
 
+import functools
 import re
 
 from docutils import io
@@ -85,56 +86,62 @@ class URLAttributeNode(nodes.Element, nodes.Invisible, nodes.Special):
         self.urltext = urltext
 
 
-def post_reference_role(role, rawtext, text, lineno, inliner,
-        options=None, content=None):
-    '''Interpret the `post` role as a :class:`URLAttributeNode`.
+def generic_reference_role(regex, typ, convert, role, rawtext, text, lineno,
+        inliner, options=None, content=None):
+    '''A generic reference role.
+
+    It is designed to be curried with a regex, the type of link, and a function
+    to return the extension, attributes, and urltext from the groupdict of the
+    regex.
     '''
-    # pylint: disable-msg=W0613
-    # pylint: disable-msg=R0913
     options = options or {}
     content = content or []
-    match = re.match(r'^(?P<extension>\w{0,6}): (?P<year>[0-9]{4})-' +
-                 r'(?P<month>[0-9]{2})-(?P<day>[0-9]{2})\s' +
-                 r'(?P<slug>(?:\||\-|\w)+)\s(?P<text>.+)$', text)
+    match   = re.match(regex, text)
     if match is None:
-        msg = inliner.reporter.error(_('Improper format for `post` reference.'),
-                line = lineno)
+        err = _('Improper format for `%s` reference.') % typ
+        msg = inliner.reporter.error(err, line=lineno)
         prb = inliner.problematic(rawtext, rawtext, msg)
         return [prb], [msg]
     attributes = match.groupdict()
-    for val in ('year', 'month', 'day'):
-        attributes[val] = int(attributes[val], 10)
-    attributes['type'] = 'post'
-    extension = attributes['extension']
-    del attributes['extension']
-    urltext = attributes['text']
-    del attributes['text']
+    extension, attributes, urltext = convert(attributes)
     return [URLAttributeNode(extension, attributes, urltext)], []
+
+
+_post_reference_role_re = r'^(?P<extension>\w{0,6}): (?P<year>[0-9]{4})-' + \
+                          r'(?P<month>[0-9]{2})-(?P<day>[0-9]{2})\s' + \
+                          r'(?P<slug>(?:\||\-|\w)+)\s(?P<text>.+)$'
+def _post_reference_role_convert(attributes):
+    '''Pull the necessary data from the attributes.
+    '''
+    ret = attributes.copy()
+    for val in ('year', 'month', 'day'):
+        ret[val] = int(ret[val], 10)
+    ret['type'] = 'post'
+    extension = ret['extension']
+    del ret['extension']
+    urltext = ret['text']
+    del ret['text']
+    return extension, ret, urltext
+post_reference_role = functools.partial(generic_reference_role,
+        _post_reference_role_re, 'post', _post_reference_role_convert)
 roles.register_local_role('post', post_reference_role)
 
 
-def staticrst_reference_role(role, rawtext, text, lineno, inliner,
-        options=None, content=None):
-    '''Interpret the `staticrst` role as a :class:`URLAttributeNode`.
+_staticrst_reference_role_re = r'^(?P<extension>\w{0,6}): ' + \
+                               r'(?P<path>[-_?%/a-zA-Z0-9]+)\s(?P<text>.+)$'
+def _staticrst_reference_role_convert(attributes):
+    '''Pull the necessary data from the attributes.
     '''
-    # pylint: disable-msg=W0613
-    # pylint: disable-msg=R0913
-    options = options or {}
-    content = content or []
-    match = re.match(r'^(?P<extension>\w{0,6}): (?P<path>[-_?%/a-zA-Z0-9]+)\s' +
-                 r'(?P<text>.+)$', text)
-    if match is None:
-        error = _('Improper format for `staticrst` reference.')
-        msg = inliner.reporter.error(error, line=lineno)
-        prb = inliner.problematic(rawtext, rawtext, msg)
-        return [prb], [msg]
-    attributes = match.groupdict()
-    attributes['type'] = 'staticrst'
-    extension = attributes['extension']
-    del attributes['extension']
-    urltext = attributes['text']
-    del attributes['text']
-    return [URLAttributeNode(extension, attributes, urltext)], []
+    ret = attributes.copy()
+    ret['type'] = 'staticrst'
+    extension = ret['extension']
+    del ret['extension']
+    urltext = ret['text']
+    del ret['text']
+    return extension, ret, urltext
+staticrst_reference_role = functools.partial(generic_reference_role,
+        _staticrst_reference_role_re, 'staticrst',
+        _staticrst_reference_role_convert)
 roles.register_local_role('staticrst', staticrst_reference_role)
 
 
