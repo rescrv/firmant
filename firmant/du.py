@@ -107,6 +107,23 @@ def generic_reference_role(regex, typ, convert, role, rawtext, text, lineno,
     return [URLAttributeNode(extension, attributes, urltext)], []
 
 
+_feed_reference_role_re = r'^(?P<extension>\w{0,6}): ' + \
+                          r'(?P<slug>(?:\||\-|\w)+)\s(?P<text>.+)$'
+def _feed_reference_role_convert(attributes):
+    '''Pull the necessary data from the attributes.
+    '''
+    ret = attributes.copy()
+    ret['type'] = 'feed'
+    extension = ret['extension']
+    del ret['extension']
+    urltext = ret['text']
+    del ret['text']
+    return extension, ret, urltext
+feed_reference_role = functools.partial(generic_reference_role,
+        _feed_reference_role_re, 'feed', _feed_reference_role_convert)
+roles.register_local_role('feed', feed_reference_role)
+
+
 _post_reference_role_re = r'^(?P<extension>\w{0,6}): (?P<year>[0-9]{4})-' + \
                           r'(?P<month>[0-9]{2})-(?P<day>[0-9]{2})\s' + \
                           r'(?P<slug>(?:\||\-|\w)+)\s(?P<text>.+)$'
