@@ -177,6 +177,23 @@ staticrst_reference_role = functools.partial(generic_reference_role,
 roles.register_local_role('staticrst', staticrst_reference_role)
 
 
+_tag_reference_role_re = r'^(?P<extension>\w{0,6}): ' + \
+                          r'(?P<slug>(?:\||\-|\w)+)\s(?P<text>.+)$'
+def _tag_reference_role_convert(attributes):
+    '''Pull the necessary data from the attributes.
+    '''
+    ret = attributes.copy()
+    ret['type'] = 'tag'
+    extension = ret['extension']
+    del ret['extension']
+    urltext = ret['text']
+    del ret['text']
+    return extension, ret, urltext
+tag_reference_role = functools.partial(generic_reference_role,
+        _tag_reference_role_re, 'tag', _tag_reference_role_convert)
+roles.register_local_role('tag', tag_reference_role)
+
+
 def meta_data_directive(func, whitespace=False):
     '''Create a Directive class to store data to a MetaDataNode.
 

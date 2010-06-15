@@ -68,6 +68,7 @@ URLS = [c.TYPE('post') /c.PAGENO
        ,c.TYPE('post') /c.YEAR/c.MONTH/c.DAY/c.PAGENO
        ,c.TYPE('post') /c.YEAR/c.MONTH/c.DAY/c.SLUG
        ,c.TYPE('feed') /c.SLUG
+       ,c.TYPE('tag') /c.SLUG
        ,c.TYPE('static') /c.PATH
        ,c.TYPE('staticrst') /c.PATH
        ]
