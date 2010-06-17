@@ -1,5 +1,16 @@
 from distutils.core import setup
 
+
+classifiers = [ 'Development Status :: 4 - Beta'
+              , 'Intended Audience :: Developers'
+              , 'License :: OSI Approved :: BSD License'
+              , 'Operating System :: MacOS :: MacOS X'
+              , 'Operating System :: POSIX :: Linux'
+              , 'Operating System :: Unix'
+              , 'Programming Language :: Python :: 2.6'
+              , 'Topic :: Internet :: WWW/HTTP :: Site Management'
+              ]
+
 setup(name='Firmant',
       version='0.2dev',
       author='Robert Escriva (rescrv)',
@@ -19,4 +30,5 @@ setup(name='Firmant',
       license='3-clause BSD',
       description='A framework for static web applications.',
       long_description=open('doc/README.rst').read(),
+      classifiers=classifiers,
       )
