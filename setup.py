@@ -12,7 +12,7 @@ classifiers = [ 'Development Status :: 4 - Beta'
               ]
 
 setup(name='Firmant',
-      version='0.2dev',
+      version='0.3dev',
       author='Robert Escriva (rescrv)',
       author_email='firmant@mail.robescriva.com',
       packages=['firmant'
