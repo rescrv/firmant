@@ -175,7 +175,7 @@ class CheckURLConflicts(AbstractChunk):
         '''Ensure that the sets of URLs are disjoint.
         '''
         urls = dict()
-        for key, inst in environment['urls'].items():
+        for key, inst in environment.get('urls', {}).items():
             for url in inst:
                 if url is None:
                     warning  = _("Writer %s's URLs incompletely defined.")
