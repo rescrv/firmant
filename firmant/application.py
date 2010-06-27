@@ -83,11 +83,13 @@ class Firmant(object):
         self.chunks.append(CreatePermalinks())
         self.chunks.append(CrossReference())
 
+        if not hasattr(settings, 'GLOBALS'): settings.GLOBALS = []
         for glob in settings.GLOBALS:
             glob = utils.get_obj(glob)
             self.chunks.append(glob(self.env, self.objs))
 
         # Setup parsers
+        if not hasattr(settings, 'PARSERS'): settings.PARSERS = []
         for parser in settings.PARSERS:
             parser = utils.get_obj(parser)
             if issubclass(parser, AbstractChunk):
@@ -96,7 +98,8 @@ class Firmant(object):
                 self.log.error(_("'%s' is not a parser.") % str(parser))
 
         # Setup writers
-        for writer in self.settings.WRITERS:
+        if not hasattr(settings, 'WRITERS'): settings.WRITERS = []
+        for writer in settings.WRITERS:
             writer = utils.get_obj(writer)
             self.chunks.append(writer(self.env, self.objs))
 
