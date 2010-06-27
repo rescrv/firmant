@@ -88,7 +88,7 @@ class Firmant(object):
             self.chunks.append(glob(self.env, self.objs))
 
         # Setup parsers
-        for parser in settings.PARSERS.values():
+        for parser in settings.PARSERS:
             parser = utils.get_obj(parser)
             if issubclass(parser, AbstractChunk):
                 self.chunks.append(parser(self.env, self.objs))

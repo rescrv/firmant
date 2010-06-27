@@ -37,12 +37,12 @@ import jinja2
 from firmant.routing import components as c
 
 
-PARSERS = {'feeds': 'firmant.parsers.feeds.FeedParser'
-          ,'posts': 'firmant.parsers.posts.PostParser'
-          ,'tags': 'firmant.parsers.tags.TagParser'
-          ,'static': 'firmant.parsers.static.StaticParser'
-          ,'staticrst': 'firmant.parsers.staticrst.StaticRstParser'
-          }
+PARSERS = ['firmant.parsers.feeds.FeedParser'
+          ,'firmant.parsers.posts.PostParser'
+          ,'firmant.parsers.tags.TagParser'
+          ,'firmant.parsers.static.StaticParser'
+          ,'firmant.parsers.staticrst.StaticRstParser'
+          ]
 CONTENT_ROOT = 'testdata/pristine'
 FEEDS_SUBDIR = 'feeds'
 POSTS_SUBDIR = 'posts'
