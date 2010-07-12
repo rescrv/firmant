@@ -29,6 +29,6 @@ setup(name='Firmant',
       url='http://firmant.org/',
       license='3-clause BSD',
       description='A framework for static web applications.',
-      long_description=open('doc/README.rst').read(),
+      long_description=open('README.rst').read(),
       classifiers=classifiers,
       )

@@ -1,5 +1,5 @@
+include README.rst
 include doc/index.rst
-include doc/README.rst
 include doc/_static/.gitignore
 include doc/conf.py
 include doc/modules.rst
