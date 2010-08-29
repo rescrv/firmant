@@ -114,7 +114,7 @@ class StaticRstParser(parsers.RstParser):
     '''
 
     type = 'staticrst'
-    paths = '.*\.rst'
+    paths = '.*\.rst$'
     cls = StaticRstObject
 
     @decorators.in_environment('settings')
