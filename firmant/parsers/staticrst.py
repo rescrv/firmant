@@ -114,7 +114,7 @@ class StaticRstParser(parsers.RstParser):
     '''
 
     type = 'staticrst'
-    paths = '.*\.rst'
+    paths = '.*\.rst$'
     cls = StaticRstObject
 
     @decorators.in_environment('settings')
@@ -128,7 +128,7 @@ class StaticRstParser(parsers.RstParser):
         '''Use the parsed rst document to construct the necessary objects.
         '''
         attrs = {}
-        attrs['path'] = unicode(path[:-4])
+        attrs['path'] = unicode(path.rsplit('.',1)[0])
         attrs['_pub'] = pieces['pub']
         objects[self.type].append(self.cls(**attrs))
 

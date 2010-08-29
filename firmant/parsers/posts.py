@@ -183,7 +183,7 @@ class PostParser(parsers.RstParser):
         updated = pieces['metadata'].get('updated', published)
         # Other attrs
         attrs = {}
-        attrs['slug'] = unicode(path[11:-4])
+        attrs['slug'] = unicode(path[11:].rsplit('.',1)[0])
         attrs['author'] = pieces['metadata'].get('author', '')
         attrs['copyright'] = pieces['metadata'].get('copyright', '')
         attrs['tags'] = pieces['metadata'].get('tags', [])
