@@ -35,6 +35,8 @@ import os
 from firmant import decorators
 from firmant import parsers
 
+from pysettings import settings
+
 
 class StaticRstObject(parsers.RstParsedObject):
     '''A static object that contains title, content, and path information.
@@ -117,11 +119,9 @@ class StaticRstParser(parsers.RstParser):
     paths = '.*\.rst$'
     cls = StaticRstObject
 
-    @decorators.in_environment('settings')
     def root(self, environment):
         '''The directory under which all staticrst objects reside.
         '''
-        settings = environment['settings']
         return os.path.join(settings.CONTENT_ROOT, settings.STATIC_RST_SUBDIR)
 
     def rstparse(self, environment, objects, path, pieces):
@@ -138,11 +138,10 @@ def _setup(test):
     '''
     from pysettings import Settings
     from firmant import routing
-    test.globs['settings'] = Settings({'CONTENT_ROOT': 'testdata/pristine'
-                                      ,'STATIC_RST_SUBDIR': 'flat'
-                                      })
+    settings.configure(Settings({'CONTENT_ROOT': 'testdata/pristine'
+                                ,'STATIC_RST_SUBDIR': 'flat'
+                                }), override=True)
     urlmapper = routing.URLMapper('/path/to/output/dir', 'http://testurl/', [])
-    test.globs['environment'] = {'settings': test.globs['settings']
-                                ,'urlmapper': urlmapper
+    test.globs['environment'] = {'urlmapper': urlmapper
                                 }
     test.globs['objects'] = {}

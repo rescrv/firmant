@@ -38,6 +38,8 @@ from firmant import decorators
 from firmant import parsers
 from firmant.utils import strptime
 
+from pysettings import settings
+
 
 class Post(parsers.RstParsedObject):
     '''A post is piece of content identified by a date of publication and a
@@ -165,11 +167,9 @@ class PostParser(parsers.RstParser):
     paths = '^[0-9]{4}-[0-9]{2}-[0-9]{2}-[-a-zA-Z0-9_]+\.rst$'
     cls = Post
 
-    @decorators.in_environment('settings')
     def root(self, environment):
         '''The directory under which all post objects reside.
         '''
-        settings = environment['settings']
         return os.path.join(settings.CONTENT_ROOT, settings.POSTS_SUBDIR)
 
     def rstparse(self, environment, objects, path, pieces):
@@ -199,11 +199,10 @@ def _setup(test):
     '''
     from pysettings import Settings
     from firmant import routing
-    test.globs['settings'] = Settings({'CONTENT_ROOT': 'testdata/pristine'
-                                      ,'POSTS_SUBDIR': 'posts'
-                                      })
+    settings.configure(Settings({'CONTENT_ROOT': 'testdata/pristine'
+                                ,'POSTS_SUBDIR': 'posts'
+                                }), override=True)
     urlmapper = routing.URLMapper('/path/to/output/dir', 'http://testurl/', [])
-    test.globs['environment'] = {'settings': test.globs['settings']
-                                ,'urlmapper': urlmapper
+    test.globs['environment'] = {'urlmapper': urlmapper
                                 }
     test.globs['objects'] = {}

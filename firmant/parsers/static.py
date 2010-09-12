@@ -37,6 +37,8 @@ import os
 from firmant import decorators
 from firmant import parsers
 
+from pysettings import settings
+
 
 class StaticObject(parsers.ParsedObject):
     '''An object that serves as a placeholder for a file on the filesystem.
@@ -111,11 +113,9 @@ class StaticParser(parsers.Parser):
         fullpath = os.path.join(self.root(environment), path)
         objects[self.type].append(self.cls(fullpath=fullpath, relpath=path))
 
-    @decorators.in_environment('settings')
     def root(self, environment):
         '''The directory under which all static objects reside.
         '''
-        settings = environment['settings']
         return os.path.join(settings.CONTENT_ROOT, settings.STATIC_SUBDIR)
 
 
@@ -123,9 +123,8 @@ def _setup(test):
     '''Setup a test environment and test set of objects.
     '''
     from pysettings import Settings
-    test.globs['settings'] = Settings({'CONTENT_ROOT': 'testdata/pristine'
-                                      ,'STATIC_SUBDIR': 'static'
-                                      })
-    test.globs['environment'] = {'settings': test.globs['settings']
-                                }
+    settings.configure(Settings({'CONTENT_ROOT': 'testdata/pristine'
+                                ,'STATIC_SUBDIR': 'static'
+                                }), override=True)
+    test.globs['environment'] = {}
     test.globs['objects'] = {}

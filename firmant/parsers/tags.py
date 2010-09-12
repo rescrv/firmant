@@ -34,6 +34,8 @@ import os
 from firmant import decorators
 from firmant import parsers
 
+from pysettings import settings
+
 
 class Tag(parsers.RstParsedObject):
     '''A tag is a means of categorizing objects.
@@ -123,11 +125,9 @@ class TagParser(parsers.RstParser):
     paths = '^[-a-zA-Z0-9_.]+\.rst$'
     cls = Tag
 
-    @decorators.in_environment('settings')
     def root(self, environment):
         '''The directory under which all tag objects reside.
         '''
-        settings = environment['settings']
         return os.path.join(settings.CONTENT_ROOT, settings.TAGS_SUBDIR)
 
     def rstparse(self, environment, objects, path, pieces):
@@ -144,11 +144,10 @@ def _setup(test):
     '''
     from pysettings import Settings
     from firmant import routing
-    test.globs['settings'] = Settings({'CONTENT_ROOT': 'testdata/pristine'
-                                      ,'TAGS_SUBDIR': 'tags'
-                                      })
+    settings.configure(Settings({'CONTENT_ROOT': 'testdata/pristine'
+                                ,'TAGS_SUBDIR': 'tags'
+                                }), override=True)
     urlmapper = routing.URLMapper('/path/to/output/dir', 'http://testurl/', [])
-    test.globs['environment'] = {'settings': test.globs['settings']
-                                ,'urlmapper': urlmapper
+    test.globs['environment'] = {'urlmapper': urlmapper
                                 }
     test.globs['objects'] = {}

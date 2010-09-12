@@ -37,6 +37,8 @@ import pytz
 from firmant import decorators
 from firmant import parsers
 
+from pysettings import settings
+
 
 class Feed(parsers.RstParsedObject):
     '''A feed is a means of categorizing objects.
@@ -141,11 +143,9 @@ class FeedParser(parsers.RstParser):
     paths = '^[-a-zA-Z0-9_.]+\.rst$'
     cls = Feed
 
-    @decorators.in_environment('settings')
     def root(self, environment):
         '''The directory under which all feed objects reside.
         '''
-        settings = environment['settings']
         return os.path.join(settings.CONTENT_ROOT, settings.FEEDS_SUBDIR)
 
     def rstparse(self, environment, objects, path, pieces):
@@ -163,11 +163,10 @@ def _setup(test):
     '''
     from pysettings import Settings
     from firmant import routing
-    test.globs['settings'] = Settings({'CONTENT_ROOT': 'testdata/pristine'
-                                      ,'FEEDS_SUBDIR': 'feeds'
-                                      })
+    settings.configure(Settings({'CONTENT_ROOT': 'testdata/pristine'
+                                ,'FEEDS_SUBDIR': 'feeds'
+                                }), override=True)
     urlmapper = routing.URLMapper('/path/to/output/dir', 'http://testurl/', [])
-    test.globs['environment'] = {'settings': test.globs['settings']
-                                ,'urlmapper': urlmapper
+    test.globs['environment'] = {'urlmapper': urlmapper
                                 }
     test.globs['objects'] = {}
