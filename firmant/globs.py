@@ -39,6 +39,8 @@ from firmant import decorators
 from firmant.utils import workarounds
 from firmant.writers import j2
 
+from pysettings import settings
+
 
 class Global(chunks.AbstractChunk):
     '''Base class for other globals providers.
@@ -107,11 +109,10 @@ class RecentPosts(Global):
     '''Add a list of the `SIDEBAR_POSTS_LEN` most recent posts to globals.
     '''
 
-    @decorators.in_environment('settings')
     def add_glob(self, globs, environment, objects):
         '''Put the list of posts under the key ``recent_posts``.
         '''
-        offset = environment['settings'].SIDEBAR_POSTS_LEN
+        offset = settings.SIDEBAR_POSTS_LEN
         posts = _sorted_posts(objects)[:offset]
         globs['recent_posts'] = [(p.title, p.permalink) for p in posts]
 
@@ -121,13 +122,12 @@ class DailyArchives(Global):
     globals.
     '''
 
-    @decorators.in_environment('settings')
     @decorators.in_environment('urlmapper')
     def add_glob(self, globs, environment, objects):
         '''Put the list of daily archives under the key ``daily_archives``.
         '''
         url = environment['urlmapper'].url
-        offset = environment['settings'].SIDEBAR_POSTS_LEN
+        offset = settings.SIDEBAR_POSTS_LEN
         posts = _sorted_posts(objects)
         archives = set([(p.published.year, p.published.month, p.published.day)
                         for p in posts])
@@ -143,13 +143,12 @@ class MonthlyArchives(Global):
     globals.
     '''
 
-    @decorators.in_environment('settings')
     @decorators.in_environment('urlmapper')
     def add_glob(self, globs, environment, objects):
         '''Put the list of monthly archives under the key ``monthly_archives``.
         '''
         url = environment['urlmapper'].url
-        offset = environment['settings'].SIDEBAR_POSTS_LEN
+        offset = settings.SIDEBAR_POSTS_LEN
         posts = _sorted_posts(objects)
         archives = set([(p.published.year, p.published.month) for p in posts])
         globs['monthly_archives'] = [(datetime.date(y, m, 1),
@@ -164,13 +163,12 @@ class YearlyArchives(Global):
     globals.
     '''
 
-    @decorators.in_environment('settings')
     @decorators.in_environment('urlmapper')
     def add_glob(self, globs, environment, objects):
         '''Put the list of yearly archives under the key ``yearly_archives``.
         '''
         url = environment['urlmapper'].url
-        offset = environment['settings'].SIDEBAR_POSTS_LEN
+        offset = settings.SIDEBAR_POSTS_LEN
         posts = _sorted_posts(objects)
         archives = set([(p.published.year) for p in posts])
         globs['yearly_archives'] = [(datetime.date(y, 1, 1),
