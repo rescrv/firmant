@@ -33,6 +33,8 @@ from firmant import decorators
 from firmant import paginate
 from firmant import writers
 
+from pysettings import settings
+
 
 class PostWriter(writers.Writer):
     '''Write/render individual post objects.
@@ -160,7 +162,7 @@ class PostArchiveAll(writers.Writer):
 
         .. doctest::
 
-           >>> obj = spaa.obj_list({'settings': settings},
+           >>> obj = spaa.obj_list({},
            ...                     {'post': objects.posts})[0]
            >>> pprint(obj) #doctest: +ELLIPSIS
            ([Post(2010-02-02-newday2), Post(2010-02-02-newday)], Paginated(None, 1, 2))
@@ -173,7 +175,6 @@ class PostArchiveAll(writers.Writer):
                ,'page': obj[1].cur
                }
 
-    @decorators.in_environment('settings')
     def obj_list(self, environment, objects):
         '''Return 3-tuples with the list of objects and prev/next information.
 
@@ -191,18 +192,18 @@ class PostArchiveAll(writers.Writer):
 
         .. doctest::
 
-           >>> spaa.obj_list({'settings': settings}, {})
+           >>> spaa.obj_list({}, {})
            []
-           >>> spaa.obj_list({'settings': settings}, {'post': []})
+           >>> spaa.obj_list({}, {'post': []})
            []
-           >>> pprint(spaa.obj_list({'settings': settings},
+           >>> pprint(spaa.obj_list({},
            ...                      {'post': objects.posts})) #doctest: +ELLIPSIS
            [([Post(2010-02-02-newday2), Post(2010-02-02-newday)], Paginated(None, 1, 2)),
             ([Post(2010-02-01-newmonth), Post(2010-01-01-newyear)], Paginated(1, 2, 3)),
             ([Post(2009-12-31-party)], Paginated(2, 3, None))]
 
         '''
-        num_per_page = environment['settings'].POSTS_PER_PAGE
+        num_per_page = settings.POSTS_PER_PAGE
         posts = [p for p in reversed(sorted(objects.get('post', []),
                        key=lambda p: (p.published, p.slug)))]
         return paginate.paginate(num_per_page, posts)
@@ -244,7 +245,7 @@ class PostArchiveYearly(writers.Writer):
 
         .. doctest::
 
-           >>> obj = spay.obj_list({'settings': settings},
+           >>> obj = spay.obj_list({},
            ...                     {'post': objects.posts})[0]
            >>> pprint(obj) #doctest: +ELLIPSIS
            ([Post(2010-02-02-newday2), Post(2010-02-02-newday)],
@@ -259,7 +260,6 @@ class PostArchiveYearly(writers.Writer):
                ,'page': obj[2].cur
                }
 
-    @decorators.in_environment('settings')
     def obj_list(self, environment, objects):
         '''Return 3-tuples with the list of objects and prev/next information.
 
@@ -277,11 +277,11 @@ class PostArchiveYearly(writers.Writer):
 
         .. doctest::
 
-           >>> spay.obj_list({'settings': settings}, {})
+           >>> spay.obj_list({}, {})
            []
-           >>> spay.obj_list({'settings': settings}, {'post': []})
+           >>> spay.obj_list({}, {'post': []})
            []
-           >>> pprint(spay.obj_list({'settings': settings},
+           >>> pprint(spay.obj_list({},
            ...                      {'post': objects.posts}))
            [([Post(2010-02-02-newday2), Post(2010-02-02-newday)],
              Paginated(None, (2010,), (2009,)),
@@ -294,7 +294,7 @@ class PostArchiveYearly(writers.Writer):
              Paginated(None, 1, None))]
 
         '''
-        num_per_page = environment['settings'].POSTS_PER_PAGE
+        num_per_page = settings.POSTS_PER_PAGE
         posts = [p for p in reversed(sorted(objects.get('post', []),
                        key=lambda p: (p.published, p.slug)))]
         return paginate.split_paginate(num_per_page, self._splitfunc, posts)
@@ -345,7 +345,7 @@ class PostArchiveMonthly(writers.Writer):
 
         .. doctest::
 
-           >>> obj = spam.obj_list({'settings': settings},
+           >>> obj = spam.obj_list({},
            ...                     {'post': objects.posts})[0]
            >>> pprint(obj)
            ([Post(2010-02-02-newday2), Post(2010-02-02-newday)],
@@ -361,7 +361,6 @@ class PostArchiveMonthly(writers.Writer):
                ,'page': obj[2].cur
                }
 
-    @decorators.in_environment('settings')
     def obj_list(self, environment, objects):
         '''Return 3-tuples with the list of objects and prev/next information.
 
@@ -379,11 +378,11 @@ class PostArchiveMonthly(writers.Writer):
 
         .. doctest::
 
-           >>> spam.obj_list({'settings': settings}, {})
+           >>> spam.obj_list({}, {})
            []
-           >>> spam.obj_list({'settings': settings}, {'post': []})
+           >>> spam.obj_list({}, {'post': []})
            []
-           >>> pprint(spam.obj_list({'settings': settings},
+           >>> pprint(spam.obj_list({},
            ...                      {'post': objects.posts})) #doctest: +ELLIPSIS
            [([Post(2010-02-02-newday2), Post(2010-02-02-newday)],
              Paginated(None, (2010, 2), (2010, 1)),
@@ -399,7 +398,7 @@ class PostArchiveMonthly(writers.Writer):
              Paginated(None, 1, None))]
 
         '''
-        num_per_page = environment['settings'].POSTS_PER_PAGE
+        num_per_page = settings.POSTS_PER_PAGE
         posts = [p for p in reversed(sorted(objects.get('post', []),
                        key=lambda p: (p.published, p.slug)))]
         return paginate.split_paginate(num_per_page, self._splitfunc, posts)
@@ -453,7 +452,7 @@ class PostArchiveDaily(writers.Writer):
 
         .. doctest::
 
-           >>> obj = spad.obj_list({'settings': settings},
+           >>> obj = spad.obj_list({},
            ...                     {'post': objects.posts})[0]
            >>> pprint(obj) #doctest: +ELLIPSIS
            ([Post(2010-02-02-newday2), Post(2010-02-02-newday)],
@@ -470,7 +469,6 @@ class PostArchiveDaily(writers.Writer):
                ,'page': obj[2].cur
                }
 
-    @decorators.in_environment('settings')
     def obj_list(self, environment, objects):
         '''Return 3-tuples with the list of objects and prev/next information.
 
@@ -488,11 +486,11 @@ class PostArchiveDaily(writers.Writer):
 
         .. doctest::
 
-           >>> spad.obj_list({'settings': settings}, {})
+           >>> spad.obj_list({}, {})
            []
-           >>> spad.obj_list({'settings': settings}, {'post': []})
+           >>> spad.obj_list({}, {'post': []})
            []
-           >>> pprint(spad.obj_list({'settings': settings},
+           >>> pprint(spad.obj_list({},
            ...                      {'post': objects.posts})) #doctest: +ELLIPSIS
            [([Post(2010-02-02-newday2), Post(2010-02-02-newday)],
              Paginated(None, (2010, 2, 2), (2010, 2, 1)),
@@ -508,7 +506,7 @@ class PostArchiveDaily(writers.Writer):
              Paginated(None, 1, None))]
 
         '''
-        num_per_page = environment['settings'].POSTS_PER_PAGE
+        num_per_page = settings.POSTS_PER_PAGE
         posts = [p for p in reversed(sorted(objects.get('post', []),
                        key=lambda p: (p.published, p.slug)))]
         return paginate.split_paginate(num_per_page, self._splitfunc, posts)
@@ -525,7 +523,5 @@ def _setup(test):
     '''
     from pysettings import Settings
     from testdata.chunks import c900
-    settings = Settings()
-    settings.POSTS_PER_PAGE = 2
-    test.globs['settings'] = settings
+    settings.configure(Settings({'POSTS_PER_PAGE': 2}), override=True)
     test.globs['objects'] = c900

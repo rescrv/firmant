@@ -37,6 +37,8 @@ from firmant.writers import posts
 from firmant.utils import paths
 from firmant.utils import workarounds
 
+from pysettings import settings
+
 
 class Jinja2Base(object):
     '''Base class used for functionality common to all J2 writers.
@@ -45,14 +47,12 @@ class Jinja2Base(object):
     # pylint: disable-msg=R0903
 
     @staticmethod
-    @decorators.in_environment('settings')
     def render_to_file(environment, path, template, context):
         '''Render template with context and save to path.
         '''
         j2env = environment.get(Jinja2Base, {})
         environment[Jinja2Base] = j2env
         if 'env' not in j2env:
-            settings = environment['settings']
             loader = getattr(settings, 'TEMPLATE_LOADER', None)
             if loader is None:
                 loader = jinja2.PackageLoader('firmant', 'templates')
@@ -221,17 +221,15 @@ def _setup(self):
     from firmant.routing import URLMapper
     from firmant.utils.paths import cat
     from testdata.chunks import c900
-    settings = Settings({'POSTS_PER_PAGE': 2
-                        ,'OUTPUT_DIR': tempfile.mkdtemp()
-                        ,'PERMALINK_ROOT': 'http://testurl'
-                        ,'TEMPLATE_LOADER':
-                        jinja2.FileSystemLoader('testdata/pristine/templates')
-                        })
+    settings.configure(Settings({'POSTS_PER_PAGE': 2
+                                ,'OUTPUT_DIR': tempfile.mkdtemp()
+                                ,'PERMALINK_ROOT': 'http://testurl'
+                                ,'TEMPLATE_LOADER':
+                                jinja2.FileSystemLoader('testdata/pristine/templates')
+                                }), override=True)
     urlmapper = URLMapper(settings.OUTPUT_DIR, settings.PERMALINK_ROOT)
-    self.globs['settings']   = settings
     self.globs['cat']        = cat
-    self.globs['environment'] = {'settings': settings
-                                ,'urlmapper': urlmapper
+    self.globs['environment'] = {'urlmapper': urlmapper
                                 ,Jinja2Base: {'globals':
                                               {'urlfor': urlmapper.url}}
                                 }
@@ -248,4 +246,4 @@ def _teardown(test):
     import os
     import shutil
     os.unlink(test.globs['_path'])
-    shutil.rmtree(test.globs['settings'].OUTPUT_DIR)
+    shutil.rmtree(settings.OUTPUT_DIR)
