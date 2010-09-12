@@ -36,6 +36,7 @@ import logging
 import os
 import sys
 
+import pysettings
 from pysettings import loaders
 
 from firmant import application
@@ -57,9 +58,8 @@ if __name__ == '__main__':
         sys.exit(2)
     gettext.install('firmant')
     logging.basicConfig(level=logging.INFO)
-    settings = loaders.mod_to_settings(sys.argv[1])
-    for key, value in os.environ.items():
-        if key.startswith('FIRMANT_'):
-            setattr(settings, key[8:], value)
+    from_module = loaders.mod_to_settings(sys.argv[1])
+    from_environment = loaders.environ_to_settings('FIRMANT_')
+    settings = pysettings.cascading_settings(from_module, from_environment)
     firmant_app = application.Firmant(settings)
     firmant_app()
