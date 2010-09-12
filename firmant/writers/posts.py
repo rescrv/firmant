@@ -523,7 +523,7 @@ class PostArchiveDaily(writers.Writer):
 def _setup(test):
     '''Setup the environment for tests.
     '''
-    from pysettings.settings import Settings
+    from pysettings import Settings
     from testdata.chunks import c900
     settings = Settings()
     settings.POSTS_PER_PAGE = 2

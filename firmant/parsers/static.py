@@ -122,7 +122,7 @@ class StaticParser(parsers.Parser):
 def _setup(test):
     '''Setup a test environment and test set of objects.
     '''
-    from pysettings.settings import Settings
+    from pysettings import Settings
     test.globs['settings'] = Settings({'CONTENT_ROOT': 'testdata/pristine'
                                       ,'STATIC_SUBDIR': 'static'
                                       })

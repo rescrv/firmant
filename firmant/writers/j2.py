@@ -217,7 +217,7 @@ def _setup(self):
     '''
     import tempfile
     import os
-    from pysettings.settings import Settings
+    from pysettings import Settings
     from firmant.routing import URLMapper
     from firmant.utils.paths import cat
     from testdata.chunks import c900

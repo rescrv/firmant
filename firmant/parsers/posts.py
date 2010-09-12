@@ -197,7 +197,7 @@ class PostParser(parsers.RstParser):
 def _setup(test):
     '''Setup the tests.
     '''
-    from pysettings.settings import Settings
+    from pysettings import Settings
     from firmant import routing
     test.globs['settings'] = Settings({'CONTENT_ROOT': 'testdata/pristine'
                                       ,'POSTS_SUBDIR': 'posts'

@@ -161,7 +161,7 @@ class FeedParser(parsers.RstParser):
 def _setup(test):
     '''Setup the tests.
     '''
-    from pysettings.settings import Settings
+    from pysettings import Settings
     from firmant import routing
     test.globs['settings'] = Settings({'CONTENT_ROOT': 'testdata/pristine'
                                       ,'FEEDS_SUBDIR': 'feeds'
