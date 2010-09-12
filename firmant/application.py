@@ -38,6 +38,8 @@ from firmant.chunks import AbstractChunk
 from firmant.routing import URLMapper
 from firmant.utils import class_name
 
+import pysettings
+
 
 class Firmant(object):
     '''Perform a complete run from parsing through writing.
@@ -78,6 +80,7 @@ class Firmant(object):
         self.env['log'] = self.log
         self.env['urlmapper'] = self.urlmapper
         self.env['settings'] = self.settings
+        pysettings.settings.configure(self.settings)
 
         self.chunks.append(CheckURLConflicts())
         self.chunks.append(CreatePermalinks())
@@ -205,13 +208,9 @@ class CreatePermalinks(AbstractChunk):
     # pylint: disable-msg=R0903
 
     def __call__(self, environment, objects):
-        if 'settings' not in environment:
-            environment['log'].error(_('Expected `settings` in environment.'))
-            return
         if 'urlmapper' not in environment:
             environment['log'].error(_('Expected `urlmapper` in environment.'))
             return
-        settings = environment['settings']
         urlmapper = environment['urlmapper']
         for typ, objlist in objects.items():
             for obj in objlist:
@@ -221,7 +220,7 @@ class CreatePermalinks(AbstractChunk):
                     # pylint: disable-msg=W0212
                     attrs = obj._attributes
                     attrs['type'] = typ
-                    extension = settings.PERMALINK_EXTENSIONS[typ]
+                    extension = pysettings.settings.PERMALINK_EXTENSIONS[typ]
                     obj.permalink = urlmapper.url(extension, **attrs)
         return (environment, objects, [])
 
