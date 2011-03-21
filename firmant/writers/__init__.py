@@ -139,7 +139,7 @@ class Writer(chunks.AbstractChunk):
        >>> sw.scheduling_order
        10
        >>> pprint(sw(environment, objects)) #doctest: +ELLIPSIS
-       ({'log': <logging.Logger instance at 0x...>,
+       ({'log': <logging.Logger object at 0x...>,
          'urlmapper': <firmant.routing.URLMapper object at 0x...>},
         {'objs': ['obj1', 'obj2', 'obj3']},
         [<firmant.writers.SampleWriter object at 0x...>,
@@ -162,7 +162,7 @@ class Writer(chunks.AbstractChunk):
        >>> render.scheduling_order
        900
        >>> pprint(urls(environment, objects)) #doctest: +ELLIPSIS
-       ({'log': <logging.Logger instance at 0x...>,
+       ({'log': <logging.Logger object at 0x...>,
          'urlmapper': <firmant.routing.URLMapper object at 0x...>,
          'urls': {'firmant.writers.SampleWriter': ['http://testurl/obj1/',
                                                    'http://testurl/obj2/',
@@ -173,7 +173,7 @@ class Writer(chunks.AbstractChunk):
        Save object "obj1" to "outputdir/obj1/index.txt"
        Save object "obj2" to "outputdir/obj2/index.txt"
        Save object "obj3" to "outputdir/obj3/index.txt"
-       ({'log': <logging.Logger instance at 0x...>,
+       ({'log': <logging.Logger object at 0x...>,
          'urlmapper': <firmant.routing.URLMapper object at 0x...>},
         {'objs': ['obj1', 'obj2', 'obj3']},
         [])

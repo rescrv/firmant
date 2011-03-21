@@ -197,7 +197,7 @@ class Parser(chunks.AbstractChunk):
        >>> sp.scheduling_order
        10
        >>> pprint(sp(environment, objects)) #doctest: +ELLIPSIS
-       ({'log': <logging.Logger instance at 0x...>},
+       ({'log': <logging.Logger object at 0x...>},
         {},
         [<firmant.parsers.SampleParser object at 0x...>])
 
@@ -216,7 +216,7 @@ class Parser(chunks.AbstractChunk):
        >>> parse.scheduling_order
        200
        >>> pprint(parse(environment, objects)) #doctest: +ELLIPSIS
-       ({'log': <logging.Logger instance at 0x...>},
+       ({'log': <logging.Logger object at 0x...>},
         {'objs': ['numbers/1', 'numbers/2', 'numbers/3']},
         [])
 
