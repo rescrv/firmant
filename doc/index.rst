@@ -8,6 +8,15 @@ Welcome to Firmant's documentation!
 
 .. include:: ../README.rst
 
+For Users
+=========
+
+Users may find the following pages useful:
+ - :ref:`_customizing_urls`
+
+For Developers
+==============
+
 .. automodule:: firmant
 
 Indices and tables
