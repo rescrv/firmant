@@ -34,7 +34,6 @@ location in the output hierarchy.
 
 import os
 
-from firmant import decorators
 from firmant import parsers
 
 from pysettings import settings

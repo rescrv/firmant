@@ -55,6 +55,8 @@ from docutils.parsers.rst import roles
 from docutils.transforms import Transform
 from docutils.readers import standalone
 from docutils import nodes
+from pygments import highlight
+from pygments.lexers import get_lexer_by_name, TextLexer
 
 from firmant.utils import strptime
 
@@ -237,12 +239,6 @@ VARIANTS = {
     'linenos': HtmlFormatter(noclasses=INLINESTYLES, linenos=True),
 }
 
-
-from docutils import nodes
-from docutils.parsers.rst import directives, Directive
-
-from pygments import highlight
-from pygments.lexers import get_lexer_by_name, TextLexer
 
 class Pygments(Directive):
     """ Source code syntax hightlighting.

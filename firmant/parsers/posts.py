@@ -34,7 +34,6 @@ import os
 
 import pytz
 
-from firmant import decorators
 from firmant import parsers
 from firmant.utils import strptime
 

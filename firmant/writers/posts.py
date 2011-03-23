@@ -29,7 +29,6 @@
 '''
 
 
-from firmant import decorators
 from firmant import paginate
 from firmant import writers
 
