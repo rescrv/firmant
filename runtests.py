@@ -50,6 +50,7 @@ if __name__ == '__main__':
               ,'firmant.parsers.static'
               ,'firmant.parsers.staticrst'
               ,'firmant.parsers.tags'
+              ,'firmant.plugin'
               ,'firmant.routing'
               ,'firmant.routing.components'
               ,'firmant.settings'
