@@ -53,6 +53,7 @@ if __name__ == '__main__':
               ,'firmant.routing'
               ,'firmant.routing.components'
               ,'firmant.settings'
+              ,'firmant.urls'
               ,'firmant.utils'
               ,'firmant.utils.exceptions'
               ,'firmant.utils.paths'

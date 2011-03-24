@@ -20,9 +20,9 @@ File extension:
    The file extension will be appended to all files, and allows the web server
    to serve the file with the correct mimetype.
 
-Bound attributes:
-   The bound attributes are key-value pairs which are constant.  A set of
-   attributes may only match the URL rule if all bound attributes of the URL
+Fixed attributes:
+   The fixed attributes are key-value pairs which are constant.  A set of
+   attributes may only match the URL rule if all fixed attributes of the URL
    rule are present in the set.
 
 Format string:
@@ -33,7 +33,7 @@ Format string:
 
 To construct a URL for a set of attributes, Firmant finds the first rule whose
 attributes have the same values as the set of attributes for which we are
-constructing the rule.  Bound attributes must share the same value.  For
+constructing the rule.  Fixed attributes must share the same value.  For
 instance, the rule shown above will match the attributes ``{'type': 'post',
 'year': 2011, 'month': 5, 'day': 19, 'slug': 'hithere'}``, but would not match
 ``{'year': 2011, 'month': 5, 'day': 19, 'slug': 'hithere'}`` or ``{'type':

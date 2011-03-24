@@ -17,6 +17,8 @@ Users may find the following pages useful:
 For Developers
 ==============
 
+Developers will find the module documentation useful:
+
 .. automodule:: firmant
 
 Indices and tables

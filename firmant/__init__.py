@@ -40,6 +40,7 @@ Modules in this package:
    firmant.parsers
    firmant.routing
    firmant.settings
+   firmant.urls
    firmant.utils
    firmant.writers
 
