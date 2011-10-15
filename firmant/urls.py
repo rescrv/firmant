@@ -25,109 +25,25 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-'''This documentation is for Firmant developers.  It assumes familiarity with
-the user-level documentation (:ref:`_customizing_urls`).
+'''This module automatically handles URL construction.
 
-Writer plugins specify the dictionary of attributes that define a rendered
-object (typically an HTML document, but nothing enforces this).  This module
-maps the dictionaries of attributes onto valid URLs and local filesystem paths
-according to the URL rules provided by the user (either explicitly, or as part
-of a package).  URLs are created by providing attributes to :func:`url`, while
-local filesystem paths are created by providing attributes to :func:`fs`.
+Each URL in Firmant has two distinct locations associated with it.  The first
+location is the location in the local filesystem hierarchy.  This location is
+where Firmant applications write the generate website.  The other location is
+the URL at which the generated website is published.  Firmant abstracts away
+knowledge of these two locations behind a common interface.
 
-The way in which this works is best shown by example.  In the following
-example, we first clear all URL routing rules, set the URL base, and
-install a rule which matches HTML documents which represent ``post`` objects by
-their ``year``, ``month``, ``day``, and ``slug``.  The example then constructs
-a URL from a complete set of attributes.
+The abstraction provided by this module is a set of rules which map key-value
+attributes to local and remote path names.  The developer of a Firmant-powered
+website may override these rules, and specify custom rules to tailor her URLs
+without requiring any changes to the code which generates the URLs.
 
-.. doctest::
-
-   >>> seturlbase('http://example.org/')
-   >>> setfsbase('/tmp/firmant')
-   >>> clear()
-   >>> installrule(ext='html', fix={'type': 'post'},
-   ...             fmt='/posts/{year:04}/{month:02}/{day:02}/{slug}')
-   >>> a = {'type': 'post', 'year': 2011, 'month': 5, 'day': 19, 'slug': 'hi'}
-   >>> url(a)  # We can pass a dictionary.
-   u'http://example.org/posts/2011/05/19/hi/'
-   >>> url(type='post', year=2011, month=5, day=19, slug='hi')  # Or use keywords.
-   u'http://example.org/posts/2011/05/19/hi/'
-
-By default, the :func:`installrule` function will create pretty URLs.  To do
-so, it relies upon the web server to rewrite requests for directories to serve
-an index document instead.  This behavior may be disabled on a per-rule or
-global basis.  Per-rule pretty-URL settings override the global setting.
-Compare the URLs and local filesystem paths in the following example.
-
-.. doctest::
-
-   >>> clear()
-   >>> installrule(ext='html', fix={'type': 'post'},
-   ...             fmt='/posts/{year:04}/{month:02}/{day:02}/{slug}')
-   >>> installrule(ext='atom', fix={'type': 'atom'},
-   ...             fmt='/atom/{slug}', pretty=True)
-   >>> installrule(ext='rss', fix={'type': 'rss'},
-   ...             fmt='/rss/{slug}', pretty=False)
-
-   >>> url(type='post', year=2011, month=5, day=19, slug='hi')
-   u'http://example.org/posts/2011/05/19/hi/'
-   >>> fs(type='post', year=2011, month=5, day=19, slug='hi')
-   u'/tmp/firmant/posts/2011/05/19/hi/index.html'
-
-   >>> url(type='atom', slug='firmant')
-   u'http://example.org/atom/firmant/'
-   >>> fs(type='atom', slug='firmant')
-   u'/tmp/firmant/atom/firmant/index.atom'
-
-   >>> url(type='rss', slug='firmant')
-   u'http://example.org/rss/firmant.rss'
-   >>> fs(type='rss', slug='firmant')
-   u'/tmp/firmant/rss/firmant.rss'
-
-   >>> setpretty(False)  # A value of False globally disables pretty urls.
-
-   >>> url(type='post', year=2011, month=5, day=19, slug='hi')
-   u'http://example.org/posts/2011/05/19/hi.html'
-   >>> fs(type='post', year=2011, month=5, day=19, slug='hi')
-   u'/tmp/firmant/posts/2011/05/19/hi.html'
-
-   >>> url(type='atom', slug='firmant')
-   u'http://example.org/atom/firmant/'
-   >>> fs(type='atom', slug='firmant')
-   u'/tmp/firmant/atom/firmant/index.atom'
-
-   >>> url(type='rss', slug='firmant')
-   u'http://example.org/rss/firmant.rss'
-   >>> fs(type='rss', slug='firmant')
-   u'/tmp/firmant/rss/firmant.rss'
-
-   >>> setpretty(True)  # A value of True globally enables pretty urls (the default).
-
-   >>> url(type='post', year=2011, month=5, day=19, slug='hi')
-   u'http://example.org/posts/2011/05/19/hi/'
-   >>> fs(type='post', year=2011, month=5, day=19, slug='hi')
-   u'/tmp/firmant/posts/2011/05/19/hi/index.html'
-
-   >>> url(type='atom', slug='firmant')
-   u'http://example.org/atom/firmant/'
-   >>> fs(type='atom', slug='firmant')
-   u'/tmp/firmant/atom/firmant/index.atom'
-
-   >>> url(type='rss', slug='firmant')
-   u'http://example.org/rss/firmant.rss'
-   >>> fs(type='rss', slug='firmant')
-   u'/tmp/firmant/rss/firmant.rss'
-
-   >>> setpretty()  # Use the default pretty url behavior
-
-:func:`url` and :func:`fs` will return ``None`` if no rule matches.
-
-.. doctest::
-
-   >>> url(type='notype')
-   >>> fs(type='notype')
-
+There is more to this module than meets the eye.  URLs come in two forms: the
+first of which is standard for static websites and includes the file extension
+(e.g., ``http://example.org/page.html``), while the second is the *pretty* form
+of the URL and hides the extension (e.g., ``http://example.org/page/``).  The
+second form of URLs requires that the webserver support serving index pages when
+a request for a directory is made.
 '''
 
 
@@ -155,18 +71,62 @@ _impl['pretty'] = _PRETTYDEFAULT
 
 
 def seturlbase(base):
+    '''Set the base component of the URL.
+
+    This is the address at which the published website will be accessible.
+
+    .. doctest::
+
+       >>> seturlbase('http://example.org/')
+
+    '''
     _impl['url'] = base
 
 
 def setfsbase(base):
+    '''Set the base component for local filesystem paths.
+
+    This is the local directory in which the website is built.
+
+    .. doctest::
+
+       >>> setfsbase('/var/www/example.org/')
+
+    '''
     _impl['fs'] = base
 
 
 def clear():
+    '''Clear all installed rules.
+
+    .. doctest::
+
+       >>> clear()
+
+    '''
     _rules = []
 
 
 def installrule(ext, fix, fmt, pretty=None):
+    '''Install a rule for constructing URLs.
+
+    Each rule has three pieces:  the extension, the fixed attributes, and the
+    format string which constructs the URL.  Each URL is constructed from a set
+    of key-value pairs which identify the object.  When a rule is installed, the
+    set of keys is inferred from the union of the keys of fixed attributes, and
+    the keys defined by the format string.
+
+    In the following example, the installed rule will match objects which have
+    an attribute ``type`` which equals 'post', and attributes ``year``,
+    ``month``, ``day``, and ``slug``.
+
+    .. doctest::
+
+       >>> installrule(ext='html', fix={'type': 'post'},
+       ...             fmt='/posts/{year:04}/{month:02}/{day:02}/{slug}')
+       ...
+
+    '''
     keys = [x[1] for x in string.Formatter().parse(fmt) if x[1]]
     keys += fix.keys()
     keys = set(keys)
@@ -193,6 +153,63 @@ def _first_matching_path(dicts, kwargs):
 
 
 def url(*dicts, **kwargs):
+    '''Return the URL for the specified attributes.
+
+    Firmant determines the URL for a set of attributes by finding the first rule
+    which contains exactly the same set of attributes and which matches the
+    fixed attributes specified by the rule.
+
+    For instance, if we install the following rules:
+
+    .. doctest::
+       :hide:
+
+       >>> seturlbase('https://URLBASE')
+       >>> setpretty(True)
+       >>> clear()
+
+    .. doctest::
+
+       >>> installrule(ext='html', fix={'type': 'wiki'}, fmt='/path/to/wiki/{url}')
+       >>> installrule(ext='html', fix={}, fmt='/{type}/{url}')
+
+    The rules will match only the attributes ``{'type', 'url'}``.  If ``type``
+    is 'wiki', then the first rule will be used; otherwise, the second rule is
+    used:
+
+    .. doctest::
+
+       >>> url(type='wiki', url='url/of/wiki/page')
+       u'https://URLBASE/path/to/wiki/url/of/wiki/page/'
+       >>> url(type='image', url='url/of/image')
+       u'https://URLBASE/image/url/of/image/'
+
+    If the rules do not match anything, then ``None`` is returned.
+
+    .. doctest::
+
+       >>> url(type='notype')
+
+    When pretty URLs are enabled (the default), you get output like the above.
+    If, however, pretty URLs are disabled, the output is different:
+
+    .. doctest::
+
+       >>> setpretty(False)
+       >>> url(type='wiki', url='url/of/wiki/page')
+       u'https://URLBASE/path/to/wiki/url/of/wiki/page.html'
+       >>> url(type='image', url='url/of/image')
+       u'https://URLBASE/image/url/of/image.html'
+
+    For convenience, this function also accepts dictionaries instead of
+    keyword attributes.
+
+    .. doctest::
+
+       >>> url({'type': 'wiki', 'url': 'url/of/wiki/page'})
+       u'https://URLBASE/path/to/wiki/url/of/wiki/page.html'
+
+    '''
     match = _first_matching_path(dicts, kwargs)
     if not match:
         return None
@@ -205,6 +222,62 @@ def url(*dicts, **kwargs):
 
 
 def fs(*dicts, **kwargs):
+    '''Return the filesystem path for the specified attributes.
+
+    Firmant determines the filesystem path for a set of attributes by finding
+    the first rule which contains exactly the same set of attributes and which
+    matches the fixed attributes specified by the rule.
+
+    For instance, if we install the following rules:
+
+    .. doctest::
+       :hide:
+
+       >>> setfsbase('FSBASE')
+       >>> clear()
+
+    .. doctest::
+
+       >>> installrule(ext='html', fix={'type': 'wiki'}, fmt='/path/to/wiki/{url}')
+       >>> installrule(ext='html', fix={}, fmt='/{type}/{url}')
+
+    The rules will match only the attributes ``{'type', 'url'}``.  If ``type``
+    is 'wiki', then the first rule will be used; otherwise, the second rule is
+    used:
+
+    .. doctest::
+
+       >>> fs(type='wiki', url='url/of/wiki/page')
+       u'FSBASE/path/to/wiki/url/of/wiki/page/index.html'
+       >>> fs(type='image', url='url/of/image')
+       u'FSBASE/image/url/of/image/index.html'
+
+    If the rules do not match anything, then ``None`` is returned.
+
+    .. doctest::
+
+       >>> fs(type='notype')
+
+    When pretty URLs are enabled (the default), you get output like the above.
+    If, however, pretty URLs are disabled, the output is different:
+
+    .. doctest::
+
+       >>> setpretty(False)
+       >>> fs(type='wiki', url='url/of/wiki/page')
+       u'FSBASE/path/to/wiki/url/of/wiki/page.html'
+       >>> fs(type='image', url='url/of/image')
+       u'FSBASE/image/url/of/image.html'
+
+    For convenience, this function also accepts dictionaries instead of
+    keyword attributes.
+
+    .. doctest::
+
+       >>> fs({'type': 'wiki', 'url': 'url/of/wiki/page'})
+       u'FSBASE/path/to/wiki/url/of/wiki/page.html'
+
+    '''
     match = _first_matching_path(dicts, kwargs)
     if not match:
         return None
@@ -218,6 +291,79 @@ def fs(*dicts, **kwargs):
 
 
 def setpretty(pretty=None):
+    '''
+
+    By default, the :func:`installrule` function will create pretty URLs.  To do
+    so, it relies upon the web server to rewrite requests for directories to
+    serve an index document instead.  This behavior may be disabled on a
+    per-rule or global basis.  Per-rule pretty-URL settings override the global
+    setting.  Compare the URLs and local filesystem paths in the following
+    example.
+
+    .. doctest::
+
+       >>> clear()
+       >>> setfsbase('/var/www/example.org/')
+       >>> seturlbase('http://example.org/')
+       >>> installrule(ext='html', fix={'type': 'post'},
+       ...             fmt='/posts/{year:04}/{month:02}/{day:02}/{slug}')
+       >>> installrule(ext='atom', fix={'type': 'atom'},
+       ...             fmt='/atom/{slug}', pretty=True)
+       >>> installrule(ext='rss', fix={'type': 'rss'},
+       ...             fmt='/rss/{slug}', pretty=False)
+
+       >>> setpretty()  # Use the default pretty url behavior
+
+       >>> url(type='post', year=2011, month=5, day=19, slug='hi')
+       u'http://example.org/posts/2011/05/19/hi/'
+       >>> fs(type='post', year=2011, month=5, day=19, slug='hi')
+       u'/var/www/example.org/posts/2011/05/19/hi/index.html'
+
+       >>> url(type='atom', slug='firmant')
+       u'http://example.org/atom/firmant/'
+       >>> fs(type='atom', slug='firmant')
+       u'/var/www/example.org/atom/firmant/index.atom'
+
+       >>> url(type='rss', slug='firmant')
+       u'http://example.org/rss/firmant.rss'
+       >>> fs(type='rss', slug='firmant')
+       u'/var/www/example.org/rss/firmant.rss'
+
+       >>> setpretty(False)  # A value of False globally disables pretty urls.
+
+       >>> url(type='post', year=2011, month=5, day=19, slug='hi')
+       u'http://example.org/posts/2011/05/19/hi.html'
+       >>> fs(type='post', year=2011, month=5, day=19, slug='hi')
+       u'/var/www/example.org/posts/2011/05/19/hi.html'
+
+       >>> url(type='atom', slug='firmant')
+       u'http://example.org/atom/firmant/'
+       >>> fs(type='atom', slug='firmant')
+       u'/var/www/example.org/atom/firmant/index.atom'
+
+       >>> url(type='rss', slug='firmant')
+       u'http://example.org/rss/firmant.rss'
+       >>> fs(type='rss', slug='firmant')
+       u'/var/www/example.org/rss/firmant.rss'
+
+       >>> setpretty(True)  # A value of True globally enables pretty urls (the default).
+
+       >>> url(type='post', year=2011, month=5, day=19, slug='hi')
+       u'http://example.org/posts/2011/05/19/hi/'
+       >>> fs(type='post', year=2011, month=5, day=19, slug='hi')
+       u'/var/www/example.org/posts/2011/05/19/hi/index.html'
+
+       >>> url(type='atom', slug='firmant')
+       u'http://example.org/atom/firmant/'
+       >>> fs(type='atom', slug='firmant')
+       u'/var/www/example.org/atom/firmant/index.atom'
+
+       >>> url(type='rss', slug='firmant')
+       u'http://example.org/rss/firmant.rss'
+       >>> fs(type='rss', slug='firmant')
+       u'/var/www/example.org/rss/firmant.rss'
+
+   '''
     if pretty is None:
         pretty = _PRETTYDEFAULT
     _impl['pretty'] = pretty
