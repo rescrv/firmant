@@ -38,7 +38,6 @@ Modules in this package:
    firmant.globs
    firmant.paginate
    firmant.parsers
-   firmant.routing
    firmant.settings
    firmant.urls
    firmant.utils
