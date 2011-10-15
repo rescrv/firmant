@@ -46,7 +46,7 @@ a URL from a complete set of attributes.
    >>> seturlbase('http://example.org/')
    >>> setfsbase('/tmp/firmant')
    >>> clear()
-   >>> installrule(extension='html', fixed={'type': 'post'},
+   >>> installrule(ext='html', fix={'type': 'post'},
    ...             fmt='/posts/{year:04}/{month:02}/{day:02}/{slug}')
    >>> a = {'type': 'post', 'year': 2011, 'month': 5, 'day': 19, 'slug': 'hi'}
    >>> url(a)  # We can pass a dictionary.
@@ -63,11 +63,11 @@ Compare the URLs and local filesystem paths in the following example.
 .. doctest::
 
    >>> clear()
-   >>> installrule(extension='html', fixed={'type': 'post'},
+   >>> installrule(ext='html', fix={'type': 'post'},
    ...             fmt='/posts/{year:04}/{month:02}/{day:02}/{slug}')
-   >>> installrule(extension='atom', fixed={'type': 'atom'},
+   >>> installrule(ext='atom', fix={'type': 'atom'},
    ...             fmt='/atom/{slug}', pretty=True)
-   >>> installrule(extension='rss', fixed={'type': 'rss'},
+   >>> installrule(ext='rss', fix={'type': 'rss'},
    ...             fmt='/rss/{slug}', pretty=False)
 
    >>> url(type='post', year=2011, month=5, day=19, slug='hi')
@@ -121,6 +121,13 @@ Compare the URLs and local filesystem paths in the following example.
 
    >>> setpretty()  # Use the default pretty url behavior
 
+:func:`url` and :func:`fs` will return ``None`` if no rule matches.
+
+.. doctest::
+
+   >>> url(type='notype')
+   >>> fs(type='notype')
+
 '''
 
 
@@ -138,7 +145,7 @@ __all__ = ['seturlbase', 'clear', 'installrule', 'url', 'fs', 'setpretty']
 
 
 # Internally, rules are stored as four-tuples:
-# (extension, keys, fixed attributes, format string, pretty flag)
+# (ext, keys, fixed attributes, format string, pretty flag)
 
 
 _PRETTYDEFAULT = True
@@ -159,18 +166,18 @@ def clear():
     _rules = []
 
 
-def installrule(extension, fixed, fmt, pretty=None):
+def installrule(ext, fix, fmt, pretty=None):
     keys = [x[1] for x in string.Formatter().parse(fmt) if x[1]]
-    keys += fixed.keys()
+    keys += fix.keys()
     keys = set(keys)
-    _rules.append((extension, keys, fixed, fmt, pretty))
+    _rules.append((ext, keys, fix, fmt, pretty))
 
 
 def _first_matching_path(dicts, kwargs):
     '''Returns the information about the first matching rule.
 
     The information returned is the 4-tuple:
-    (extension, fixed attributes, path, pretty flag)
+    (ext, fixed attributes, path, pretty flag)
     '''
     attr = {}
     for d in dicts:
@@ -178,15 +185,18 @@ def _first_matching_path(dicts, kwargs):
     attr.update(kwargs)
     keys = set(attr.keys())
     for ext, rule_keys, rule_fixed, fmt, pretty in _rules:
-        fixed = {}
+        fix = {}
         for key in rule_fixed.keys():
-            fixed[key] = attr[key]
-        if keys == rule_keys and fixed == rule_fixed:
+            fix[key] = attr[key]
+        if keys == rule_keys and fix == rule_fixed:
             return ext, rule_fixed, fmt.format(**attr).rstrip('/'), pretty
 
 
 def url(*dicts, **kwargs):
-    ext, fixed, path, pretty = _first_matching_path(dicts, kwargs)
+    match = _first_matching_path(dicts, kwargs)
+    if not match:
+        return None
+    ext, fix, path, pretty = match
     if pretty or (pretty is None and _impl['pretty']):
         path += '/'
     else:
@@ -195,7 +205,10 @@ def url(*dicts, **kwargs):
 
 
 def fs(*dicts, **kwargs):
-    ext, fixed, path, pretty = _first_matching_path(dicts, kwargs)
+    match = _first_matching_path(dicts, kwargs)
+    if not match:
+        return None
+    ext, fix, path, pretty = match
     path = path.lstrip('/')
     if pretty or (pretty is None and _impl['pretty']):
         path += '/index.%s' % ext
