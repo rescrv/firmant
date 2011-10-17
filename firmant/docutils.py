@@ -30,6 +30,8 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import with_statement
 
+import os
+import os.path
 import re
 
 import docutils.core
@@ -37,6 +39,7 @@ import docutils.io
 import docutils.nodes
 from docutils.writers.html4css1 import HTMLTranslator
 
+import firmant.objects
 from firmant.parser import ParseError
 
 
@@ -108,11 +111,18 @@ class RestParser(object):
         if set(fix.keys()) & set(self._regex.groupindex.keys()):
             raise ValueError("Fixed attributes and regex-derived attributes must be disjoint")
 
-    def matches(self, path):
-        return self._regex.match(path) is not None
+    def parse_all(self):
+        for root, dirs, files in os.walk('.'):
+            for f in files:
+                path = os.path.normpath(os.path.join(root, f))
+                match = self._regex.match(path)
+                if match:
+                    key, obj = self.parse(path, match)
+                    if not firmant.objects.add(key, obj):
+                        firmant.parser.report_duplicate_object(path, 'RestParser')
 
-    def parse(self, path):
-        attrs = self._regex.match(path).groupdict()
+    def parse(self, path, match):
+        attrs = match.groupdict()
         attrs.update(self._fix)
         settings_overrides = {'initial_header_level': '2'
                              ,'warning_stream': False
