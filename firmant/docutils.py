@@ -49,7 +49,7 @@ class RestSection(object):
     def id(self):
         return self._node.get('ids')[0]
 
-    def ashtml(self):
+    def as_html(self):
         visitor = HTMLTranslator(self._node.document)
         self._node.walkabout(visitor)
         return ''.join(visitor.body)
@@ -85,7 +85,7 @@ class RestDocument(object):
     def sections(self):
         return self._sections
 
-    def ashtml(self):
+    def as_html(self):
         return self._pub.writer.parts['html_body']
 
 
