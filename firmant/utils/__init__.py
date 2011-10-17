@@ -40,11 +40,10 @@ Modules in this package:
 
 
 import datetime
+import importlib
 import inspect
 import os
 import sys
-
-from pysettings import modules
 
 
 def class_name(cls):
@@ -168,5 +167,5 @@ def get_obj(path):
 
     '''
     mod, attr = path.rsplit('.', 1)
-    mod = modules.get_module(mod)
+    mod = importlib.importmodule(mod)
     return getattr(mod, attr)
