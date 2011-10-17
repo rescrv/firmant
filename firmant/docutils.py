@@ -128,7 +128,7 @@ class RestParser(object):
             rdoc = RestDocument(pub, self._filters)
             for md in self._metadata:
                 if not hasattr(rdoc, md):
-                    raise ParseError('Required metadata field "{0}" is missing'.format(md))
+                    firmant.parser.report_parse_error(path, 'Required metadata field "{0}" is missing (in {1})'.format(md))
             return attrs, rdoc
         except docutils.utils.SystemMessage as e:
             msg = e.message
@@ -136,4 +136,4 @@ class RestParser(object):
             lineno, level, msg = msg[len(path):].split(' ', 2)
             lineno = lineno.strip(":")
             msg = msg.strip(".;:")
-            raise ParseError(msg + " (on line {0}).".format(lineno))
+            firmant.parser.report_parse_error(path, msg + " (on line {1})".format(lineno))
