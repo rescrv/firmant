@@ -289,6 +289,8 @@ def fs(*dicts, **kwargs):
         return None
     ext, fix, path, pretty = match
     path = path.lstrip('/')
+    if not path:
+        path = '.'
     if pretty or (pretty is None and _impl['pretty']):
         path += '/index.%s' % ext
     elif ext is not None:
