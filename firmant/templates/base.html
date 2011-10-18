@@ -1,4 +1,3 @@
-{% import 'config.html' as config with context %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
@@ -9,21 +8,20 @@
 
         <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.0r4/build/reset-fonts-grids/reset-fonts-grids.css">
         <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.0r4/build/base/base-min.css">
-
-        <link rel="stylesheet" href="{{ urlfor(None, type='static', path='css/style.css') }}" type="text/css" />
+        <link rel="stylesheet" href="{{ url(type='static', path='css/style.css') }}" type="text/css" />
         {% endblock %}
 
-        <title>{% block documenttitle %}{{ config.doctitle }}{% endblock %}</title>
+        <title>{% block documenttitle %}Document Title (in &lt;head&gt;){% endblock %}</title>
     </head>
     <body>
-        <div id="{{ config.divdocid }}" class="{{ config.divdocclass }}">
+        <div id="doc3" class="yui-t5">
             <div id="hd">
                 <h1 class="title">
-                    <a href="{{ urlfor(None) }}" title="Home">
-                        {{ config.sitetitle }}
+                    <a href="{{ url() }}" title="Home">
+                        Site Title (in the body)
                     </a>
                 </h1>
-                <div class="tagline">{{ config.tagline }}</div>
+                <div class="tagline">Something that describes your site in a few words</div>
             </div><!-- hd -->
             <div id="bd">
                 <div id="yui-main">
