@@ -37,7 +37,7 @@ import firmant.output
 import firmant.urls
 
 
-class Jinja2SingleObject(object):
+class Jinja2Writer(object):
 
     def __init__(self, retrieve, objname, template, context=None, loader=None):
         self._retrieve = retrieve
