@@ -115,6 +115,8 @@ def retrieve(key = None):
        []
 
     '''
+    if key is None:
+        return sorted(_objs.items())
     key = key or {}
     filters = []
     for k in key:
