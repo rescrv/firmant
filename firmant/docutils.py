@@ -118,12 +118,15 @@ class RestParser(object):
                 match = self._regex.match(path)
                 if match:
                     key, obj = self.parse(path, match)
-                    if not firmant.objects.add(key, obj):
+                    if key and not firmant.objects.add(key, obj):
                         firmant.parser.report_duplicate_object(path, 'RestParser')
 
     def parse(self, path, match):
         attrs = match.groupdict()
         attrs.update(self._fix)
+        for key, filt in self._filters.iteritems():
+            if key in attrs:
+                attrs[key] = filt(attrs[key])
         settings_overrides = {'initial_header_level': '2'
                              ,'warning_stream': False
                              ,'report_level': 6
