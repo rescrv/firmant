@@ -149,4 +149,4 @@ class RestParser(object):
             lineno, level, msg = msg[len(path):].split(' ', 2)
             lineno = lineno.strip(":")
             msg = msg.strip(".;:")
-            firmant.parser.report_parse_error(path, msg + " (on line {1})".format(lineno))
+            firmant.parser.report_parse_error(path, msg + " (on line {0})".format(lineno))
