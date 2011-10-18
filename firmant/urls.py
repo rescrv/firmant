@@ -70,6 +70,9 @@ _rules = []
 _impl['pretty'] = _PRETTYDEFAULT
 
 
+class BadRule(Exception): pass
+
+
 def seturlbase(base):
     '''Set the base component of the URL.
 
@@ -127,6 +130,8 @@ def installrule(ext, fix, fmt, pretty=None):
        ...
 
     '''
+    if ext is None and pretty is not False:
+        raise BadRule("URL rules with ext=None must set pretty=False")
     keys = [x[1] for x in string.Formatter().parse(fmt) if x[1]]
     keys += fix.keys()
     keys = set(keys)
@@ -217,7 +222,7 @@ def url(*dicts, **kwargs):
     ext, fix, path, pretty = match
     if pretty or (pretty is None and _impl['pretty']):
         path += '/'
-    else:
+    elif ext is not None:
         path += '.%s' % ext
     return urlparse.urljoin(_impl['url'], path)
 
@@ -286,7 +291,7 @@ def fs(*dicts, **kwargs):
     path = path.lstrip('/')
     if pretty or (pretty is None and _impl['pretty']):
         path += '/index.%s' % ext
-    else:
+    elif ext is not None:
         path += '.%s' % ext
     return os.path.join(_impl['fs'], path)
 
