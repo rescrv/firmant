@@ -34,6 +34,10 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import with_statement
 
+import errno
+import os
+import os.path
+
 import firmant.urls
 import firmant.utils.paths
 
@@ -42,6 +46,22 @@ __all__ = ['write']
 
 
 _written = set()
+
+
+def symlink(key, path):
+    dest = firmant.urls.fs(key)
+    rel = os.path.relpath(path, os.path.dirname(dest))
+    try:
+        os.makedirs(os.path.dirname(dest))
+    except OSError, ex:
+        if ex.errno != errno.EEXIST:
+            raise ex
+    try:
+        os.unlink(dest)
+    except OSError, ex:
+        if ex.errno != errno.ENOENT:
+            raise ex
+    os.symlink(rel, dest)
 
 
 def write(key, data):
