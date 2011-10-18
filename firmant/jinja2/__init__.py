@@ -43,7 +43,8 @@ class Jinja2Writer(object):
         self._retrieve = retrieve
         self._objname = objname
         self._template = template
-        self._context = context or {}
+        self._context = {'url': firmant.urls.url}
+        self._context.update(context or {})
         loader = loader or jinja2.PackageLoader('firmant', 'templates')
         self._env = jinja2.Environment(loader=loader)
 
