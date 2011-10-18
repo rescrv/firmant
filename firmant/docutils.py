@@ -62,10 +62,12 @@ class RestDocument(object):
     '''A fully parsed reStructuredText document.
     '''
 
-    def __init__(self, pub, filters={}):
+    def __init__(self, key, pub, filters={}, extras={}):
         self._pub = pub
         self._filters = filters
+        self._extras = extras
         self._set_metadata()
+        self._set_extras(key)
         self._set_sections()
 
     def _set_metadata(self):
@@ -81,6 +83,10 @@ class RestDocument(object):
         self.title = self._pub.writer.parts['title']
         self.subtitle = self._pub.writer.parts['subtitle']
 
+    def _set_extras(self, key):
+        for name, func in self._extras.iteritems():
+            setattr(self, name, func(key, self))
+
     def _set_sections(self):
         self._sections = [RestSection(x) for x in self._pub.document.traverse(docutils.nodes.section)]
 
@@ -94,7 +100,7 @@ class RestDocument(object):
 
 class RestParser(object):
 
-    def __init__(self, fix, regex, metadata, filters={}):
+    def __init__(self, fix, regex, metadata, filters={}, extras={}):
         '''Parse RestDocuments.
 
         All files matching regex will be parsed.  The union of named groups in
@@ -108,6 +114,7 @@ class RestParser(object):
         self._metadata = metadata
         self._regex = re.compile(regex)
         self._filters = filters
+        self._extras = extras
         if set(fix.keys()) & set(self._regex.groupindex.keys()):
             raise ValueError("Fixed attributes and regex-derived attributes must be disjoint")
 
@@ -138,7 +145,7 @@ class RestParser(object):
         pub.set_source(source_path=path)
         try:
             pub.publish()
-            rdoc = RestDocument(pub, self._filters)
+            rdoc = RestDocument(attrs, pub, self._filters, self._extras)
             for md in self._metadata:
                 if not hasattr(rdoc, md):
                     firmant.parser.report_parse_error(path, 'Required metadata field "{0}" is missing (in {1})'.format(md))
