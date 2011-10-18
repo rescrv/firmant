@@ -147,7 +147,8 @@ def _first_matching_path(dicts, kwargs):
     for ext, rule_keys, rule_fixed, fmt, pretty in _rules:
         fix = {}
         for key in rule_fixed.keys():
-            fix[key] = attr[key]
+            class WillNotMatch(object): pass
+            fix[key] = attr.get(key, WillNotMatch)
         if keys == rule_keys and fix == rule_fixed:
             return ext, rule_fixed, fmt.format(**attr).rstrip('/'), pretty
 
