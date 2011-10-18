@@ -150,3 +150,4 @@ class RestParser(object):
             lineno = lineno.strip(":")
             msg = msg.strip(".;:")
             firmant.parser.report_parse_error(path, msg + " (on line {0})".format(lineno))
+            return None, None
