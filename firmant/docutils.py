@@ -30,6 +30,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import with_statement
 
+import collections
 import os
 import os.path
 import re
@@ -71,6 +72,7 @@ class RestDocument(object):
         self._set_sections()
 
     def _set_metadata(self):
+        names = set()
         for docinfo in self._pub.document.traverse(docutils.nodes.docinfo):
             for elem in docinfo.children:
                 if elem.tagname == 'field':
@@ -78,8 +80,22 @@ class RestDocument(object):
                     name, content = name.astext(), content.astext()
                 else:
                     name, content = elem.tagname, elem.astext()
-                content = self._filters.get(name, lambda x: x)(content)
-                setattr(self, name, content)
+                names.add(name)
+                if hasattr(self, name):
+                    prev = getattr(self, name)
+                    if isinstance(prev, collections.MutableSequence):
+                        prev.append(content)
+                    else:
+                        setattr(self, name, [prev, content])
+                else:
+                    setattr(self, name, content)
+        def default(obj):
+            if isinstance(obj, collections.MutableSequence):
+                return obj[0]
+            else:
+                return obj
+        for name in names:
+            setattr(self, name, self._filters.get(name, default)(getattr(self, name)))
         self.title = self._pub.writer.parts['title']
         self.subtitle = self._pub.writer.parts['subtitle']
 
@@ -148,7 +164,8 @@ class RestParser(object):
             rdoc = RestDocument(attrs, pub, self._filters, self._extras)
             for md in self._metadata:
                 if not hasattr(rdoc, md):
-                    firmant.parser.report_parse_error(path, 'Required metadata field "{0}" is missing (in {1})'.format(md))
+                    firmant.parser.report_parse_error(path, 'Required metadata field "{0}" is missing'.format(md))
+                    return None, None
             return attrs, rdoc
         except docutils.utils.SystemMessage as e:
             msg = e.message
