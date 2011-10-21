@@ -34,14 +34,20 @@ import collections
 import os
 import os.path
 import re
+import shlex
 
 import docutils.core
 import docutils.io
 import docutils.nodes
+from docutils.transforms import Transform
 from docutils.writers.html4css1 import HTMLTranslator
 
 import firmant.objects
+import firmant.urls
 from firmant.parser import ParseError
+
+
+_url_re = re.compile('^`.* <[(](?P<attrs>.*)[)]>`_$')
 
 
 class RestSection(object):
@@ -64,11 +70,12 @@ class RestDocument(object):
     '''
 
     def __init__(self, key, pub, filters={}, extras={}):
+        self._key = key
         self._pub = pub
         self._filters = filters
         self._extras = extras
         self._set_metadata()
-        self._set_extras(key)
+        self._set_extras()
         self._set_sections()
 
     def _set_metadata(self):
@@ -99,9 +106,9 @@ class RestDocument(object):
         self.title = self._pub.writer.parts['title']
         self.subtitle = self._pub.writer.parts['subtitle']
 
-    def _set_extras(self, key):
+    def _set_extras(self):
         for name, func in self._extras.iteritems():
-            setattr(self, name, func(key, self))
+            setattr(self, name, func(self._key, self))
 
     def _set_sections(self):
         self._sections = [RestSection(x) for x in self._pub.document.traverse(docutils.nodes.section)]
@@ -112,6 +119,22 @@ class RestDocument(object):
 
     def as_html(self):
         return self._pub.writer.parts['html_body']
+
+    def update_urls(self):
+        permalink = firmant.urls.url(self._key)
+        if permalink:
+            self.permalink = permalink
+        for reference in self._pub.document.traverse(docutils.nodes.reference):
+            match = _url_re.match(reference.rawsource)
+            if match:
+                attrstr = match.groupdict()['attrs'].encode('ascii')
+                attrs = [tuple(x.split('=', 1)) for x in shlex.split(attrstr)]
+                attrs = dict(attrs)
+                url = firmant.urls.url(attrs)
+                if url:
+                    reference.attributes['refuri'] = url
+        self._pub.writer.write(self._pub.document, self._pub.destination)
+        self._pub.writer.assemble_parts()
 
 
 class RestParser(object):
