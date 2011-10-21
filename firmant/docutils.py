@@ -133,6 +133,10 @@ class RestDocument(object):
                 url = firmant.urls.url(attrs)
                 if url:
                     reference.attributes['refuri'] = url
+        for image in self._pub.document.traverse(docutils.nodes.image):
+            url = firmant.urls.url({'image': image.get('uri')})
+            if url:
+                image.attributes['uri'] = url
         self._pub.writer.write(self._pub.document, self._pub.destination)
         self._pub.writer.assemble_parts()
 
