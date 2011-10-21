@@ -1,7 +1,0 @@
-Prev year: {% if sprev %}{{ sprev }}{% endif %}
-Next year: {% if snext %}{{ snext }}{% endif %}
-Prev page: {% if pprev %}{{ pprev }}{% endif %}
-Next page: {% if pnext %}{{ pnext }}{% endif %}
-{% for post in posts -%}
-    {{ post.published.date() }}-{{ post.slug }}
-{% endfor %}

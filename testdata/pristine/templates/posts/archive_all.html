@@ -1,5 +1,0 @@
-Prev: {% if pprev %}{{ pprev }}{% endif %}
-Next: {% if pnext %}{{ pnext }}{% endif %}
-{% for post in posts -%}
-    {{ post.published.date() }}-{{ post.slug }}
-{% endfor %}
