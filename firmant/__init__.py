@@ -25,22 +25,78 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-'''
-Modules in this package:
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import with_statement
 
-.. autosummary::
-   :toctree: generated
+import firmant.objects
 
-   firmant.application
-   firmant.chunks
-   firmant.decorators
-   firmant.du
-   firmant.globs
-   firmant.paginate
-   firmant.parsers
-   firmant.settings
-   firmant.urls
-   firmant.utils
-   firmant.writers
 
-'''
+__all__ = ['add_parser', 'add_writer', 'main']
+
+
+_modules = []
+_parsers = []
+_writers = []
+
+
+def add_module(module):
+    _modules.append(module)
+
+
+def add_parser(parser):
+    _parsers.append(parser)
+
+
+def add_writer(writer):
+    _writers.append(writer)
+
+
+def main():
+    # Initialize all modules.
+    for module in _modules:
+        mod()
+
+    # For each parser, parse all objects the parser can handle.
+    for parser in _parsers:
+        if hasattr(parser, 'parse_all'):
+            parser.parse_all()
+
+    # Generate additional objects.
+    iterated = set()
+    while _parsers and len(iterated) != len(_parsers):
+        for parser in _parsers:
+            if parser not in iterated and hasattr(parser, 'iterate'):
+                if parser.iterate():
+                    iterated.add(parser)
+            elif parser not in iterated:
+                iterated.add(parser)
+
+    # Check for URL conflicts.
+    urls = set()
+
+    for key, obj in firmant.objects.retrieve():
+        url = firmant.urls.url(key)
+        if url and url in urls:
+            print('The URL', url, 'is overloaded.')
+        if url:
+            urls.add(url)
+
+    for writer in _writers:
+        if hasattr(writer, 'urls'):
+            wurls = writer.urls()
+            for url in wurls:
+                if url in urls:
+                    print('The URL', url, 'is overloaded.')
+                urls.add(url)
+
+    # Update objects to use the now exposed URLs
+    for key, obj in firmant.objects.retrieve():
+        if hasattr(obj, 'update_urls'):
+            obj.update_urls()
+
+    # Generate the site.
+    for writer in _writers:
+        if hasattr(writer, 'write_all'):
+            writer.write_all()
