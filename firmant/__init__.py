@@ -74,14 +74,16 @@ def main():
                 iterated.add(parser)
 
     # Check for URL conflicts.
-    urls = set()
+    permalinks = set()
 
     for key, obj in firmant.objects.retrieve():
         url = firmant.urls.url(key)
-        if url and url in urls:
-            print('The URL', url, 'is overloaded.')
+        if url and url in permalinks:
+            print('The permalink', url, 'is overloaded.')
         if url:
-            urls.add(url)
+            permalinks.add(url)
+
+    urls = set()
 
     for writer in _writers:
         if hasattr(writer, 'urls'):
@@ -90,6 +92,9 @@ def main():
                 if url in urls:
                     print('The URL', url, 'is overloaded.')
                 urls.add(url)
+
+    for url in permalinks - urls:
+        print('The permalink', url, 'is not created by any writer.')
 
     # Update objects to use the now exposed URLs
     for key, obj in firmant.objects.retrieve():

@@ -48,6 +48,9 @@ class Jinja2Writer(object):
         loader = loader or jinja2.PackageLoader('firmant', 'templates')
         self._env = jinja2.Environment(loader=loader)
 
+    def urls(self):
+        return {firmant.urls.url(key) for key, obj in firmant.objects.retrieve(self._retrieve)}
+
     def write_all(self):
         for key, obj in firmant.objects.retrieve(self._retrieve):
             self.write(key, obj)
