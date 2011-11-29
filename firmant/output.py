@@ -50,7 +50,6 @@ _written = set()
 
 def symlink(key, path):
     dest = firmant.urls.fs(key)
-    rel = os.path.relpath(path, os.path.dirname(dest))
     try:
         os.makedirs(os.path.dirname(dest))
     except OSError, ex:
@@ -61,7 +60,7 @@ def symlink(key, path):
     except OSError, ex:
         if ex.errno != errno.ENOENT:
             raise ex
-    os.symlink(rel, dest)
+    os.link(path, dest)
 
 
 def write(key, data):
