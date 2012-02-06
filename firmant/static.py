@@ -87,7 +87,7 @@ class StaticWriter(object):
         self._retrieve = retrieve
 
     def urls(self):
-        return {firmant.urls.url(key) for key, obj in firmant.objects.retrieve(self._retrieve)}
+        return set([firmant.urls.url(key) for key, obj in firmant.objects.retrieve(self._retrieve)])
 
     def write_all(self):
         for key, obj in firmant.objects.retrieve(self._retrieve):
