@@ -67,6 +67,9 @@ from docutils.parsers.rst import directives
 
 INLINESTYLES = True
 
+from docutils import nodes
+from pygments import highlight
+from pygments import lexers
 from pygments.formatters import HtmlFormatter
 
 # The default formatter
@@ -90,7 +93,7 @@ class Pygments(Directive):
     def run(self):
         self.assert_has_content()
         try:
-            lexer = get_lexer_by_name(self.arguments[0])
+            lexer = lexers.get_lexer_by_name(self.arguments[0])
         except ValueError:
             # no lexer found - use the text one instead of an exception
             lexer = TextLexer()
