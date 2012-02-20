@@ -79,6 +79,8 @@ class RestDocument(object):
         self._set_sections()
 
     def _set_metadata(self):
+        self.title = self._pub.writer.parts['title']
+        self.subtitle = self._pub.writer.parts['subtitle']
         names = set()
         for docinfo in self._pub.document.traverse(docutils.nodes.docinfo):
             for elem in docinfo.children:
@@ -103,8 +105,6 @@ class RestDocument(object):
                 return obj
         for name in names:
             setattr(self, name, self._filters.get(name, default)(getattr(self, name)))
-        self.title = self._pub.writer.parts['title']
-        self.subtitle = self._pub.writer.parts['subtitle']
 
     def _set_extras(self):
         for name, func in self._extras.iteritems():
@@ -118,7 +118,7 @@ class RestDocument(object):
         return self._sections
 
     def as_html(self):
-        return self._pub.writer.parts['html_body']
+        return self._pub.writer.parts['fragment']
 
     def update_urls(self):
         permalink = firmant.urls.url(self._key)
