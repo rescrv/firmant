@@ -47,7 +47,7 @@ import firmant.urls
 from firmant.parser import ParseError
 
 
-_url_re = re.compile('^`.* <[(](?P<attrs>.*)[)]>`_$')
+_url_re = re.compile('^[(](?P<attrs>.*)[)]$')
 
 
 class RestSection(object):
@@ -125,7 +125,10 @@ class RestDocument(object):
         if permalink:
             self.permalink = permalink
         for reference in self._pub.document.traverse(docutils.nodes.reference):
-            match = _url_re.match(reference.rawsource)
+            attdict = dict(reference.attlist())
+            match = None
+            if 'refuri' in attdict:
+                match = _url_re.match(attdict['refuri'])
             if match:
                 attrstr = match.groupdict()['attrs'].encode('ascii')
                 attrs = [tuple(x.split('=', 1)) for x in shlex.split(attrstr)]
