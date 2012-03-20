@@ -131,7 +131,7 @@ class RestDocument(object):
                 match = _url_re.match(attdict['refuri'])
             if match:
                 attrstr = match.groupdict()['attrs'].encode('ascii')
-                attrs = [tuple(x.split('=', 1)) for x in shlex.split(attrstr)]
+                attrs = [tuple(x.strip().split('=', 1)) for x in attrstr.split(',')]
                 attrs = dict(attrs)
                 url = firmant.urls.url(attrs)
                 if url:
