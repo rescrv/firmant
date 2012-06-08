@@ -25,18 +25,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-'''Utilities that don't fit anywhere else.
-
-Modules in this package:
-
-.. autosummary::
-   :toctree: ../generated
-
-   exceptions
-   paths
-   workarounds
-
-'''
+'''Random utilities that don't fit anywhere else.'''
 
 
 import datetime
