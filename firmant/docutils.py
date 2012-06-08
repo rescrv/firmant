@@ -135,7 +135,7 @@ class RestDocument(object):
                 attrs = dict(attrs)
                 url = firmant.urls.url(attrs)
                 if url:
-                    reference.set_class('-'.join(['url'] + sorted(attrs.keys())))
+                    reference['classes'].append('-'.join(['url'] + sorted(attrs.keys())))
                     reference.attributes['refuri'] = url
         for image in self._pub.document.traverse(docutils.nodes.image):
             url = firmant.urls.url({'image': image.get('uri')})
