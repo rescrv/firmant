@@ -31,6 +31,7 @@ from __future__ import unicode_literals
 from __future__ import with_statement
 
 import collections
+import inspect
 import os
 import os.path
 import re
@@ -77,6 +78,7 @@ class RestDocument(object):
         self._set_metadata()
         self._set_extras()
         self._set_sections()
+        self._do_filters()
 
     def _set_metadata(self):
         self.title = self._pub.writer.parts['title']
@@ -98,13 +100,12 @@ class RestDocument(object):
                         setattr(self, name, [prev, content])
                 else:
                     setattr(self, name, content)
-        def default(obj):
-            if isinstance(obj, collections.MutableSequence):
-                return obj[0]
-            else:
-                return obj
         for name in names:
-            setattr(self, name, self._filters.get(name, default)(getattr(self, name)))
+            obj = getattr(self, name, None)
+            if isinstance(obj, collections.MutableSequence):
+                setattr(self, name, obj[0])
+            else:
+                setattr(self, name, obj)
 
     def _set_extras(self):
         for name, func in self._extras.iteritems():
@@ -112,6 +113,10 @@ class RestDocument(object):
 
     def _set_sections(self):
         self._sections = [RestSection(x) for x in self._pub.document.traverse(docutils.nodes.section)]
+
+    def _do_filters(self):
+        for name, filt in self._filters.iteritems():
+            setattr(self, name, filt(getattr(self, name, None)))
 
     @property
     def sections(self):
