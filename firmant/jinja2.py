@@ -30,11 +30,64 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import with_statement
 
+import os
+import re
+
 import jinja2
 
 import firmant.objects
 import firmant.output
 import firmant.urls
+
+
+class Jinja2TemplateParser(object):
+
+    def __init__(self, fix, regex):
+        '''Parse Jinja2 templates.
+
+        All files matching regex will be parsed.  The union of named groups in
+        the regex and the fixed attributes will become the set of key-value
+        pairs which identify the object.
+        '''
+        self._fix = fix
+        self._regex = re.compile(regex)
+        if set(fix.keys()) & set(self._regex.groupindex.keys()):
+            raise ValueError("Fixed attributes and regex-derived attributes must be disjoint")
+
+    def parse_all(self):
+        for root, dirs, files in os.walk('.'):
+            for f in files:
+                path = os.path.normpath(os.path.join(root, f))
+                match = self._regex.match(path)
+                if match:
+                    attrs = match.groupdict()
+                    attrs.update(self._fix)
+                    key, obj = attrs, path
+                    if key and not firmant.objects.add(key, obj):
+                        firmant.parser.report_duplicate_object(path, 'Jinja2Parser')
+
+
+class Jinja2TemplateWriter(object):
+
+    def __init__(self, retrieve, context=None, loader=None):
+        self._retrieve = retrieve
+        self._context = {'url': firmant.urls.url}
+        self._context.update(context or {})
+        loader = loader or jinja2.PackageLoader('firmant', 'templates')
+        self._env = jinja2.Environment(loader=loader)
+
+    def urls(self):
+        return set([firmant.urls.url(key) for key, obj in firmant.objects.retrieve(self._retrieve)])
+
+    def write_all(self):
+        for key, obj in firmant.objects.retrieve(self._retrieve):
+            self.write(key, obj)
+
+    def write(self, key, obj):
+        context = self._context.copy()
+        template = self._env.get_template(obj)
+        data = template.render(context)
+        firmant.output.write(key, data)
 
 
 class Jinja2Writer(object):
