@@ -121,11 +121,11 @@ class CrossTeXLabelTransform(Transform):
 
     def apply(self):
         assert isinstance(self.document.xtxcite, list)
-        if not hasattr(self.document, 'xtxlabels'):
-            raise RuntimeError('Citations without CrossTeX block')
-        assert isinstance(self.document.xtxlabels, dict)
-        labels = self.document.xtxlabels
         for node in self.document.traverse(xtxref):
+            if not hasattr(self.document, 'xtxlabels'):
+                raise RuntimeError('Citations without CrossTeX block')
+            assert isinstance(self.document.xtxlabels, dict)
+            labels = self.document.xtxlabels
             label = '['
             cites = []
             for k in node.xtxkeys:
