@@ -49,6 +49,7 @@ from firmant.parser import ParseError
 
 
 _url_re = re.compile('^[(](?P<attrs>.*)[)]$')
+_transforms = []
 
 
 class RestSection(object):
@@ -195,6 +196,10 @@ class RestParser(object):
         pub.set_components('standalone', 'restructuredtext', 'html')
         pub.process_programmatic_settings(None, settings_overrides, None)
         pub.set_source(source_path=path)
+        gt = pub.reader.get_transforms
+        def get_transforms():
+            return gt() + _transforms
+        pub.reader.get_transforms = get_transforms
         try:
             pub.publish()
             rdoc = RestDocument(attrs, pub, self._filters, self._extras)
@@ -211,3 +216,7 @@ class RestParser(object):
             msg = msg.strip(".;:")
             firmant.parser.report_parse_error(path, msg + " (on line {0})".format(lineno))
             return None, None
+
+
+def add_transform(t):
+    _transforms.append(t)
