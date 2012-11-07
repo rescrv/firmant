@@ -50,6 +50,8 @@ _written = set()
 
 def symlink(key, path):
     dest = firmant.urls.fs(key)
+    if dest is None:
+        raise RuntimeError('Cannot create URL for %r' % key)
     try:
         os.makedirs(os.path.dirname(dest))
     except OSError, ex:
@@ -65,6 +67,8 @@ def symlink(key, path):
 
 def write(key, data):
     path = firmant.urls.fs(key)
+    if path is None:
+        raise RuntimeError('Cannot create URL for %r' % key)
     with firmant.utils.paths.create_or_truncate(path) as fout:
         fout.write(data.encode('utf-8'))
         fout.flush()
