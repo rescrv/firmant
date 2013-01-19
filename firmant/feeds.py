@@ -129,7 +129,7 @@ class FeedWriter(object):
         selflink = lxml.etree.SubElement(feed, 'link')
         selflink.set('href', url)
         selflink.set('rel', 'self')
-        entries = sorted(obj.entries(), key=lambda e: e['updated'], reverse=True)[:10]
+        entries = sorted(obj.entries(), key=lambda e: (e['updated'], e['published']), reverse=True)[:10]
         updated = entries[0]['updated'] if entries else datetime.datetime.now()
         _add_text_subelement(feed, 'updated', _rfc3339(updated))
         for entry in entries:
