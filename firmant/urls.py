@@ -68,6 +68,7 @@ _PRETTYDEFAULT = True
 _impl = {}
 _rules = []
 _impl['pretty'] = _PRETTYDEFAULT
+_aliases = {}
 
 
 class BadRule(Exception): pass
@@ -136,6 +137,10 @@ def installrule(ext, fix, fmt, pretty=None):
     keys += fix.keys()
     keys = set(keys)
     _rules.append((ext, keys, fix, fmt, pretty))
+
+
+def installalias(alias, fix):
+    _aliases[alias] = fix
 
 
 def _first_matching_path(dicts, kwargs):
@@ -216,6 +221,10 @@ def url(*dicts, **kwargs):
        u'https://URLBASE/path/to/wiki/url/of/wiki/page.html'
 
     '''
+    if len(dicts) == 1 and kwargs == {} and \
+       isinstance(dicts[0], str) and \
+       dicts[0] in _aliases:
+        dicts = (_aliases[dicts[0]],)
     match = _first_matching_path(dicts, kwargs)
     if not match:
         return None
@@ -284,6 +293,10 @@ def fs(*dicts, **kwargs):
        u'FSBASE/path/to/wiki/url/of/wiki/page.html'
 
     '''
+    if len(dicts) == 1 and kwargs == {} and \
+       isinstance(dicts[0], str) and \
+       dicts[0] in _aliases:
+        dicts = (_aliases[dicts[0]],)
     match = _first_matching_path(dicts, kwargs)
     if not match:
         return None
