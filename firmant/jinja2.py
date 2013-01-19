@@ -40,6 +40,9 @@ import firmant.output
 import firmant.urls
 
 
+_context = {}
+
+
 class Jinja2TemplateParser(object):
 
     def __init__(self, fix, regex):
@@ -84,7 +87,8 @@ class Jinja2TemplateWriter(object):
             self.write(key, obj)
 
     def write(self, key, obj):
-        context = self._context.copy()
+        context = _context.copy()
+        context.update(self._context)
         template = self._env.get_template(obj)
         data = template.render(context)
         firmant.output.write(key, data)
@@ -109,8 +113,13 @@ class Jinja2Writer(object):
             self.write(key, obj)
 
     def write(self, key, obj):
-        context = self._context.copy()
+        context = _context.copy()
+        context.update(self._context)
         context[self._objname] = obj
         template = self._env.get_template(self._template)
         data = template.render(context)
         firmant.output.write(key, data)
+
+
+def addglobal(name, obj):
+    _context[name] = obj
